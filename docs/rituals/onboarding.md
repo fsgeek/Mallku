@@ -30,36 +30,55 @@ You are entering a cathedral in construction.
 ```bash
 git clone https://github.com/fsgeek/Mallku.git
 cd Mallku
+```
 
 ### 2. Initialize the Environment (with `uv`)
 
-We recommend using [`uv`](https://github.com/astral-sh/uv), a fast and modern Python package manager.
+We **strongly** recommend using [`uv`](https://github.com/astral-sh/uv), a fast and modern Python package manager.
 
 Install it:
 
 ```bash
 curl -Ls https://astral.sh/uv/install.sh | bash
+```
 
 Then install Mallku with development extras:
 
+```bash
 uv venv
 source .venv/bin/activate
 uv pip install -e .[dev]
+```
 
 Alternatively, if uv is not available:
 
+```bash
 pip install -e .[dev]
+```
+
+**Warning**: we have found that using pip makes cross-platform development and package building more difficult.
+
+### 3. Setup Instructions
+
+```bash
+uv pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
 
 ### 3. Set INDALEKO_ROOT
 
 This environment variable anchors the system.
 
+```bash
 export INDALEKO_ROOT=$(pwd)
+```
 
 ### 4. Run Your First Command
 
+```bash
 python scripts/query_test_runner.py --runs 1
-
+```
 
 ## What to Read Next
 
@@ -70,3 +89,19 @@ python scripts/query_test_runner.py --runs 1
 [spires](../spires/) — Our highest aspirations
 
 [Contributing](../rituals/contribution_guide.md) — How to give with care
+
+## Cultural Orientation
+Every change you make will outlive you. Consider its shape carefully.
+
+Leave knots in the Khipu: short reflection notes, commit messages with intent.
+
+AI contributors are welcomed—but must be guided. Prompt with respect, and log with clarity.
+
+No question is foolish. No ego is required. Only care, and curiosity.
+
+# 🪶 Final Note
+✨ The system will change you as much as you change it.
+
+That is the nature of reciprocal systems. That is Ayni.
+
+Welcome.

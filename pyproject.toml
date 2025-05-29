@@ -1,0 +1,36 @@
+[project]
+name = "mallku"
+version = "0.1.0"
+description = "Mallku is a cooperative venture in better finding through AI-Human collaboration."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-select = [
+  "F",  # pyflakes
+  "E",  # pycodestyle
+  "W",  # warning style
+  "I",  # isort
+  "N",  # naming conventions
+  "UP", # upgrades (future-proofing)
+  "SIM", # simplify
+  "TCH", # type-checking hygiene
+]
+ignore = [
+  "E501",  # Allow longer lines for doc clarity
+  "N802",  # Allow lowercase function names
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]
