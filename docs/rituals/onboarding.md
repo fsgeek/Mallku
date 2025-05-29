@@ -63,10 +63,10 @@ python scripts/query_test_runner.py --runs 1
 
 ## What to Read Next
 
-(docs/index.md)[docs/index.md] — Project overview and document structure
+[docs/index.md](../index.md)— Project overview and document structure
 
-[docs/modules/](docs/modules/) — Core architectural components
+[docs/modules/](../modules/) — Core architectural components
 
-[docs/spires/](docs/spires/) — Our highest aspirations
+[docs/spires/](../spires/) — Our highest aspirations
 
-[docs/rituals/contribution_guide.md](docs/rituals/contribution_guide.md) — How to give with care
+[docs/rituals/contribution_guide.md](../rituals/contribution_guide.md) — How to give with care
