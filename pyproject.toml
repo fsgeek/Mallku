@@ -5,7 +5,12 @@ description = "Mallku is a cooperative venture in better finding through AI-Huma
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.115.12",
+    "httpx>=0.28.1",
     "pydantic>=2.11.5",
+    "python-arango>=8.1.7",
+    "uvicorn>=0.34.2",
+    "websockets>=15.0.1",
 ]
 
 [tool.ruff]
