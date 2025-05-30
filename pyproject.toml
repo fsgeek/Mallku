@@ -3,8 +3,9 @@ name = "mallku"
 version = "0.1.0"
 description = "Mallku is a cooperative venture in better finding through AI-Human collaboration."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
+    "pydantic>=2.11.5",
 ]
 
 [tool.ruff]
@@ -19,6 +20,7 @@ extend-select = [
   "UP", # upgrades (future-proofing)
   "SIM", # simplify
   "TCH", # type-checking hygiene
+  "DTZ", # datetime timezone awareness
 ]
 ignore = [
   "E501",  # Allow longer lines for doc clarity
