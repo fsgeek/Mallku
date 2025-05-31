@@ -12,11 +12,11 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
-from src.mallku.database import get_database  # ArangoDB connection
-from src.mallku.models import MemoryAnchor
+from mallku.core.database import get_database  # ArangoDB connection
+from mallku.models import MemoryAnchor
 
 if TYPE_CHECKING:
-    from arangodb import ArangoClient
+    from arango.database import StandardDatabase
 
 # --- Pydantic Models for API ---
 
@@ -62,7 +62,7 @@ class MemoryAnchorService:
     """
 
     def __init__(self):
-        self.db: ArangoClient | None = None
+        self.db: StandardDatabase | None = None
         self.current_anchor_id: UUID | None = None
         self.current_anchor: MemoryAnchor | None = None
         self.providers: dict[str, ProviderInfo] = {}
@@ -72,7 +72,7 @@ class MemoryAnchorService:
 
     async def initialize(self):
         """Initialize service connections and state"""
-        self.db = await get_database()
+        self.db = get_database()
         await self._load_current_anchor()
 
     async def shutdown(self):
@@ -80,9 +80,8 @@ class MemoryAnchorService:
         # Close websocket connections
         for client in self.websocket_clients:
             await client.close()
-        # Close database
-        if self.db:
-            await self.db.close()
+        # Database connection is managed globally, no need to close here
+        self.db = None
 
     async def _load_current_anchor(self):
         """Load the most recent anchor from database"""
@@ -93,10 +92,10 @@ class MemoryAnchorService:
             LIMIT 1
             RETURN anchor
         """
-        cursor = await self.db.aql.execute(query) # type: ignore
-        async for anchor in cursor:
+        cursor = self.db.aql.execute(query)
+        for anchor in cursor:
             self.current_anchor_id = UUID(anchor['_key'])
-            self.current_anchor = MemoryAnchor(**anchor)
+            self.current_anchor = MemoryAnchor.from_arangodb_document(anchor)
             self.cursor_state = anchor.get('cursors', {})
 
         if not self.current_anchor:
@@ -107,22 +106,24 @@ class MemoryAnchorService:
         """Create a new memory anchor"""
         new_id = uuid4()
 
-        anchor_data = {
-            "_key": str(new_id),
-            "timestamp": datetime.now(UTC),
-            "cursors": self.cursor_state.copy(),
-            "predecessor_id": str(predecessor_id) if predecessor_id else None,
-            "metadata": {
+        # Create MemoryAnchor model instance
+        anchor = MemoryAnchor(
+            anchor_id=new_id,
+            timestamp=datetime.now(UTC),
+            cursors=self.cursor_state.copy(),
+            predecessor_id=predecessor_id,
+            metadata={
                 "providers": list(self.providers.keys()),
                 "creation_trigger": "initial" if not predecessor_id else "threshold"
             }
-        }
+        )
 
         # Store in database
-        await self.db.collection('memory_anchors').insert(anchor_data)
+        anchor_data = anchor.to_arangodb_document()
+        self.db.collection('memory_anchors').insert(anchor_data)
 
         self.current_anchor_id = new_id
-        self.current_anchor = MemoryAnchor(**anchor_data)
+        self.current_anchor = anchor
 
         # Notify websocket clients
         await self._broadcast_anchor_change(new_id)
@@ -204,7 +205,7 @@ class MemoryAnchorService:
             "last_updated": datetime.now(UTC)
         }
 
-        await self.db.collection('memory_anchors').update(
+        self.db.collection('memory_anchors').update(
             {"_key": str(self.current_anchor_id)},
             update_data
         )
@@ -221,7 +222,7 @@ class MemoryAnchorService:
 
     async def get_anchor_by_id(self, anchor_id: UUID) -> MemoryAnchorResponse:
         """Retrieve specific anchor by ID"""
-        doc = await self.db.collection('memory_anchors').get(str(anchor_id))
+        doc = self.db.collection('memory_anchors').get(str(anchor_id))
 
         if not doc:
             raise HTTPException(status_code=404, detail="Anchor not found")
