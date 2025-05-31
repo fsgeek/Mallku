@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.11.5",
     "python-arango>=8.1.7",
     "uvicorn>=0.34.2",
+    "watchdog>=6.0.0",
     "websockets>=15.0.1",
 ]
 

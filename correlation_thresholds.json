@@ -1,0 +1,15 @@
+{
+  "confidence_threshold": 0.6,
+  "frequency_threshold": 3,
+  "temporal_windows": {
+    "TemporalPrecision.INSTANT": 10.0,
+    "TemporalPrecision.MINUTE": 300.0,
+    "TemporalPrecision.SESSION": 1800.0,
+    "TemporalPrecision.DAILY": 14400.0,
+    "TemporalPrecision.CYCLICAL": 86400.0
+  },
+  "learning_rate": 0.1,
+  "target_precision": 0.8,
+  "target_recall": 0.7,
+  "last_updated": "2025-05-31T17:15:41.729830+00:00"
+}
