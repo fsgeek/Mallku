@@ -5,6 +5,7 @@ description = "Mallku is a cooperative venture in better finding through AI-Huma
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "fastapi>=0.115.12",
     "httpx>=0.28.1",
     "pydantic>=2.11.5",
@@ -16,6 +17,8 @@ dependencies = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.ruff.lint]
 extend-select = [
   "F",  # pyflakes
   "E",  # pycodestyle
@@ -40,4 +43,5 @@ skip-magic-trailing-comma = false
 [dependency-groups]
 dev = [
     "pre-commit>=4.2.0",
+    "ruff>=0.11.12",
 ]
