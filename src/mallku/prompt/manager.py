@@ -1,0 +1,671 @@
+"""
+Prompt Manager - Protection Layer for LLM Operations
+
+This module provides the ONLY authorized interface to LLM operations in Mallku.
+It enforces contractual guarantees and protection mechanisms to ensure safe
+and effective LLM usage while preventing memory loss from affecting AI coders.
+
+Key principles:
+- All LLM access must go through this protection layer
+- Contractual guarantees enforced structurally
+- Caching and optimization for efficiency
+- Quality validation and testing mechanisms
+- Memory-loss resistant through structural enforcement
+"""
+
+import logging
+from datetime import UTC, datetime
+from typing import Any
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, Field
+
+from ..llm.multi_llm_layer import (
+    LLMProvider,
+    LLMRequest,
+    LLMResponse,
+    MultiLLMService,
+    PromptCategory,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class PromptContract(BaseModel):
+    """
+    Contract definition for a prompt category.
+
+    This defines the guarantees and requirements for using LLMs
+    in a specific context, ensuring consistent quality.
+    """
+    category: PromptCategory = Field(description="Prompt category")
+    required_context_fields: list[str] = Field(description="Required context fields")
+    required_examples_count: int = Field(description="Minimum examples required")
+    quality_threshold: float = Field(description="Minimum quality score (0-1)")
+    max_response_tokens: int = Field(description="Maximum response length")
+    temperature_range: tuple[float, float] = Field(description="Allowed temperature range")
+    required_validation_checks: list[str] = Field(description="Required validation checks")
+    test_prompts: list[str] = Field(description="Test prompts for validation")
+    expected_response_patterns: list[str] = Field(description="Expected response patterns")
+    failure_fallback: str | None = Field(description="Fallback response on failure")
+
+
+class PromptValidationResult(BaseModel):
+    """Result of prompt validation against contract."""
+    valid: bool = Field(description="Whether prompt meets contract requirements")
+    violations: list[str] = Field(default_factory=list, description="Contract violations found")
+    quality_score: float = Field(description="Quality assessment (0-1)")
+    recommendations: list[str] = Field(default_factory=list, description="Improvement recommendations")
+    contract_compliance: float = Field(description="Percentage compliance with contract")
+
+
+class PromptExecution(BaseModel):
+    """Record of prompt execution for auditing and optimization."""
+    execution_id: UUID = Field(default_factory=uuid4)
+    category: PromptCategory = Field(description="Prompt category")
+    contract_used: str = Field(description="Contract identifier")
+    request: LLMRequest = Field(description="Original request")
+    response: LLMResponse = Field(description="LLM response")
+    validation_result: PromptValidationResult = Field(description="Pre-execution validation")
+    quality_assessment: float = Field(description="Post-execution quality assessment")
+    execution_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    success: bool = Field(description="Whether execution was successful")
+    error_message: str | None = Field(description="Error message if failed")
+
+
+class ContractViolationError(Exception):
+    """Raised when a prompt violates its contract."""
+
+    def __init__(self, violations: list[str], validation_result: PromptValidationResult):
+        self.violations = violations
+        self.validation_result = validation_result
+        super().__init__(f"Contract violations: {', '.join(violations)}")
+
+
+class PromptManager:
+    """
+    The ONLY authorized interface for LLM operations in Mallku.
+
+    This class enforces contractual guarantees and provides protection
+    against memory loss by making compliance structural rather than optional.
+
+    Key features:
+    - Contract enforcement prevents unsafe LLM usage
+    - Caching optimizes performance like database query plans
+    - Quality validation ensures consistent results
+    - Structural protection against AI coder memory loss
+    """
+
+    def __init__(self):
+        """Initialize the prompt manager with protection mechanisms."""
+        self.llm_service = MultiLLMService()
+        self.contracts: dict[str, PromptContract] = {}
+        self.execution_history: list[PromptExecution] = []
+        self.cached_validations: dict[str, PromptValidationResult] = {}
+        self.quality_metrics: dict[str, list[float]] = {}
+        self._register_default_contracts()
+
+    async def initialize(self, llm_configs: dict[str, dict]) -> None:
+        """Initialize the prompt manager and underlying LLM service."""
+        await self.llm_service.initialize(llm_configs)
+        logger.info("Prompt manager initialized with protection layer active")
+
+    def _register_default_contracts(self) -> None:
+        """Register default contracts for all prompt categories."""
+
+        # Database validation contract
+        self.contracts["database_validation"] = PromptContract(
+            category=PromptCategory.DATABASE_VALIDATION,
+            required_context_fields=["schema", "description", "examples"],
+            required_examples_count=2,
+            quality_threshold=0.8,
+            max_response_tokens=2000,
+            temperature_range=(0.1, 0.5),
+            required_validation_checks=[
+                "schema_completeness",
+                "security_appropriateness",
+                "index_optimization",
+                "field_type_validation"
+            ],
+            test_prompts=[
+                "Validate this schema for a user profile collection",
+                "Analyze field types for a transaction log schema"
+            ],
+            expected_response_patterns=[
+                "field types",
+                "security considerations",
+                "index recommendations",
+                "completeness assessment"
+            ],
+            failure_fallback="Schema validation failed - manual review required"
+        )
+
+        # Schema analysis contract
+        self.contracts["schema_analysis"] = PromptContract(
+            category=PromptCategory.SCHEMA_ANALYSIS,
+            required_context_fields=["schema", "purpose"],
+            required_examples_count=1,
+            quality_threshold=0.75,
+            max_response_tokens=1500,
+            temperature_range=(0.2, 0.6),
+            required_validation_checks=[
+                "field_relationships",
+                "normalization_level",
+                "query_optimization"
+            ],
+            test_prompts=[
+                "Analyze relationships in this schema",
+                "Evaluate normalization of this data structure"
+            ],
+            expected_response_patterns=[
+                "relationships",
+                "normalization",
+                "optimization",
+                "structure analysis"
+            ],
+            failure_fallback="Schema analysis incomplete - expert review needed"
+        )
+
+        # Security evaluation contract
+        self.contracts["security_evaluation"] = PromptContract(
+            category=PromptCategory.SECURITY_EVALUATION,
+            required_context_fields=["security_context", "threat_model"],
+            required_examples_count=1,
+            quality_threshold=0.85,
+            max_response_tokens=1800,
+            temperature_range=(0.1, 0.4),
+            required_validation_checks=[
+                "threat_coverage",
+                "vulnerability_assessment",
+                "mitigation_adequacy"
+            ],
+            test_prompts=[
+                "Evaluate security of this data access pattern",
+                "Assess vulnerability in this authentication flow"
+            ],
+            expected_response_patterns=[
+                "vulnerabilities",
+                "threats",
+                "mitigations",
+                "risk assessment"
+            ],
+            failure_fallback="Security evaluation inconclusive - security team review required"
+        )
+
+    async def execute_prompt(
+        self,
+        category: PromptCategory,
+        prompt: str,
+        context: dict[str, Any],
+        **kwargs
+    ) -> LLMResponse:
+        """
+        Execute a prompt with full contract enforcement.
+
+        This is the ONLY way to use LLMs in Mallku - ensures all contractual
+        guarantees are met and protects against memory loss.
+        """
+        try:
+            # Get contract for this category
+            contract = self._get_contract(category)
+
+            # Create LLM request
+            request = LLMRequest(
+                prompt=prompt,
+                category=category,
+                context=context,
+                max_tokens=min(kwargs.get('max_tokens', 1000), contract.max_response_tokens),
+                temperature=self._validate_temperature(
+                    kwargs.get('temperature', 0.7),
+                    contract
+                ),
+                preferred_provider=kwargs.get('preferred_provider'),
+                require_cached=kwargs.get('require_cached', False),
+                priority=kwargs.get('priority', 5)
+            )
+
+            # Validate against contract BEFORE execution
+            validation_result = await self._validate_prompt_contract(request, contract)
+
+            if not validation_result.valid:
+                raise ContractViolationError(validation_result.violations, validation_result)
+
+            # Execute through LLM service
+            response = await self.llm_service.generate_response(request)
+
+            # Post-execution quality assessment
+            quality_score = await self._assess_response_quality(response, contract)
+
+            # Record execution for auditing
+            execution = PromptExecution(
+                category=category,
+                contract_used=self._get_contract_id(category),
+                request=request,
+                response=response,
+                validation_result=validation_result,
+                quality_assessment=quality_score,
+                success=True
+            )
+
+            self.execution_history.append(execution)
+            self._update_quality_metrics(category, quality_score)
+
+            # Check if response meets quality threshold
+            if quality_score < contract.quality_threshold:
+                logger.warning(
+                    f"Response quality {quality_score:.2f} below threshold "
+                    f"{contract.quality_threshold:.2f} for {category}"
+                )
+
+            logger.info(f"Successfully executed {category} prompt with quality {quality_score:.2f}")
+            return response
+
+        except ContractViolationError:
+            # Re-raise contract violations
+            raise
+        except Exception as e:
+            # Log execution failure
+            execution = PromptExecution(
+                category=category,
+                contract_used=self._get_contract_id(category),
+                request=LLMRequest(prompt=prompt, category=category, context=context),
+                response=LLMResponse(
+                    response_text="",
+                    provider_used=LLMProvider.ANTHROPIC,
+                    model_name="error",
+                    tokens_used=0,
+                    processing_time=0.0,
+                    cached=False,
+                    quality_score=0.0
+                ),
+                validation_result=PromptValidationResult(
+                    valid=False,
+                    violations=["execution_failed"],
+                    quality_score=0.0,
+                    contract_compliance=0.0
+                ),
+                quality_assessment=0.0,
+                success=False,
+                error_message=str(e)
+            )
+
+            self.execution_history.append(execution)
+
+            logger.error(f"Prompt execution failed for {category}: {e}")
+            raise
+
+    async def validate_database_addition(
+        self,
+        collection_description: str,
+        schema_definition: dict[str, Any],
+        examples: list[str],
+        test_mechanisms: list[str]
+    ) -> dict[str, Any]:
+        """
+        Validate a proposed database addition meets LLM usage requirements.
+
+        This ensures the database contains sufficient information for LLMs
+        to work correctly with the data.
+        """
+        try:
+            # Build validation context
+            context = {
+                "schema": schema_definition,
+                "description": collection_description,
+                "examples": examples,
+                "test_mechanisms": test_mechanisms,
+                "purpose": "LLM database interaction validation"
+            }
+
+            # Create comprehensive validation prompt
+            validation_prompt = f"""
+            Evaluate this database collection for LLM compatibility:
+
+            Collection Description: {collection_description}
+            Schema: {schema_definition}
+            Examples: {examples}
+            Test Mechanisms: {test_mechanisms}
+
+            Assessment criteria:
+            1. Information Sufficiency: Does the collection provide enough context for LLMs to understand and work with the data effectively?
+            2. Example Quality: Are the provided examples sufficient to guide LLM operations?
+            3. Test Coverage: Do the test mechanisms adequately validate LLM interactions?
+            4. Schema Clarity: Is the schema well-documented and self-explanatory?
+            5. Semantic Richness: Does the collection contain sufficient semantic information?
+
+            Provide:
+            - Overall compatibility score (0-100)
+            - Specific deficiencies and recommendations
+            - Required improvements for LLM effectiveness
+            - Test mechanism adequacy assessment
+            """
+
+            # Execute validation through contract system
+            response = await self.execute_prompt(
+                category=PromptCategory.DATABASE_VALIDATION,
+                prompt=validation_prompt,
+                context=context,
+                temperature=0.3,
+                max_tokens=2000
+            )
+
+            # Parse and structure the validation result
+            return {
+                "validation_passed": response.quality_score >= 0.8,
+                "compatibility_assessment": response.response_text,
+                "quality_score": response.quality_score,
+                "provider_used": response.provider_used.value,
+                "tokens_used": response.tokens_used,
+                "cached": response.cached,
+                "recommendations": self._extract_recommendations(response.response_text),
+                "required_improvements": self._extract_improvements(response.response_text)
+            }
+
+        except Exception as e:
+            logger.error(f"Database addition validation failed: {e}")
+            return {
+                "validation_passed": False,
+                "error": str(e),
+                "quality_score": 0.0,
+                "recommendations": ["Manual expert review required due to validation failure"]
+            }
+
+    async def cache_prompt_qualification(
+        self,
+        category: PromptCategory,
+        prompt: str,
+        context: dict[str, Any]
+    ) -> PromptValidationResult:
+        """
+        Cache prompt qualification to improve efficiency.
+
+        Similar to database query plan caching, this reduces overhead
+        for frequently used prompt patterns.
+        """
+        # Generate cache key
+        cache_key = self._generate_validation_cache_key(category, prompt, context)
+
+        # Check cache first
+        if cache_key in self.cached_validations:
+            cached_result = self.cached_validations[cache_key]
+            logger.info(f"Using cached validation for {category}")
+            return cached_result
+
+        # Perform validation
+        contract = self._get_contract(category)
+        request = LLMRequest(prompt=prompt, category=category, context=context)
+
+        validation_result = await self._validate_prompt_contract(request, contract)
+
+        # Cache the result
+        self.cached_validations[cache_key] = validation_result
+
+        logger.info(f"Cached validation result for {category}")
+        return validation_result
+
+    def get_contract_for_category(self, category: PromptCategory) -> PromptContract:
+        """Get the contract for a specific category."""
+        return self._get_contract(category)
+
+    def update_contract(self, category: PromptCategory, contract: PromptContract) -> None:
+        """Update contract for a category (admin operation)."""
+        contract_id = self._get_contract_id(category)
+        self.contracts[contract_id] = contract
+
+        # Clear cached validations for this category
+        keys_to_remove = [
+            key for key in self.cached_validations
+            if category.value in key
+        ]
+        for key in keys_to_remove:
+            del self.cached_validations[key]
+
+        logger.info(f"Updated contract for {category}")
+
+    def get_execution_metrics(self) -> dict[str, Any]:
+        """Get comprehensive execution metrics."""
+        total_executions = len(self.execution_history)
+        successful_executions = sum(1 for ex in self.execution_history if ex.success)
+
+        category_stats = {}
+        for execution in self.execution_history:
+            category = execution.category.value
+            if category not in category_stats:
+                category_stats[category] = {"total": 0, "successful": 0, "avg_quality": 0.0}
+
+            category_stats[category]["total"] += 1
+            if execution.success:
+                category_stats[category]["successful"] += 1
+
+        # Calculate average quality scores
+        for category, qualities in self.quality_metrics.items():
+            if qualities:
+                category_stats[category]["avg_quality"] = sum(qualities) / len(qualities)
+
+        return {
+            "total_executions": total_executions,
+            "successful_executions": successful_executions,
+            "success_rate": successful_executions / max(1, total_executions),
+            "category_statistics": category_stats,
+            "cache_entries": len(self.cached_validations),
+            "contracts_registered": len(self.contracts),
+            "average_quality_scores": {
+                category: sum(scores) / len(scores) if scores else 0.0
+                for category, scores in self.quality_metrics.items()
+            }
+        }
+
+    def validate_test_mechanisms(
+        self,
+        category: PromptCategory,
+        test_prompts: list[str],
+        expected_patterns: list[str]
+    ) -> dict[str, Any]:
+        """
+        Validate that test mechanisms are adequate for a prompt category.
+
+        This ensures contractual guarantees can be verified.
+        """
+        contract = self._get_contract(category)
+
+        validation_results = {
+            "test_coverage": len(test_prompts) >= len(contract.test_prompts),
+            "pattern_coverage": len(expected_patterns) >= len(contract.expected_response_patterns),
+            "test_quality": self._assess_test_quality(test_prompts, contract),
+            "pattern_specificity": self._assess_pattern_specificity(expected_patterns),
+            "overall_adequacy": False
+        }
+
+        # Calculate overall adequacy
+        validation_results["overall_adequacy"] = (
+            validation_results["test_coverage"] and
+            validation_results["pattern_coverage"] and
+            validation_results["test_quality"] >= 0.7 and
+            validation_results["pattern_specificity"] >= 0.7
+        )
+
+        return validation_results
+
+    # Private implementation methods
+
+    def _get_contract(self, category: PromptCategory) -> PromptContract:
+        """Get contract for category, raising error if not found."""
+        contract_id = self._get_contract_id(category)
+        if contract_id not in self.contracts:
+            raise ValueError(f"No contract registered for category: {category}")
+        return self.contracts[contract_id]
+
+    def _get_contract_id(self, category: PromptCategory) -> str:
+        """Get contract identifier for category."""
+        return category.value
+
+    def _validate_temperature(self, temperature: float, contract: PromptContract) -> float:
+        """Validate temperature is within contract bounds."""
+        min_temp, max_temp = contract.temperature_range
+        if not (min_temp <= temperature <= max_temp):
+            logger.warning(
+                f"Temperature {temperature} outside contract range "
+                f"[{min_temp}, {max_temp}], adjusting"
+            )
+            return max(min_temp, min(max_temp, temperature))
+        return temperature
+
+    async def _validate_prompt_contract(
+        self,
+        request: LLMRequest,
+        contract: PromptContract
+    ) -> PromptValidationResult:
+        """Validate request against contract requirements."""
+        violations = []
+        recommendations = []
+
+        # Check required context fields
+        missing_context = [
+            field for field in contract.required_context_fields
+            if field not in request.context
+        ]
+        if missing_context:
+            violations.append(f"Missing required context fields: {missing_context}")
+
+        # Check examples count
+        examples = request.context.get("examples", [])
+        if len(examples) < contract.required_examples_count:
+            violations.append(
+                f"Insufficient examples: {len(examples)} < {contract.required_examples_count}"
+            )
+
+        # Check token limit
+        if request.max_tokens > contract.max_response_tokens:
+            violations.append(
+                f"Token limit exceeds contract: {request.max_tokens} > {contract.max_response_tokens}"
+            )
+
+        # Check temperature range
+        min_temp, max_temp = contract.temperature_range
+        if not (min_temp <= request.temperature <= max_temp):
+            violations.append(
+                f"Temperature outside contract range: {request.temperature} not in [{min_temp}, {max_temp}]"
+            )
+
+        # Generate recommendations
+        if not violations:
+            recommendations.append("Prompt meets all contract requirements")
+        else:
+            recommendations.extend([
+                "Provide all required context fields",
+                "Include sufficient examples",
+                "Stay within token and temperature limits"
+            ])
+
+        # Calculate compliance score
+        total_checks = 4  # Number of validation checks
+        violations_count = len([v for v in violations if v])
+        compliance = max(0.0, (total_checks - violations_count) / total_checks)
+
+        return PromptValidationResult(
+            valid=len(violations) == 0,
+            violations=violations,
+            quality_score=compliance,
+            recommendations=recommendations,
+            contract_compliance=compliance
+        )
+
+    async def _assess_response_quality(
+        self,
+        response: LLMResponse,
+        contract: PromptContract
+    ) -> float:
+        """Assess quality of response against contract expectations."""
+        quality_factors = []
+
+        # Check response length appropriateness
+        response_length = len(response.response_text.split())
+        expected_length = contract.max_response_tokens * 0.75  # Assume 75% token utilization
+        length_score = min(1.0, response_length / expected_length) if expected_length > 0 else 1.0
+        quality_factors.append(length_score)
+
+        # Check for expected patterns
+        response_lower = response.response_text.lower()
+        pattern_matches = sum(
+            1 for pattern in contract.expected_response_patterns
+            if pattern.lower() in response_lower
+        )
+        pattern_score = pattern_matches / max(1, len(contract.expected_response_patterns))
+        quality_factors.append(pattern_score)
+
+        # Use provider's quality score
+        quality_factors.append(response.quality_score)
+
+        # Calculate weighted average
+        return sum(quality_factors) / len(quality_factors)
+
+    def _update_quality_metrics(self, category: PromptCategory, quality_score: float) -> None:
+        """Update quality metrics for category."""
+        category_key = category.value
+        if category_key not in self.quality_metrics:
+            self.quality_metrics[category_key] = []
+
+        self.quality_metrics[category_key].append(quality_score)
+
+        # Keep only recent scores to avoid unbounded growth
+        if len(self.quality_metrics[category_key]) > 100:
+            self.quality_metrics[category_key] = self.quality_metrics[category_key][-100:]
+
+    def _generate_validation_cache_key(
+        self,
+        category: PromptCategory,
+        prompt: str,
+        context: dict[str, Any]
+    ) -> str:
+        """Generate cache key for validation result."""
+        import hashlib
+
+        cache_data = f"{category.value}:{prompt}:{sorted(context.items())}"
+        return hashlib.sha256(cache_data.encode()).hexdigest()
+
+    def _extract_recommendations(self, response_text: str) -> list[str]:
+        """Extract recommendations from LLM response."""
+        # Simplified extraction - would use more sophisticated parsing
+        lines = response_text.split('\n')
+        recommendations = [
+            line.strip() for line in lines
+            if 'recommend' in line.lower() or 'suggest' in line.lower()
+        ]
+        return recommendations[:5]  # Limit to top 5
+
+    def _extract_improvements(self, response_text: str) -> list[str]:
+        """Extract required improvements from LLM response."""
+        lines = response_text.split('\n')
+        improvements = [
+            line.strip() for line in lines
+            if 'improve' in line.lower() or 'required' in line.lower() or 'must' in line.lower()
+        ]
+        return improvements[:5]  # Limit to top 5
+
+    def _assess_test_quality(self, test_prompts: list[str], contract: PromptContract) -> float:
+        """Assess quality of test prompts."""
+        if not test_prompts:
+            return 0.0
+
+        quality_score = 0.0
+        for prompt in test_prompts:
+            # Simple quality assessment based on length and content
+            if len(prompt) > 20:  # Reasonable length
+                quality_score += 0.3
+            if any(pattern in prompt.lower() for pattern in contract.expected_response_patterns):
+                quality_score += 0.7
+
+        return min(1.0, quality_score / len(test_prompts))
+
+    def _assess_pattern_specificity(self, patterns: list[str]) -> float:
+        """Assess specificity of expected patterns."""
+        if not patterns:
+            return 0.0
+
+        specificity_scores = []
+        for pattern in patterns:
+            # Simple specificity assessment
+            score = min(1.0, len(pattern.split()) / 3.0)  # More words = more specific
+            specificity_scores.append(score)
+
+        return sum(specificity_scores) / len(specificity_scores)

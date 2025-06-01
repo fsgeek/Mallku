@@ -13,6 +13,11 @@ dependencies = [
     "uvicorn>=0.34.2",
     "watchdog>=6.0.0",
     "websockets>=15.0.1",
+    # Container and infrastructure dependencies
+    "docker>=7.1.0",
+    # LLM provider dependencies (optional)
+    "anthropic>=0.5.0; extra == 'llm'",
+    "openai>=1.0.0; extra == 'llm'",
 ]
 
 [tool.ruff]
@@ -45,4 +50,16 @@ skip-magic-trailing-comma = false
 dev = [
     "pre-commit>=4.2.0",
     "ruff>=0.11.12",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.14.0",
+]
+
+[project.optional-dependencies]
+llm = [
+    "anthropic>=0.5.0",
+    "openai>=1.0.0",
+]
+docker = [
+    "docker>=7.1.0",
 ]
