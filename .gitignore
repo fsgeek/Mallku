@@ -172,8 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# directory for storing config info
 .secrets
 uv.lock
+
+# foreign repositories - ephemeral
 indaleko/
 exemplar/
 dbfacade/
+firecircle/
