@@ -12,14 +12,14 @@ The beauty of this pattern is its reciprocity:
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, List, Union, Optional, Any, Protocol
 from datetime import datetime
+from typing import Any, Protocol
 
 
 class DataWranglerInterface(Protocol):
     """
     Universal interface for data movement in Mallku.
-    
+
     Any component in the system can use wranglers for data transport,
     not just collectors and recorders. This enables:
     - Memory Anchor Service event distribution
@@ -28,22 +28,22 @@ class DataWranglerInterface(Protocol):
     - Inter-service communication
     - Fire Circle message passing
     """
-    
+
     @abstractmethod
     async def put(
-        self, 
-        items: Union[Dict, List[Dict]], 
+        self,
+        items: dict | list[dict],
         priority: int = 0,
-        metadata: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Accept data from any source.
-        
+
         Args:
             items: Single item or list of items to wrangle
             priority: Priority level (0 = normal, higher = more urgent)
             metadata: Optional metadata about the items
-            
+
         Returns:
             Receipt containing:
             - success: bool
@@ -52,86 +52,86 @@ class DataWranglerInterface(Protocol):
             - timestamp: when items were accepted
         """
         pass
-    
+
     @abstractmethod
     async def get(
-        self, 
-        count: int = 1, 
-        timeout: Optional[float] = None,
+        self,
+        count: int = 1,
+        timeout: float | None = None,
         auto_ack: bool = True
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Provide data to any consumer.
-        
+
         Args:
             count: Maximum number of items to retrieve
             timeout: Max seconds to wait for items (None = no wait)
             auto_ack: Automatically acknowledge receipt
-            
+
         Returns:
             List of items (may be empty if none available)
         """
         pass
-    
+
     @abstractmethod
     async def peek(
-        self, 
+        self,
         count: int = 1,
         offset: int = 0
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Preview items without consuming them.
-        
+
         Args:
             count: Maximum number of items to preview
             offset: Skip this many items before peeking
-            
+
         Returns:
             List of items (not removed from wrangler)
         """
         pass
-    
+
     @abstractmethod
     async def ack(
-        self, 
-        message_ids: Union[str, List[str]]
+        self,
+        message_ids: str | list[str]
     ) -> bool:
         """
         Acknowledge successful processing of items.
-        
+
         Args:
             message_ids: ID(s) of successfully processed items
-            
+
         Returns:
             True if all acknowledgments succeeded
         """
         pass
-    
+
     @abstractmethod
     async def nack(
-        self, 
-        message_ids: Union[str, List[str]],
+        self,
+        message_ids: str | list[str],
         requeue: bool = True,
-        reason: Optional[str] = None
+        reason: str | None = None
     ) -> bool:
         """
         Negative acknowledgment - processing failed.
-        
+
         Args:
             message_ids: ID(s) of failed items
             requeue: Whether to make items available again
             reason: Optional failure reason for diagnostics
-            
+
         Returns:
             True if all nacks succeeded
         """
         pass
-    
+
     @abstractmethod
-    async def get_stats(self) -> Dict[str, Any]:
+    async def get_stats(self) -> dict[str, Any]:
         """
         Get wrangler statistics and health information.
-        
+
         Returns:
             Dictionary containing:
             - depth: Current number of items
@@ -143,12 +143,12 @@ class DataWranglerInterface(Protocol):
             - implementation: Wrangler type details
         """
         pass
-    
+
     @abstractmethod
     async def close(self) -> None:
         """
         Gracefully shut down the wrangler.
-        
+
         Should:
         - Flush any pending items
         - Close connections
@@ -156,61 +156,61 @@ class DataWranglerInterface(Protocol):
         - Save state if applicable
         """
         pass
-    
+
     # Optional enhanced capabilities
-    
+
     async def subscribe(
         self,
         callback: Any,  # Callable[[Dict], Awaitable[None]]
-        filter_expr: Optional[str] = None
+        filter_expr: str | None = None
     ) -> str:
         """
         Subscribe to items matching a filter (if supported).
-        
+
         Args:
             callback: Async function to call with matching items
             filter_expr: Optional filter expression
-            
+
         Returns:
             Subscription ID for later unsubscribe
-            
+
         Raises:
             NotImplementedError: If wrangler doesn't support subscriptions
         """
         raise NotImplementedError("This wrangler does not support subscriptions")
-    
+
     async def unsubscribe(self, subscription_id: str) -> bool:
         """
         Cancel a subscription.
-        
+
         Args:
             subscription_id: ID returned from subscribe()
-            
+
         Returns:
             True if successfully unsubscribed
-            
+
         Raises:
             NotImplementedError: If wrangler doesn't support subscriptions
         """
         raise NotImplementedError("This wrangler does not support subscriptions")
-    
+
     async def query(
         self,
         filter_expr: str,
         limit: int = 100,
-        since: Optional[datetime] = None
-    ) -> List[Dict]:
+        since: datetime | None = None
+    ) -> list[dict]:
         """
         Query historical items (if supported).
-        
+
         Args:
             filter_expr: Query expression
             limit: Maximum results
             since: Only items after this time
-            
+
         Returns:
             Matching items
-            
+
         Raises:
             NotImplementedError: If wrangler doesn't support queries
         """
@@ -221,7 +221,7 @@ class WranglerCapabilities:
     """
     Declares what optional features a wrangler supports.
     """
-    
+
     def __init__(
         self,
         supports_priority: bool = False,
@@ -229,8 +229,8 @@ class WranglerCapabilities:
         supports_queries: bool = False,
         supports_transactions: bool = False,
         supports_persistence: bool = False,
-        max_item_size: Optional[int] = None,
-        max_batch_size: Optional[int] = None
+        max_item_size: int | None = None,
+        max_batch_size: int | None = None
     ):
         self.supports_priority = supports_priority
         self.supports_subscriptions = supports_subscriptions
@@ -245,20 +245,20 @@ class BaseWrangler(ABC):
     """
     Base implementation providing common functionality.
     """
-    
-    def __init__(self, name: str, capabilities: Optional[WranglerCapabilities] = None):
+
+    def __init__(self, name: str, capabilities: WranglerCapabilities | None = None):
         self.name = name
         self.capabilities = capabilities or WranglerCapabilities()
         self.total_in = 0
         self.total_out = 0
         self.created_at = datetime.utcnow()
-    
-    def _validate_items(self, items: Union[Dict, List[Dict]]) -> List[Dict]:
+
+    def _validate_items(self, items: dict | list[dict]) -> list[dict]:
         """Ensure items are in list format."""
         if isinstance(items, dict):
             return [items]
         return items
-    
+
     def _generate_message_id(self) -> str:
         """Generate unique message ID."""
         import uuid
