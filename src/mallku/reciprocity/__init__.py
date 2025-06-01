@@ -34,7 +34,9 @@ from .models import (
     ReciprocityPattern,
     SystemHealthMetrics,
 )
-from .tracker import ReciprocityTracker
+
+# Primary secure implementation
+from .tracker import SecureReciprocityTracker as ReciprocityTracker
 
 __all__ = [
     'ReciprocityTracker',
