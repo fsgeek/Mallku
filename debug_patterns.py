@@ -11,6 +11,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# ruff: noqa: E402
 from mallku.correlation.models import Event, EventType
 from mallku.correlation.patterns import (
     ConcurrentPattern,
@@ -19,6 +20,7 @@ from mallku.correlation.patterns import (
     SequentialPattern,
 )
 
+# ruff: qa E402
 
 def generate_test_events():
     """Generate the same test events as the test suite."""

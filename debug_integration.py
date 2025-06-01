@@ -7,13 +7,14 @@ import asyncio
 import logging
 import sys
 import tempfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Add src to Python path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# ruff: noqa: E402
 from mallku.integration import EndToEndIntegrationService, PipelineConfiguration
 
 
@@ -58,10 +59,10 @@ async def debug_integration_pipeline():
         await service.initialize()
 
         # Add file event handler directly to file connector for debugging
-        service.file_connector.add_event_callback(capture_file_event)
+        service.file_connector.add_event_callback(capture_file_event) # type: ignore
 
         print(f"Service running: {service.is_running}")
-        print(f"File connector running: {service.file_connector._is_running}")
+        print(f"File connector running: {service.file_connector._is_running}") # type: ignore
         print(f"Pipeline ID: {service.pipeline_id}")
 
         # Wait for full startup
@@ -72,7 +73,7 @@ async def debug_integration_pipeline():
         print("\n--- Creating Test File ---")
         test_file = test_dir / "debug_test.txt"
         print(f"Creating: {test_file}")
-        test_file.write_text(f"Debug content created at {datetime.now()}")
+        test_file.write_text(f"Debug content created at {datetime.now(UTC)}")
 
         # Wait for event processing
         print("Waiting 5 seconds for event processing...")
@@ -110,7 +111,7 @@ async def debug_integration_pipeline():
 
         # Try modifying the file
         print("\n--- Modifying Test File ---")
-        test_file.write_text(f"Modified content at {datetime.now()}")
+        test_file.write_text(f"Modified content at {datetime.now(UTC)}")
         await asyncio.sleep(3.0)
 
         print("\nAfter modification:")
@@ -131,7 +132,7 @@ async def debug_integration_pipeline():
 
     finally:
         # Cleanup
-        await service.shutdown()
+        await service.shutdown() # type: ignore
 
         # Remove test directory
         import shutil

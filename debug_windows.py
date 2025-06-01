@@ -12,6 +12,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# ruff: noqa: E402
 from mallku.correlation.engine import CorrelationEngine
 from mallku.correlation.models import Event, EventType
 from mallku.services.memory_anchor_service import MemoryAnchorService

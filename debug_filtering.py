@@ -11,7 +11,12 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from mallku.streams.filesystem.file_event_models import FileEvent, FileEventFilter, FileOperation
+# ruff: noqa: E402
+from mallku.streams.filesystem.file_event_models import (
+    FileEvent,
+    FileEventFilter,
+    FileOperation,
+)
 
 
 def debug_event_filtering():
@@ -73,11 +78,13 @@ def debug_event_filtering():
             print(f"    FILTERED: Directory contains ignored pattern '{ignore_dir}'")
 
     # Extension check
-    if event_filter.include_extensions and file_event.file_extension:
-        if file_event.file_extension.lower() not in [ext.lower() for ext in event_filter.include_extensions]:
-            print(f"    FILTERED: Extension {file_event.file_extension} not in include list")
+    include_exts = event_filter.include_extensions or []
+    exclude_exts = event_filter.exclude_extensions or []
 
-    if file_event.file_extension and file_event.file_extension.lower() in [ext.lower() for ext in event_filter.exclude_extensions]:
+    if include_exts and file_event.file_extension and file_event.file_extension.lower() not in [ext.lower() for ext in include_exts]:
+        print(f"    FILTERED: Extension {file_event.file_extension} not in include list")
+
+    if file_event.file_extension and file_event.file_extension.lower() in [ext.lower() for ext in exclude_exts]:
         print(f"    FILTERED: Extension {file_event.file_extension} in exclude list")
 
     # Operation check

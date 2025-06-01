@@ -11,8 +11,14 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from mallku.streams.filesystem.file_event_models import FileEvent, FileEventFilter, FileOperation
+# ruff: noqa: E402
+from mallku.streams.filesystem.file_event_models import (
+    FileEvent,
+    FileEventFilter,
+    FileOperation,
+)
 
+# ruff: qa: E402
 
 def debug_filter_in_integration_context():
     """Debug the exact filtering that happens in integration service."""
