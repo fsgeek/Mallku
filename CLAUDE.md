@@ -76,6 +76,28 @@ When switching instances:
 3. Flag decisions needing validation
 4. Record insights that shouldn't be lost
 
+## Khipu Guidelines
+
+**Khipu are NOT GitHub Issues** - they are reflections stored in `docs/khipu/`
+
+### What Khipu Are For
+- Storytelling and reflection on the building process
+- Recording insights, visions, and emergent understanding  
+- Capturing aspirations, goals, dreams, desires
+- Preserving the "why" behind technical decisions
+
+### What Khipu Are NOT For
+- Technical specifications (use docs/architecture/)
+- Work tracking (use GitHub Issues)
+- Implementation details (use code comments)
+
+### Creating a Khipu
+1. Create markdown file in `docs/khipu/`
+2. Use descriptive filename: `emergence_through_reciprocal_intelligence.md`
+3. Write in narrative form - tell the story
+4. Include reflection on what was learned
+5. Let the form serve the content - no rigid structure
+
 ## Active Questions
 
 1. How to handle semantic validation without creating new dependencies?
