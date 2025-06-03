@@ -2,7 +2,7 @@
 # This container embodies "security through architecture" principles
 # by making direct database access impossible.
 
-FROM arangodb/arangodb:3.11.8
+FROM arangodb/arangodb:latest
 
 # Create mallku user for running the service
 RUN useradd -r -u 999 mallku
