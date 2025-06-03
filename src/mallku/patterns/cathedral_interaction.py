@@ -18,7 +18,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ..prompt.manager import PromptManager
+# Removed circular import - PromptManager will be passed as parameter
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class CathedralInteractionPattern:
     making cathedral thinking emerge naturally from the conversation flow.
     """
 
-    def __init__(self, prompt_manager: PromptManager):
+    def __init__(self, prompt_manager):
         self.prompt_manager = prompt_manager
         self.interaction_history: list[InteractionReflection] = []
         self.cathedral_templates = self._initialize_cathedral_templates()

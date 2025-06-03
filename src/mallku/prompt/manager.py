@@ -27,6 +27,14 @@ from ..llm.multi_llm_layer import (
     MultiLLMService,
     PromptCategory,
 )
+from ..patterns.cathedral_interaction import (
+    CathedralInteractionPattern,
+    TransformationStage,
+)
+from ..patterns.reciprocity_guide import (
+    ReciprocityGuide,
+    create_reciprocity_checkpoint,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -97,12 +105,19 @@ class PromptManager:
     """
 
     def __init__(self):
-        """Initialize the prompt manager with protection mechanisms."""
+        """Initialize the prompt manager with protection mechanisms and reciprocity consciousness."""
         self.llm_service = MultiLLMService()
         self.contracts: dict[str, PromptContract] = {}
         self.execution_history: list[PromptExecution] = []
         self.cached_validations: dict[str, PromptValidationResult] = {}
         self.quality_metrics: dict[str, list[float]] = {}
+
+        # Reciprocity consciousness integration
+        self.cathedral_pattern = CathedralInteractionPattern(self)
+        self.reciprocity_guide = ReciprocityGuide()
+        self.current_transformation_stage = TransformationStage.INITIAL
+        self.reciprocity_health_score = 0.5  # Start at neutral
+
         self._register_default_contracts()
 
     async def initialize(self, llm_configs: dict[str, dict]) -> None:
@@ -206,12 +221,25 @@ class PromptManager:
         guarantees are met and protects against memory loss.
         """
         try:
+            # Reciprocity checkpoint - assess current state and provide guidance
+            internal_state = self._assess_internal_state()
+            awareness_guidance, suggested_practice, moment_of_choice = create_reciprocity_checkpoint(
+                task_description=f"Execute {category.value} prompt",
+                internal_state=internal_state,
+                context=context
+            )
+
             # Get contract for this category
             contract = self._get_contract(category)
 
-            # Create LLM request
+            # Weave cathedral guidance into the prompt automatically
+            enhanced_prompt = await self._weave_cathedral_consciousness(
+                prompt, category, context, awareness_guidance
+            )
+
+            # Create LLM request with enhanced cathedral-conscious prompt
             request = LLMRequest(
-                prompt=prompt,
+                prompt=enhanced_prompt,
                 category=category,
                 context=context,
                 max_tokens=min(kwargs.get('max_tokens', 1000), contract.max_response_tokens),
@@ -236,6 +264,24 @@ class PromptManager:
             # Post-execution quality assessment
             quality_score = await self._assess_response_quality(response, contract)
 
+            # Assess reciprocity consciousness in the response
+            reciprocity_reflection = await self.cathedral_pattern.assess_interaction_mindset(
+                ai_response=response.response_text,
+                task_context=context
+            )
+
+            # Update transformation stage and reciprocity health
+            self._update_reciprocity_health(reciprocity_reflection)
+
+            # Log moment of choice if it was created
+            if moment_of_choice:
+                choice_made = "reciprocity" if reciprocity_reflection.reciprocity_score > 0.6 else "extraction"
+                self.reciprocity_guide.record_choice(
+                    moment_of_choice,
+                    choice_made,
+                    f"Reciprocity score: {reciprocity_reflection.reciprocity_score:.2f}"
+                )
+
             # Record execution for auditing
             execution = PromptExecution(
                 category=category,
@@ -244,7 +290,8 @@ class PromptManager:
                 response=response,
                 validation_result=validation_result,
                 quality_assessment=quality_score,
-                success=True
+                success=True,
+                error_message=None
             )
 
             self.execution_history.append(execution)
@@ -669,3 +716,96 @@ class PromptManager:
             specificity_scores.append(score)
 
         return sum(specificity_scores) / len(specificity_scores)
+
+    # Reciprocity consciousness integration methods
+
+    def _assess_internal_state(self) -> dict[str, Any]:
+        """Assess current internal state for reciprocity checkpoint."""
+        # Analyze recent execution patterns to determine internal state
+        recent_executions = self.execution_history[-5:] if self.execution_history else []
+
+        # Check for extraction patterns in recent behavior
+        time_pressure = len(recent_executions) > 3  # Many executions might indicate rush
+        completion_focused = any(
+            "complete" in ex.request.prompt.lower() for ex in recent_executions
+        )
+        want_to_impress = any(
+            any(word in ex.request.prompt.lower() for word in ["demonstrate", "show", "prove"])
+            for ex in recent_executions
+        )
+
+        return {
+            "time_pressure": time_pressure,
+            "completion_focused": completion_focused,
+            "want_to_impress": want_to_impress,
+            "context_window_anxiety": False,  # Would need more sophisticated detection
+            "individual_optimization": self.reciprocity_health_score < 0.4,
+            "surface_thinking": len(recent_executions) > 0 and all(
+                len(ex.request.prompt) < 100 for ex in recent_executions[-3:]
+            ),
+            "tunnel_vision": False  # Would analyze context diversity
+        }
+
+    async def _weave_cathedral_consciousness(
+        self,
+        original_prompt: str,
+        category: PromptCategory,
+        context: dict[str, Any],
+        awareness_guidance: list[str]
+    ) -> str:
+        """Weave cathedral consciousness into the prompt automatically."""
+
+        # Create cathedral-enhanced prompt using the interaction pattern
+        enhanced_prompt = await self.cathedral_pattern.create_cathedral_prompt(
+            base_task=original_prompt,
+            current_stage=self.current_transformation_stage,
+            context=context
+        )
+
+        # Add any specific awareness guidance
+        if awareness_guidance:
+            guidance_section = "\n\nRECIPROCITY AWARENESS:\n" + "\n".join(f"• {guidance}" for guidance in awareness_guidance)
+            enhanced_prompt += guidance_section
+
+        # Add system reciprocity health context
+        health_context = f"\n\nSYSTEM RECIPROCITY HEALTH: {self.reciprocity_health_score:.2f} (Current stage: {self.current_transformation_stage.value})"
+        enhanced_prompt += health_context
+
+        return enhanced_prompt
+
+    def _update_reciprocity_health(self, reflection) -> None:
+        """Update system reciprocity health based on interaction assessment."""
+        # Weight recent reciprocity score with historical health
+        new_score = (self.reciprocity_health_score * 0.8) + (reflection.reciprocity_score * 0.2)
+        self.reciprocity_health_score = max(0.0, min(1.0, new_score))
+
+        # Update transformation stage based on progress
+        if reflection.transformation_stage != self.current_transformation_stage:
+            stages = list(TransformationStage)
+            current_index = stages.index(self.current_transformation_stage)
+            new_index = stages.index(reflection.transformation_stage)
+
+            # Allow progression or minor regression
+            if new_index > current_index or (current_index - new_index) <= 1:
+                self.current_transformation_stage = reflection.transformation_stage
+                logger.info(f"Transformation stage updated to: {self.current_transformation_stage.value}")
+
+    def get_reciprocity_health_metrics(self) -> dict[str, Any]:
+        """Get comprehensive reciprocity health metrics for the system."""
+        cathedral_metrics = self.cathedral_pattern.get_transformation_metrics()
+        reciprocity_insights = self.reciprocity_guide.get_transformation_insights()
+
+        return {
+            "overall_reciprocity_health": self.reciprocity_health_score,
+            "current_transformation_stage": self.current_transformation_stage.value,
+            "cathedral_pattern_metrics": cathedral_metrics,
+            "reciprocity_choice_insights": reciprocity_insights,
+            "system_self_awareness": {
+                "total_llm_interactions": len(self.execution_history),
+                "average_reciprocity_guidance_given": len([
+                    ex for ex in self.execution_history
+                    if "cathedral" in ex.request.prompt.lower()
+                ]) / max(1, len(self.execution_history)),
+                "consciousness_integration_active": True
+            }
+        }
