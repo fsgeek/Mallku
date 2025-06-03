@@ -7,23 +7,50 @@ Security through architecture, not through policy.
 """
 
 import os
+import sys
 import logging
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import JSONResponse, Response
-from arango import ArangoClient
-from prometheus_client import Counter, Histogram, generate_latest
-from prometheus_client.core import CollectorRegistry
-import uvicorn
-
-# Configure logging
+# Configure logging FIRST
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    stream=sys.stdout  # Ensure logs go to stdout for Docker
 )
 logger = logging.getLogger(__name__)
+
+logger.info("Starting Mallku API Service - Import phase")
+
+try:
+    from fastapi import FastAPI, HTTPException, Depends
+    from fastapi.responses import JSONResponse, Response
+    logger.info("FastAPI imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import FastAPI: {e}")
+    sys.exit(1)
+
+try:
+    from arango import ArangoClient
+    logger.info("ArangoClient imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import ArangoClient: {e}")
+    sys.exit(1)
+
+try:
+    from prometheus_client import Counter, Histogram, generate_latest
+    from prometheus_client.core import CollectorRegistry
+    logger.info("Prometheus client imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import prometheus_client: {e}")
+    sys.exit(1)
+
+try:
+    import uvicorn
+    logger.info("Uvicorn imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import uvicorn: {e}")
+    sys.exit(1)
 
 # Metrics
 registry = CollectorRegistry()
@@ -40,19 +67,23 @@ async def lifespan(app: FastAPI):
     global db_client, db
     
     # Startup
-    logger.info("Starting Mallku API Service...")
+    logger.info("Lifespan startup phase beginning...")
     
     # Connect to ArangoDB
     db_host = os.getenv('MALLKU_DB_HOST', 'database')
     db_port = os.getenv('MALLKU_DB_PORT', '8529')
     
+    logger.info(f"Attempting to connect to ArangoDB at {db_host}:{db_port}")
+    
     try:
         db_client = ArangoClient(hosts=f'http://{db_host}:{db_port}')
         # Use _system database for now - in production, create mallku database
         db = db_client.db('_system')
-        logger.info(f"Connected to ArangoDB at {db_host}:{db_port}")
+        logger.info(f"Successfully connected to ArangoDB at {db_host}:{db_port}")
     except Exception as e:
         logger.error(f"Failed to connect to database: {e}")
+        logger.error(f"Exception type: {type(e)}")
+        logger.error(f"Exception args: {e.args}")
         raise
     
     yield
@@ -63,6 +94,7 @@ async def lifespan(app: FastAPI):
         db_client.close()
 
 # Create FastAPI app
+logger.info("Creating FastAPI application...")
 app = FastAPI(
     title="Mallku Database API",
     description="Secured gateway to ArangoDB - Cathedral Architecture",
@@ -75,7 +107,8 @@ async def health() -> Dict[str, str]:
     """Health check endpoint."""
     try:
         # Verify database connection
-        db.version()
+        if db is not None:
+            db.version()
         return {"status": "healthy", "service": "mallku-api"}
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -102,6 +135,8 @@ async def metrics():
 async def list_collections():
     """List available collections - example secured endpoint."""
     try:
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database not connected")
         collections = db.collections()
         return {
             "collections": [c['name'] for c in collections if not c['name'].startswith('_')]
@@ -130,6 +165,8 @@ async def internal_error(request, exc):
 
 def main():
     """Run the API service."""
+    logger.info("Main function starting...")
+    
     host = os.getenv('MALLKU_API_HOST', '0.0.0.0')
     port = int(os.getenv('MALLKU_API_PORT', '8080'))
     
@@ -137,7 +174,12 @@ def main():
     logger.info("Remember: This is the only door to the database")
     logger.info("Cathedral Architecture - Security through structure")
     
-    uvicorn.run(app, host=host, port=port)
+    try:
+        uvicorn.run(app, host=host, port=port)
+    except Exception as e:
+        logger.error(f"Failed to start uvicorn: {e}")
+        raise
 
 if __name__ == "__main__":
+    logger.info("Script started as __main__")
     main()
