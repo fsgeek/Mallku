@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from mallku.core.database import get_database
+from mallku.core.database import get_secured_database
 
 from .models import (
     QueryExplanation,
@@ -39,7 +39,8 @@ class MemoryAnchorQueryService:
 
     async def initialize(self):
         """Initialize database connection."""
-        self.db = get_database()
+        self.db = get_secured_database()
+        await self.db.initialize()
         logger.info("MemoryAnchorQueryService initialized")
 
     async def shutdown(self):
@@ -151,9 +152,9 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            cursor = self.db.aql.execute(aql_query)
+            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
 
-            for doc in cursor:
+            for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     result = QueryResult.from_memory_anchor_and_file(
                         anchor_id=UUID(doc["anchor_id"]),
@@ -220,9 +221,9 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            cursor = self.db.aql.execute(aql_query)
+            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
 
-            for doc in cursor:
+            for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     result = QueryResult.from_memory_anchor_and_file(
                         anchor_id=UUID(doc["anchor_id"]),
@@ -291,9 +292,9 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            cursor = self.db.aql.execute(aql_query)
+            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
 
-            for doc in cursor:
+            for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     # Calculate contextual similarity score
                     similarity_score = self._calculate_contextual_similarity(
@@ -418,9 +419,13 @@ class MemoryAnchorQueryService:
                 }
             """
 
-            cursor = self.db.aql.execute(aql_query, bind_vars={"anchor_id": str(anchor_id)})
+            query_results = await self.db.execute_secured_query(
+                aql_query,
+                bind_vars={"anchor_id": str(anchor_id)},
+                collection_name="memory_anchors"
+            )
 
-            for doc in cursor:
+            for doc in query_results:
                 return {
                     "anchor": doc["anchor"],
                     "predecessor": doc["predecessor"],

@@ -12,7 +12,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
-from mallku.core.database import get_database  # ArangoDB connection
+from mallku.core.database import get_secured_database  # ArangoDB connection
 from mallku.models import MemoryAnchor
 
 if TYPE_CHECKING:
@@ -72,7 +72,8 @@ class MemoryAnchorService:
 
     async def initialize(self):
         """Initialize service connections and state"""
-        self.db = get_database()
+        self.db = get_secured_database()
+        await self.db.initialize()
         await self._load_current_anchor()
 
     async def shutdown(self):
@@ -92,8 +93,8 @@ class MemoryAnchorService:
             LIMIT 1
             RETURN anchor
         """
-        cursor = self.db.aql.execute(query)
-        for anchor in cursor:
+        results = await self.db.execute_secured_query(query, collection_name="memory_anchors")
+        for anchor in results:
             self.current_anchor_id = UUID(anchor['_key'])
             self.current_anchor = MemoryAnchor.from_arangodb_document(anchor)
             self.cursor_state = anchor.get('cursors', {})
@@ -118,9 +119,11 @@ class MemoryAnchorService:
             }
         )
 
-        # Store in database
+        # Store in database using secured interface
         anchor_data = anchor.to_arangodb_document()
-        self.db.collection('memory_anchors').insert(anchor_data)
+        memory_anchors_collection = await self.db.get_secured_collection('memory_anchors')
+        # Note: memory_anchors has requires_security=False policy for legacy compatibility
+        memory_anchors_collection._collection.insert(anchor_data)
 
         self.current_anchor_id = new_id
         self.current_anchor = anchor
