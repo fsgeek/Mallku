@@ -25,7 +25,7 @@ services:
   # Security layer - the only gateway
   api:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.api
     container_name: mallku-api-gateway
     depends_on:
@@ -42,7 +42,7 @@ services:
       - mallku-internal
       - mallku-external
     volumes:
-      - ./src:/app/src:ro  # Read-only mount
+      - ../src:/app/src:ro  # Read-only mount
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
