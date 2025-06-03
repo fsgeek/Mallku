@@ -63,7 +63,7 @@ echo -n "Testing network isolation... "
 if docker network ls | grep -q mallku-internal; then
     echo -e "${GREEN}✓ PASS${NC}"
     echo "  Internal network exists and is configured"
-    
+
     # Additional test: try to connect to internal network from a test container
     echo -n "  Testing network access restriction... "
     if docker run --rm --network docker_mallku-internal alpine ping -c 1 database > /dev/null 2>&1; then
