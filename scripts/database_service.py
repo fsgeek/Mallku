@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 from typing import Dict, Any
 
 from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from arango import ArangoClient
 from prometheus_client import Counter, Histogram, generate_latest
 from prometheus_client.core import CollectorRegistry
