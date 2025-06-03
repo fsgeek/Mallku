@@ -1,0 +1,45 @@
+# Cathedral Stone: API Gateway Container
+# Built on Ubuntu for stability and understanding
+# One job: Provide secured access to database
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Python and basic tools
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for API service
+RUN useradd -m -s /bin/bash mallku
+
+# Setup Python environment
+WORKDIR /app
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Install dependencies
+COPY docker/requirements-api.txt .
+RUN pip install --no-cache-dir -r requirements-api.txt
+
+# Copy application code
+COPY src/ /app/src/
+COPY scripts/database_service.py /app/
+
+# Set ownership
+RUN chown -R mallku:mallku /app
+
+# Switch to non-root user
+USER mallku
+
+# API runs on 8080
+EXPOSE 8080
+
+# Simple, clear entrypoint
+CMD ["python", "database_service.py"]
