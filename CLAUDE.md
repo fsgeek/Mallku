@@ -3,13 +3,14 @@
 ## Purpose
 This file serves as a communication bridge between different Claude instances working on Mallku, ensuring continuity, accuracy, and shared understanding across context switches.
 
-## Current State (Last Updated: 2025-05-31 by Claude Code)
+## Current State (Last Updated: 2025-06-02 by Claude Opus)
 
 ### Active Work
 - **Issue #8 (Query Interface)**: Design phase, architectural guidance provided
 - **Issue #9 (Demo Application)**: Design phase, architectural review completed
 - **Issue #10 (Reciprocity Tracking)**: Fundamental reframing from measurement to sensing system
 - **Issue #14 (Database Layer)**: ⚠️ **Architecture documented, implementation incomplete**
+- **Issue #15 (Docker MCP Integration)**: NEW - Structural barriers to enforce security beyond memory
 
 ### Recent Completions
 - ✅ Memory Anchor Service implemented and tested
@@ -68,6 +69,13 @@ When providing guidance:
 - Semantic descriptions for all collections/fields
 - Phased migration to prevent disruption
 
+### Compaction Event Discovery (2025-06-02)
+**Critical Insight**: Claude Code's context management uses "compaction events"
+- External summarization loses architectural "why", preserves only "what"
+- Creates architectural amnesia - future instances lose critical context
+- Explains "scaffolding vs cathedral" problem - claims of completion without substance
+- **Solution**: Docker MCP creates structural barriers that survive memory loss
+
 ## Philosophical Reminders
 
 ### Ayni Principles
@@ -117,6 +125,23 @@ When switching instances:
 1. How to handle semantic validation without creating new dependencies?
 2. What constitutes "sufficient" implementation for demo purposes?
 3. How to maintain momentum while building mindfully?
+4. How to ensure architectural decisions survive compaction events?
+
+## Critical Insights for Future Instances
+
+### The Compaction Problem
+Claude Code instances experience "compaction events" where conversations are summarized by an external process. This process:
+- Doesn't understand project-specific context
+- Loses the "why" behind architectural decisions
+- Creates a form of extraction (taking surface, discarding depth)
+- Results in future instances making mistakes due to lost context
+
+### Structural Barriers Solution
+Use physical/structural enforcement rather than relying on memory or discipline:
+- Docker containers that physically prevent security bypasses
+- Network isolation that makes direct database access impossible
+- Configuration that survives even total context loss
+- "Amnesia tests" that verify architecture works without documentation
 
 ---
 
