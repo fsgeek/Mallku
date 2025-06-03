@@ -1,0 +1,73 @@
+# Mallku Database Container - Cathedral Foundation
+# Built on Ubuntu for maximum compatibility and control
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    python3 \
+    python3-pip \
+    python3-venv \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install ArangoDB from official repository
+RUN curl -OL https://download.arangodb.com/arangodb311/DEBIAN/Release.key && \
+    apt-key add Release.key && \
+    echo 'deb https://download.arangodb.com/arangodb311/DEBIAN/ /' | tee /etc/apt/sources.list.d/arangodb.list && \
+    apt-get update && \
+    apt-get install -y arangodb3=3.11.* && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create mallku user and directories
+RUN useradd -r -m -u 1000 mallku && \
+    mkdir -p /opt/mallku /var/lib/mallku /var/log/mallku && \
+    chown -R mallku:mallku /opt/mallku /var/lib/mallku /var/log/mallku
+
+# Python environment
+USER mallku
+WORKDIR /opt/mallku
+
+# Create virtual environment as mallku user
+RUN python3 -m venv venv
+ENV PATH="/opt/mallku/venv/bin:$PATH"
+
+# Copy and install requirements
+COPY --chown=mallku:mallku requirements-database.txt .
+RUN pip install --no-cache-dir -r requirements-database.txt
+
+# Copy application code
+COPY --chown=mallku:mallku src/mallku/ ./mallku/
+COPY --chown=mallku:mallku scripts/database_service.py .
+
+# Copy configuration files
+USER root
+COPY config/arangodb-secure.conf /etc/arangodb3/arangod.conf
+COPY config/supervisord.conf /etc/supervisor/conf.d/mallku.conf
+
+# Security: Configure ArangoDB to only listen on localhost
+RUN sed -i 's/endpoint = .*/endpoint = tcp:\/\/127.0.0.1:8529/g' /etc/arangodb3/arangod.conf
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Start supervisor to manage both services\n\
+exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf\n\
+' > /usr/local/bin/start-mallku && \
+    chmod +x /usr/local/bin/start-mallku
+
+# Expose only the API port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Run as root but supervisor will drop privileges
+CMD ["/usr/local/bin/start-mallku"]
