@@ -1,25 +1,12 @@
-# Requirements for Mallku Database Container
-# Minimal dependencies for the secured database interface
+# Minimal requirements for database container
+# Just enough to get it building and running
 
-# Core dependencies
-pydantic>=2.0.0
-python-arango>=7.5.0
-uvicorn>=0.23.0
-fastapi>=0.100.0
+# ArangoDB Python driver
+pyArango==2.0.2
 
-# Security and crypto
-cryptography>=41.0.0
-bcrypt>=4.0.0
+# Basic web framework for API
+fastapi==0.104.1
+uvicorn==0.24.0
 
-# Async support
-aiofiles>=23.0.0
-
-# Logging and monitoring
-structlog>=23.0.0
-
-# Date/time handling
-python-dateutil>=2.8.0
-
-# Development dependencies (optional)
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
+# For health checks
+httpx==0.25.2
