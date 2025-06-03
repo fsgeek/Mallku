@@ -20,7 +20,8 @@ services:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8529/_api/version"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10  # More retries for slow systems
+      start_period: 30s  # More time to initialize
 
   # Security layer - the only gateway
   api:
@@ -28,6 +29,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.api
     container_name: mallku-api-gateway
+    restart: unless-stopped  # Auto-restart on failure
     depends_on:
       database:
         condition: service_healthy
@@ -45,8 +47,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s  # Give API time to start
+      retries: 5
+      start_period: 60s  # Give API plenty of time to start
 
 networks:
   mallku-internal:
