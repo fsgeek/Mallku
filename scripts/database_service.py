@@ -6,11 +6,11 @@ This service is the sole gateway to the database.
 Security through architecture, not through policy.
 """
 
+import logging
 import os
 import sys
-import logging
 from contextlib import asynccontextmanager
-from typing import Dict, Any
+from typing import Any
 
 # Configure logging FIRST
 logging.basicConfig(
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 logger.info("Starting Mallku API Service - Import phase")
 
 try:
-    from fastapi import FastAPI, HTTPException, Depends
+    from fastapi import FastAPI, HTTPException
     from fastapi.responses import JSONResponse, Response
     logger.info("FastAPI imported successfully")
 except ImportError as e:
@@ -65,16 +65,16 @@ db = None
 async def lifespan(app: FastAPI):
     """Manage service lifecycle - connect to database on startup."""
     global db_client, db
-    
+
     # Startup
     logger.info("Lifespan startup phase beginning...")
-    
+
     # Connect to ArangoDB
     db_host = os.getenv('MALLKU_DB_HOST', 'database')
     db_port = os.getenv('MALLKU_DB_PORT', '8529')
-    
+
     logger.info(f"Attempting to connect to ArangoDB at {db_host}:{db_port}")
-    
+
     try:
         db_client = ArangoClient(hosts=f'http://{db_host}:{db_port}')
         # Use _system database for now - in production, create mallku database
@@ -85,9 +85,9 @@ async def lifespan(app: FastAPI):
         logger.error(f"Exception type: {type(e)}")
         logger.error(f"Exception args: {e.args}")
         raise
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down Mallku API Service...")
     if db_client:
@@ -103,7 +103,7 @@ app = FastAPI(
 )
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
+async def health() -> dict[str, str]:
     """Health check endpoint."""
     try:
         # Verify database connection
@@ -115,7 +115,7 @@ async def health() -> Dict[str, str]:
         raise HTTPException(status_code=503, detail="Database connection failed")
 
 @app.get("/security/metrics")
-async def security_metrics() -> Dict[str, Any]:
+async def security_metrics() -> dict[str, Any]:
     """Return security metrics - shows structural enforcement."""
     return {
         "architecture": "cathedral",
@@ -166,14 +166,14 @@ async def internal_error(request, exc):
 def main():
     """Run the API service."""
     logger.info("Main function starting...")
-    
+
     host = os.getenv('MALLKU_API_HOST', '0.0.0.0')
     port = int(os.getenv('MALLKU_API_PORT', '8080'))
-    
+
     logger.info(f"Starting Mallku API on {host}:{port}")
     logger.info("Remember: This is the only door to the database")
     logger.info("Cathedral Architecture - Security through structure")
-    
+
     try:
         uvicorn.run(app, host=host, port=port)
     except Exception as e:

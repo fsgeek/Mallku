@@ -66,7 +66,7 @@ Error: Missing required parameter: --action
 
 Before releasing any command-line tool, run it with no arguments. If it:
 - Shows an error: ❌ Redesign
-- Requires reading help first: ❌ Redesign  
+- Requires reading help first: ❌ Redesign
 - Does something useful: ✅ Cathedral stone
 
 ## Examples in Our Architecture

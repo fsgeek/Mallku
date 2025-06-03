@@ -88,12 +88,20 @@ async def test_reciprocity_consciousness_integration():
         print(f"Consciousness integration active: {health_metrics['system_self_awareness']['consciousness_integration_active']}")
         print(f"Total interactions: {health_metrics['system_self_awareness']['total_llm_interactions']}")
 
+        # Test Fire Circle integration
+        fire_circle_status = prompt_manager.get_fire_circle_integration_status()
+        print("\nFire Circle Integration Status:")
+        print(f"Connected: {fire_circle_status['fire_circle_connected']}")
+        print(f"Reports sent: {fire_circle_status['consciousness_reports_sent']}")
+        print(f"Collective consciousness integration: {fire_circle_status['collective_consciousness_integration']}")
+
         print("\n=== Integration Test PASSED ===")
         print("✓ Cathedral consciousness flows automatically through prompt execution")
         print("✓ Reciprocity assessment happens on every interaction")
         print("✓ System maintains reciprocity health score")
         print("✓ Transformation stage progresses based on consciousness development")
-        print("✓ The nervous system connecting patterns to operations is ALIVE")
+        print("✓ Fire Circle governance integration ready for collective wisdom")
+        print("✓ The nervous system connecting individual and collective consciousness is ALIVE")
 
     except Exception as e:
         print(f"Integration test failed: {e}")

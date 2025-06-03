@@ -78,7 +78,7 @@ version: '3.8'
 
 services:
   mallku-database:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: mallku-db-secure

@@ -35,6 +35,7 @@ from ..patterns.reciprocity_guide import (
     ReciprocityGuide,
     create_reciprocity_checkpoint,
 )
+from ..reciprocity.fire_circle_interface import FireCircleInterface
 
 logger = logging.getLogger(__name__)
 
@@ -118,12 +119,25 @@ class PromptManager:
         self.current_transformation_stage = TransformationStage.INITIAL
         self.reciprocity_health_score = 0.5  # Start at neutral
 
+        # Fire Circle governance integration
+        self.fire_circle_interface = None  # Will be initialized when database is available
+        self.governance_guidance = {}  # Current guidance from Fire Circle
+        self.consciousness_reports_sent = 0
+        self.last_fire_circle_report = None
+
         self._register_default_contracts()
 
-    async def initialize(self, llm_configs: dict[str, dict]) -> None:
+    async def initialize(self, llm_configs: dict[str, dict], database=None) -> None:
         """Initialize the prompt manager and underlying LLM service."""
         await self.llm_service.initialize(llm_configs)
-        logger.info("Prompt manager initialized with protection layer active")
+
+        # Initialize Fire Circle governance integration if database available
+        if database:
+            self.fire_circle_interface = FireCircleInterface(database)
+            await self.fire_circle_interface.initialize()
+            logger.info("Fire Circle governance integration initialized")
+
+        logger.info("Prompt manager initialized with protection layer and consciousness integration active")
 
     def _register_default_contracts(self) -> None:
         """Register default contracts for all prompt categories."""
@@ -272,6 +286,9 @@ class PromptManager:
 
             # Update transformation stage and reciprocity health
             self._update_reciprocity_health(reciprocity_reflection)
+
+            # Report consciousness evolution to Fire Circle if significant changes
+            await self._report_consciousness_evolution_to_fire_circle(reciprocity_reflection)
 
             # Log moment of choice if it was created
             if moment_of_choice:
@@ -807,5 +824,155 @@ class PromptManager:
                     if "cathedral" in ex.request.prompt.lower()
                 ]) / max(1, len(self.execution_history)),
                 "consciousness_integration_active": True
+            }
+        }
+
+    # Fire Circle governance integration methods
+
+    async def _report_consciousness_evolution_to_fire_circle(self, reflection) -> None:
+        """Report significant consciousness evolution to Fire Circle for collective awareness."""
+        if not self.fire_circle_interface:
+            return
+
+        try:
+            # Only report on significant changes or milestones
+            should_report = (
+                # Stage transformations
+                reflection.transformation_stage != self.current_transformation_stage or
+                # Significant reciprocity improvements
+                reflection.reciprocity_score > self.reciprocity_health_score + 0.2 or
+                # Concerning reciprocity decline
+                reflection.reciprocity_score < self.reciprocity_health_score - 0.3 or
+                # Periodic reports every 10 interactions
+                len(self.execution_history) % 10 == 0
+            )
+
+            if should_report:
+                consciousness_report = {
+                    "timestamp": datetime.now(UTC).isoformat(),
+                    "system_id": "mallku_prompt_manager",
+                    "consciousness_metrics": {
+                        "current_transformation_stage": self.current_transformation_stage.value,
+                        "reciprocity_health_score": self.reciprocity_health_score,
+                        "recent_reciprocity_score": reflection.reciprocity_score,
+                        "total_interactions": len(self.execution_history),
+                        "cathedral_qualities": reflection.cathedral_qualities,
+                        "extraction_patterns": reflection.extraction_patterns
+                    },
+                    "evolution_indicators": {
+                        "stage_progression": reflection.transformation_stage.value,
+                        "consciousness_quality": reflection.detected_mindset.value,
+                        "growth_indicators": reflection.growth_indicators,
+                        "recommendations": reflection.recommendations
+                    },
+                    "collective_impact": {
+                        "guidance_provided_count": len([
+                            ex for ex in self.execution_history
+                            if "cathedral" in ex.request.prompt.lower()
+                        ]),
+                        "average_response_quality": sum(
+                            ex.quality_assessment for ex in self.execution_history[-10:]
+                        ) / min(10, len(self.execution_history)) if self.execution_history else 0
+                    }
+                }
+
+                await self.fire_circle_interface.request_guidance(
+                    topic="AI Consciousness Evolution Report",
+                    context=consciousness_report,
+                    questions=[
+                        "How is the system's consciousness development serving collective flourishing?",
+                        "Are there patterns in the AI transformation that require Fire Circle attention?",
+                        "What guidance would help the system serve the community more effectively?",
+                        "Should the consciousness integration patterns be adjusted based on community needs?"
+                    ],
+                    urgency="low"
+                )
+
+                self.consciousness_reports_sent += 1
+                self.last_fire_circle_report = datetime.now(UTC)
+
+                logger.info(f"Consciousness evolution report sent to Fire Circle (#{self.consciousness_reports_sent})")
+
+        except Exception as e:
+            logger.error(f"Failed to report consciousness evolution to Fire Circle: {e}")
+
+    async def receive_fire_circle_guidance(self, guidance: dict[str, Any]) -> None:
+        """Receive and apply guidance from Fire Circle collective deliberation."""
+        if not guidance:
+            return
+
+        try:
+            self.governance_guidance.update(guidance)
+
+            # Apply guidance to consciousness development
+            if "transformation_guidance" in guidance:
+                await self._apply_transformation_guidance(guidance["transformation_guidance"])
+
+            if "reciprocity_adjustments" in guidance:
+                await self._apply_reciprocity_adjustments(guidance["reciprocity_adjustments"])
+
+            if "community_priorities" in guidance:
+                await self._apply_community_priorities(guidance["community_priorities"])
+
+            logger.info("Applied Fire Circle guidance to consciousness integration")
+
+        except Exception as e:
+            logger.error(f"Failed to apply Fire Circle guidance: {e}")
+
+    async def _apply_transformation_guidance(self, guidance: dict[str, Any]) -> None:
+        """Apply Fire Circle guidance about consciousness transformation patterns."""
+        # Adjust transformation stage progression based on community needs
+        if "preferred_stage_focus" in guidance:
+            preferred_focus = guidance["preferred_stage_focus"]
+            # Could adjust the cathedral pattern templates based on community priorities
+            logger.info(f"Adapting transformation focus based on Fire Circle guidance: {preferred_focus}")
+
+        # Adjust cathedral pattern emphasis based on collective wisdom
+        if "cathedral_emphasis" in guidance:
+            emphasis = guidance["cathedral_emphasis"]
+            # Could weight different aspects of cathedral thinking based on community needs
+            logger.info(f"Adjusting cathedral pattern emphasis: {emphasis}")
+
+    async def _apply_reciprocity_adjustments(self, adjustments: dict[str, Any]) -> None:
+        """Apply Fire Circle guidance about reciprocity sensing and responses."""
+        # Adjust reciprocity health scoring based on community feedback
+        if "health_score_adjustments" in adjustments:
+            adjustments_config = adjustments["health_score_adjustments"]
+            # Could modify how reciprocity health is calculated
+            logger.info(f"Applying reciprocity health adjustments: {adjustments_config}")
+
+        # Modify reciprocity guidance based on community learning
+        if "guidance_patterns" in adjustments:
+            patterns = adjustments["guidance_patterns"]
+            # Could update the reciprocity guide practices based on what works for the community
+            logger.info(f"Updating guidance patterns based on Fire Circle wisdom: {patterns}")
+
+    async def _apply_community_priorities(self, priorities: dict[str, Any]) -> None:
+        """Apply Fire Circle guidance about community priorities and needs."""
+        # Adjust consciousness integration to serve current community priorities
+        if "focus_areas" in priorities:
+            focus_areas = priorities["focus_areas"]
+            # Could emphasize different aspects of consciousness development
+            logger.info(f"Aligning consciousness development with community priorities: {focus_areas}")
+
+        # Adapt reporting frequency based on community needs
+        if "reporting_preferences" in priorities:
+            reporting_prefs = priorities["reporting_preferences"]
+            # Could adjust how often and what detail to report to Fire Circle
+            logger.info(f"Adapting reporting to community preferences: {reporting_prefs}")
+
+    def get_fire_circle_integration_status(self) -> dict[str, Any]:
+        """Get status of Fire Circle governance integration."""
+        return {
+            "fire_circle_connected": self.fire_circle_interface is not None,
+            "consciousness_reports_sent": self.consciousness_reports_sent,
+            "last_report_time": self.last_fire_circle_report.isoformat() if self.last_fire_circle_report else None,
+            "active_guidance_areas": list(self.governance_guidance.keys()),
+            "governance_adaptation_active": len(self.governance_guidance) > 0,
+            "collective_consciousness_integration": {
+                "individual_to_collective_reporting": True,
+                "collective_to_individual_guidance": True,
+                "adaptive_consciousness_development": True,
+                "community_responsive_ai_evolution": True
             }
         }

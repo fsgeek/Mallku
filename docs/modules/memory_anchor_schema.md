@@ -4,12 +4,12 @@
 ## ✨ Design Song
 
 Memory anchors are not metadata. They are not tags or labels or categories.
-They are **utilitarian correlation tools** - the precise mechanisms that bind 
+They are **utilitarian correlation tools** - the precise mechanisms that bind
 isolated events into meaningful temporal associations.
 
 This schema defines memory anchors as focused infrastructure for temporal correlation,
 with formal structure that enables both accurate pattern recognition and efficient graph traversal.
-Each anchor holds the capacity for relationship - the ability to bind moments across time 
+Each anchor holds the capacity for relationship - the ability to bind moments across time
 through the recognition of temporal proximity and contextual resonance.
 
 ## 🏗️ Core Schema
@@ -23,29 +23,29 @@ MemoryAnchor:
   created_at: ISO8601         # Moment of creation
   last_accessed: ISO8601      # Most recent traversal
   last_reinforced: ISO8601    # Most recent strengthening
-  
+
   # Classification and strength
   anchor_type: AnchorType     # See type definitions below
   strength: float             # 0.0-1.0, subject to decay and reinforcement
   confidence: float           # 0.0-1.0, certainty of correlation
   decay_rate: float          # Natural weakening over time
-  
+
   # Temporal and spatial binding
   temporal_window:
     start_time: ISO8601       # Beginning of associated time span
-    end_time: ISO8601         # End of associated time span  
+    end_time: ISO8601         # End of associated time span
     precision: TemporalPrecision  # second, minute, hour, day, week
-  
+
   spatial_context:           # Optional location binding
     coordinates: [lat, lon]   # Geographic anchoring
     location_name: string     # Human-readable place reference
     precision_radius: meters  # Uncertainty radius
-  
+
   # Correlation data
   context_signature: SHA256   # Unique hash of circumstances
   activity_streams: [UUID]    # Contributing data streams
   storage_events: [UUID]      # Associated file/data operations
-  
+
   # Utilitarian metrics
   access_frequency: int       # How often this anchor is traversed
   correlation_accuracy: float # Historical success rate of this correlation
@@ -59,23 +59,23 @@ AnchorType:
   TEMPORAL:         # Time-based correlations
     description: "Events clustered by temporal proximity"
     examples: ["files created during meetings", "edits during travel"]
-    
+
   CONTEXTUAL:       # Environmental/situational
-    description: "Actions taken under similar circumstances"  
+    description: "Actions taken under similar circumstances"
     examples: ["work done while listening to specific music", "focus sessions"]
-    
+
   SEMANTIC:         # Content-meaning relationships
     description: "Connections based on content similarity or theme"
     examples: ["documents about same project", "images of same event"]
-    
+
   SOCIAL:          # Human relationship contexts
     description: "Activities involving specific people or groups"
     examples: ["files shared with collaborators", "work done during conversations"]
-    
+
   CAUSAL:          # Sequential dependencies
     description: "Events that trigger or result from other events"
     examples: ["email leads to document creation", "meeting spawns action items"]
-    
+
   RITUAL:          # Repeated behavioral patterns
     description: "Recurring practices and workflows"
     examples: ["daily review sessions", "weekly planning rituals"]
@@ -104,11 +104,11 @@ RESONATES_WITH:
   resonance_strength: float        # Degree of contextual overlap
   stability: float                 # Consistency over time
 
-# Hierarchical relationships - part/whole structures  
+# Hierarchical relationships - part/whole structures
 CONTAINS:
   containment_type: ContainmentType  # spatial, temporal, semantic, social
   coverage: float                    # How much of child is contained
-  
+
 DERIVES_FROM:
   derivation_type: DerivationType    # specialization, generalization, transformation
   transformation_confidence: float   # Certainty of derivation
@@ -117,7 +117,7 @@ DERIVES_FROM:
 CONFLICTS_WITH:
   conflict_type: ConflictType        # temporal, semantic, causal
   resolution_strategy: string        # How conflicts should be resolved
-  
+
 COMPETES_WITH:
   competition_dimension: string      # What they compete for (attention, resources)
   winner_determination: string       # How to choose between them
@@ -129,16 +129,16 @@ COMPETES_WITH:
 TemporalPrecision:
   INSTANT:     # sub-second precision
     use_case: "File save events, keystroke patterns"
-    
-  MINUTE:      # minute-level grouping  
+
+  MINUTE:      # minute-level grouping
     use_case: "Brief focused activities, quick edits"
-    
+
   SESSION:     # multi-minute work periods
     use_case: "Concentrated work blocks, meeting segments"
-    
+
   DAILY:       # day-level patterns
     use_case: "Daily rhythms, routine activities"
-    
+
   CYCLICAL:    # weekly/monthly patterns
     use_case: "Recurring meetings, periodic reviews"
 ```
@@ -147,7 +147,7 @@ TemporalPrecision:
 
 ### Anchor Creation
 - **Threshold-based**: Created when correlation strength exceeds minimum confidence
-- **Pattern recognition**: Emerge from repeated temporal proximities  
+- **Pattern recognition**: Emerge from repeated temporal proximities
 - **Manual curation**: User or AI-assisted anchor creation
 - **Import/migration**: From existing activity context data
 
@@ -177,7 +177,7 @@ TemporalPrecision:
 - Supports complex pattern matching across temporal and semantic dimensions
 - Optimized indexing on temporal windows and strength metrics
 
-### With Query System  
+### With Query System
 - Natural language queries can traverse anchor relationships
 - "Show me files from when I was working on project X" becomes graph traversal
 - Anchor metadata enriches query result ranking and explanation

@@ -51,7 +51,7 @@ CorrelationStability:
   description: "Temporal patterns that repeat independently indicate meaningful relationships"
   detection: "Same correlation detected across multiple observation windows"
   confidence_boost: "Increase confidence when patterns self-replicate"
-  
+
 CrossValidation:
   description: "Multiple activity streams pointing to same correlation"
   examples:
@@ -88,7 +88,7 @@ NaturalInteractionPoints:
     frequency: "Weekly, only for active users"
     format: "Simple emoji response: How was your search experience?"
     opt_out: "Always available, respected permanently"
-    
+
   high_engagement_moments:
     trigger: "User has been productively engaged for >20 minutes with anchor-suggested content"
     prompt: "Tiny thumbs up/down icon with 'More like this?' option"
@@ -113,7 +113,7 @@ EngagementMetrics:
     - edited_suggested_content: +0.3_confidence
     - shared_or_collaborated: +0.4_confidence
     - bookmarked_or_starred: +0.5_confidence
-    
+
   negative_indicators:
     - immediate_back_navigation: -0.1_confidence
     - searched_alternative_immediately: -0.2_confidence
@@ -125,7 +125,7 @@ BehavioralLearning:
     - temporal_preference_detection: "User prefers recent files vs. historical"
     - context_weighting_preferences: "Values location over social context"
     - precision_vs_recall_balance: "Prefers fewer, highly relevant results"
-    
+
   adaptation_mechanisms:
     - personal_threshold_calibration: "Adjust confidence thresholds per user"
     - domain_specific_learning: "Work patterns vs. personal patterns"
@@ -142,7 +142,7 @@ SeasonalPatternRecognition:
     - work_schedule_changes: "Summer hours, holiday patterns, sabbaticals"
     - project_lifecycle_shifts: "Research phase vs. writing phase vs. review phase"
     - life_transition_events: "Moving, job changes, major life events"
-    
+
   adaptation_responses:
     - threshold_adjustment: "Reduce correlation confidence during transition periods"
     - pattern_retirement: "Archive anchors that no longer match life context"
@@ -153,7 +153,7 @@ LongTermValidation:
     - correlation_persistence: "Which temporal patterns remain stable over months?"
     - effectiveness_trends: "Are anchor suggestions becoming more or less useful?"
     - user_growth_tracking: "How does search sophistication evolve over time?"
-    
+
   quarterly_recalibration:
     - confidence_threshold_review: "Optimize precision/recall balance"
     - anchor_pruning: "Remove correlations that no longer serve"
@@ -168,7 +168,7 @@ CrossUserPatterns:
     - common_correlation_types: "Temporal patterns that work across users"
     - context_sensitivity_patterns: "Which correlations are highly personal vs. universal"
     - threshold_optimization: "Statistical analysis of effective confidence levels"
-    
+
   privacy_preservation:
     - no_content_sharing: "Learn patterns, not specific data"
     - opt_out_always_available: "Individual choice over participation"

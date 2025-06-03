@@ -25,14 +25,14 @@ These files represented our learning journey but now create confusion:
 - `requirements-api.txt` - Clear API dependencies
 
 ### The Lesson
-Scaffolding is necessary for building, but must be removed once the structure stands. 
+Scaffolding is necessary for building, but must be removed once the structure stands.
 Every file in the cathedral should have one clear purpose.
 
 ## The Command Record
 ```bash
 # Files removed
 git rm docker/Dockerfile.database
-git rm docker/Dockerfile.database.alpine  
+git rm docker/Dockerfile.database.alpine
 git rm docker/Dockerfile.database.ubuntu
 git rm docker/fix-build.sh
 git rm docker/requirements-database.txt

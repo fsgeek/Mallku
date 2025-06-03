@@ -28,7 +28,7 @@ Even with full host access, you cannot reach the database directly. The structur
 
 ### 3. Simplicity Over Cleverness
 - Ubuntu base (not Alpine) - understood by all
-- Clear file structure - each container self-contained  
+- Clear file structure - each container self-contained
 - Explicit dependencies - no hidden complexity
 
 ## The Architecture
@@ -68,7 +68,7 @@ Even with full host access, you cannot reach the database directly. The structur
 ### Survives Amnesia
 New developers cannot accidentally expose the database. The structure prevents it.
 
-### Enforces Boundaries  
+### Enforces Boundaries
 API container literally cannot be bypassed. Physical network isolation.
 
 ### Self-Documenting
@@ -105,7 +105,7 @@ docker run --rm --network mallku_mallku-internal alpine ping database
 ## Future Stones
 
 1. **Encrypted volumes** - Data at rest protection
-2. **mTLS between containers** - Encrypted internal communication  
+2. **mTLS between containers** - Encrypted internal communication
 3. **API rate limiting** - Protection from abuse
 4. **Audit logging** - Every access recorded
 

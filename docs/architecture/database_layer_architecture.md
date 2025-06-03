@@ -24,12 +24,12 @@ mallku-database-container:
     - Schema Registry
     - Security Transformer
     - Semantic Mapper
-  
+
   exposed:
     - Mallku Database API (REST/gRPC)
     - Health endpoints
     - Metrics endpoints
-  
+
   never-exposed:
     - Direct ArangoDB ports
     - Raw data access
@@ -44,14 +44,14 @@ class MallkuDatabaseLayer:
     The ONLY interface to persistent storage.
     Enforces schemas, security, and semantic mappings.
     """
-    
+
     def __init__(self):
         self._db = ArangoDB()  # Private, never exposed
         self._registry = CollectionRegistry()
         self._schemas = SchemaRegistry()
         self._security = SecurityTransformer()
         self._semantics = SemanticMapper()
-    
+
     async def register_collection(
         self,
         semantic_name: str,
@@ -67,30 +67,30 @@ class MallkuDatabaseLayer:
         await self._validate_semantic_coherence(
             description, schema, semantic_definitions
         )
-        
+
         # Generate UUID for collection
         collection_uuid = self._security.generate_collection_uuid()
-        
+
         # Store semantic mappings
         self._semantics.register_collection(
             semantic_name, collection_uuid, description
         )
-        
+
         # Create schema with semantic field definitions
         self._schemas.register(collection_uuid, schema, semantic_definitions)
-        
+
         # Create indices for marked fields
         await self._create_indices(collection_uuid, schema)
-        
+
         # Initialize collection in ArangoDB
         await self._db.create_collection(collection_uuid)
-        
+
         return CollectionRegistration(
             semantic_name=semantic_name,
             uuid=collection_uuid,
             created_at=datetime.utcnow()
         )
-    
+
     async def store(
         self,
         collection_name: str,
@@ -101,23 +101,23 @@ class MallkuDatabaseLayer:
         """
         # Resolve collection UUID
         collection_uuid = self._semantics.get_collection_uuid(collection_name)
-        
+
         # Validate against schema
         schema = self._schemas.get_schema(collection_uuid)
         validation_result = schema.validate(data)
         if not validation_result.valid:
             raise SchemaValidationError(validation_result.errors)
-        
+
         # Apply security transformations
         secured_data = self._security.transform(
             collection_uuid,
             data,
             schema.security_config
         )
-        
+
         # Store in ArangoDB
         doc = await self._db.insert(collection_uuid, secured_data)
-        
+
         # Return obfuscated reference
         return StorageResult(
             id=self._security.obfuscate_id(doc._id),
@@ -132,16 +132,16 @@ class MallkuDatabaseLayer:
 @dataclass
 class CollectionSchema:
     """Schema definition with semantic context."""
-    
+
     fields: Dict[str, FieldDefinition]
     required_fields: List[str]
     indices: List[IndexDefinition]
     security_config: SecurityConfiguration
-    
+
 @dataclass
 class FieldDefinition:
     """Field definition with semantic meaning."""
-    
+
     type: FieldType
     semantic_description: str
     indexed: bool = False
@@ -152,7 +152,7 @@ class FieldDefinition:
 @dataclass
 class SemanticValidation:
     """Ensures semantic descriptions align with schemas."""
-    
+
     async def validate_coherence(
         self,
         collection_description: str,
@@ -174,21 +174,21 @@ class SemanticValidation:
 ```python
 class IndexManager:
     """Manages indices based on schema definitions."""
-    
+
     async def create_indices(
         self,
         collection_uuid: str,
         schema: CollectionSchema
     ):
         """Create indices for all marked fields."""
-        
+
         for field_name, field_def in schema.fields.items():
             if field_def.indexed:
                 # Map semantic field name to UUID
                 field_uuid = self._security.get_field_uuid(
                     collection_uuid, field_name
                 )
-                
+
                 # Create appropriate index type
                 if field_def.type in [FieldType.TEXT, FieldType.STRING]:
                     await self._create_inverted_index(

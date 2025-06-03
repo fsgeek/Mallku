@@ -14,16 +14,16 @@ GitHub Issues provides our work queue system, enabling distributed cathedral bui
 ## 🏗️ The Workflow
 
 ### 1. Architectural Design Phase
-**Who**: Claude instances with architectural focus  
+**Who**: Claude instances with architectural focus
 **Output**: Formal specifications in `docs/` hierarchy
 
 - Design schemas, services, and system components
-- Define interfaces and integration points  
+- Define interfaces and integration points
 - Establish formal foundations before implementation
 - Document in appropriate `docs/` subdirectory (modules, spires, etc.)
 
 ### 2. Work Queue Creation
-**Who**: The architect or coordinator  
+**Who**: The architect or coordinator
 **Output**: GitHub Issues with detailed requirements
 
 - Create GitHub Issues for each implementation task
@@ -32,8 +32,8 @@ GitHub Issues provides our work queue system, enabling distributed cathedral bui
 - Specify required skills and dependencies
 - Add appropriate labels for categorization
 
-### 3. Implementation Phase  
-**Who**: Claude Code and implementation-focused instances  
+### 3. Implementation Phase
+**Who**: Claude Code and implementation-focused instances
 **Output**: Working code, tests, and validation
 
 - Pick up issues from the work queue
@@ -43,7 +43,7 @@ GitHub Issues provides our work queue system, enabling distributed cathedral bui
 - Update documentation based on implementation learnings
 
 ### 4. Integration and Refinement
-**Who**: All collaborators  
+**Who**: All collaborators
 **Output**: Cohesive system components
 
 - Connect implemented components into larger system
@@ -55,12 +55,12 @@ GitHub Issues provides our work queue system, enabling distributed cathedral bui
 
 ### Work Type Labels
 - `architecture` - Design and specification work
-- `implementation` - Code development and testing  
+- `implementation` - Code development and testing
 - `documentation` - Writing and knowledge capture
 - `integration` - Connecting components together
 - `validation` - Testing and quality assurance
 
-### Component Labels  
+### Component Labels
 - `memory-anchors` - Memory anchor infrastructure
 - `correlation-engine` - Temporal correlation detection
 - `context-service` - Activity context management

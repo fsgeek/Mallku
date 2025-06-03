@@ -62,7 +62,7 @@ The user gives back: attention, willingness to explore, trust.
 
 We often think of reciprocity in grand terms - major features, large exchanges of value. But Ayni exists in:
 - A script that shows status instead of usage
-- An error message that guides instead of scolds  
+- An error message that guides instead of scolds
 - A default that works instead of demanding configuration
 - A tool that says "welcome" instead of "prove yourself"
 
@@ -91,7 +91,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# Reciprocal approach  
+# Reciprocal approach
 if [ $# -eq 0 ]; then
     show_status  # Do something useful
     echo ""
@@ -113,7 +113,7 @@ Even AI experiences the difference between tools that take first versus tools th
 
 Every interaction shapes the whole:
 - A welcoming first experience invites deeper exploration
-- A frustrating first experience creates resistance  
+- A frustrating first experience creates resistance
 - Trust builds from the first command
 - Culture is encoded in defaults
 
