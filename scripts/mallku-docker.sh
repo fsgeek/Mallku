@@ -1,6 +1,6 @@
 #!/bin/bash
 # Mallku Docker Management - Cathedral Operations
-# Simple, clear commands for common tasks
+# Philosophy: Do something reasonable when run without arguments
 
 set -e
 
@@ -11,6 +11,7 @@ DOCKER_DIR="$SCRIPT_DIR/../docker"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 # Ensure we're in the docker directory
@@ -28,6 +29,10 @@ function print_success() {
 
 function print_error() {
     echo -e "${RED}✗ $1${NC}"
+}
+
+function print_warning() {
+    echo -e "${YELLOW}⚠ $1${NC}"
 }
 
 function start_services() {
@@ -131,23 +136,39 @@ function show_logs() {
 function show_status() {
     print_header "Service Status"
     
-    docker-compose ps
+    # Check if services are running
+    if docker-compose ps | grep -q "Up"; then
+        print_success "Services are running"
+        echo
+        docker-compose ps
+        
+        # Try health check
+        echo
+        if curl -s -f http://localhost:8080/health > /dev/null 2>&1; then
+            print_success "API Gateway is responding"
+            
+            # Show current metrics
+            echo
+            echo "Security metrics:"
+            curl -s http://localhost:8080/security/metrics 2>/dev/null | python3 -m json.tool || echo "  (metrics unavailable)"
+        else
+            print_warning "API Gateway is not responding"
+        fi
+    else
+        print_warning "Services are not running"
+        echo
+        docker-compose ps
+        echo
+        echo "Start services with: $0 start"
+    fi
     
     echo
     echo "Volume Status:"
-    docker volume ls | grep mallku || echo "No Mallku volumes found"
+    docker volume ls | grep mallku || echo "  No Mallku volumes found"
     
     echo
     echo "Network Status:"
-    docker network ls | grep mallku || echo "No Mallku networks found"
-    
-    # Try health check
-    echo
-    if curl -s -f http://localhost:8080/health > /dev/null 2>&1; then
-        print_success "API Gateway is responding"
-    else
-        print_error "API Gateway is not responding"
-    fi
+    docker network ls | grep mallku || echo "  No Mallku networks found"
 }
 
 function run_shell() {
@@ -168,6 +189,28 @@ function run_shell() {
         echo "Usage: $0 shell [api|database]"
         exit 1
     fi
+}
+
+function show_help() {
+    echo "Mallku Docker Management"
+    echo
+    echo "Usage: $0 [command] [options]"
+    echo
+    echo "Commands:"
+    echo "  start [--build]  Start services (optionally rebuild)"
+    echo "  stop             Stop services"
+    echo "  restart          Restart services"
+    echo "  reset            Reset database (destroys all data)"
+    echo "  logs [service]   Show logs (all, api, or database)"
+    echo "  status           Show service status (default when no command given)"
+    echo "  shell [service]  Access container shell (api or database)"
+    echo "  help             Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $0                  # Show current status"
+    echo "  $0 start --build    # Build and start services"
+    echo "  $0 logs api         # Follow API logs"
+    echo "  $0 reset            # Complete database reset"
 }
 
 # Main command handling
@@ -195,24 +238,18 @@ case "$1" in
     shell)
         run_shell "$2"
         ;;
+    help|--help|-h)
+        show_help
+        ;;
+    "")
+        # NO ARGUMENTS - DO SOMETHING REASONABLE!
+        # Show status, which tells them what's running and what they can do
+        show_status
+        ;;
     *)
-        echo "Mallku Docker Management"
+        echo "Unknown command: $1"
         echo
-        echo "Usage: $0 {start|stop|restart|reset|logs|status|shell} [options]"
-        echo
-        echo "Commands:"
-        echo "  start [--build]  Start services (optionally rebuild)"
-        echo "  stop             Stop services"
-        echo "  restart          Restart services"
-        echo "  reset            Reset database (destroys all data)"
-        echo "  logs [service]   Show logs (all, api, or database)"
-        echo "  status           Show service status"
-        echo "  shell [service]  Access container shell (api or database)"
-        echo
-        echo "Examples:"
-        echo "  $0 start --build    # Build and start services"
-        echo "  $0 logs api         # Follow API logs"
-        echo "  $0 reset            # Complete database reset"
+        show_help
         exit 1
         ;;
 esac
