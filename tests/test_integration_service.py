@@ -19,6 +19,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# ruff: noqa: E402
 from mallku.integration import EndToEndIntegrationService, PipelineConfiguration, PipelineEvent
 from mallku.integration.pipeline_models import PipelineStage
 

@@ -1,0 +1,64 @@
+# Dockerfile.database - Secured ArangoDB with Mallku Interface
+# This container embodies "security through architecture" principles
+# by making direct database access impossible.
+
+FROM arangodb/arangodb:3.11.8
+
+# Create mallku user for running the service
+RUN useradd -r -u 999 mallku
+
+# Install Python for the Mallku interface layer
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python3 -m venv /opt/mallku-venv
+ENV PATH="/opt/mallku-venv/bin:$PATH"
+
+# Copy requirements for the database interface
+COPY requirements-database.txt /tmp/
+RUN pip install -r /tmp/requirements-database.txt
+
+# Copy only the Mallku database interface code
+COPY src/mallku/core/database/ /opt/mallku/core/database/
+COPY src/mallku/core/security/ /opt/mallku/core/security/
+COPY src/mallku/core/__init__.py /opt/mallku/core/
+COPY src/mallku/__init__.py /opt/mallku/
+
+# Copy the database service entry point
+COPY scripts/database_service.py /opt/mallku/
+
+# Copy ArangoDB configuration that disables external access
+COPY config/arangodb-secured.conf /etc/arangodb3/
+
+# Set working directory
+WORKDIR /opt/mallku
+
+# Create data directory with proper permissions
+RUN mkdir -p /var/lib/arangodb3 && \
+    chown -R arangodb:arangodb /var/lib/arangodb3 && \
+    chown -R mallku:mallku /opt/mallku
+
+# Environment variables for Mallku configuration
+ENV MALLKU_DB_HOST=localhost
+ENV MALLKU_DB_PORT=8529
+ENV MALLKU_API_HOST=0.0.0.0
+ENV MALLKU_API_PORT=8080
+ENV PYTHONPATH=/opt/mallku
+
+# Expose only the Mallku API port (NOT ArangoDB port)
+EXPOSE 8080
+
+# Health check for the Mallku interface
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Start script that launches both ArangoDB and Mallku interface
+COPY scripts/start_database_service.sh /opt/mallku/
+RUN chmod +x /opt/mallku/start_database_service.sh
+
+# Use the start script as entry point
+CMD ["/opt/mallku/start_database_service.sh"]

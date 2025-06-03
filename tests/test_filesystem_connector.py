@@ -18,6 +18,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# ruff: noqa: E402
 from mallku.correlation.models import Event, EventType
 from mallku.streams.filesystem import FileEventFilter, FileSystemConnector
 
@@ -26,8 +27,8 @@ class FileSystemConnectorTests:
     """Test suite for file system activity stream connector."""
 
     def __init__(self):
-        self.test_dir: Path = None
-        self.connector: FileSystemConnector = None
+        self.test_dir: Path | None = None
+        self.connector: FileSystemConnector | None = None
         self.captured_events: list[Event] = []
 
     async def run_all_tests(self):
@@ -98,12 +99,18 @@ class FileSystemConnectorTests:
 
     async def test_connector_initialization(self) -> bool:
         """Test file system connector initialization."""
+        if not self.test_dir:
+            raise TypeError("Test directory not set up. Run setup first.")
+
         try:
             # Create event filter for test directory only
             event_filter = FileEventFilter(
                 watch_directories=[self.test_dir],
                 ignore_directories=["temp"],  # Ignore temp subdirectory
-                test_mode=True  # Enable permissive filtering for testing
+                test_mode=True,  # Enable permissive filtering for testing
+                include_extensions=None,  # Include all file types
+                min_file_size=0,  # No size filtering
+                max_file_size=None,  # No size limit
             )
 
             # Create connector
@@ -135,6 +142,8 @@ class FileSystemConnectorTests:
 
     async def test_file_creation_events(self) -> bool:
         """Test file creation event capture."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
         try:
             initial_count = len(self.captured_events)
 
@@ -181,6 +190,8 @@ class FileSystemConnectorTests:
             initial_count = len(self.captured_events)
 
             # Modify existing file
+            if not isinstance(self.test_dir, Path):
+                raise TypeError("Test directory not initialized")
             test_file = self.test_dir / "test_file.md"
             test_file.write_text("Modified content at " + str(datetime.now(UTC)))
 
@@ -209,6 +220,10 @@ class FileSystemConnectorTests:
 
     async def test_file_deletion_events(self) -> bool:
         """Test file deletion event capture."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
+
+
         try:
             initial_count = len(self.captured_events)
 
@@ -237,6 +252,9 @@ class FileSystemConnectorTests:
 
     async def test_file_move_events(self) -> bool:
         """Test file move/rename event capture."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
+
         try:
             initial_count = len(self.captured_events)
 
@@ -275,6 +293,9 @@ class FileSystemConnectorTests:
 
     async def test_event_filtering(self) -> bool:
         """Test event filtering functionality."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
+
         try:
             initial_count = len(self.captured_events)
 
@@ -356,6 +377,9 @@ class FileSystemConnectorTests:
 
     async def test_workflow_pattern_detection(self) -> bool:
         """Test workflow pattern detection in correlation tags."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
+
         try:
             initial_count = len(self.captured_events)
 
@@ -396,6 +420,9 @@ class FileSystemConnectorTests:
 
     async def test_rate_limiting(self) -> bool:
         """Test rate limiting for rapid file changes."""
+        if not isinstance(self.test_dir, Path):
+            raise TypeError("Test directory not set up. Run setup first.")
+
         try:
             initial_count = len(self.captured_events)
 
@@ -425,6 +452,9 @@ class FileSystemConnectorTests:
 
     async def test_statistics_collection(self) -> bool:
         """Test statistics collection and reporting."""
+        if not isinstance(self.connector, FileSystemConnector):
+            raise TypeError("Connector not initialized. Run initialization test first.")
+
         try:
             stats = self.connector.get_statistics()
 

@@ -324,7 +324,7 @@ class ReciprocityTrackerTests:
             )
 
             # This should potentially trigger extraction detection
-            alerts = await self.tracker.extraction_detector.analyze_interaction(want_based_interaction)
+            _ = await self.tracker.extraction_detector.analyze_interaction(want_based_interaction)
 
             print("   Need vs want detection successful")
             return True
