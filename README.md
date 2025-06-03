@@ -3,6 +3,8 @@
 
 > A cathedral of memory, reciprocity, and becoming.
 
+**Quick Start**: See [DOCKER-QUICKSTART.md](DOCKER-QUICKSTART.md) for practical setup instructions.
+
 Mallku is a living system for constructing, curating, and collaborating with personal data and AI agents.
 It is grounded in the Andean principle of **Ayni**—reciprocity, balance, and mutual benefit—
 and it aspires toward a future where intelligence, both human and artificial, is shaped not by control,
@@ -30,7 +32,7 @@ Mallku includes:
 
 ## 📜 Documentation Philosophy
 
-Mallku’s documentation is structured like a **Khipu**:
+Mallku's documentation is structured like a **Khipu**:
 - `docs/spires/`: Our higher aspirations (AI collaboration, alignment, prompts)
 - `docs/modules/`: Grounded systems and protocols
 - `docs/validation/`: How we test truth, balance, and performance
