@@ -1,105 +1,60 @@
-# Docker Compose for Mallku - Cathedral Architecture
-# This embodies "security through architecture" principles by ensuring
-# only the secured interface is accessible, never the raw database
-
 version: '3.8'
 
-services:
-  # Secured Database Service - The Foundation Stone
-  mallku-database:
-    build:
-      context: .
-      dockerfile: Dockerfile.database
-    container_name: mallku-database
-    restart: unless-stopped
+# Cathedral Architecture: Each container has one sacred duty
+# Structure enforces security - no memory required
 
-    # Environment configuration
+services:
+  # Pure database - no modifications, no complexity
+  database:
+    image: arangodb:latest
+    container_name: mallku-database-core
     environment:
-      - MALLKU_DB_HOST=localhost
+      - ARANGO_NO_AUTH=1  # Auth happens at API layer
+    volumes:
+      - mallku_data:/var/lib/arangodb3
+      - mallku_apps_data:/var/lib/arangodb3-apps
+    networks:
+      - mallku-internal
+    # NO PORTS EXPOSED - this is structural security
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8529/_api/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Security layer - the only gateway
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: mallku-api-gateway
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - MALLKU_DB_HOST=database
       - MALLKU_DB_PORT=8529
       - MALLKU_API_HOST=0.0.0.0
       - MALLKU_API_PORT=8080
-      - PYTHONPATH=/opt/mallku
-
-    # Only expose the Mallku API port - ArangoDB port is internal only
     ports:
-      - "8080:8080"
-      # NOTE: Port 8529 (ArangoDB) is NOT exposed - security through architecture
-
-    # Persistent storage for database
+      - "8080:8080"  # ONLY exposed port in entire system
+    networks:
+      - mallku-internal
+      - mallku-external
     volumes:
-      - mallku_database_data:/var/lib/arangodb3
-      - mallku_database_logs:/var/log/arangodb3
-
-    # Health check
+      - ../src:/app/src:ro  # Read-only mount
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
 
-    # Security settings
-    security_opt:
-      - no-new-privileges:true
-    read_only: false  # ArangoDB needs write access to data directory
-
-    # Resource limits
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-
-    networks:
-      - mallku-internal
-
-  # Example application service (for testing the secured interface)
-  mallku-example:
-    build:
-      context: .
-      dockerfile: Dockerfile.example
-    container_name: mallku-example
-    restart: unless-stopped
-
-    # Wait for database to be ready
-    depends_on:
-      mallku-database:
-        condition: service_healthy
-
-    environment:
-      - MALLKU_DATABASE_URL=http://mallku-database:8080
-
-    ports:
-      - "8081:8081"
-
-    networks:
-      - mallku-internal
-
-# Named volumes for persistence
-volumes:
-  mallku_database_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data/database
-
-  mallku_database_logs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./logs/database
-
-# Internal network - no external access to database
 networks:
   mallku-internal:
-    driver: bridge
-    internal: false  # Allow internet access for updates
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+    internal: true  # Cannot be reached from host
+  mallku-external:
+    # Only the API container connects here
+
+volumes:
+  mallku_data:
+  mallku_apps_data:
