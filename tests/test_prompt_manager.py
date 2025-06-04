@@ -99,7 +99,8 @@ class TestPromptManager:
             prompt="Analyze this schema structure",
             context={
                 "schema": {"field": "definition"},
-                "purpose": "Testing schema analysis"
+                "purpose": "Testing schema analysis",
+                "examples": ["Example schema usage"]
             }
         )
 
@@ -257,7 +258,7 @@ class TestPromptManager:
         await prompt_manager.execute_prompt(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test"}
+            context={"schema": {}, "purpose": "test", "examples": ["test example"]}
         )
 
         # Check metrics
@@ -288,7 +289,7 @@ class TestPromptManager:
         response = await prompt_manager.execute_prompt(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test"}
+            context={"schema": {}, "purpose": "test", "examples": ["test example"]}
         )
 
         assert response.quality_score == 0.3

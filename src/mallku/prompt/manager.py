@@ -641,14 +641,21 @@ class PromptManager:
     ) -> float:
         """Assess quality of response against contract expectations."""
         quality_factors = []
+        weights = []
 
-        # Check response length appropriateness
+        # Check response length appropriateness (tokens ≈ 0.75 words)
         response_length = len(response.response_text.split())
-        expected_length = contract.max_response_tokens * 0.75  # Assume 75% token utilization
-        length_score = min(1.0, response_length / expected_length) if expected_length > 0 else 1.0
-        quality_factors.append(length_score)
+        # Convert tokens to words, then expect reasonable utilization
+        expected_words = contract.max_response_tokens * 0.75  # tokens to words
+        target_length = expected_words * 0.2  # Expect 20% utilization for concise technical responses
 
-        # Check for expected patterns
+        # Length scoring: favor concise, complete responses over verbose ones
+        length_score = 1.0 if response_length >= target_length else response_length / target_length
+
+        quality_factors.append(length_score)
+        weights.append(0.2)  # Lower weight for length
+
+        # Check for expected patterns (most important for technical content)
         response_lower = response.response_text.lower()
         pattern_matches = sum(
             1 for pattern in contract.expected_response_patterns
@@ -656,12 +663,16 @@ class PromptManager:
         )
         pattern_score = pattern_matches / max(1, len(contract.expected_response_patterns))
         quality_factors.append(pattern_score)
+        weights.append(0.5)  # Higher weight for technical pattern compliance
 
-        # Use provider's quality score
+        # Use provider's quality score (general linguistic quality)
         quality_factors.append(response.quality_score)
+        weights.append(0.3)  # Moderate weight for provider assessment
 
         # Calculate weighted average
-        return sum(quality_factors) / len(quality_factors)
+        weighted_sum = sum(factor * weight for factor, weight in zip(quality_factors, weights))
+        total_weight = sum(weights)
+        return weighted_sum / total_weight
 
     def _update_quality_metrics(self, category: PromptCategory, quality_score: float) -> None:
         """Update quality metrics for category."""
