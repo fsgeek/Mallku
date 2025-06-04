@@ -7,14 +7,27 @@ through structured dialogue, consensus building, and wisdom preservation.
 
 from .protocol import (
     GovernanceMessage,
+    MessageType,
     ConsensusState,
+    ConsensusTracker,
     ParticipantRole,
+    Participant,
+    ParticipantRegistry,
 )
 
 __all__ = [
+    # Message structures
     "GovernanceMessage",
-    "ConsensusState", 
+    "MessageType",
+    
+    # Consensus mechanisms
+    "ConsensusState",
+    "ConsensusTracker",
+    
+    # Participant management
     "ParticipantRole",
+    "Participant",
+    "ParticipantRegistry",
 ]
 
 __version__ = "0.1.0"
