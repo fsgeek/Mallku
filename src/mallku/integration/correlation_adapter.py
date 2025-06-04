@@ -142,13 +142,19 @@ class CorrelationToAnchorAdapter:
             # Extract primary event information
             primary_event = correlation.primary_event
 
-            # Build cursors from correlated events
-            cursors = self._build_cursors_from_correlation(correlation)
+            # Build cursors from correlated events as dict, not list
+            cursor_list = self._build_cursors_from_correlation(correlation)
+            cursors = {}
+            for i, cursor in enumerate(cursor_list):
+                cursors[f"event_{i}"] = cursor
 
-            # Create temporal window
+            # Create temporal window from correlation events
+            all_events = [correlation.primary_event] + correlation.correlated_events
+            timestamps = [event.timestamp for event in all_events]
+
             temporal_window = {
-                'start_time': correlation.temporal_window_start,
-                'end_time': correlation.temporal_window_end,
+                'start_time': min(timestamps).isoformat(),
+                'end_time': max(timestamps).isoformat(),
                 'precision': correlation.temporal_precision.value,
                 'gap': correlation.temporal_gap.total_seconds()
             }
@@ -162,14 +168,15 @@ class CorrelationToAnchorAdapter:
                 'confidence_factors': correlation.confidence_factors
             }
 
-            # Create memory anchor
+            # Create memory anchor with correct field names
             anchor = MemoryAnchor(
                 anchor_id=uuid4(),
-                cursors=cursors,
-                temporal_window=temporal_window,
+                timestamp=datetime.now(UTC),  # MemoryAnchor expects 'timestamp'
+                cursors=cursors,  # Dict format, not list
                 metadata={
                     'correlation_id': str(correlation.correlation_id),
                     'correlation_metadata': correlation_metadata,
+                    'temporal_window': temporal_window,
                     'primary_event': {
                         'event_id': str(primary_event.event_id),
                         'timestamp': primary_event.timestamp.isoformat(),
@@ -178,15 +185,13 @@ class CorrelationToAnchorAdapter:
                         'correlation_tags': primary_event.correlation_tags
                     },
                     'created_by': 'correlation_adapter',
-                    'creation_method': 'temporal_correlation'
-                },
-                confidence_score=correlation.confidence_score,
-                created_at=datetime.now(UTC),
-                last_accessed=datetime.now(UTC)
+                    'creation_method': 'temporal_correlation',
+                    'confidence_score': correlation.confidence_score
+                }
             )
 
             # Store anchor using memory service
-            stored_anchor = await self.memory_service.create_memory_anchor(anchor)
+            stored_anchor = await self.memory_service.store_memory_anchor(anchor)
 
             return stored_anchor
 
