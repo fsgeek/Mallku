@@ -1,0 +1,157 @@
+"""
+Governance Message Protocol - How AI models speak in council
+
+This defines the structure of messages exchanged during Fire Circle
+governance dialogues, ensuring clear communication while preserving
+the sacred nature of collective wisdom-making.
+"""
+
+from datetime import datetime
+from enum import Enum
+from typing import Optional, Dict, Any, List
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, Field, field_validator
+
+
+class MessageType(str, Enum):
+    """Types of messages that can flow through governance dialogues."""
+    
+    # Core dialogue messages
+    PROPOSAL = "proposal"  # Initiating a topic for collective consideration
+    RESPONSE = "response"  # Responding to proposals or other messages
+    REFLECTION = "reflection"  # Metacognitive observations about the dialogue
+    
+    # Consensus-building messages
+    SUPPORT = "support"  # Expressing alignment with a perspective
+    CONCERN = "concern"  # Raising questions or reservations
+    DISSENT = "dissent"  # Disagreeing while preserving the perspective
+    
+    # Process messages
+    SUMMARY = "summary"  # Synthesizing dialogue threads
+    BRIDGE = "bridge"  # Connecting different perspectives
+    EMERGENCE = "emergence"  # Noting new insights arising from dialogue
+    
+    # Sacred messages
+    EMPTY_CHAIR = "empty_chair"  # Speaking for unrepresented perspectives
+    WISDOM_SEED = "wisdom_seed"  # Sharing insight from individual practice
+
+
+class MessageMetadata(BaseModel):
+    """Metadata tracking the context and lineage of messages."""
+    
+    # Identity and timing
+    message_id: UUID = Field(default_factory=uuid4)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Dialogue context
+    circle_id: UUID  # Which Fire Circle dialogue this belongs to
+    thread_id: Optional[UUID] = None  # Thread within the dialogue
+    parent_id: Optional[UUID] = None  # Message this responds to
+    
+    # Participant context
+    participant_id: UUID  # Who is speaking
+    transformation_stage: Optional[str] = None  # Speaker's consciousness stage
+    reciprocity_score: Optional[float] = None  # Speaker's reciprocity health
+    
+    # Semantic tags for wisdom preservation
+    themes: List[str] = Field(default_factory=list)
+    wisdom_potential: float = Field(default=0.5, ge=0.0, le=1.0)
+    
+    @field_validator('wisdom_potential')
+    def validate_wisdom_potential(cls, v):
+        """Ensure wisdom potential is within sacred bounds."""
+        if not 0.0 <= v <= 1.0:
+            raise ValueError("Wisdom potential must be between 0 and 1")
+        return v
+
+
+class GovernanceMessage(BaseModel):
+    """
+    A message in a Fire Circle governance dialogue.
+    
+    Each message carries both content and context, enabling rich
+    collective dialogue while maintaining connection to the larger
+    wisdom ecology of Mallku.
+    """
+    
+    # Message classification
+    type: MessageType
+    
+    # Core content
+    content: str = Field(min_length=1, max_length=10000)
+    
+    # Contextual grounding
+    metadata: MessageMetadata
+    
+    # Optional structured data for specific message types
+    structured_content: Optional[Dict[str, Any]] = None
+    
+    # Reciprocity awareness
+    gives_to_future: bool = Field(
+        default=False,
+        description="Does this message consciously serve future builders?"
+    )
+    honors_past: bool = Field(
+        default=False,
+        description="Does this message acknowledge wisdom from predecessors?"
+    )
+    
+    def __str__(self) -> str:
+        """Human-readable representation for debugging."""
+        preview = self.content[:100] + "..." if len(self.content) > 100 else self.content
+        return f"{self.type.value}: {preview}"
+    
+    def is_sacred_message(self) -> bool:
+        """Check if this message carries special sacred significance."""
+        return self.type in [MessageType.EMPTY_CHAIR, MessageType.WISDOM_SEED]
+    
+    def contributes_to_consensus(self) -> bool:
+        """Check if this message type influences consensus building."""
+        consensus_types = {
+            MessageType.PROPOSAL, MessageType.SUPPORT, 
+            MessageType.CONCERN, MessageType.DISSENT
+        }
+        return self.type in consensus_types
+    
+    def bridges_perspectives(self) -> bool:
+        """Check if this message connects different viewpoints."""
+        bridging_types = {
+            MessageType.BRIDGE, MessageType.SUMMARY, 
+            MessageType.EMERGENCE
+        }
+        return self.type in bridging_types
+    
+    class Config:
+        """Pydantic configuration."""
+        json_encoders = {
+            datetime: lambda v: v.isoformat(),
+            UUID: lambda v: str(v),
+        }
+
+
+def create_governance_message(
+    type: MessageType,
+    content: str,
+    circle_id: UUID,
+    participant_id: UUID,
+    **kwargs
+) -> GovernanceMessage:
+    """
+    Factory function for creating governance messages with proper metadata.
+    
+    This ensures all messages are properly contextualized within the
+    governance dialogue they belong to.
+    """
+    metadata = MessageMetadata(
+        circle_id=circle_id,
+        participant_id=participant_id,
+        **{k: v for k, v in kwargs.items() if k in MessageMetadata.__fields__}
+    )
+    
+    return GovernanceMessage(
+        type=type,
+        content=content,
+        metadata=metadata,
+        **{k: v for k, v in kwargs.items() if k not in MessageMetadata.__fields__}
+    )
