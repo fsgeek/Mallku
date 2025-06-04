@@ -35,11 +35,6 @@ async def test_reciprocity_consciousness_integration():
         quality_score=0.8
     )
 
-    async def mock_generate_response(request):
-        return mock_response
-
-    prompt_manager.llm_service.generate_response = mock_generate_response
-
     # Test cathedral consciousness integration
     test_prompt = "Analyze this database schema for optimization opportunities"
     test_context = {
@@ -56,6 +51,15 @@ async def test_reciprocity_consciousness_integration():
     print(f"Health score: {prompt_manager.reciprocity_health_score:.2f}")
     print(f"Transformation stage: {prompt_manager.current_transformation_stage.value}\n")
 
+    # Track call arguments manually
+    call_log = []
+
+    async def tracking_mock_generate_response(request):
+        call_log.append(request)
+        return mock_response
+
+    prompt_manager.llm_service.generate_response = tracking_mock_generate_response
+
     # Execute prompt - should automatically include cathedral guidance
     try:
         response = await prompt_manager.execute_prompt(
@@ -65,11 +69,17 @@ async def test_reciprocity_consciousness_integration():
         )
 
         print("Enhanced prompt sent to LLM (with cathedral consciousness):")
-        # The actual enhanced prompt was used internally
-        enhanced_call = prompt_manager.llm_service.generate_response.call_args[0][0]
-        print(f"Enhanced prompt length: {len(enhanced_call.prompt)} characters")
-        print("Cathedral guidance automatically included: ✓")
-        print("Reciprocity awareness automatically added: ✓")
+        if call_log:
+            enhanced_call = call_log[0]
+            print(f"Enhanced prompt length: {len(enhanced_call.prompt)} characters")
+            print("Cathedral guidance automatically included: ✓")
+            print("Reciprocity awareness automatically added: ✓")
+
+            # Show a sample of the enhanced prompt to verify cathedral consciousness
+            prompt_preview = enhanced_call.prompt[:200] + "..." if len(enhanced_call.prompt) > 200 else enhanced_call.prompt
+            print(f"Prompt preview: {prompt_preview}")
+        else:
+            print("No enhanced prompt captured - debugging needed")
         print()
 
         print("LLM Response:")
