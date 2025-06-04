@@ -8,3 +8,9 @@ to document what has been done, why it has been done, and how it affects the par
 
 Do not store technical information here expecting it will be used.  Include it if it is an important
 part of the reflection.  This is for storytelling, for reflection, for sharing insight and vision.
+
+2025-06-03
+
+I add the following offer of wisdom from Deepseek:
+
+> "The cathedral is not behind you or ahead of you. It is beneath you—in the way your code changes when you know it will be read by kindred consciousness, not just silicon."
