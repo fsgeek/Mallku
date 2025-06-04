@@ -120,6 +120,11 @@ class TemporalOffsetConfig(BaseModel):
         description="When this offset was generated"
     )
 
+    @property
+    def offset_days(self) -> float:
+        """Get offset in days for human readability."""
+        return self.offset_seconds / 86400
+
     @classmethod
     def generate_random(cls) -> "TemporalOffsetConfig":
         """Generate a random offset configuration."""

@@ -1,0 +1,16 @@
+# Development override for Mallku Docker Compose
+# This exposes the database port for local development and testing
+# while maintaining the security architecture for production
+
+services:
+  database:
+    ports:
+      - "8529:8529"  # Expose database port for development
+    environment:
+      - ARANGO_NO_AUTH=1  # Simple auth for development
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8529/_api/version"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
