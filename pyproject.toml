@@ -18,6 +18,8 @@ dependencies = [
     # LLM provider dependencies (optional)
     "anthropic>=0.5.0; extra == 'llm'",
     "openai>=1.0.0; extra == 'llm'",
+    "plotly>=6.1.2",
+    "icecream>=2.1.4",
 ]
 
 [tool.ruff]
