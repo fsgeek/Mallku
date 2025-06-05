@@ -6,7 +6,7 @@ with no intermediate storage or buffering.
 """
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from .interface import BaseWrangler, WranglerCapabilities
@@ -53,7 +53,7 @@ class IdentityWrangler(BaseWrangler):
             msg_id = self._generate_message_id()
             wrapped = {
                 '_id': msg_id,
-                '_timestamp': datetime.utcnow(),
+                '_timestamp': datetime.now(UTC),
                 'data': item
             }
             await self._queue.put(wrapped)
@@ -64,7 +64,7 @@ class IdentityWrangler(BaseWrangler):
             'success': True,
             'count': len(items_list),
             'message_ids': message_ids,
-            'timestamp': datetime.utcnow()
+            'timestamp': datetime.now(UTC)
         }
 
     async def get(

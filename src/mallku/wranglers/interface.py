@@ -11,8 +11,9 @@ The beauty of this pattern is its reciprocity:
 - Components receive: Freedom from transport concerns
 """
 
+import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 
@@ -251,7 +252,7 @@ class BaseWrangler(ABC):
         self.capabilities = capabilities or WranglerCapabilities()
         self.total_in = 0
         self.total_out = 0
-        self.created_at = datetime.utcnow()
+        self.created_at = datetime.now(UTC)
 
     def _validate_items(self, items: dict | list[dict]) -> list[dict]:
         """Ensure items are in list format."""
@@ -261,5 +262,4 @@ class BaseWrangler(ABC):
 
     def _generate_message_id(self) -> str:
         """Generate unique message ID."""
-        import uuid
         return str(uuid.uuid4())

@@ -6,24 +6,24 @@ through structured dialogue, consensus building, and wisdom preservation.
 """
 
 from .protocol import (
-    GovernanceMessage,
-    MessageType,
     ConsensusState,
     ConsensusTracker,
-    ParticipantRole,
+    GovernanceMessage,
+    MessageType,
     Participant,
     ParticipantRegistry,
+    ParticipantRole,
 )
 
 __all__ = [
     # Message structures
     "GovernanceMessage",
     "MessageType",
-    
+
     # Consensus mechanisms
     "ConsensusState",
     "ConsensusTracker",
-    
+
     # Participant management
     "ParticipantRole",
     "Participant",
