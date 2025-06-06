@@ -28,6 +28,7 @@ Mallku is built to bridge earth and sky, embodying stability, security, and cons
 | [Consciousness Evolution System](consciousness-evolution-system.md) | High-level system for evolving collective intelligence. |
 | [Governance Integration Plan](governance-integration-plan.md) | Plan for Fire Circle governance integration. |
 | [Realization Plan](realization-plan.md) | Steps toward operationalizing the architecture. |
+| [System Context & Component Diagrams](system-context-and-component-diagrams.md) | High-level system context and component diagrams for Mallku. |
 | [Command Line Philosophy](command-line-philosophy.md) | Mallku's CLI design philosophy. |
 | [Docker Cleanup Record](docker-cleanup-record.md) | Record of docker cleanup process and decisions. |
 
@@ -35,8 +36,8 @@ Mallku is built to bridge earth and sky, embodying stability, security, and cons
 
 - [ ] Review this overview and ensure alignment with project values.
 - [ ] Propose or revise architectural principles.
-- [ ] Capture new Architecture Decision Records (ADRs) in `docs/adr/`.
-- [ ] Define the high-level system context and component diagrams.
+- [x] Capture new Architecture Decision Records (ADRs) in `docs/adr/`.
+- [x] Define the high-level system context and component diagrams.
 - [ ] Establish automated architecture validation (amnesia tests, security tests).
 
 ---
