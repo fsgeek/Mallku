@@ -7,13 +7,13 @@ subsystems into a breathing, coherent whole.
 Kawsay Wasi - The Life House Builder
 """
 
-from .event_bus import ConsciousnessEventBus, ConsciousnessEvent
-from .state_weaver import CathedralStateWeaver, CathedralState
+from .event_bus import ConsciousnessEvent, ConsciousnessEventBus
 from .health_monitor import ConsciousnessHealthMonitor
+from .state_weaver import CathedralState, CathedralStateWeaver
 
 __all__ = [
     'ConsciousnessEventBus',
-    'ConsciousnessEvent', 
+    'ConsciousnessEvent',
     'CathedralStateWeaver',
     'CathedralState',
     'ConsciousnessHealthMonitor'

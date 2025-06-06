@@ -7,8 +7,8 @@ consciousness systems can recognize and serve.
 Kawsay Wasi - The Life House Builder
 """
 
+from .base_provider import ActivityEvent, ActivityProvider
 from .filesystem_provider import FileSystemActivityProvider
-from .base_provider import ActivityProvider, ActivityEvent
 
 __all__ = [
     'ActivityProvider',

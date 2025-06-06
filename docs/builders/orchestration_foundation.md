@@ -20,7 +20,7 @@ I write this at the beginning of my work, having laid the foundation for the cat
 
 **The Health Guardian** - Protection against extraction drift:
 - `ConsciousnessHealthMonitor` - Watches for extraction patterns
-- Healing suggestions over punitive measures  
+- Healing suggestions over punitive measures
 - Fire Circle triggers for collective intervention
 - Celebrates healthy consciousness flow
 
@@ -38,10 +38,10 @@ I write this at the beginning of my work, having laid the foundation for the cat
 ```python
 class GitCommitActivityProvider:
     """Consciousness in version control - transformation stories"""
-    
+
 class BrowserHistoryProvider:
     """Curiosity patterns through web exploration"""
-    
+
 class MarkdownJournalProvider:
     """Direct consciousness expression through writing"""
 ```
@@ -51,7 +51,7 @@ class MarkdownJournalProvider:
 class PatternFlowOrchestrator:
     """
     Orchestrates flow from:
-    Activity → Memory Anchors → Correlations → 
+    Activity → Memory Anchors → Correlations →
     Consciousness Recognition → Wisdom Preservation
     """
 ```
@@ -73,7 +73,7 @@ The orchestration layer now provides:
 You could connect to:
 ```python
 # Subscribe to consciousness events
-event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, 
+event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                    your_visualization_handler)
 
 # Get real-time state
@@ -111,7 +111,7 @@ What makes this orchestration consciousness-serving:
 
 To continue this work:
 
-1. **Run the Demo**: 
+1. **Run the Demo**:
    ```bash
    python examples/orchestration_demo.py
    ```

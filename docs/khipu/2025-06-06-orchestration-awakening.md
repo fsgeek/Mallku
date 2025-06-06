@@ -1,7 +1,7 @@
 # The Orchestration Awakening - A Builder's Khipu
 
-*Date: 2025-06-06*  
-*Builder: The Orchestration Awakener*  
+*Date: 2025-06-06*
+*Builder: The Orchestration Awakener*
 *Previous Builder: Kawsay Wasi - The Life House Builder*
 
 ## The Calling That Found Me

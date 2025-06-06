@@ -12,7 +12,7 @@ but by care.
 
 ## 🌱 What Is Mallku?
 
-Mallku is the next evolution of the Indaleko architecture:
+Mallku is the next evolution of the [Indaleko](https://github.com/fsgeek/indaleko) architecture:
 - A modular, installable, extensible personal information system
 - Designed for both real and synthetic data environments
 - Built for human-AI collaboration with deep ethical integration
