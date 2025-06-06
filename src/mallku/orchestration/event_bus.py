@@ -26,6 +26,9 @@ class EventType(Enum):
     # Memory events
     MEMORY_ANCHOR_CREATED = "memory.anchor.created"
     MEMORY_PATTERN_DISCOVERED = "memory.pattern.discovered"
+    MEMORY_CURSOR_UPDATED = "memory.cursor.updated"
+    MEMORY_PROVIDER_REGISTERED = "memory.provider.registered"
+    MEMORY_LINEAGE_TRACED = "memory.lineage.traced"
 
     # Correlation events
     TEMPORAL_CORRELATION_FOUND = "correlation.temporal.found"
