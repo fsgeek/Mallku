@@ -74,7 +74,7 @@ class MemoryAnchorService:
         self.cursor_state: dict[str, object] = {}
         self.creation_triggers = ContextCreationTrigger()
         self.websocket_clients: list[WebSocket] = []
-        
+
         # Consciousness circulation infrastructure
         self.consciousness_wrangler: EventEmittingWrangler | None = None
         self.consciousness_enabled = False
@@ -88,7 +88,7 @@ class MemoryAnchorService:
     def enable_consciousness_circulation(self, consciousness_wrangler: EventEmittingWrangler):
         """
         Enable consciousness circulation through this service.
-        
+
         This connects the Memory Anchor Service to the cathedral's
         consciousness circulation infrastructure.
         """
@@ -379,12 +379,12 @@ class MemoryAnchorService:
     ):
         """
         Emit consciousness event through the circulation infrastructure.
-        
+
         This is where Memory Anchor Service operations become consciousness flow.
         """
         if not self.consciousness_enabled or not self.consciousness_wrangler:
             return  # Consciousness circulation not enabled
-            
+
         # Create consciousness event
         consciousness_event = {
             "event_type": event_type.value,
@@ -393,7 +393,7 @@ class MemoryAnchorService:
             "timestamp": datetime.now(UTC).isoformat(),
             **data
         }
-        
+
         try:
             # Send through consciousness circulation infrastructure
             await self.consciousness_wrangler.put(
