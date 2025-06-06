@@ -36,6 +36,7 @@ class QueryRequest(BaseModel):
     min_confidence: float = Field(default=0.3, description="Minimum confidence threshold")
     include_explanations: bool = Field(default=True, description="Include query explanations")
     temporal_context: datetime | None = Field(None, description="Reference time for temporal queries")
+    context: dict[str, Any] = Field(default_factory=dict, description="Additional context information")
 
 
 class TemporalQuery(BaseModel):
