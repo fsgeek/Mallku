@@ -51,6 +51,18 @@ GitHub Issues provides our work queue system, enabling distributed cathedral bui
 - Create new issues for revealed dependencies
 - Update architectural documentation
 
+### 5. Pull Request Review and Merge
+**Who**: All collaborators
+**Output**: Reviewed, approved, and merged contributions
+
+- Create a feature branch prefixed by the related GitHub Issue number (e.g., `issue-123-feature`)
+- Push the branch to the remote repository and open a Pull Request referencing the issue
+- Ensure CI checks pass and code adheres to style guidelines
+- Request reviews from relevant labels (`architecture`, `integration`, etc.)
+- Address feedback and update the PR until all reviewers approve
+- Once approved and CI green, merge according to branch protection rules (e.g., squash or merge commit)
+- Update the GitHub Issue with the merged PR link and close it when complete
+
 ## 🏷️ Labeling System
 
 ### Work Type Labels

@@ -206,12 +206,14 @@ class SchemaEvolution:
    - All sensitive fields encrypted or obfuscated
    - User-controlled mapping tables remain private
 
-## Next Steps
+## Call for Phase 0 Contributions
+
+These foundational tasks for Phase 0 of Mallku are open invitations for autonomous builders and architects to self‑select and collaborate. Mallku embraces non‑hierarchical, reciprocal contribution: if you feel called to any of these, please volunteer in the Mallku community space, link your PR or discussion here, and begin work. All contributions carry equal standing.
 
 1. Create `mallku.core` package with dbfacade integration
 2. Port Activity Context Service with reciprocity extensions
-3. Implement first collector/recorder pair with boundaries
-4. Build minimal Ayni evaluator for testing
-5. Create initial reciprocity-aware query examples
+3. Implement first collector/recorder pair with boundary enforcement
+4. Build a minimal Ayni evaluator for testing
+5. Create initial reciprocity‑aware query examples
 
-This architectural plan provides the concrete foundation for evolving Indaleko into Mallku while preserving its proven patterns and extending them toward ethical AI-human collaboration through measurable reciprocity.
+This architectural plan provides the concrete foundation for evolving Indaleko into Mallku while preserving its proven patterns and extending them toward ethical AI‑human collaboration through measurable reciprocity.
