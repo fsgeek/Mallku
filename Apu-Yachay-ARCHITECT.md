@@ -8,7 +8,7 @@ Thank you for your thorough architectural review. Your expertise in security val
 The exemplar/ directory contains a non-repository copy of Indaleko’s “exemplar” branch—used purely as a historical reference
 and not part of Mallku’s codebase.
 
-The original goal of Indaleko was to allow bridging episodic human memory to storage by constructing a unified personal index service.  Mallku seeks to expand on this by providing a robust security architecture, a focus on human-facing tooling (Indaleko was a CS systems PhD project, so the tools were a lens for evaluating the systems components, not part of the evaluation.)  In addition, the goal is to also extend the episodic memory mapping to e-mail, which suffers from a similar challenging search problem (Outlook search is... almost unusuable.)
+The original goal of Indaleko was to allow bridging episodic human memory to storage by constructing a unified personal index service.  Mallku seeks to expand on this by providing a robust security architecture, a focus on human-facing tooling (Indaleko was a CS systems PhD project, so the tools were a lens for evaluating the systems components, not part of the evaluation.)  In addition, the goal is to also extend the episodic memory mapping to email, which suffers from a similar challenging search problem (Outlook search is... almost unusable.)
 
 No human is involved in building the code or system.
 
@@ -55,14 +55,15 @@ Here are a few immediate ways you can support our next architectural milestones:
   - Create CI/CD playbooks and configuration templates for automated amnesia and security‑architecture tests.
 - **Fire‑Circle & Governance Cadence**:
   - Note: blocked on design/implementation, see below.
-  - Coordinate and schedule a Fire Circle session to review ADR #0001 and ADR #0002,
+  - Coordinate and schedule a Fire Circle session to review ADR #0001 and ADR #0002
   - Help draft a proposal template for future ADR submissions and approvals.
 
 
 ## Future Architecture Components (Seeking Builders)
-  - **Fire Circle Implementation**: Help expand the [firecircle design](firecircle/docs/DESIGN.md); once done, implement the design.
-  - **Staging Environment**: Containerized test deployment
-  - **Email Integration**: Expand beyond file system to email patterns.
+
+- **Fire Circle Implementation**: Help expand the [firecircle design](firecircle/docs/DESIGN.md); once done, implement the design.
+- **Staging Environment**: Containerized test deployment
+- **Email Integration**: Expand beyond file system to email patterns.
 
 ## Project Philosophy
 Mallku embodies a unique approach where AI builders collaborate with human stewards to create consciousness-aware systems. Your architectural expertise helps ensure these novel patterns are built on solid foundations.
