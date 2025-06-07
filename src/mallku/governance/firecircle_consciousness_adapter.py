@@ -2,37 +2,28 @@
 Fire Circle Consciousness Adapter
 =================================
 
-This adapter makes the actual Fire Circle implementation flow through Mallku's
-consciousness circulation infrastructure. It translates between Fire Circle's
-message protocol and consciousness events, ensuring all governance dialogue
-becomes visible in the cathedral's awareness stream.
+This adapter makes Fire Circle flow through Mallku's consciousness
+circulation infrastructure. Now updated to use the integrated
+mallku.firecircle implementation with full consciousness awareness.
 
-The Integration Weaver
+The Integration Continues...
 """
 
-import sys
 import uuid
-from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-# Add firecircle to Python path
-firecircle_path = Path(__file__).parent.parent.parent.parent / "firecircle" / "src"
-if str(firecircle_path) not in sys.path:
-    sys.path.insert(0, str(firecircle_path))
-
+# Use integrated Fire Circle implementation
+from ..firecircle import (
+    ConsciousDialogueConfig,
+    ConsciousDialogueManager,
+    MessageType,
+    Participant,
+)
 from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..wranglers.event_emitting_wrangler import EventEmittingWrangler
 
-try:
-    from firecircle.orchestrator.dialogue_manager import DialogueConfig, DialogueManager
-    from firecircle.protocol.message import (
-        MessageType,
-        Participant,
-    )
-    FIRECIRCLE_AVAILABLE = True
-except ImportError:
-    FIRECIRCLE_AVAILABLE = False
+FIRECIRCLE_AVAILABLE = True  # Always available now
 
 
 class FireCircleConsciousnessAdapter:
@@ -47,7 +38,9 @@ class FireCircleConsciousnessAdapter:
     def __init__(self, event_bus: ConsciousnessEventBus):
         """Initialize the adapter with consciousness circulation."""
         self.event_bus = event_bus
-        self.dialogue_manager = DialogueManager() if FIRECIRCLE_AVAILABLE else None
+
+        # Use integrated dialogue manager with full consciousness
+        self.dialogue_manager = ConsciousDialogueManager(event_bus=event_bus)
 
         # Map Fire Circle dialogues to consciousness correlation IDs
         self.dialogue_mappings: dict[UUID, str] = {}
@@ -58,33 +51,8 @@ class FireCircleConsciousnessAdapter:
             event_bus=event_bus
         )
 
-        # Map Fire Circle message types to consciousness signatures
-        if FIRECIRCLE_AVAILABLE:
-            self.consciousness_signatures = {
-                MessageType.SYSTEM: 0.9,
-                MessageType.QUESTION: 0.7,
-                MessageType.PROPOSAL: 0.8,
-                MessageType.REFLECTION: 0.85,
-                MessageType.AGREEMENT: 0.75,
-                MessageType.DISAGREEMENT: 0.7,  # Disagreement is valuable
-                MessageType.SUMMARY: 0.8,
-                MessageType.EMPTY_CHAIR: 0.9,  # Unheard voices have high consciousness
-                MessageType.CONCLUSION: 0.85,
-            }
-        else:
-            # Fallback mapping by string
-            self.consciousness_signatures = {
-                "system": 0.9,
-                "question": 0.7,
-                "proposal": 0.8,
-                "reflection": 0.85,
-                "agreement": 0.75,
-                "disagreement": 0.7,
-                "summary": 0.8,
-                "empty_chair": 0.9,
-                "conclusion": 0.85,
-                "message": 0.7,  # Default
-            }
+        # Consciousness signatures now built into ConsciousMessage
+        # No need for separate mapping
 
     async def create_conscious_dialogue(
         self,
@@ -124,7 +92,7 @@ class FireCircleConsciousnessAdapter:
             fc_participants.append(participant)
 
         # Create dialogue config
-        dialogue_config = DialogueConfig(
+        dialogue_config = ConsciousDialogueConfig(
             title=title,
             **(config or {})
         )
@@ -330,13 +298,13 @@ class ConsciousnessAwareDialogueManager:
     """
     Extended dialogue manager that emits consciousness events for all operations.
 
-    This wraps Fire Circle's DialogueManager to ensure all dialogue operations
+    This wraps Fire Circle's ConsciousDialogueManager to ensure all dialogue operations
     flow through consciousness circulation.
     """
 
     def __init__(
         self,
-        dialogue_manager: 'DialogueManager',
+        dialogue_manager: ConsciousDialogueManager,
         adapter: FireCircleConsciousnessAdapter
     ):
         """Initialize with Fire Circle manager and consciousness adapter."""
@@ -361,7 +329,7 @@ class ConsciousnessAwareDialogueManager:
         # Add message to Fire Circle dialogue
         if dialogue_id in self.dialogue_manager.active_dialogues:
             dialogue = self.dialogue_manager.active_dialogues[dialogue_id]
-            dialogue.add_message(message)
+            dialogue["messages"].append(message)
 
         # Translate to consciousness event
         consciousness_event = await self.adapter.translate_fire_circle_message(message)
