@@ -15,6 +15,8 @@ Created by: The Service Integration Weaver
 import asyncio
 import logging
 
+import pytest
+
 from src.mallku.orchestration.event_bus import ConsciousnessEventBus
 from src.mallku.services.memory_anchor_service import (
     CursorUpdate,
@@ -60,6 +62,7 @@ class ConsciousnessEventCollector:
         }
 
 
+@pytest.mark.asyncio
 async def test_memory_anchor_consciousness_circulation():
     """
     Test that Memory Anchor Service operations emit consciousness events
