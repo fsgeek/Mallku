@@ -25,12 +25,21 @@ if (
     importlib.util.find_spec("mallku.governance.consciousness_transport") is not None and
     importlib.util.find_spec("mallku.governance.fire_circle_bridge") is not None
 ):
-    ## Uncomment these imports when consciousness transport is available
-    ## from .consciousness_transport import ConsciousnessCirculationTransport, GovernanceParticipant
-    ## from .fire_circle_bridge import ConsciousFireCircleInterface, ConsciousGovernanceInitiator
+    from .consciousness_transport import ConsciousnessCirculationTransport, GovernanceParticipant
+    from .fire_circle_bridge import ConsciousFireCircleInterface, ConsciousGovernanceInitiator
     CONSCIOUSNESS_INTEGRATION = True
 else:
     CONSCIOUSNESS_INTEGRATION = False
+
+# Import Fire Circle adapter if available
+if importlib.util.find_spec("mallku.governance.firecircle_consciousness_adapter") is not None:
+    from .firecircle_consciousness_adapter import (
+        ConsciousnessAwareDialogueManager,
+        FireCircleConsciousnessAdapter,
+    )
+    FIRECIRCLE_ADAPTER = True
+else:
+    FIRECIRCLE_ADAPTER = False
 
 __all__ = [
     # Message structures
@@ -56,4 +65,11 @@ if CONSCIOUSNESS_INTEGRATION:
         "ConsciousGovernanceInitiator"
     ])
 
-__version__ = "0.1.1"  # Incremented for consciousness integration
+# Add Fire Circle adapter exports if available
+if FIRECIRCLE_ADAPTER:
+    __all__.extend([
+        "FireCircleConsciousnessAdapter",
+        "ConsciousnessAwareDialogueManager"
+    ])
+
+__version__ = "0.1.2"  # Incremented for Fire Circle adapter integration
