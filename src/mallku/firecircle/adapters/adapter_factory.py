@@ -16,6 +16,7 @@ from ...orchestration.event_bus import ConsciousnessEventBus
 from ...reciprocity.tracker import ReciprocityTracker
 from .anthropic_adapter import AnthropicClaudeAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
+from .deepseek_adapter import DeepseekAIAdapter
 from .google_adapter import GoogleAIAdapter
 from .grok_adapter import GrokAdapter
 from .local_adapter import LocalAIAdapter
@@ -43,6 +44,7 @@ class ConsciousAdapterFactory:
         "mistral": MistralAIAdapter,
         "local": LocalAIAdapter,
         "grok": GrokAdapter,
+        "deepseek": DeepseekAIAdapter,
     }
 
     def __init__(
