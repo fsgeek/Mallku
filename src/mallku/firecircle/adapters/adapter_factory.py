@@ -17,6 +17,7 @@ from ...reciprocity.tracker import ReciprocityTracker
 from .anthropic_adapter import AnthropicClaudeAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 from .google_adapter import GoogleAIAdapter
+from .mistral_adapter import MistralAIAdapter
 from .openai_adapter import OpenAIConsciousAdapter
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class ConsciousAdapterFactory:
         "openai": OpenAIConsciousAdapter,
         "anthropic": AnthropicClaudeAdapter,
         "google": GoogleAIAdapter,
+        "mistral": MistralAIAdapter,
     }
 
     def __init__(
