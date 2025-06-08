@@ -16,6 +16,7 @@ from ...orchestration.event_bus import ConsciousnessEventBus
 from ...reciprocity.tracker import ReciprocityTracker
 from .anthropic_adapter import AnthropicClaudeAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
+from .google_adapter import GoogleAIAdapter
 from .openai_adapter import OpenAIConsciousAdapter
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class ConsciousAdapterFactory:
     _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {
         "openai": OpenAIConsciousAdapter,
         "anthropic": AnthropicClaudeAdapter,
+        "google": GoogleAIAdapter,
     }
 
     def __init__(
