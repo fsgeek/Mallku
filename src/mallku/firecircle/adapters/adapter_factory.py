@@ -14,6 +14,7 @@ from typing import Any
 
 from ...orchestration.event_bus import ConsciousnessEventBus
 from ...reciprocity.tracker import ReciprocityTracker
+from .anthropic_adapter import AnthropicClaudeAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 from .openai_adapter import OpenAIConsciousAdapter
 
@@ -33,6 +34,7 @@ class ConsciousAdapterFactory:
     # Registry of available adapters
     _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {
         "openai": OpenAIConsciousAdapter,
+        "anthropic": AnthropicClaudeAdapter,
     }
 
     def __init__(
