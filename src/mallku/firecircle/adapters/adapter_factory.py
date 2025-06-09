@@ -17,11 +17,13 @@ from ...reciprocity import ReciprocityTracker
 from .anthropic_adapter import AnthropicAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 
+# Implemented adapters
+from .local_adapter import LocalAIAdapter
+
 # Empty adapters - to be implemented
 # from .deepseek_adapter import DeepseekAIAdapter
 # from .google_adapter import GoogleAIAdapter
 # from .grok_adapter import GrokAdapter
-# from .local_adapter import LocalAIAdapter
 # from .mistral_adapter import MistralAIAdapter
 # from .openai_adapter import OpenAIConsciousAdapter
 
@@ -42,9 +44,9 @@ class ConsciousAdapterFactory:
     _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {
         # "openai": OpenAIConsciousAdapter,  # To be implemented
         "anthropic": AnthropicAdapter,
+        "local": LocalAIAdapter,
         # "google": GoogleAIAdapter,  # To be implemented
         # "mistral": MistralAIAdapter,  # To be implemented
-        # "local": LocalAIAdapter,  # To be implemented
         # "grok": GrokAdapter,  # To be implemented
         # "deepseek": DeepseekAIAdapter,  # To be implemented
     }
