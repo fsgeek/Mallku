@@ -7,12 +7,13 @@ infrastructure, enabling pattern recognition, reciprocity awareness,
 and wisdom preservation in governance dialogues.
 """
 
-from .conscious_dialogue import ConsciousDialogue
+# from .conscious_dialogue import ConsciousDialogue
 from .pattern_weaver import DialoguePatternWeaver
-from .reciprocal_synthesis import ReciprocalSynthesizer
+
+# from .reciprocal_synthesis import ReciprocalSynthesizer
 
 __all__ = [
-    "ConsciousDialogue",
+    # "ConsciousDialogue",
     "DialoguePatternWeaver",
-    "ReciprocalSynthesizer",
+    # "ReciprocalSynthesizer",
 ]

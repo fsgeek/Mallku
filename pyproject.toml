@@ -22,6 +22,7 @@ dependencies = [
     "openai>=1.0.0; extra == 'llm'",
     "plotly>=6.1.2",
     "icecream>=2.1.4",
+    "deepseek>=1.0.0",
 ]
 
 [tool.ruff]

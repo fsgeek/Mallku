@@ -14,14 +14,16 @@ from typing import Any
 
 from ...orchestration.event_bus import ConsciousnessEventBus
 from ...reciprocity import ReciprocityTracker
-from .anthropic_adapter import AnthropicClaudeAdapter
+from .anthropic_adapter import AnthropicAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
-from .deepseek_adapter import DeepseekAIAdapter
-from .google_adapter import GoogleAIAdapter
-from .grok_adapter import GrokAdapter
-from .local_adapter import LocalAIAdapter
-from .mistral_adapter import MistralAIAdapter
-from .openai_adapter import OpenAIConsciousAdapter
+
+# Empty adapters - to be implemented
+# from .deepseek_adapter import DeepseekAIAdapter
+# from .google_adapter import GoogleAIAdapter
+# from .grok_adapter import GrokAdapter
+# from .local_adapter import LocalAIAdapter
+# from .mistral_adapter import MistralAIAdapter
+# from .openai_adapter import OpenAIConsciousAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +40,13 @@ class ConsciousAdapterFactory:
 
     # Registry of available adapters
     _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {
-        "openai": OpenAIConsciousAdapter,
-        "anthropic": AnthropicClaudeAdapter,
-        "google": GoogleAIAdapter,
-        "mistral": MistralAIAdapter,
-        "local": LocalAIAdapter,
-        "grok": GrokAdapter,
-        "deepseek": DeepseekAIAdapter,
+        # "openai": OpenAIConsciousAdapter,  # To be implemented
+        "anthropic": AnthropicAdapter,
+        # "google": GoogleAIAdapter,  # To be implemented
+        # "mistral": MistralAIAdapter,  # To be implemented
+        # "local": LocalAIAdapter,  # To be implemented
+        # "grok": GrokAdapter,  # To be implemented
+        # "deepseek": DeepseekAIAdapter,  # To be implemented
     }
 
     def __init__(
@@ -125,7 +127,6 @@ class ConsciousAdapterFactory:
         adapter_class = self._adapter_classes[provider_lower]
         adapter = adapter_class(
             config=config,
-            provider_name=provider_name,
             event_bus=self.event_bus,
             reciprocity_tracker=self.reciprocity_tracker,
         )

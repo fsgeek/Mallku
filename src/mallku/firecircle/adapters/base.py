@@ -246,7 +246,7 @@ class ConsciousModelAdapter(ABC):
             MessageType.REFLECTION: 0.85,
             MessageType.EMPTY_CHAIR: 0.9,
             MessageType.PROPOSAL: 0.8,
-            MessageType.SYNTHESIS: 0.8,
+            MessageType.SUMMARY: 0.8,
             MessageType.QUESTION: 0.7,
             MessageType.DISAGREEMENT: 0.7,
             MessageType.MESSAGE: 0.6,
