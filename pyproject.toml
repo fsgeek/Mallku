@@ -23,6 +23,8 @@ dependencies = [
     "plotly>=6.1.2",
     "icecream>=2.1.4",
     "deepseek>=1.0.0",
+    "google-genai>=1.19.0",
+    "xai-sdk>=0.3.0",
 ]
 
 [tool.ruff]
