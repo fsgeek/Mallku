@@ -18,7 +18,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field
 
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
-from ...reciprocity.tracker import ReciprocityTracker
+from ...reciprocity import ReciprocityTracker
 from ..protocol.conscious_message import ConsciousMessage, MessageType
 
 logger = logging.getLogger(__name__)

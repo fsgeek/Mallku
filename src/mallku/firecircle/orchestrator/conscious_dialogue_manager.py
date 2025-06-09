@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 from ...core.database import get_secured_database
 from ...correlation.engine import CorrelationEngine
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
-from ...reciprocity.tracker import ReciprocityTracker
+from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..protocol.conscious_message import (
     ConsciousMessage,

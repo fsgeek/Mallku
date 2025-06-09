@@ -13,7 +13,7 @@ import logging
 from typing import Any
 
 from ...orchestration.event_bus import ConsciousnessEventBus
-from ...reciprocity.tracker import ReciprocityTracker
+from ...reciprocity import ReciprocityTracker
 from .anthropic_adapter import AnthropicClaudeAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 from .deepseek_adapter import DeepseekAIAdapter
