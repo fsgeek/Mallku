@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class AdapterConfig(BaseModel):
     """Configuration for consciousness-aware model adapter."""
 
-    api_key: str = Field(..., description="API key for the model provider")
+    api_key: str = Field(default="", description="API key for the model provider (auto-loaded from secrets if empty)")
     model_name: str | None = Field(None, description="Specific model to use")
     temperature: float = Field(0.7, description="Temperature for generation")
     max_tokens: int | None = Field(None, description="Maximum tokens to generate")

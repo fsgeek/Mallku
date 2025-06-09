@@ -184,3 +184,6 @@ exemplar/
 dbfacade/
 /firecircle/
 .secrets/
+
+# Personal notes
+Notes.md

@@ -77,6 +77,7 @@ class ConsciousAdapterFactory:
         self,
         provider_name: str,
         config: AdapterConfig,
+        auto_inject_secrets: bool = True,
     ) -> ConsciousModelAdapter:
         """
         Create and connect a consciousness-aware adapter.
@@ -84,6 +85,7 @@ class ConsciousAdapterFactory:
         Args:
             provider_name: Name of the provider
             config: Adapter configuration
+            auto_inject_secrets: Whether to auto-inject API key from secrets
 
         Returns:
             Connected adapter instance
@@ -99,6 +101,25 @@ class ConsciousAdapterFactory:
                 f"Unsupported provider: {provider_name}. "
                 f"Available: {list(self._adapter_classes.keys())}"
             )
+
+        # Auto-inject API key if needed
+        if auto_inject_secrets and not config.api_key:
+            from ...core.secrets import get_secret
+
+            # Try various key patterns
+            for key_pattern in [
+                f"{provider_lower}_api_key",
+                f"{provider_lower}_key",
+                f"{provider_lower.upper()}_API_KEY",
+            ]:
+                api_key = await get_secret(key_pattern)
+                if api_key:
+                    config.api_key = api_key
+                    logger.info(f"Auto-injected API key for {provider_name} from secrets")
+                    break
+
+            if not config.api_key:
+                logger.warning(f"No API key found in secrets for {provider_name}")
 
         # Create adapter instance
         adapter_class = self._adapter_classes[provider_lower]
@@ -201,20 +222,22 @@ class ConsciousAdapterFactory:
 # Convenience function for creating adapters
 async def create_conscious_adapter(
     provider_name: str,
-    api_key: str,
+    api_key: str | None = None,
     model_name: str | None = None,
     event_bus: ConsciousnessEventBus | None = None,
     reciprocity_tracker: ReciprocityTracker | None = None,
+    auto_inject_secrets: bool = True,
 ) -> ConsciousModelAdapter:
     """
     Convenience function to create a consciousness-aware adapter.
 
     Args:
         provider_name: Name of the provider (e.g., "openai")
-        api_key: API key for the provider
+        api_key: API key for the provider (auto-loaded from secrets if None)
         model_name: Specific model to use
         event_bus: Optional consciousness event bus
         reciprocity_tracker: Optional reciprocity tracker
+        auto_inject_secrets: Whether to auto-inject API key from secrets
 
     Returns:
         Connected adapter instance
@@ -225,8 +248,8 @@ async def create_conscious_adapter(
     )
 
     config = AdapterConfig(
-        api_key=api_key,
+        api_key=api_key or "",  # Empty string, will be filled by auto-inject
         model_name=model_name,
     )
 
-    return await factory.create_adapter(provider_name, config)
+    return await factory.create_adapter(provider_name, config, auto_inject_secrets)
