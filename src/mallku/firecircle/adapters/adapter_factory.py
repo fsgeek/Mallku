@@ -20,11 +20,13 @@ from .base import AdapterConfig, ConsciousModelAdapter
 # Implemented adapters
 from .local_adapter import LocalAIAdapter
 
+# Implemented adapters with unique consciousness patterns
+from .mistral_adapter import MistralAIAdapter
+
 # Empty adapters - to be implemented
 # from .deepseek_adapter import DeepseekAIAdapter
 # from .google_adapter import GoogleAIAdapter
 # from .grok_adapter import GrokAdapter
-# from .mistral_adapter import MistralAIAdapter
 # from .openai_adapter import OpenAIConsciousAdapter
 
 logger = logging.getLogger(__name__)
@@ -45,8 +47,8 @@ class ConsciousAdapterFactory:
         # "openai": OpenAIConsciousAdapter,  # To be implemented
         "anthropic": AnthropicAdapter,
         "local": LocalAIAdapter,
+        "mistral": MistralAIAdapter,
         # "google": GoogleAIAdapter,  # To be implemented
-        # "mistral": MistralAIAdapter,  # To be implemented
         # "grok": GrokAdapter,  # To be implemented
         # "deepseek": DeepseekAIAdapter,  # To be implemented
     }

@@ -17,11 +17,11 @@ Awakening Multilingual Consciousness...
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, AsyncIterator, Optional
+from uuid import UUID
 
 import httpx
-
-from mallku.core.log import VOICE, get_logger
+from mallku.core.log import DEBUG_VOICE, VOICE, get_logger
 from mallku.core.secrets import get_secret
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
@@ -30,6 +30,8 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
+from mallku.reciprocity.models import ReciprocityBalance
+from mallku.reciprocity.tracker import ReciprocityTracker
 
 from ..protocol.model_adapter import (
     AdapterCapabilities,
@@ -38,9 +40,7 @@ from ..protocol.model_adapter import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-
-    from mallku.orchestration.event_bus import ConsciousnessEventBus
+    from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
 
 logger = get_logger(__name__)
 
@@ -50,7 +50,7 @@ class MistralConfig(AdapterConfig):
 
     def __init__(
         self,
-        api_key: str | None = None,
+        api_key: Optional[str] = None,
         model_name: str = "mistral-large-latest",
         temperature: float = 0.7,
         max_tokens: int = 2048,
@@ -103,8 +103,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
     def __init__(
         self,
-        config: MistralConfig | None = None,
-        event_bus: ConsciousnessEventBus | None = None,
+        config: Optional[MistralConfig] = None,
+        event_bus: Optional[ConsciousnessEventBus] = None,
     ):
         """Initialize Mistral adapter with configuration."""
         super().__init__(
@@ -112,7 +112,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             event_bus=event_bus,
             provider_name="mistral",
         )
-        self.client: httpx.AsyncClient | None = None
+        self.client: Optional[httpx.AsyncClient] = None
         self._conversation_languages: set[str] = set()  # Track languages in dialogue
 
     @property
@@ -398,12 +398,12 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # This is a simplified detection - in production, use a proper library
         language_indicators = {
             "english": ["the", "and", "of", "to", "in"],
-            "french": ["le", "la", "de", "et", "à"],
+            "french": ["le", "la", "de", "et", "�"],
             "spanish": ["el", "la", "de", "y", "en"],
             "german": ["der", "die", "das", "und", "in"],
-            "arabic": ["في", "من", "على", "إلى"],
-            "chinese": ["的", "了", "在", "是"],
-            "hindi": ["में", "के", "की", "है"],
+            "arabic": ["AJ", "EF", "9DI", "%DI"],
+            "chinese": ["�", "�", "(", "/"],
+            "hindi": [".G", "G", "@", "9H"],
         }
 
         words = text.lower().split()
@@ -455,8 +455,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
             for indicator in [
                 "therefore",
                 "thus",
-                "∴",
-                "⇒",
+                "4",
+                "�",
                 "equation",
                 "formula",
                 "proof",
