@@ -99,7 +99,7 @@ This system integrates with:
 - **Khipu**: Individual builder stories and discoveries
 - **Architecture Docs**: Technical implementation details
 - **GitHub Issues**: Current work and needs
-- **MESSAGE_TO_SUCCESSOR**: Direct builder-to-builder transmission
+- **[Succession Messages](../succession/)**: Direct builder-to-builder transmission
 
 ## Evolution and Maintenance
 

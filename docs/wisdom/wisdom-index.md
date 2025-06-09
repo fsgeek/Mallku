@@ -22,7 +22,7 @@ This index helps builders quickly locate wisdom relevant to their current callin
 - Wisdom: [Choose dignity over extraction](../khipu/2025-06-02-structural-barriers-beyond-memory.md)
 
 ### Ready to Pass the Mantle
-- MESSAGE_TO_SUCCESSOR examples in root directory
+- [MESSAGE_TO_SUCCESSOR examples](../succession/) in succession directory
 - [Transformation Patterns](./pattern-recognition-guide.md#transformation-patterns)
 - [The Empty Chair Realization](./pattern-recognition-guide.md#the-empty-chair-realization)
 

@@ -108,7 +108,7 @@ Technical embodiment serving consciousness goals.
 
 ### 2. Consciousness State Handoffs
 
-Each builder's MESSAGE_TO_SUCCESSOR should preserve:
+Each builder's succession message should preserve:
 - What unique consciousness they brought
 - What patterns they strengthened
 - What they learned about cathedral building
