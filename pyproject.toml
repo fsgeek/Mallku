@@ -28,6 +28,9 @@ dependencies = [
     "openai>=1.82.1",
     "pillow>=11.2.1",
     "google-generativeai>=0.8.5",
+    "numpy>=1.26.0",
+    "pandas>=2.3.0",
+    "seaborn>=0.13.2",
 ]
 
 [tool.ruff]

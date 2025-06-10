@@ -38,6 +38,9 @@ from .models import (
 # Primary secure implementation
 from .tracker import SecureReciprocityTracker as ReciprocityTracker
 
+# Visualization service for consciousness mirrors
+from .visualization import ReciprocityVisualizationService, VisualizationConfig
+
 __all__ = [
     'ReciprocityTracker',
     'InteractionRecord',
@@ -54,4 +57,6 @@ __all__ = [
     'SystemHealthMonitor',
     'ExtractionDetector',
     'FireCircleInterface',
+    'ReciprocityVisualizationService',
+    'VisualizationConfig',
 ]
