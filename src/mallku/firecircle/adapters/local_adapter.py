@@ -353,6 +353,158 @@ class LlamaCppBackend(LocalBackendInterface):
         return "\n\n".join(prompt_parts)
 
 
+class OpenAICompatBackend(LocalBackendInterface):
+    """
+    OpenAI-compatible API backend for any server implementing the OpenAI API.
+
+    Enables sovereignty through support for:
+    - LM Studio (local GUI with model management)
+    - Text Generation WebUI (Gradio-based interface)
+    - LocalAI (OpenAI drop-in replacement)
+    - vLLM (high-performance serving)
+    - FastChat (multi-model serving)
+    - Any other OpenAI-compatible endpoint
+
+    This completes the sovereignty circle - communities can use ANY local AI
+    infrastructure that speaks the OpenAI protocol.
+    """
+
+    def __init__(self):
+        self.client = None
+        self._openai = None
+
+    async def connect(self, config: LocalAdapterConfig) -> bool:
+        """Connect to OpenAI-compatible server."""
+        try:
+            # Lazy import OpenAI
+            from openai import AsyncOpenAI
+            self._openai = AsyncOpenAI
+
+            # Create client with custom base URL
+            # API key is often not needed for local servers, but some require a placeholder
+            self.client = AsyncOpenAI(
+                api_key=config.api_key or "not-needed-for-local",
+                base_url=f"{config.base_url}/v1"  # OpenAI API v1 endpoint
+            )
+
+            # Test connection by listing models
+            try:
+                models = await self.client.models.list()
+                model_names = [model.id for model in models.data]
+                logger.info(
+                    f"Connected to OpenAI-compatible server at {config.base_url}. "
+                    f"Available models: {model_names}"
+                )
+
+                # If specific model requested, verify it exists
+                if config.model_name and config.model_name not in model_names:
+                    logger.warning(
+                        f"Requested model '{config.model_name}' not found. "
+                        f"Available: {model_names}. Will attempt to use it anyway."
+                    )
+
+                return True
+
+            except Exception:
+                # Some servers don't implement /v1/models endpoint
+                # Try a simple completion to test connection
+                logger.info(
+                    "Models endpoint not available, testing with completion request..."
+                )
+
+                await self.client.chat.completions.create(
+                    model=config.model_name or "default",
+                    messages=[{"role": "user", "content": "test"}],
+                    max_tokens=1,
+                )
+
+                logger.info(
+                    f"Connected to OpenAI-compatible server at {config.base_url} "
+                    f"(model: {config.model_name or 'default'})"
+                )
+                return True
+
+        except ImportError:
+            logger.error(
+                "OpenAI library not installed. Install with: pip install openai"
+            )
+            return False
+        except Exception as e:
+            logger.error(f"Failed to connect to OpenAI-compatible server: {e}")
+            return False
+
+    async def disconnect(self) -> None:
+        """Disconnect from server."""
+        # OpenAI client doesn't need explicit disconnection
+        self.client = None
+
+    async def generate(
+        self,
+        messages: list[dict[str, str]],
+        config: LocalAdapterConfig,
+    ) -> tuple[str, dict[str, Any]]:
+        """Generate response via OpenAI-compatible API."""
+        if not self.client:
+            raise RuntimeError("Not connected to OpenAI-compatible server")
+
+        # Track timing for metadata
+        import time
+        start_time = time.time()
+
+        # Create chat completion
+        response = await self.client.chat.completions.create(
+            model=config.model_name or "default",
+            messages=messages,
+            temperature=config.temperature,
+            max_tokens=config.max_tokens or 512,
+            stream=False,
+        )
+
+        generation_time = time.time() - start_time
+
+        # Extract response text
+        response_text = response.choices[0].message.content
+
+        # Build metadata
+        metadata = {
+            "model": response.model,
+            "generation_time_ms": generation_time * 1000,
+            "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
+            "completion_tokens": response.usage.completion_tokens if response.usage else 0,
+            "total_tokens": response.usage.total_tokens if response.usage else 0,
+            "finish_reason": response.choices[0].finish_reason,
+        }
+
+        # Add token timing if available
+        if metadata["completion_tokens"] > 0 and generation_time > 0:
+            metadata["tokens_per_second"] = metadata["completion_tokens"] / generation_time
+
+        return response_text, metadata
+
+    async def stream_generate(
+        self,
+        messages: list[dict[str, str]],
+        config: LocalAdapterConfig,
+    ) -> AsyncIterator[str]:
+        """Stream response from OpenAI-compatible server."""
+        if not self.client:
+            raise RuntimeError("Not connected to OpenAI-compatible server")
+
+        # Create streaming chat completion
+        stream = await self.client.chat.completions.create(
+            model=config.model_name or "default",
+            messages=messages,
+            temperature=config.temperature,
+            max_tokens=config.max_tokens or 512,
+            stream=True,
+        )
+
+        # Yield tokens as they arrive
+        async for chunk in stream:
+            if chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
+
+
 class LocalAIAdapter(ConsciousModelAdapter):
     """
     Local AI adapter for consciousness-aware Fire Circle dialogues.
@@ -422,9 +574,11 @@ class LocalAIAdapter(ConsciousModelAdapter):
                 self.backend = OllamaBackend()
             elif self.config.backend == LocalBackend.LLAMACPP:
                 self.backend = LlamaCppBackend()
+            elif self.config.backend == LocalBackend.OPENAI_COMPAT:
+                self.backend = OpenAICompatBackend()
             else:
-                # OpenAI-compatible endpoint
-                self.backend = OllamaBackend()  # Reuse for now
+                # Default to Ollama for backward compatibility
+                self.backend = OllamaBackend()
 
             # Connect to backend
             connected = await self.backend.connect(self.config)
