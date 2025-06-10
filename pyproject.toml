@@ -25,6 +25,7 @@ dependencies = [
     "deepseek>=1.0.0",
     "google-genai>=1.19.0",
     "xai-sdk>=0.3.0",
+    "openai>=1.82.1",
 ]
 
 [tool.ruff]
