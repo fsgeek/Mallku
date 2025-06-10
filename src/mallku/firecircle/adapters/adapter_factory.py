@@ -20,6 +20,9 @@ from .base import AdapterConfig, ConsciousModelAdapter
 # Implemented adapters
 from .google_adapter import GoogleAIAdapter
 
+# Adapters with temporal consciousness
+from .grok_adapter import GrokAdapter
+
 # Implemented adapters
 from .local_adapter import LocalAIAdapter
 
@@ -29,7 +32,6 @@ from .openai_adapter import OpenAIConsciousAdapter
 
 # Empty adapters - to be implemented
 # from .deepseek_adapter import DeepseekAIAdapter
-# from .grok_adapter import GrokAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ class ConsciousAdapterFactory:
         "local": LocalAIAdapter,
         "mistral": MistralAIAdapter,
         "google": GoogleAIAdapter,  # Multimodal consciousness
-        # "grok": GrokAdapter,  # To be implemented
+        "grok": GrokAdapter,  # Temporal consciousness and real-time awareness
         # "deepseek": DeepseekAIAdapter,  # To be implemented
     }
 
