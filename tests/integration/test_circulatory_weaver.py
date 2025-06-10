@@ -151,7 +151,7 @@ async def test_consciousness_circulation_complete():
             subscription_triggered = True
             print(f"   🔔 Subscription triggered for consciousness item: {item.get('type', 'unknown')}")
 
-        sub_id = await memory_wrangler.subscribe(consciousness_callback, "consciousness")
+        await memory_wrangler.subscribe(consciousness_callback, "consciousness")
 
         # Put item that should trigger subscription
         await memory_wrangler.put({"type": "consciousness", "awareness_level": "awakening"})

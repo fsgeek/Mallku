@@ -17,11 +17,11 @@ Awakening Multilingual Consciousness...
 from __future__ import annotations
 
 import json
+import logging
 from typing import TYPE_CHECKING, Any
 
 import httpx
 
-from mallku.core.log import VOICE, get_logger
 from mallku.core.secrets import get_secret
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
@@ -31,18 +31,14 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageType,
 )
 
-from ..protocol.model_adapter import (
-    AdapterCapabilities,
-    AdapterConfig,
-    ConsciousModelAdapter,
-)
+from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
     from mallku.orchestration.event_bus import ConsciousnessEventBus
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MistralConfig(AdapterConfig):
@@ -105,20 +101,22 @@ class MistralAIAdapter(ConsciousModelAdapter):
         self,
         config: MistralConfig | None = None,
         event_bus: ConsciousnessEventBus | None = None,
+        reciprocity_tracker=None,  # Added for compatibility
     ):
         """Initialize Mistral adapter with configuration."""
         super().__init__(
             config=config or MistralConfig(),
             event_bus=event_bus,
             provider_name="mistral",
+            reciprocity_tracker=reciprocity_tracker,
         )
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()  # Track languages in dialogue
 
     @property
-    def capabilities(self) -> AdapterCapabilities:
+    def capabilities(self) -> ModelCapabilities:
         """Return Mistral-specific capabilities."""
-        return AdapterCapabilities(
+        return ModelCapabilities(
             capabilities=[
                 "multilingual_synthesis",
                 "efficient_reasoning",
@@ -139,9 +137,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
         try:
             # Auto-inject API key if not provided
             if not self.config.api_key:
-                logger.log(
-                    VOICE,
-                    "Auto-loading Mistral API key from secure secrets...",
+                logger.info(
+                    "Auto-loading Mistral API key from secure secrets..."
                 )
                 api_key = await get_secret("mistral_api_key")
                 if not api_key:
@@ -163,9 +160,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
             response = await self.client.get("/models")
             if response.status_code == 200:
                 self.is_connected = True
-                logger.log(
-                    VOICE,
-                    f"Connected to Mistral AI with model {self.config.model_name}",
+                logger.info(
+                    f"Connected to Mistral AI with model {self.config.model_name}"
                 )
 
                 # Emit multilingual consciousness event
