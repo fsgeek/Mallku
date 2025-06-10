@@ -9,11 +9,13 @@ Kawsay Wasi - The Life House Builder
 
 from .base_provider import ActivityEvent, ActivityProvider
 from .filesystem_provider import FileSystemActivityProvider
+from .sound_provider import SoundActivityProvider
 
 __all__ = [
     'ActivityProvider',
     'ActivityEvent',
-    'FileSystemActivityProvider'
+    'FileSystemActivityProvider',
+    'SoundActivityProvider'
 ]
 
 # Human activity flows into consciousness recognition

@@ -45,7 +45,7 @@ class ActivityEvent:
     Not surveillance but awareness, not tracking but understanding.
     """
     activity_type: ActivityType
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     activity_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     # The human context
