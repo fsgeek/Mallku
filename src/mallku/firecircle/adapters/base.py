@@ -32,6 +32,24 @@ class AdapterConfig(BaseModel):
     temperature: float = Field(0.7, description="Temperature for generation")
     max_tokens: int | None = Field(None, description="Maximum tokens to generate")
 
+    # Provider-specific overrides
+    base_url: str | None = Field(
+        default=None,
+        description="Custom API endpoint for the provider (optional)",
+    )
+
+    # Arbitrary extra configuration knobs that individual adapters may
+    # wish to honour.  Using a dict avoids having to modify this shared
+    # class for every new provider feature.
+    extra_config: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Free-form provider-specific configuration values",
+    )
+
+    model_config = {
+        "extra": "allow",  # Accept unknown fields for forward compatibility
+    }
+
     # Consciousness configuration
     track_reciprocity: bool = Field(default=True, description="Track reciprocity for this model")
     emit_events: bool = Field(default=True, description="Emit consciousness events")
@@ -74,7 +92,11 @@ class ConsciousModelAdapter(ABC):
         # Adapter state
         self.adapter_id = uuid4()
         self.is_connected = False
-        self.capabilities = ModelCapabilities()
+
+        # Initialise capabilities via private backing field so subclasses
+        # can safely override later without colliding with attribute
+        # assignment performed here.
+
 
         # Reciprocity tracking
         self.messages_sent = 0
@@ -164,6 +186,19 @@ class ConsciousModelAdapter(ABC):
             })
 
         return formatted
+
+    # ------------------------------------------------------------------
+    # Capabilities property (mutable)
+    # ------------------------------------------------------------------
+
+    @property
+    def capabilities(self) -> ModelCapabilities:  # noqa: D401 – property method
+        """Return the capabilities description for this adapter instance."""
+        return self._capabilities
+
+    @capabilities.setter
+    def capabilities(self, value: ModelCapabilities) -> None:  # noqa: D401 – property method
+        self._capabilities = value
 
     async def track_interaction(
         self,

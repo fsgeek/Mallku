@@ -584,3 +584,16 @@ class SecureReciprocityTracker:
         """Load existing Fire Circle guidance from database."""
         # Implementation would load stored cultural guidance and apply it
         pass
+
+# ---------------------------------------------------------------------------
+# Backward-compatibility shim
+# ---------------------------------------------------------------------------
+
+# Older code (including the current test-suite) expects to import
+# ``ReciprocityTracker`` directly from ``mallku.reciprocity.tracker``.  The
+# secure implementation now lives under the name
+# ``SecureReciprocityTracker``.  To avoid widespread breakage while the
+# codebase migrates, we provide an alias that simply references the new
+# class.
+
+ReciprocityTracker = SecureReciprocityTracker  # noqa: N816 – keep original camel-case

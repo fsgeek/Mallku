@@ -27,9 +27,6 @@ from uuid import UUID, uuid4
 
 import google.generativeai as genai
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
-from PIL import Image
-from pydantic import Field
-
 from mallku.core.secrets import get_secret
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
@@ -38,6 +35,8 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
+from PIL import Image
+from pydantic import Field
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 

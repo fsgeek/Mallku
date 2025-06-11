@@ -9,6 +9,7 @@ Like short-term memory that enables rapid consciousness pattern recognition.
 
 import asyncio
 import time
+from asyncio.log import logger
 from collections import deque
 from datetime import UTC, datetime
 from typing import Any
@@ -69,7 +70,7 @@ class MemoryBufferWrangler(BaseWrangler):
         self._in_flight: dict[str, dict] = {}
 
         # Message history for queries (if enabled)
-        self._history: deque = deque(maxlen=history_size) if enable_history else None
+        self._history: deque | None = deque(maxlen=history_size) if enable_history else None
 
         # Subscription support
         self._subscriptions: dict[str, tuple] = {}
@@ -126,6 +127,7 @@ class MemoryBufferWrangler(BaseWrangler):
             }
 
             # Priority-aware queuing
+            adjusted_priority = priority
             if self.enable_priority:
                 adjusted_priority = self._adjust_priority_for_consciousness(priority, consciousness_score)
                 await self._enqueue_with_priority(wrapped, adjusted_priority)

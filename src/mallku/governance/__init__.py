@@ -54,6 +54,16 @@ __all__ = [
     "ParticipantRole",
     "Participant",
     "ParticipantRegistry",
+
+    # Consciousness integration components
+    "ConsciousnessCirculationTransport",
+    "GovernanceParticipant",
+    "ConsciousFireCircleInterface",
+    "ConsciousGovernanceInitiator",
+
+    # Fire Circle adapter components
+    "FireCircleConsciousnessAdapter",
+    "ConsciousnessAwareDialogueManager",
 ]
 
 # Add consciousness integration exports if available
