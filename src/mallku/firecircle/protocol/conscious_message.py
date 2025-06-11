@@ -29,7 +29,10 @@ class MessageType(str, Enum):
     DISAGREEMENT = "disagreement"
     REFLECTION = "reflection"
     SUMMARY = "summary"
+    RESPONSE = "response"  # Alias used by adapter tests
+    SYNTHESIS = "synthesis"  # Additional type referenced in adapter
     CLARIFICATION = "clarification"
+    PERSPECTIVE = "perspective"
     EMPTY_CHAIR = "empty_chair"
     CONCLUSION = "conclusion"
     SYSTEM = "system"

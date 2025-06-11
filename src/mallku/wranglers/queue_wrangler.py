@@ -395,12 +395,11 @@ class QueueWrangler(BaseWrangler):
             consciousness_score += 0.3
 
         # Check metadata for consciousness patterns
-        if metadata:
-            if any(
-                indicator in metadata
-                for indicator in ['consciousness_intention', 'sacred_question', 'fire_circle']
-            ):
-                consciousness_score += 0.1
+        if metadata and any(
+            indicator in metadata
+            for indicator in ['consciousness_intention', 'sacred_question', 'fire_circle']
+        ):
+            consciousness_score += 0.1
 
         return min(1.0, consciousness_score)
 

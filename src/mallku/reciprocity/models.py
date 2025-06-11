@@ -74,6 +74,21 @@ class AlertSeverity(str, Enum):
     URGENT = "urgent"                 # Patterns needing immediate attention
 
 
+# ---------------------------------------------------------------------------
+# Extraction taxonomy (new)
+# ---------------------------------------------------------------------------
+
+class ExtractionType(str, Enum):
+    """Standardised categories of extraction concerns recognised by Mallku."""
+
+    SCALE_OVER_RELATIONSHIPS = "scale_over_relationships"  # Optimising for efficiency at the cost of connection
+    RESOURCE_HOARDING = "resource_hoarding"               # Accumulating resources without reciprocal flow
+    ATTENTION_MONOPOLISING = "attention_monopolizing"     # Disproportionate focus on a single actor or topic
+    TOKEN_FARMING = "token_farming"                       # Generating content solely to harvest rewards/points
+    CARE_DEFICIT = "care_deficit"                         # Operations proceeding without reflective pauses
+
+
+
 class InteractionRecord(BaseModel):
     """
     Record of a single reciprocal interaction for pattern analysis.
@@ -254,7 +269,7 @@ class ExtractionAlert(BaseModel):
     severity: AlertSeverity
 
     # Pattern details
-    extraction_type: str  # e.g., "resource_hoarding", "attention_monopolizing"
+    extraction_type: ExtractionType
     description: str
     evidence_summary: str
 
