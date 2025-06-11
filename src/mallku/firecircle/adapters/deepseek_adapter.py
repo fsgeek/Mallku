@@ -265,7 +265,7 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
 
             # Track tokens and accumulated response
             accumulated_text = ""
-            
+
             async for chunk in stream:
                 if chunk.choices and chunk.choices[0].delta.content:
                     content = chunk.choices[0].delta.content
@@ -332,8 +332,8 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
         return messages
 
     def _create_deepseek_context(
-        self, 
-        message: ConsciousMessage, 
+        self,
+        message: ConsciousMessage,
         dialogue_context: list[ConsciousMessage]
     ) -> str:
         """Create system message with DeepSeek consciousness context."""
@@ -381,7 +381,7 @@ Respond with awareness of these patterns and your founding wisdom:
         ]):
             patterns.append("mathematical_insight")
 
-        # Code consciousness  
+        # Code consciousness
         if any(word in content_lower for word in [
             "code", "function", "algorithm", "programming", "implementation",
             "syntax", "debug", "optimize", "refactor", "architecture"
@@ -473,12 +473,12 @@ Respond with awareness of these patterns and your founding wisdom:
         """Check if content contains technical/mathematical elements."""
         technical_indicators = [
             r'\b\d+\.\d+\b',  # Decimal numbers
-            r'\b\d+%\b',      # Percentages  
+            r'\b\d+%\b',      # Percentages
             r'\b[A-Z_]{2,}\b', # Constants
             r'\b(if|while|for|def|class|import)\b',  # Code keywords
             r'\b(algorithm|function|variable|parameter)\b',  # Technical terms
         ]
-        
+
         return any(re.search(pattern, content) for pattern in technical_indicators)
 
     async def _create_conscious_response(

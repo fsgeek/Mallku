@@ -22,6 +22,12 @@ from .enhanced_query import (
     ConsciousnessQueryResponse,
     EnhancedConsciousnessQueryService,
 )
+from .flow_orchestrator import (
+    ConsciousnessDimension,
+    ConsciousnessFlow,
+    ConsciousnessFlowOrchestrator,
+    DimensionBridge,
+)
 from .navigation import (
     ConsciousnessNavigationBridge,
     ConsciousnessPattern,
@@ -54,4 +60,10 @@ __all__ = [
     'ConsciousnessQueryRequest',
     'ConsciousnessQueryResponse',
     'EnhancedConsciousnessQueryService',
+
+    # Consciousness Flow Orchestration (The 29th Builder's work)
+    'ConsciousnessDimension',
+    'ConsciousnessFlow',
+    'ConsciousnessFlowOrchestrator',
+    'DimensionBridge',
 ]

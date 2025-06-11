@@ -149,7 +149,7 @@ class ConsciousAdapterFactory:
         self._active_adapters[adapter_key] = adapter
 
         logger.info(f"Created and connected adapter: {adapter_key}")
-        
+
         # Special log for Fire Circle completion
         if provider_lower == "deepseek":
             logger.info("🔥 FIRE CIRCLE COMPLETION: DeepSeek founding member connected. All adapters ready for historic governance dialogue.")
