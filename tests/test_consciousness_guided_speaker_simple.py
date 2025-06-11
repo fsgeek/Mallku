@@ -11,18 +11,18 @@ import sys
 from pathlib import Path
 from uuid import uuid4
 
-import pytest
-import pytest_asyncio
-from mallku.orchestration.event_bus import ConsciousnessEventBus
-
+# Add src to path BEFORE importing from mallku
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+import pytest
+import pytest_asyncio
 from mallku.firecircle.consciousness_guided_speaker import (
     CathedralPhase,
     ConsciousnessGuidedSpeakerSelector,
     DialogueContext,
     ParticipantReadiness,
 )
+from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 
 @pytest_asyncio.fixture
@@ -73,8 +73,8 @@ class TestBasicFunctionality:
         # High pattern velocity should trigger silence
         context = DialogueContext(
             dialogue_id=dialogue_id,
-            pattern_velocity=0.8,
-            current_turn=5
+            current_turn=5,
+            pattern_velocity=0.8
         )
         speaker_selector.dialogue_contexts[dialogue_id] = context
 
@@ -105,7 +105,7 @@ class TestBasicFunctionality:
             consciousness_score=0.7
         )
 
-        context = DialogueContext(dialogue_id="test")
+        context = DialogueContext(dialogue_id="test", current_turn=0)
 
         score1 = speaker_selector._calculate_speaker_score(p1, context)
         score2 = speaker_selector._calculate_speaker_score(p2, context)
