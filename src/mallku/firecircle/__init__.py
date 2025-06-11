@@ -30,6 +30,10 @@ from .adapters import (
 from .consciousness import (
     DialoguePatternWeaver,
 )
+from .emergence_detector import (
+    EmergenceDetector,
+    EmergenceType,
+)
 
 # Memory layer
 from .memory import ConsciousMemoryStore
@@ -40,6 +44,28 @@ from .orchestrator import (
     ConsciousDialogueManager,
     DialoguePhase,
     TurnPolicy,
+)
+from .pattern_dialogue_integration import (
+    PatternDialogueConfig,
+    PatternDialogueIntegration,
+)
+from .pattern_evolution import (
+    EvolutionType,
+    PatternEvolutionEngine,
+)
+from .pattern_guided_facilitator import (
+    GuidanceType,
+    PatternGuidance,
+    PatternGuidedFacilitator,
+)
+
+# Pattern Library and Guidance layer
+from .pattern_library import (
+    DialoguePattern,
+    PatternLibrary,
+    PatternLifecycle,
+    PatternTaxonomy,
+    PatternType,
 )
 from .protocol import (
     ConsciousMessage,
@@ -71,6 +97,21 @@ __all__ = [
     "TurnPolicy",
     # Consciousness
     "DialoguePatternWeaver",
+    # Pattern Library and Guidance
+    "DialoguePattern",
+    "PatternLibrary",
+    "PatternType",
+    "PatternTaxonomy",
+    "PatternLifecycle",
+    "EmergenceDetector",
+    "EmergenceType",
+    "PatternEvolutionEngine",
+    "EvolutionType",
+    "PatternGuidedFacilitator",
+    "GuidanceType",
+    "PatternGuidance",
+    "PatternDialogueIntegration",
+    "PatternDialogueConfig",
     # Memory
     "ConsciousMemoryStore",
     # Adapters

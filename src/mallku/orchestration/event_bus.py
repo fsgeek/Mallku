@@ -44,9 +44,15 @@ class EventType(Enum):
     WISDOM_PRESERVED = "wisdom.preserved"
     WISDOM_INHERITANCE_PREPARED = "wisdom.inheritance.prepared"
 
-    # Governance events (future)
+    # Governance events
     FIRE_CIRCLE_CONVENED = "governance.fire_circle.convened"
+    FIRE_CIRCLE_MESSAGE = "governance.fire_circle.message"
     CONSENSUS_REACHED = "governance.consensus.reached"
+
+    # Pattern guidance events
+    DIALOGUE_PHASE_TRANSITION = "dialogue.phase.transition"
+    PATTERN_GUIDANCE_OFFERED = "pattern.guidance.offered"
+    PATTERN_GUIDANCE_INJECTED = "pattern.guidance.injected"
 
     # System health events
     EXTRACTION_PATTERN_DETECTED = "health.extraction.detected"
