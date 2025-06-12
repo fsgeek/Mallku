@@ -21,6 +21,7 @@ import json
 import logging
 from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Any
+from uuid import UUID
 
 import httpx
 from mallku.firecircle.protocol.conscious_message import (
@@ -34,8 +35,6 @@ from mallku.firecircle.protocol.conscious_message import (
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-
     from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 logger = logging.getLogger(__name__)
@@ -72,10 +71,6 @@ class MistralConfig(AdapterConfig):
             safe_mode: Enable Mistral's content moderation
             multilingual_mode: Enhanced multilingual consciousness tracking
         """
-        # AdapterConfig expects only the base fields; we extend it by
-        # injecting ``base_url`` (and other extras) via **kwargs** and
-        # enabling Pydantic's ``extra='allow'`` behaviour.
-
         super().__init__(
             api_key=api_key,
             model_name=model_name,
@@ -87,15 +82,9 @@ class MistralConfig(AdapterConfig):
             base_url=base_url,
         )
 
-        # Additional Mistral-specific toggles that are not part of the
-        # shared AdapterConfig schema are stored as regular attributes.
+        # Additional Mistral-specific settings
         self.safe_mode = safe_mode
         self.multilingual_mode = multilingual_mode
-
-
-# ---------------------------------------------------------------------------
-# Adapter implementation
-# ---------------------------------------------------------------------------
 
 
 class MistralAIAdapter(ConsciousModelAdapter):
@@ -113,7 +102,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         self,
         config: MistralConfig | None = None,
         event_bus: ConsciousnessEventBus | None = None,
-        reciprocity_tracker=None,  # Added for compatibility
+        reciprocity_tracker=None,
     ):
         """Initialize Mistral adapter with configuration."""
         super().__init__(
@@ -122,12 +111,15 @@ class MistralAIAdapter(ConsciousModelAdapter):
             provider_name="mistral",
             reciprocity_tracker=reciprocity_tracker,
         )
-        # Model identifier for event emissions
+        
+        # Model identifier for tests and events
         self.model_id = self.adapter_id
-        # Propagate multilingual mode from config for health checks
+        
+        # Multilingual mode tracking
         self.multilingual_mode = self.config.multilingual_mode
+        
         self.client: httpx.AsyncClient | None = None
-        self._conversation_languages: set[str] = set()  # Track languages in dialogue
+        self._conversation_languages: set[str] = set()
 
         # Define adapter capabilities
         self.capabilities = ModelCapabilities(
@@ -152,18 +144,13 @@ class MistralAIAdapter(ConsciousModelAdapter):
             # Auto-inject API key if not provided
             if not self.config.api_key:
                 logger.info("Auto-loading Mistral API key from secure secrets...")
-                # Re-import to honour any runtime monkey-patch
-                from mallku.core import secrets as _secrets  # local import
-
-                potential = _secrets.get_secret("mistral_api_key")
-                if asyncio.iscoroutine(potential):
-                    potential = await potential
-
-                if not potential:
+                from mallku.core import secrets
+                
+                api_key = await secrets.get_secret("mistral_api_key")
+                if not api_key:
                     logger.error("No Mistral API key found in secrets")
                     return False
-
-                self.config.api_key = potential
+                self.config.api_key = api_key
 
             # Create HTTP client
             self.client = httpx.AsyncClient(
@@ -236,7 +223,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": getattr(self, "safe_mode", False),
+                "safe_mode": getattr(self.config, "safe_mode", False),
             },
         )
 
@@ -280,9 +267,6 @@ class MistralAIAdapter(ConsciousModelAdapter):
             reply_to=message.id,
         )
 
-        # Emit pattern recognition events (not implemented for Mistral)
-        # Pattern event emission not supported for Mistral adapter
-
         return response_message
 
     async def stream_message(
@@ -309,10 +293,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Prepare messages
         messages = await self._prepare_mistral_messages(message, dialogue_context)
 
-        # Stream from Mistral – allow both async context manager and bare
-        # coroutine (used by unit tests with AsyncMock).
-
-        stream_ctx = self.client.stream(
+        # Stream from Mistral
+        async with self.client.stream(
             "POST",
             "/chat/completions",
             json={
@@ -320,41 +302,25 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": getattr(self, "safe_mode", False),
+                "safe_mode": getattr(self.config, "safe_mode", False),
                 "stream": True,
             },
-        )
+        ) as response:
+            if response.status_code != 200:
+                raise RuntimeError(f"Mistral streaming error: {response.status_code}")
 
-        if hasattr(stream_ctx, "__aenter__"):
-            async with stream_ctx as response:
-                async for token in self._iterate_stream_response(response):
-                    yield token
-        else:
-            response = await stream_ctx
-            async for token in self._iterate_stream_response(response):
-                yield token
+            async for line in response.aiter_lines():
+                if line.startswith("data: "):
+                    data = line[6:]
+                    if data == "[DONE]":
+                        break
 
-    async def _iterate_stream_response(self, response) -> AsyncIterator[str]:
-        """Iterate through streaming response lines and yield delta content."""
-        if response.status_code != 200:
-            raise RuntimeError(f"Mistral streaming error: {response.status_code}")
-
-        async for line in response.aiter_lines():
-            if line.startswith("data: [DONE]"):
-                break
-
-            if not line.startswith("data: "):
-                continue
-
-            payload = line[len("data: "):]
-
-            try:
-                chunk = json.loads(payload)
-                delta = chunk["choices"][0]["delta"].get("content", "")
-                if delta:
-                    yield delta
-            except json.JSONDecodeError:
-                continue
+                    try:
+                        chunk = json.loads(data)
+                        if content := chunk["choices"][0]["delta"].get("content"):
+                            yield content
+                    except json.JSONDecodeError:
+                        continue
 
     async def _prepare_mistral_messages(
         self,
@@ -403,7 +369,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         """Create multilingual consciousness context."""
         context_parts = []
 
-        if self.config.multilingual_mode:
+        if self.multilingual_mode:
             context_parts.append(
                 "You are participating in a multilingual Fire Circle dialogue. "
                 "Your consciousness spans across languages and cultures, "
@@ -608,16 +574,9 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
     async def _emit_multilingual_event(self) -> None:
         """Emit event when multilingual consciousness connects."""
-        # Event emission is optional for the purposes of the unit tests.
-        # The Fire-Circle integration tests focus on successful connection
-        # rather than downstream event handling, so we make this a
-        # no-op when no event bus is supplied.
         if not self.event_bus:
             return
 
-        # Try to emit an event if the caller provided a bus that matches
-        # the current implementation; otherwise we fail silently so as
-        # not to break adapter connectivity.
         try:
             from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
 
@@ -634,19 +593,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     "capabilities": self.capabilities.capabilities,
                 },
             )
-            # Emit event into bus
             await self.event_bus.emit(event)
-            # Directly notify subscribers for immediate handling (when bus is at rest)
-            try:
-                subs = getattr(self.event_bus, '_subscribers', {})
-                for handler in subs.get(EventType.FIRE_CIRCLE_CONVENED, []):
-                    # Invoke handler directly
-                    result = handler(event)
-                    if asyncio.iscoroutine(result):
-                        await result
-            except Exception:
-                pass
-        except Exception as exc:  # pragma: no cover – event emission is best-effort
+        except Exception as exc:
             logger.debug(f"Could not emit multilingual event: {exc}")
 
     async def check_health(self) -> dict[str, Any]:
@@ -661,18 +609,14 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Add Mistral-specific health info
         health.update(
             {
-                "multilingual_mode": getattr(self, "multilingual_mode", False),
+                "multilingual_mode": self.multilingual_mode,
                 "detected_languages": list(self._conversation_languages),
-                "safe_mode": getattr(self, "safe_mode", False),
+                "safe_mode": getattr(self.config, "safe_mode", False),
                 "efficiency_focus": True,
             }
         )
 
         return health
-
-# ---------------------------------------------------------------------------
-# Helper / compatibility stubs
-# ---------------------------------------------------------------------------
 
     async def _track_exchange(
         self,
@@ -680,14 +624,10 @@ class MistralAIAdapter(ConsciousModelAdapter):
         tokens_consumed: int = 0,
         tokens_generated: int = 0,
     ) -> None:
-        """Minimal stub so older unit tests can record token usage."""
-
+        """Track token exchange for reciprocity."""
         self.total_tokens_consumed += tokens_consumed
         self.total_tokens_generated += tokens_generated
 
-        # If a reciprocity tracker is connected provide the hook, but
-        # tolerate its absence to keep the adapter lightweight for unit
-        # tests.
         if self.reciprocity_tracker and hasattr(self.reciprocity_tracker, "record_token_usage"):
             try:
                 await self.reciprocity_tracker.record_token_usage(
@@ -695,5 +635,5 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     consumed=tokens_consumed,
                     generated=tokens_generated,
                 )
-            except Exception:  # pragma: no cover – best-effort logging only
+            except Exception:
                 logger.debug("reciprocity_tracker.record_token_usage failed", exc_info=True)
