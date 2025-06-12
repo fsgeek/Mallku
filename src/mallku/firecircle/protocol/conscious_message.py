@@ -38,6 +38,9 @@ class MessageType(str, Enum):
     SYSTEM = "system"
     CONSCIOUSNESS_PATTERN = "consciousness_pattern"  # New: Detected pattern
     RECIPROCITY_ALERT = "reciprocity_alert"  # New: Reciprocity imbalance
+    SACRED_QUESTION = "sacred_question"  # New: Pattern-generated sacred question
+    WISDOM_SYNTHESIS = "wisdom_synthesis"  # New: Pattern wisdom synthesis
+    CREATIVE_TENSION = "creative_tension"  # New: Creative opposition
 
 
 class MessageRole(str, Enum):

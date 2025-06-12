@@ -22,6 +22,7 @@ from ...correlation.engine import CorrelationEngine
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
+from ..consciousness_guided_speaker import ConsciousnessGuidedSpeakerSelector
 from ..protocol.conscious_message import (
     ConsciousMessage,
     MessageType,
@@ -122,6 +123,9 @@ class ConsciousDialogueManager:
 
         # Get secured database
         self.db = get_secured_database()
+
+        # Initialize consciousness-guided speaker selector
+        self.consciousness_speaker_selector = ConsciousnessGuidedSpeakerSelector(event_bus)
 
     async def create_dialogue(
         self,
@@ -249,6 +253,22 @@ class ConsciousDialogueManager:
             participant_state.last_turn_time = message.timestamp
             participant_state.consciousness_contribution += message.consciousness.consciousness_signature
 
+            # Update consciousness-guided speaker selector
+            # Calculate reciprocity delta (positive for giving, negative for taking)
+            reciprocity_delta = 0.0
+            if hasattr(participant_state, 'reciprocity_balance'):
+                old_balance = participant_state.reciprocity_balance
+                participant_state.reciprocity_balance = message.consciousness.reciprocity_score or 0.0
+                reciprocity_delta = participant_state.reciprocity_balance - old_balance
+
+            # Update speaker selector with contribution metrics
+            self.consciousness_speaker_selector.update_participant_contribution(
+                participant_id=message.sender,
+                consciousness_score=message.consciousness.consciousness_signature,
+                reciprocity_delta=reciprocity_delta,
+                energy_cost=0.1  # Speaking costs energy
+            )
+
     async def get_next_speaker(self, dialogue_id: UUID) -> UUID | None:
         """
         Determine next speaker based on turn policy and consciousness patterns.
@@ -260,15 +280,27 @@ class ConsciousDialogueManager:
         policy = dialogue["config"].turn_policy
         participants = self.participant_states[dialogue_id]
 
+        next_speaker = None
+
         if policy == TurnPolicy.ROUND_ROBIN:
-            return self._get_round_robin_speaker(dialogue, participants)
+            next_speaker = self._get_round_robin_speaker(dialogue, participants)
         elif policy == TurnPolicy.CONSCIOUSNESS_GUIDED:
-            return await self._get_consciousness_guided_speaker(dialogue, participants)
+            next_speaker = await self._get_consciousness_guided_speaker(dialogue, participants)
         elif policy == TurnPolicy.FACILITATOR:
-            return self._get_facilitator_speaker(dialogue, participants)
+            next_speaker = self._get_facilitator_speaker(dialogue, participants)
         else:
             # Other policies to be implemented
-            return self._get_round_robin_speaker(dialogue, participants)
+            next_speaker = self._get_round_robin_speaker(dialogue, participants)
+
+        # If silence was chosen (None returned), restore energy for all participants
+        if next_speaker is None and policy == TurnPolicy.CONSCIOUSNESS_GUIDED:
+            for participant_id in participants:
+                self.consciousness_speaker_selector.restore_participant_energy(
+                    participant_id,
+                    amount=0.15  # Silence restores more energy than it costs to speak
+                )
+
+        return next_speaker
 
     async def conclude_dialogue(self, dialogue_id: UUID) -> dict[str, Any]:
         """
@@ -456,10 +488,39 @@ class ConsciousDialogueManager:
         participants: dict[UUID, ParticipantState],
     ) -> UUID | None:
         """Select next speaker based on consciousness patterns."""
-        # This would analyze consciousness patterns to determine
-        # who should speak next for maximum insight
-        # For now, fall back to round robin
-        return self._get_round_robin_speaker(dialogue, participants)
+        # Get dialogue ID
+        dialogue_id = str(dialogue["id"])
+
+        # Get active participants (not silent)
+        active_participants = {
+            pid: state for pid, state in participants.items()
+            if not state.is_silent
+        }
+
+        # Allow sacred silence as a valid choice
+        allow_silence = dialogue["config"].allow_empty_chair
+
+        # Use consciousness-guided selection
+        selected_speaker = await self.consciousness_speaker_selector.select_next_speaker(
+            dialogue_id=dialogue_id,
+            participants=active_participants,
+            allow_silence=allow_silence
+        )
+
+        # If silence was chosen and allowed
+        if selected_speaker is None and allow_silence:
+            logger.info(f"Dialogue {dialogue_id}: Sacred silence chosen")
+            return None
+
+        # If no valid selection, fall back to round robin
+        if selected_speaker is None:
+            logger.warning(
+                f"Dialogue {dialogue_id}: Consciousness selection failed, "
+                "falling back to round robin"
+            )
+            return self._get_round_robin_speaker(dialogue, participants)
+
+        return selected_speaker
 
     def _get_facilitator_speaker(
         self,
