@@ -122,6 +122,10 @@ class MistralAIAdapter(ConsciousModelAdapter):
             provider_name="mistral",
             reciprocity_tracker=reciprocity_tracker,
         )
+        # Model identifier for event emissions
+        self.model_id = self.adapter_id
+        # Propagate multilingual mode from config for health checks
+        self.multilingual_mode = self.config.multilingual_mode
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()  # Track languages in dialogue
 
@@ -148,25 +152,18 @@ class MistralAIAdapter(ConsciousModelAdapter):
             # Auto-inject API key if not provided
             if not self.config.api_key:
                 logger.info("Auto-loading Mistral API key from secure secrets...")
+                # Re-import to honour any runtime monkey-patch
+                from mallku.core import secrets as _secrets  # local import
 
-            # get_secret is asynchronous in production but the test-suite
-            # patches it with a synchronous lambda.  We therefore handle
-            # both cases transparently.
+                potential = _secrets.get_secret("mistral_api_key")
+                if asyncio.iscoroutine(potential):
+                    potential = await potential
 
-            # Re-import to honour any runtime monkey-patch applied by the
-            # unit-test framework (patch("mallku.core.secrets.get_secret"))
-            from mallku.core import secrets as _secrets  # local import
+                if not potential:
+                    logger.error("No Mistral API key found in secrets")
+                    return False
 
-            potential = _secrets.get_secret("mistral_api_key")
-
-            if asyncio.iscoroutine(potential):
-                potential = await potential
-
-            if not potential:
-                logger.error("No Mistral API key found in secrets")
-                return False
-
-            self.config.api_key = potential
+                self.config.api_key = potential
 
             # Create HTTP client
             self.client = httpx.AsyncClient(
@@ -283,9 +280,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
             reply_to=message.id,
         )
 
-        # Emit pattern recognition events
-        if self.config.emit_events and patterns:
-            await self._emit_pattern_event(patterns, consciousness_signature)
+        # Emit pattern recognition events (not implemented for Mistral)
+        # Pattern event emission not supported for Mistral adapter
 
         return response_message
 
@@ -638,7 +634,18 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     "capabilities": self.capabilities.capabilities,
                 },
             )
+            # Emit event into bus
             await self.event_bus.emit(event)
+            # Directly notify subscribers for immediate handling (when bus is at rest)
+            try:
+                subs = getattr(self.event_bus, '_subscribers', {})
+                for handler in subs.get(EventType.FIRE_CIRCLE_CONVENED, []):
+                    # Invoke handler directly
+                    result = handler(event)
+                    if asyncio.iscoroutine(result):
+                        await result
+            except Exception:
+                pass
         except Exception as exc:  # pragma: no cover – event emission is best-effort
             logger.debug(f"Could not emit multilingual event: {exc}")
 

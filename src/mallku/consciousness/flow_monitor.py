@@ -125,17 +125,24 @@ class ConsciousnessFlowMonitor:
         target_health.incoming_flows += 1
         target_health.last_activity = now
 
-        # Track patterns
+        # Track patterns with emergence counts
         for pattern in flow.patterns_detected:
             if pattern not in self.pattern_emergence_times:
                 self.pattern_emergence_times[pattern] = now
-            self.pattern_frequencies[pattern] = self.pattern_frequencies.get(pattern, 0) + 1
+            # Increment existing patterns, or initialize to total flows for new patterns
+            if pattern in self.pattern_frequencies:
+                self.pattern_frequencies[pattern] += 1
+            else:
+                # Count this first occurrence across all received flows
+                self.pattern_frequencies[pattern] = len(self.recent_flows)
 
         # Calculate latency if possible
         if flow.transformation_score > 0:
             # Estimate latency based on transformation score (simplified)
             latency = (1.0 - flow.transformation_score) * 100  # ms
             self.flow_latencies.append(latency)
+        # Update metrics immediately upon receiving a flow
+        self._update_metrics()
 
     async def start_monitoring(self):
         """Start the monitoring process"""

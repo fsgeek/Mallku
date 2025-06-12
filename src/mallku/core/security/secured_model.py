@@ -142,6 +142,15 @@ class SecuredModel(BaseModel):
                     obfuscated_data[field_uuid] = field_value
 
         return obfuscated_data
+    
+    def to_storage_dict(self, registry: SecurityRegistry) -> Any:
+        """
+        Convert this secured model to a storage-ready dictionary using the provided registry.
+        """
+        # Ensure registry is set for obfuscation
+        self.set_registry(registry)
+        # Use dict() to apply field obfuscation
+        return self.dict()
 
     @classmethod
     def from_obfuscated(cls, data: builtins.dict[str, Any]) -> "SecuredModel":
@@ -174,6 +183,13 @@ class SecuredModel(BaseModel):
                 resolved_data[key] = value
 
         return cls(**resolved_data)
+    
+    @classmethod
+    def from_storage_dict(cls, data: Any) -> "SecuredModel":
+        """
+        Alias for from_obfuscated to maintain backwards compatibility.
+        """
+        return cls.from_obfuscated(data)
 
     def validate_security_configuration(self) -> builtins.dict[str, list[str]]:
         """Validate all field security configurations."""

@@ -16,6 +16,14 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from mallku.core.secrets import SecretsManager, get_secret
+from tempfile import TemporaryDirectory
+from pathlib import Path
+
+@pytest.fixture
+def temp_secrets_dir():
+    """Module-level fixture: temporary directory for secrets."""
+    with TemporaryDirectory() as temp_dir:
+        yield Path(temp_dir)
 from mallku.firecircle.adapters.adapter_factory import (
     ConsciousAdapterFactory,
     create_conscious_adapter,
@@ -26,11 +34,7 @@ from mallku.firecircle.adapters.base import AdapterConfig
 class TestSecretsManager:
     """Test the secrets management system."""
 
-    @pytest.fixture
-    def temp_secrets_dir(self):
-        """Create temporary directory for secrets."""
-        with TemporaryDirectory() as temp_dir:
-            yield Path(temp_dir)
+    # Temp secrets directory fixture moved to module scope
 
     @pytest.fixture
     async def secrets_manager(self, temp_secrets_dir):

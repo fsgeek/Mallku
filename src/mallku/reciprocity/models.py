@@ -90,6 +90,24 @@ class ExtractionType(str, Enum):
 
 
 class InteractionRecord(BaseModel):
+    def __init__(self, **data: Any):
+        # Handle legacy parameters for primary/secondary participants and metadata
+        primary = data.pop('primary_participant', None)
+        secondary = data.pop('secondary_participant', None)
+        meta = data.pop('metadata', None)
+        # Map legacy parameters to required fields
+        if primary is not None:
+            data['initiator'] = primary
+        if secondary is not None:
+            data['responder'] = secondary
+        super().__init__(**data)
+        # Preserve legacy attributes
+        if primary is not None:
+            object.__setattr__(self, 'primary_participant', primary)
+        if secondary is not None:
+            object.__setattr__(self, 'secondary_participant', secondary)
+        if meta is not None:
+            object.__setattr__(self, 'metadata', meta)
     """
     Record of a single reciprocal interaction for pattern analysis.
 
@@ -102,8 +120,8 @@ class InteractionRecord(BaseModel):
     interaction_type: InteractionType
 
     # Participants and their roles
-    initiator: ParticipantType
-    responder: ParticipantType
+    initiator: str
+    responder: str
     participant_context: dict[str, Any] = Field(default_factory=dict)
 
     # Contribution and need analysis

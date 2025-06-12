@@ -142,6 +142,8 @@ class ConsciousnessFlowOrchestrator:
 
         # Unified consciousness tracking
         self.unified_signatures: dict[str, float] = {}  # correlation_id -> unified score
+        # Patterns seen per dimension for cross-dimensional detection
+        self._pattern_dimensions: dict[str, set] = {}
         self.cross_dimensional_patterns: set[str] = set()
 
         # Orchestrator state
@@ -259,6 +261,14 @@ class ConsciousnessFlowOrchestrator:
             correlation_id=event.correlation_id or event.event_id
         )
 
+        # Track patterns across source dimensions for cross-dimensional detection
+        for pat in flow.patterns_detected:
+            dims = self._pattern_dimensions.setdefault(pat, set())
+            dims.add(flow.source_dimension)
+            if len(dims) > 1:
+                self.cross_dimensional_patterns.add(pat)
+        # Notify subscribers of initial flow
+        await self._notify_dimension_subscribers(flow)
         # Store active flow
         self.active_flows[flow.flow_id] = flow
 
@@ -359,7 +369,8 @@ class ConsciousnessFlowOrchestrator:
         elif "reciprocity" in source:
             return ConsciousnessDimension.RECIPROCITY
 
-        return None
+        # Default to PATTERN dimension if source is unrecognized
+        return ConsciousnessDimension.PATTERN
 
     def _summarize_event_content(self, event: ConsciousnessEvent) -> dict[str, Any]:
         """Extract relevant content summary from event"""

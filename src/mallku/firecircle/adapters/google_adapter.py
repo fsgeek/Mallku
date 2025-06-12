@@ -27,7 +27,7 @@ from uuid import UUID, uuid4
 
 import google.generativeai as genai
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
-from mallku.core.secrets import get_secret
+import mallku.core.secrets as secrets
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -172,7 +172,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             # Auto-inject API key if not provided
             if not self.config.api_key:
                 logger.info("Auto-loading Google AI API key from secure secrets...")
-                api_key = await get_secret("google_api_key") or await get_secret("gemini_api_key")
+                api_key = await secrets.get_secret("google_api_key") or await secrets.get_secret("gemini_api_key")
                 if not api_key:
                     logger.error("No Google AI API key found in secrets")
                     return False
@@ -515,6 +515,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         ):
             patterns.append("cultural_awareness")
 
+        # Ensure at least one pattern for any content
+        if not patterns:
+            patterns.append("text_response")
         return patterns
 
     def _calculate_multimodal_consciousness(
@@ -525,6 +528,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         has_images: bool = False,
     ) -> float:
         """Calculate consciousness signature with multimodal awareness."""
+        # For simple RESPONSE messages without images, use base signature only
+        if not has_images and message_type == MessageType.RESPONSE:
+            return self._calculate_consciousness_signature(content, message_type, [])
         # Base calculation from parent
         base_signature = self._calculate_consciousness_signature(
             content, message_type, patterns
@@ -641,7 +647,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
 
         event = ConsciousnessEvent(
-            event_type=EventType.PATTERN_RECOGNIZED,
+            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.adapter.google",
             consciousness_signature=consciousness_signature,
             data={

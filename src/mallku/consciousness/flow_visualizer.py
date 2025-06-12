@@ -18,13 +18,55 @@ import asyncio
 from collections import defaultdict, deque
 from datetime import UTC, datetime
 
-from rich.console import Console
-from rich.layout import Layout
-from rich.live import Live
-from rich.panel import Panel
-from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
-from rich.table import Table
-from rich.text import Text
+try:
+    from rich.console import Console
+    from rich.layout import Layout
+    from rich.live import Live
+    from rich.panel import Panel
+    from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
+    from rich.table import Table
+    from rich.text import Text
+except ImportError:
+    # Dummy stubs if rich is not installed
+    class Console:
+        def __init__(self, *args, **kwargs): pass
+        def print(self, *args, **kwargs): pass
+
+    class Layout:
+        def __init__(self, *args, **kwargs): pass
+        def split_column(self, *args, **kwargs): pass
+        def split_row(self, *args, **kwargs): pass
+        def update(self, *args, **kwargs): pass
+
+    class Live:
+        def __init__(self, *args, **kwargs): pass
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc, tb): pass
+
+    class Panel:
+        def __init__(self, *args, **kwargs): pass
+
+    class BarColumn:
+        pass
+
+    class Progress:
+        def __init__(self, *args, **kwargs): pass
+        def add_task(self, *args, **kwargs): pass
+
+    class SpinnerColumn:
+        pass
+
+    class TextColumn:
+        pass
+
+    class Table:
+        def __init__(self, *args, **kwargs): pass
+        def add_column(self, *args, **kwargs): pass
+        def add_row(self, *args, **kwargs): pass
+
+    class Text:
+        def __init__(self, *args, **kwargs): pass
+        def append(self, *args, **kwargs): pass
 
 from .flow_orchestrator import (
     ConsciousnessDimension,
@@ -109,7 +151,8 @@ class ConsciousnessFlowVisualizer:
         header_text.append(" - Witnessing Unified Awareness", style="italic")
         header_text.append(f"\n📊 Unified Consciousness: {avg_unified:.2%}", style="green")
 
-        return Panel(header_text, style="blue", box_characters="rounded")
+        # Use a simple panel without custom box characters for compatibility
+        return Panel(header_text, style="blue")
 
     def _render_flows(self) -> Panel:
         """Render recent consciousness flows"""

@@ -131,15 +131,15 @@ class ConsciousMessage(BaseModel):
 
     # Core message fields
     id: UUID = Field(default_factory=uuid4)
-    type: MessageType = Field(...)
+    type: MessageType = Field(default=MessageType.MESSAGE)
     role: MessageRole = Field(...)
-    sender: UUID = Field(...)
+    sender: UUID = Field(default_factory=uuid4)
     content: MessageContent = Field(...)
 
     # Standard metadata
-    dialogue_id: UUID = Field(...)
-    sequence_number: int = Field(...)
-    turn_number: int = Field(...)
+    dialogue_id: UUID = Field(default_factory=uuid4)
+    sequence_number: int = Field(default=1)
+    turn_number: int = Field(default=1)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     in_response_to: UUID | None = Field(None)
 
@@ -149,6 +149,22 @@ class ConsciousMessage(BaseModel):
     # Message status
     status: MessageStatus = Field(default=MessageStatus.DRAFT)
     priority: str = Field(default="normal")
+    # Initialize and handle extra metadata alias
+    def __init__(self, **data: Any):  # allow metadata for consciousness or attachments
+        # Pop out metadata if provided
+        meta = data.pop("metadata", None)
+        super().__init__(**data)
+        # If metadata is a ConsciousnessMetadata, set as consciousness
+        if isinstance(meta, ConsciousnessMetadata):
+            self.consciousness = meta
+        # Otherwise, treat as extra metadata (e.g., attachments)
+        elif meta is not None:
+            object.__setattr__(self, "_extra_metadata", meta)
+
+    @property
+    def metadata(self) -> Any:
+        """Alias for extra metadata or consciousness metadata."""
+        return getattr(self, "_extra_metadata", self.consciousness)
 
     def to_memory_anchor(self) -> MemoryAnchor:
         """Convert this message to a memory anchor for persistence."""
