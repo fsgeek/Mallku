@@ -1,8 +1,8 @@
 """
 mallku.khipu: Structured access to the Khipu (living memory) archive.
 """
-from .service import KhipuMemoryService
 from .models import KhipuEntry, PatternSummary
+from .service import KhipuMemoryService
 
 __all__ = [
     "KhipuMemoryService",

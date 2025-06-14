@@ -16,8 +16,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from mallku.core.secrets import SecretsManager, get_secret
-from tempfile import TemporaryDirectory
-from pathlib import Path
+
 
 @pytest.fixture
 def temp_secrets_dir():

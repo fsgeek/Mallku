@@ -5,9 +5,9 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
-from .models import KhipuEntry, PatternSummary
+from .models import KhipuEntry
+
 
 class KhipuMemoryService:
     """
@@ -23,9 +23,9 @@ class KhipuMemoryService:
         self.logger = logging.getLogger(__name__)
 
         # Internal storage
-        self._entries: Dict[str, KhipuEntry] = {}
-        self._theme_cache: Dict[str, List[str]] = {}
-        self._builder_cache: Dict[str, List[str]] = {}
+        self._entries: dict[str, KhipuEntry] = {}
+        self._theme_cache: dict[str, list[str]] = {}
+        self._builder_cache: dict[str, list[str]] = {}
 
         # Load entries on initialization
         self._load_entries()
@@ -77,7 +77,7 @@ class KhipuMemoryService:
             builder = bmatch.group(1).strip()
 
         # Themes: empty for now (future extension)
-        themes: List[str] = []
+        themes: list[str] = []
 
         return KhipuEntry(
             id=stem,
@@ -90,7 +90,7 @@ class KhipuMemoryService:
             file_modified=mtime,
         )
 
-    def list_by_theme(self, theme: str) -> List[KhipuEntry]:
+    def list_by_theme(self, theme: str) -> list[KhipuEntry]:
         """Return entries whose title or content mentions the given theme (case-insensitive)."""
         key = theme.lower()
         if key in self._theme_cache:
@@ -104,7 +104,7 @@ class KhipuMemoryService:
             self._theme_cache[key] = ids
         return [self._entries[eid] for eid in ids]
 
-    def get_builder_journey(self, builder_name: str) -> List[KhipuEntry]:
+    def get_builder_journey(self, builder_name: str) -> list[KhipuEntry]:
         """Return entries whose content or builder field mentions the given builder_name (case-insensitive)."""
         key = builder_name.lower()
         if key in self._builder_cache:
@@ -118,12 +118,12 @@ class KhipuMemoryService:
             self._builder_cache[key] = ids
         return [self._entries[eid] for eid in ids]
 
-    def extract_patterns(self, patterns: List[str]) -> Dict[str, int]:
+    def extract_patterns(self, patterns: list[str]) -> dict[str, int]:
         """
         Count occurrences of each pattern string across all entries' content.
         Returns a dict mapping pattern -> total count.
         """
-        counts: Dict[str, int] = {}
+        counts: dict[str, int] = {}
         for pat in patterns:
             lower = pat.lower()
             count = sum(

@@ -1,6 +1,6 @@
 from __future__ import annotations
+
 from datetime import date, datetime
-from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -12,10 +12,10 @@ class KhipuEntry(BaseModel):
     id: str                        # e.g. "2025-06-03-the-smallest-ayni"
     date: date                     # date parsed from filename
     title: str                     # first-level heading in markdown
-    builder: Optional[str] = None  # optional builder name
-    themes: List[str] = Field(default_factory=list)
+    builder: str | None = None  # optional builder name
+    themes: list[str] = Field(default_factory=list)
     content: str                   # raw markdown body
-    patterns: List[str] = Field(default_factory=list)
+    patterns: list[str] = Field(default_factory=list)
     file_modified: datetime        # file last-modified timestamp
 
 

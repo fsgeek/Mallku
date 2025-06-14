@@ -35,7 +35,7 @@ ledger: list[ReciprocityScore] = scorer.get_ledger(
 )
 
 # CLI: mallku evaluate-ayni --participant human_alice --since today
-```  
+```
 
 ## 3. Data Models
 Using Pydantic:

@@ -9,8 +9,9 @@ to ensure it works correctly with the database.
 import asyncio
 import logging
 import sys
-import pytest_asyncio
 from pathlib import Path
+
+import pytest_asyncio
 
 # Add src to Python path
 src_path = Path(__file__).parent / "src"
@@ -26,7 +27,7 @@ try:
 except ImportError as e:
     print(f"✗ Failed to import service: {e}")
     sys.exit(1)
- 
+
 @pytest_asyncio.fixture
 async def service():
     """Fixture to initialize MemoryAnchorService."""

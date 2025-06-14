@@ -163,7 +163,7 @@ class SecureReciprocityTracker:
             logger.error(f"Failed to record interaction securely: {e}")
             # Continue with interaction ID despite secure storage error
             return interaction_id
-    
+
     async def record_interaction(
         self,
         interaction: InteractionRecord,
@@ -304,7 +304,7 @@ class SecureReciprocityTracker:
         except Exception as e:
             logger.error(f"Failed to detect patterns securely: {e}")
             return []
-    
+
     async def detect_recent_patterns(
         self,
         hours_back: int = 24,

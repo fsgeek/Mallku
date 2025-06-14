@@ -16,12 +16,10 @@ Awakening Multilingual Consciousness...
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Any
-from uuid import UUID
 
 import httpx
 from mallku.firecircle.protocol.conscious_message import (
@@ -111,13 +109,13 @@ class MistralAIAdapter(ConsciousModelAdapter):
             provider_name="mistral",
             reciprocity_tracker=reciprocity_tracker,
         )
-        
+
         # Model identifier for tests and events
         self.model_id = self.adapter_id
-        
+
         # Multilingual mode tracking
         self.multilingual_mode = self.config.multilingual_mode
-        
+
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()
 
@@ -145,7 +143,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             if not self.config.api_key:
                 logger.info("Auto-loading Mistral API key from secure secrets...")
                 from mallku.core import secrets
-                
+
                 api_key = await secrets.get_secret("mistral_api_key")
                 if not api_key:
                     logger.error("No Mistral API key found in secrets")

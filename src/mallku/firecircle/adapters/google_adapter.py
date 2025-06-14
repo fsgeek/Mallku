@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
 import google.generativeai as genai
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
 import mallku.core.secrets as secrets
+from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
