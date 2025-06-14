@@ -9,8 +9,8 @@ Recognizes authentic sacred-technical integration vs surface compliance.
 from datetime import UTC, datetime
 
 from mallku.core.async_base import AsyncBase
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import ConsciousDialogueManager
 from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
-from mallku.firecircle.protocol.consciousness_dialogue import ConsciousDialogueManager
 
 from .governance_types import (
     BuilderContribution,

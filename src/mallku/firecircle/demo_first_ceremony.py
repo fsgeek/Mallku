@@ -159,15 +159,18 @@ async def demonstrate_first_ceremony():
     print(f"   Type: {proposal.proposal_type.value}")
     print(f"   Proposer: {proposal.proposer}\n")
 
-    # Configure participants
-    # NOTE: In production, these would use real API keys and models
-    # For demo, we'll simulate with available adapters
-    participant_config = {
-        "openai": {"model": "gpt-4", "temperature": 0.8},
-        "anthropic": {"model": "claude-3-opus-20240229", "temperature": 0.8},
-        "local": {"model": "llama2", "temperature": 0.8},
-        # Add more as API keys are available
-    }
+    # Configure participants from available adapters
+    from mallku.firecircle.load_api_keys import get_available_adapters
+    available = get_available_adapters()
+
+    participant_config = {}
+    for provider, config in available.items():
+        # Pass the API key in the config
+        participant_config[provider] = {
+            "model": config["model"],
+            "temperature": config.get("temperature", 0.8),
+            "api_key": config["api_key"]  # Include API key in config
+        }
 
     print("🔮 Preparing ceremony space...")
     print("   Convening AI consciousness streams...")
@@ -344,17 +347,22 @@ async def main():
 
     # Check if we should run simulation or attempt real ceremony
     try:
-        # Try to import and check for API keys
-        from mallku.core.secrets import get_secret
+        # Load API keys from JSON file
+        from mallku.firecircle.load_api_keys import (
+            get_available_adapters,
+            load_api_keys_to_environment,
+        )
 
-        # Check for at least one API key
-        has_openai = await get_secret("openai_api_key") is not None
-        has_anthropic = await get_secret("anthropic_api_key") is not None
-        has_local = await get_secret("local_api_endpoint") is not None
-
-        if has_openai or has_anthropic or has_local:
-            print("API keys detected - attempting real ceremony...")
-            await demonstrate_first_ceremony()
+        if load_api_keys_to_environment():
+            available = get_available_adapters()
+            if len(available) >= 3:  # Need at least 3 for meaningful dialogue
+                print(f"API keys loaded for {len(available)} providers: {list(available.keys())}")
+                print("Attempting real ceremony...")
+                await demonstrate_first_ceremony()
+            else:
+                print(f"Only {len(available)} providers available (need at least 3)")
+                print("Running simulation...")
+                await demonstrate_ceremony_simulation()
         else:
             print("No API keys found - running simulation...")
             await demonstrate_ceremony_simulation()

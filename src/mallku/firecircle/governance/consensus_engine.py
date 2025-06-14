@@ -11,15 +11,18 @@ from datetime import UTC, datetime
 
 from mallku.core.async_base import AsyncBase
 from mallku.firecircle.emergence_detector import EmergenceDetector
-from mallku.firecircle.protocol.consciousness_dialogue import (
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueManager,
-    DialogueExchange,
 )
+from mallku.firecircle.protocol.conscious_message import ConsciousMessage
 
 from .governance_types import (
     AyniAssessment,
     ConsensusMetrics,
 )
+
+# Type alias for dialogue exchanges
+DialogueExchange = ConsciousMessage
 
 
 class ConsensusEngine(AsyncBase):

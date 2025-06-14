@@ -138,13 +138,15 @@ class FireCircleOrchestrator(AsyncBase):
                 adapter_config = AdapterConfig(
                     model_name=config.get("model"),
                     temperature=config.get("temperature", 0.7),
-                    max_tokens=config.get("max_tokens", 1000)
+                    max_tokens=config.get("max_tokens", 1000),
+                    api_key=config.get("api_key")  # Pass API key if provided
                 )
 
                 # Create and connect adapter
                 adapter = await self.adapter_factory.create_adapter(
                     adapter_name,
-                    adapter_config
+                    adapter_config,
+                    auto_inject_secrets=not bool(config.get("api_key"))  # Only auto-inject if no key provided
                 )
 
                 # Store connected adapter

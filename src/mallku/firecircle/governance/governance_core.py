@@ -8,14 +8,17 @@ Transforms patterns from advisors to decision-makers with real authority.
 
 from typing import TYPE_CHECKING
 
-from mallku.consciousness.flow_orchestrator import ConsciousnessOrchestrator
+from mallku.consciousness.flow_orchestrator import ConsciousnessFlowOrchestrator
 from mallku.core.async_base import AsyncBase
-from mallku.evaluation.ayni_evaluator import AyniBalanceEvaluator
-from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
-from mallku.firecircle.protocol.consciousness_dialogue import (
-    ConsciousDialogueManager,
-    DialogueConfig,
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+    ConsciousDialogueConfig as DialogueConfig,
 )
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+    ConsciousDialogueManager,
+)
+
+# from mallku.evaluation.ayni_evaluator import AyniBalanceEvaluator  # TODO: Create this module
+from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
 
 from .consciousness_assessor import ConsciousnessAssessor
 from .consensus_engine import ConsensusEngine
@@ -58,8 +61,8 @@ class FireCircleGovernance(AsyncBase):
         # Core components
         self.dialogue_manager = ConsciousDialogueManager()
         self.pattern_facilitator = PatternGuidedFacilitator()
-        self.consciousness_orchestrator = ConsciousnessOrchestrator()
-        self.ayni_evaluator = AyniBalanceEvaluator()
+        self.consciousness_orchestrator = ConsciousnessFlowOrchestrator()
+        # self.ayni_evaluator = AyniBalanceEvaluator()  # TODO: Create this
 
         # Governance subsystems
         self.consensus_engine = ConsensusEngine(self.dialogue_manager)
@@ -92,7 +95,7 @@ class FireCircleGovernance(AsyncBase):
         await self.dialogue_manager.initialize()
         await self.pattern_facilitator.initialize()
         await self.consciousness_orchestrator.initialize()
-        await self.ayni_evaluator.initialize()
+        # await self.ayni_evaluator.initialize()  # TODO: Create AyniBalanceEvaluator
 
         await self.consensus_engine.initialize()
         await self.proposal_evaluator.initialize()

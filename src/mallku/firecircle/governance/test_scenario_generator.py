@@ -8,11 +8,13 @@ Creates tests that individual perspectives might miss.
 
 
 from mallku.core.async_base import AsyncBase
-from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
-from mallku.firecircle.protocol.consciousness_dialogue import (
-    ConsciousDialogueManager,
-    DialogueConfig,
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+    ConsciousDialogueConfig as DialogueConfig,
 )
+from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+    ConsciousDialogueManager,
+)
+from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
 
 from .governance_types import (
     TestComplexity,
