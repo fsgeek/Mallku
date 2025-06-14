@@ -64,7 +64,6 @@ class GuidanceIntensity(str, Enum):
 class PatternGuidance:
     """Guidance offered by a pattern"""
 
-    guidance_id: UUID = Field(default_factory=uuid4)
     pattern_id: UUID
     guidance_type: GuidanceType
     intensity: GuidanceIntensity
@@ -73,6 +72,7 @@ class PatternGuidance:
     confidence: float
     context_match: float
     timing_score: float
+    guidance_id: UUID = Field(default_factory=uuid4)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 

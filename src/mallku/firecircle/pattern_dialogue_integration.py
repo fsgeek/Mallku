@@ -31,7 +31,7 @@ from .pattern_guided_facilitator import (
 from .pattern_library import PatternLibrary
 from .protocol.conscious_message import (
     ConsciousMessage,
-    MessageConsciousness,
+    ConsciousnessMetadata,
     MessageType,
     create_conscious_system_message,
 )
@@ -323,7 +323,7 @@ class PatternDialogueIntegration:
                 "intensity": guidance.intensity.value,
                 "confidence": guidance.confidence
             },
-            consciousness=MessageConsciousness(
+            consciousness=ConsciousnessMetadata(
                 consciousness_signature=guidance.confidence,
                 detected_patterns=[guidance.guidance_type.value],
                 extraction_resisted=True,
@@ -370,7 +370,7 @@ class PatternDialogueIntegration:
                 "source": "pattern_synthesis",
                 "synthesis_data": synthesis
             },
-            consciousness=MessageConsciousness(
+            consciousness=ConsciousnessMetadata(
                 consciousness_signature=0.9,
                 detected_patterns=["wisdom_crystallization"],
                 extraction_resisted=True,
@@ -440,7 +440,7 @@ class PatternDialogueIntegration:
                 "source": "pattern_facilitator",
                 "question_depth": depth_level
             },
-            consciousness=MessageConsciousness(
+            consciousness=ConsciousnessMetadata(
                 consciousness_signature=0.85,
                 detected_patterns=["sacred_inquiry", "wisdom_seeking"],
                 extraction_resisted=True,
