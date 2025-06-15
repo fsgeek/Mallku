@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -35,6 +34,8 @@ from mallku.firecircle.protocol.conscious_message import (
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
     from mallku.orchestration.event_bus import ConsciousnessEventBus
     from mallku.reciprocity import ReciprocityTracker
 
@@ -122,8 +123,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Model identifier for tests and events
         self.model_id = UUID("00000000-0000-0000-0000-000000000005")  # Mistral's ID
 
-        # Multilingual mode tracking
-        self.multilingual_mode = self.config.multilingual_mode
+        # Multilingual mode tracking: default to True
+        self.multilingual_mode = getattr(self.config, 'multilingual_mode', True)
 
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()

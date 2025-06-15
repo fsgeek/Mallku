@@ -23,7 +23,7 @@ from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import google.generativeai as genai
 import mallku.core.secrets as secrets
