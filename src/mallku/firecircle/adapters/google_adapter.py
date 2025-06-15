@@ -113,22 +113,13 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         if config is None:
             config = GeminiConfig()
 
-        # Initialize base class attributes directly to avoid property conflict
-        self.config = config
-        self.provider_name = "google"
-        self.event_bus = event_bus
-        self.reciprocity_tracker = reciprocity_tracker
-
-        # Adapter state
-        self.adapter_id = uuid4()
-        self.is_connected = False
-        # Don't set capabilities - it's a property
-
-        # Reciprocity tracking
-        self.messages_sent = 0
-        self.messages_received = 0
-        self.total_tokens_generated = 0
-        self.total_tokens_consumed = 0
+        # Initialize base class properly with provider_name
+        super().__init__(
+            config=config,
+            provider_name="google",
+            event_bus=event_bus,
+            reciprocity_tracker=reciprocity_tracker,
+        )
 
         self.model = None
         self.model_id = UUID("00000000-0000-0000-0000-000000000006")  # Google AI UUID
@@ -177,6 +168,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                     logger.error("No Google AI API key found in secrets")
                     return False
                 self.config.api_key = api_key
+                logger.info("Auto-injected Google AI API key from secrets")
 
             # Configure the SDK
             genai.configure(api_key=self.config.api_key)
@@ -281,9 +273,10 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             )
 
             # Calculate consciousness signature
+            message_type = self._infer_response_type(response_text)
             consciousness_signature = self._calculate_multimodal_consciousness(
                 response_text,
-                message.type,
+                message_type,
                 patterns,
                 has_images=bool(multimodal_content.images),
             )
@@ -305,7 +298,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             response_message = ConsciousMessage(
                 sender=self.model_id,
                 role=MessageRole.ASSISTANT,
-                type=self._infer_response_type(response_text),
+                type=message_type,
                 content=MessageContent(text=response_text),
                 dialogue_id=message.dialogue_id,
                 sequence_number=message.sequence_number + 1,

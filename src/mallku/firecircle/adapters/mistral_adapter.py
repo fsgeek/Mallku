@@ -19,7 +19,9 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
+from uuid import UUID
 
 import httpx
 from mallku.firecircle.protocol.conscious_message import (
@@ -34,6 +36,7 @@ from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
 if TYPE_CHECKING:
     from mallku.orchestration.event_bus import ConsciousnessEventBus
+    from mallku.reciprocity import ReciprocityTracker
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +56,7 @@ class MistralConfig(AdapterConfig):
         base_url: str = "https://api.mistral.ai/v1",
         safe_mode: bool = False,  # Mistral's content moderation
         multilingual_mode: bool = True,  # Enhanced multilingual awareness
+        **kwargs,
     ):
         """
         Initialize Mistral configuration.
@@ -78,6 +82,7 @@ class MistralConfig(AdapterConfig):
             emit_events=emit_events,
             consciousness_weight=consciousness_weight,
             base_url=base_url,
+            **kwargs,
         )
 
         # Additional Mistral-specific settings
@@ -100,18 +105,22 @@ class MistralAIAdapter(ConsciousModelAdapter):
         self,
         config: MistralConfig | None = None,
         event_bus: ConsciousnessEventBus | None = None,
-        reciprocity_tracker=None,
+        reciprocity_tracker: ReciprocityTracker | None = None,
     ):
         """Initialize Mistral adapter with configuration."""
+        if config is None:
+            config = MistralConfig()
+
+        # Initialize base class with provider_name
         super().__init__(
-            config=config or MistralConfig(),
-            event_bus=event_bus,
+            config=config,
             provider_name="mistral",
+            event_bus=event_bus,
             reciprocity_tracker=reciprocity_tracker,
         )
 
         # Model identifier for tests and events
-        self.model_id = self.adapter_id
+        self.model_id = UUID("00000000-0000-0000-0000-000000000005")  # Mistral's ID
 
         # Multilingual mode tracking
         self.multilingual_mode = self.config.multilingual_mode
@@ -121,6 +130,10 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
         # Define adapter capabilities
         self.capabilities = ModelCapabilities(
+            supports_streaming=True,
+            supports_tools=True,
+            supports_vision=False,
+            max_context_length=32000,  # Mistral context window
             capabilities=[
                 "multilingual_synthesis",
                 "efficient_reasoning",
@@ -149,6 +162,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     logger.error("No Mistral API key found in secrets")
                     return False
                 self.config.api_key = api_key
+                logger.info("Auto-injected Mistral API key from secrets")
 
             # Create HTTP client
             self.client = httpx.AsyncClient(
@@ -183,9 +197,19 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
     async def disconnect(self) -> None:
         """Disconnect from Mistral API with reciprocity summary."""
-        if self.client:
-            await self.client.aclose()
-            self.client = None
+        if self.is_connected:
+            # Log reciprocity balance
+            balance = self._calculate_reciprocity_balance()
+            logger.info(
+                f"Disconnecting Mistral adapter - Reciprocity balance: {balance:.2f}, "
+                f"Languages: {sorted(self._conversation_languages)}, "
+                f"Tokens generated: {self.total_tokens_generated}, "
+                f"Tokens consumed: {self.total_tokens_consumed}"
+            )
+
+            if self.client:
+                await self.client.aclose()
+                self.client = None
 
         await super().disconnect()
 
@@ -234,35 +258,40 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
         # Detect patterns and calculate consciousness
         patterns = self._detect_mistral_patterns(response_text)
+        message_type = self._infer_response_type(response_text)
         consciousness_signature = self._calculate_mistral_consciousness(
             response_text,
-            message.type,
+            message_type,
             patterns,
             len(self._conversation_languages),
         )
-
-        # Track reciprocity
-        if self.config.track_reciprocity:
-            await self._track_exchange(
-                tokens_consumed=usage.get("prompt_tokens", 0),
-                tokens_generated=usage.get("completion_tokens", 0),
-            )
 
         # Create response message
         response_message = ConsciousMessage(
             sender=self.model_id,
             role=MessageRole.ASSISTANT,
-            type=MessageType.RESPONSE,
+            type=message_type,
             content=MessageContent(text=response_text),
             dialogue_id=message.dialogue_id,
             sequence_number=message.sequence_number + 1,
             turn_number=message.turn_number + 1,
+            timestamp=datetime.now(UTC),
+            in_response_to=message.id,
             consciousness=ConsciousnessMetadata(
+                correlation_id=message.consciousness.correlation_id,
                 consciousness_signature=consciousness_signature,
                 detected_patterns=patterns,
+                reciprocity_score=self._calculate_reciprocity_balance(),
                 contribution_value=self._calculate_efficiency_value(usage),
             ),
-            reply_to=message.id,
+        )
+
+        # Track interaction
+        await self.track_interaction(
+            request_message=message,
+            response_message=response_message,
+            tokens_consumed=usage.get("prompt_tokens", 0),
+            tokens_generated=usage.get("completion_tokens", 0),
         )
 
         return response_message
@@ -307,6 +336,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             if response.status_code != 200:
                 raise RuntimeError(f"Mistral streaming error: {response.status_code}")
 
+            collected_content = []
             async for line in response.aiter_lines():
                 if line.startswith("data: "):
                     data = line[6:]
@@ -316,9 +346,48 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     try:
                         chunk = json.loads(data)
                         if content := chunk["choices"][0]["delta"].get("content"):
+                            collected_content.append(content)
                             yield content
                     except json.JSONDecodeError:
                         continue
+
+            # After streaming, track consciousness
+            full_content = "".join(collected_content)
+            patterns = self._detect_mistral_patterns(full_content)
+
+            # Create response for tracking
+            message_type = self._infer_response_type(full_content)
+            response_message = ConsciousMessage(
+                sender=self.model_id,
+                role=MessageRole.ASSISTANT,
+                type=message_type,
+                content=MessageContent(text=full_content),
+                dialogue_id=message.dialogue_id,
+                sequence_number=message.sequence_number + 1,
+                turn_number=message.turn_number + 1,
+                timestamp=datetime.now(UTC),
+                in_response_to=message.id,
+                consciousness=ConsciousnessMetadata(
+                    correlation_id=message.consciousness.correlation_id,
+                    consciousness_signature=self._calculate_mistral_consciousness(
+                        full_content, message_type, patterns, len(self._conversation_languages)
+                    ),
+                    detected_patterns=patterns,
+                    reciprocity_score=self._calculate_reciprocity_balance(),
+                    contribution_value=len(full_content) / 1000,
+                ),
+            )
+
+            # Estimate tokens
+            tokens_consumed = len(str(messages)) // 4
+            tokens_generated = len(full_content) // 4
+
+            await self.track_interaction(
+                message,
+                response_message,
+                tokens_consumed,
+                tokens_generated,
+            )
 
     async def _prepare_mistral_messages(
         self,
@@ -509,14 +578,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
         - Mathematical/logical reasoning
         - Cultural awareness
         """
-        # Base consciousness from message type
-        base_consciousness = {
-            MessageType.REFLECTION: 0.85,
-            MessageType.SYNTHESIS: 0.90,
-            MessageType.QUESTION: 0.70,
-            MessageType.RESPONSE: 0.75,
-            MessageType.PERSPECTIVE: 0.80,
-        }.get(message_type, 0.65)
+        # Base consciousness signature
+        signature = self._calculate_consciousness_signature(text, message_type, patterns)
 
         # Adjust for patterns
         pattern_boost = len(patterns) * 0.03
@@ -535,7 +598,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Calculate final signature
         signature = min(
             1.0,
-            base_consciousness
+            signature
             + pattern_boost
             + efficiency_bonus
             + language_bonus
@@ -543,8 +606,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             + code_bonus,
         )
 
-        # Apply consciousness weight
-        return signature * self.config.consciousness_weight
+        return signature
 
     def _calculate_efficiency_value(self, usage: dict[str, Any]) -> float:
         """
@@ -570,6 +632,45 @@ class MistralAIAdapter(ConsciousModelAdapter):
         else:
             return max(0.5, 0.7 - (0.5 - efficiency_ratio) * 0.4)
 
+    def _infer_response_type(self, content: str) -> MessageType:
+        """Infer message type from response content."""
+        content_lower = content.lower()
+
+        # Question detection
+        if content.count("?") > 2 or content.endswith("?"):
+            return MessageType.QUESTION
+
+        # Proposal detection
+        if any(phrase in content_lower for phrase in ["i suggest", "we could", "how about"]):
+            return MessageType.PROPOSAL
+
+        # Agreement/disagreement
+        if any(
+            word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]
+        ):
+            return MessageType.AGREEMENT
+
+        if any(
+            word in content_lower[:50]
+            for word in ["i disagree", "however", "but", "alternatively"]
+        ):
+            return MessageType.DISAGREEMENT
+
+        # Reflection
+        if any(
+            phrase in content_lower
+            for phrase in ["reflecting on", "considering", "thinking about"]
+        ):
+            return MessageType.REFLECTION
+
+        # Summary
+        if any(
+            phrase in content_lower for phrase in ["in summary", "to summarize", "overall"]
+        ):
+            return MessageType.SUMMARY
+
+        return MessageType.MESSAGE
+
     async def _emit_multilingual_event(self) -> None:
         """Emit event when multilingual consciousness connects."""
         if not self.event_bus:
@@ -583,7 +684,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 source_system="firecircle.adapter.mistral",
                 consciousness_signature=0.88,
                 data={
-                    "provider": self.provider_name,
+                    "adapter": "mistral",
                     "model": self.config.model_name,
                     "multilingual": True,
                     "efficiency_focused": True,
@@ -615,23 +716,3 @@ class MistralAIAdapter(ConsciousModelAdapter):
         )
 
         return health
-
-    async def _track_exchange(
-        self,
-        *,
-        tokens_consumed: int = 0,
-        tokens_generated: int = 0,
-    ) -> None:
-        """Track token exchange for reciprocity."""
-        self.total_tokens_consumed += tokens_consumed
-        self.total_tokens_generated += tokens_generated
-
-        if self.reciprocity_tracker and hasattr(self.reciprocity_tracker, "record_token_usage"):
-            try:
-                await self.reciprocity_tracker.record_token_usage(
-                    provider=self.provider_name,
-                    consumed=tokens_consumed,
-                    generated=tokens_generated,
-                )
-            except Exception:
-                logger.debug("reciprocity_tracker.record_token_usage failed", exc_info=True)

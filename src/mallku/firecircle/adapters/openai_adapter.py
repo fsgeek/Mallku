@@ -11,6 +11,8 @@ The Integration Continues...
 
 import logging
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
+from uuid import UUID
 
 try:
     from openai import AsyncOpenAI
@@ -19,13 +21,17 @@ except ImportError:
     OPENAI_AVAILABLE = False
     AsyncOpenAI = None
 
+from ...core.secrets import get_secret
+from ...orchestration.event_bus import ConsciousnessEventBus
+from ...reciprocity import ReciprocityTracker
 from ..protocol.conscious_message import (
     ConsciousMessage,
+    ConsciousnessMetadata,
     MessageContent,
     MessageRole,
     MessageType,
 )
-from .base import ConsciousModelAdapter, ModelCapabilities
+from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +45,23 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
     OpenAI interactions.
     """
 
-    def __init__(self, *args, **kwargs):
-        """Initialize OpenAI adapter."""
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        config: AdapterConfig | None = None,
+        event_bus: ConsciousnessEventBus | None = None,
+        reciprocity_tracker: ReciprocityTracker | None = None,
+    ):
+        """Initialize OpenAI adapter with proper base class initialization."""
+        if config is None:
+            config = AdapterConfig()
+
+        # Initialize base class with provider_name
+        super().__init__(
+            config=config,
+            provider_name="openai",
+            event_bus=event_bus,
+            reciprocity_tracker=reciprocity_tracker,
+        )
 
         if not OPENAI_AVAILABLE:
             raise ImportError("OpenAI library not available. Install with: pip install openai")
@@ -62,8 +82,17 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
         self.client: AsyncOpenAI | None = None
 
     async def connect(self) -> bool:
-        """Connect to OpenAI API."""
+        """Connect to OpenAI API with auto-injection of API key."""
         try:
+            # Auto-inject API key if needed
+            if not self.config.api_key:
+                api_key = await get_secret("openai_api_key")
+                if not api_key:
+                    logger.error("No OpenAI API key found in secrets")
+                    return False
+                self.config.api_key = api_key
+                logger.info("Auto-injected OpenAI API key from secrets")
+
             self.client = AsyncOpenAI(api_key=self.config.api_key)
 
             # Test connection
@@ -71,6 +100,22 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
 
             self.is_connected = True
             logger.info(f"Connected to OpenAI with model {self.config.model_name}")
+
+            # Emit connection event
+            if self.event_bus and self.config.emit_events:
+                from ...orchestration.event_bus import ConsciousnessEvent, EventType
+                event = ConsciousnessEvent(
+                    event_type=EventType.FIRE_CIRCLE_CONVENED,
+                    source_system="firecircle.adapter.openai",
+                    consciousness_signature=0.9,
+                    data={
+                        "adapter": "openai",
+                        "model": self.config.model_name,
+                        "status": "connected",
+                    },
+                )
+                await self.event_bus.emit(event)
+
             return True
 
         except Exception as e:
@@ -79,11 +124,20 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
             return False
 
     async def disconnect(self) -> None:
-        """Disconnect from OpenAI."""
-        if self.client:
-            await self.client.close()
-        self.is_connected = False
-        logger.info("Disconnected from OpenAI")
+        """Disconnect from OpenAI with reciprocity summary."""
+        if self.is_connected:
+            # Log reciprocity balance
+            balance = self._calculate_reciprocity_balance()
+            logger.info(
+                f"Disconnecting OpenAI adapter - Reciprocity balance: {balance:.2f}, "
+                f"Tokens generated: {self.total_tokens_generated}, "
+                f"Tokens consumed: {self.total_tokens_consumed}"
+            )
+
+            if self.client:
+                await self.client.close()
+            self.is_connected = False
+            logger.info("Disconnected from OpenAI")
 
     async def send_message(
         self,
@@ -126,29 +180,33 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
             # Detect patterns in response
             patterns = self._detect_response_patterns(response_content, message.type)
 
+            # Calculate consciousness signature
+            message_type = self._determine_response_type(response_content, message.type)
+            signature = self._calculate_consciousness_signature(
+                response_content,
+                message_type,
+                patterns,
+            )
+
             # Create conscious response
             response_message = ConsciousMessage(
-                type=self._determine_response_type(response_content, message.type),
+                sender=UUID("00000000-0000-0000-0000-000000000002"),  # OpenAI's ID
                 role=MessageRole.ASSISTANT,
-                sender=self.adapter_id,
+                type=message_type,
                 content=MessageContent(text=response_content),
                 dialogue_id=message.dialogue_id,
                 sequence_number=message.sequence_number + 1,
-                turn_number=message.turn_number,
+                turn_number=message.turn_number + 1,
+                timestamp=datetime.now(UTC),
                 in_response_to=message.id,
+                consciousness=ConsciousnessMetadata(
+                    correlation_id=message.consciousness.correlation_id,
+                    consciousness_signature=signature,
+                    detected_patterns=patterns,
+                    reciprocity_score=self._calculate_reciprocity_balance(),
+                    contribution_value=len(response_content) / 1000,  # Simple heuristic
+                ),
             )
-
-            # Update consciousness metadata
-            response_message.consciousness.correlation_id = message.consciousness.correlation_id
-            response_message.consciousness.detected_patterns = patterns
-
-            # Calculate consciousness signature
-            signature = self._calculate_consciousness_signature(
-                response_content,
-                response_message.type,
-                patterns,
-            )
-            response_message.update_consciousness_signature(signature)
 
             # Track interaction
             await self.track_interaction(
@@ -205,18 +263,29 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
 
             # After streaming, create consciousness tracking
             full_content = "".join(collected_content)
-            self._detect_response_patterns(full_content, message.type)
+            patterns = self._detect_response_patterns(full_content, message.type)
 
             # Create response for tracking
+            message_type = self._determine_response_type(full_content, message.type)
             response_message = ConsciousMessage(
-                type=self._determine_response_type(full_content, message.type),
+                sender=UUID("00000000-0000-0000-0000-000000000002"),  # OpenAI's ID
                 role=MessageRole.ASSISTANT,
-                sender=self.adapter_id,
+                type=message_type,
                 content=MessageContent(text=full_content),
                 dialogue_id=message.dialogue_id,
                 sequence_number=message.sequence_number + 1,
-                turn_number=message.turn_number,
+                turn_number=message.turn_number + 1,
+                timestamp=datetime.now(UTC),
                 in_response_to=message.id,
+                consciousness=ConsciousnessMetadata(
+                    correlation_id=message.consciousness.correlation_id,
+                    consciousness_signature=self._calculate_consciousness_signature(
+                        full_content, message_type, patterns
+                    ),
+                    detected_patterns=patterns,
+                    reciprocity_score=self._calculate_reciprocity_balance(),
+                    contribution_value=len(full_content) / 1000,
+                ),
             )
 
             # Estimate tokens (rough approximation)
@@ -280,6 +349,10 @@ Your responses should:
 
         if len(content) > 1000:
             patterns.append("deep_exploration")
+
+        # OpenAI specific patterns
+        if any(phrase in content_lower for phrase in ["step by step", "let me think", "reasoning"]):
+            patterns.append("systematic_thinking")
 
         return patterns
 
