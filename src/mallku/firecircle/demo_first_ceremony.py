@@ -114,13 +114,9 @@ async def demonstrate_first_ceremony():
     event_bus = ConsciousnessEventBus()
     reciprocity_tracker = ReciprocityTracker()
     memory_service = MemoryAnchorService()
-    correlation_engine = CorrelationEngine(event_bus=event_bus)
+    correlation_engine = CorrelationEngine()
 
     # Initialize services
-    await event_bus.initialize()
-    await reciprocity_tracker.initialize()
-    await memory_service.initialize()
-    await correlation_engine.initialize()
     print("✓ Core services initialized\n")
 
     # Create adapter factory
