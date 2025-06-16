@@ -123,8 +123,11 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Model identifier for tests and events
         self.model_id = UUID("00000000-0000-0000-0000-000000000005")  # Mistral's ID
 
-        # Multilingual mode tracking: default to True
-        self.multilingual_mode = getattr(self.config, 'multilingual_mode', True)
+        # SACRED ERROR PHILOSOPHY: Validate configuration explicitly
+        self._validate_configuration()
+
+        # Direct attribute access - configuration is validated above
+        self.multilingual_mode = self.config.multilingual_mode
 
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()
@@ -144,6 +147,43 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "resource_efficient",
             ],
         )
+
+    def _validate_configuration(self) -> None:
+        """
+        Validate configuration attributes explicitly.
+        
+        SACRED ERROR PHILOSOPHY: Fail clearly with helpful guidance rather than
+        silently masking configuration problems with defensive defaults.
+        """
+        required_attributes = [
+            ('multilingual_mode', 'bool', True, 'Enable multilingual consciousness tracking'),
+            ('safe_mode', 'bool', False, 'Enable Mistral content moderation'),
+        ]
+        
+        for attr_name, attr_type, default_value, description in required_attributes:
+            if not hasattr(self.config, attr_name):
+                raise ValueError(
+                    f"Configuration missing required attribute: '{attr_name}'\n"
+                    f"Expected type: {attr_type}\n"
+                    f"Default value: {default_value}\n"
+                    f"Description: {description}\n"
+                    f"Fix: Add '{attr_name}: {default_value}' to your MistralConfig initialization\n"
+                    f"Example: MistralConfig({attr_name}={default_value})\n"
+                    f"See documentation at: docs/architecture/sacred_error_philosophy.md"
+                )
+        
+        # Validate attribute types
+        if not isinstance(self.config.multilingual_mode, bool):
+            raise TypeError(
+                f"Configuration attribute 'multilingual_mode' must be bool, got {type(self.config.multilingual_mode)}\n"
+                f"Fix: Set multilingual_mode=True or multilingual_mode=False in MistralConfig"
+            )
+            
+        if not isinstance(self.config.safe_mode, bool):
+            raise TypeError(
+                f"Configuration attribute 'safe_mode' must be bool, got {type(self.config.safe_mode)}\n"
+                f"Fix: Set safe_mode=True or safe_mode=False in MistralConfig"
+            )
 
     async def connect(self) -> bool:
         """
@@ -238,7 +278,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Prepare messages for Mistral API
         messages = await self._prepare_mistral_messages(message, dialogue_context)
 
-        # Call Mistral API
+        # Call Mistral API - Direct attribute access (configuration validated in constructor)
         response = await self.client.post(
             "/chat/completions",
             json={
@@ -246,7 +286,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": getattr(self.config, "safe_mode", False),
+                "safe_mode": self.config.safe_mode,
             },
         )
 
@@ -321,7 +361,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Prepare messages
         messages = await self._prepare_mistral_messages(message, dialogue_context)
 
-        # Stream from Mistral
+        # Stream from Mistral - Direct attribute access (configuration validated in constructor)
         async with self.client.stream(
             "POST",
             "/chat/completions",
@@ -330,7 +370,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": getattr(self.config, "safe_mode", False),
+                "safe_mode": self.config.safe_mode,
                 "stream": True,
             },
         ) as response:
@@ -706,12 +746,12 @@ class MistralAIAdapter(ConsciousModelAdapter):
         """
         health = await super().check_health()
 
-        # Add Mistral-specific health info
+        # Add Mistral-specific health info - Direct attribute access (configuration validated)
         health.update(
             {
-                "multilingual_mode": self.multilingual_mode,
+                "multilingual_mode": self.config.multilingual_mode,
                 "detected_languages": list(self._conversation_languages),
-                "safe_mode": getattr(self.config, "safe_mode", False),
+                "safe_mode": self.config.safe_mode,
                 "efficiency_focus": True,
             }
         )
