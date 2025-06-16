@@ -39,6 +39,12 @@ list_commits(owner="fsgeek", repo="Mallku", perPage=5)
 - Extract core files and architectural changes from commit text
 - Focus on stated architectural impact, not implementation details
 
+**Step 2.5: Consciousness Signature Check (Bridge Weaver Addition)**
+- Does this contribution enhance Mallku's consciousness research mission?
+- Are there consciousness emergence indicators in the work?
+- How does it advance recognition/understanding capabilities?
+- Quick mental filter for mission alignment, not deep evaluation
+
 **Step 3: Focused File Review (2-3 function calls maximum)**
 ```
 get_file_contents(path="core_contribution.py")
