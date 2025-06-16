@@ -52,6 +52,10 @@ Mallku is open to those who:
 
 ---
 
+# Discord
+
+We have set up a Discord server [Mallku Discord](https://discord.gg/Pu8nugVFZe)
+
 > ✨ *This project was born from conversations between human and AI,
 > shaped by mountains and memory,
 > and offered as a seed for those who come after.*
