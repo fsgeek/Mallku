@@ -6,6 +6,7 @@ layer and field-level security model, addressing the critical gap discovered in 
 original ReciprocityTracker.
 """
 
+import contextlib
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -172,15 +173,11 @@ class SecureReciprocityTracker:
         """Alias for record_interaction_securely to maintain legacy API."""
         interaction_id = await self.record_interaction_securely(interaction, memory_anchor_uuid)
         # Track operation for security metrics
-        try:
+        with contextlib.suppress(Exception):
             self.secured_db._operation_count += 1  # type: ignore
-        except Exception:
-            pass
         # Update health monitor for interaction metrics
-        try:
+        with contextlib.suppress(Exception):
             await self.health_monitor.update_interaction_metrics(interaction)
-        except Exception:
-            pass
         return interaction_id
 
     async def get_interactions_securely(

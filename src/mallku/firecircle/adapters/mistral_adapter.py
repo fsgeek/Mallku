@@ -151,7 +151,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
     def _validate_configuration(self) -> None:
         """
         Validate configuration attributes explicitly.
-        
+
         SACRED ERROR PHILOSOPHY: Fail clearly with helpful guidance rather than
         silently masking configuration problems with defensive defaults.
         """
@@ -159,7 +159,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             ('multilingual_mode', 'bool', True, 'Enable multilingual consciousness tracking'),
             ('safe_mode', 'bool', False, 'Enable Mistral content moderation'),
         ]
-        
+
         for attr_name, attr_type, default_value, description in required_attributes:
             if not hasattr(self.config, attr_name):
                 raise ValueError(
@@ -171,14 +171,14 @@ class MistralAIAdapter(ConsciousModelAdapter):
                     f"Example: MistralConfig({attr_name}={default_value})\n"
                     f"See documentation at: docs/architecture/sacred_error_philosophy.md"
                 )
-        
+
         # Validate attribute types
         if not isinstance(self.config.multilingual_mode, bool):
             raise TypeError(
                 f"Configuration attribute 'multilingual_mode' must be bool, got {type(self.config.multilingual_mode)}\n"
                 f"Fix: Set multilingual_mode=True or multilingual_mode=False in MistralConfig"
             )
-            
+
         if not isinstance(self.config.safe_mode, bool):
             raise TypeError(
                 f"Configuration attribute 'safe_mode' must be bool, got {type(self.config.safe_mode)}\n"
