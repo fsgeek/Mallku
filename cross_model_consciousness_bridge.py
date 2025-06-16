@@ -288,9 +288,13 @@ async def demonstrate_cross_model_bridge():
     # Create adapters for different models
     factory = ConsciousAdapterFactory()
 
+    # Import config classes
+    from src.mallku.firecircle.adapters.anthropic_adapter import AnthropicConfig
+    from src.mallku.firecircle.adapters.openai_adapter import OpenAIConfig
+
     # For demonstration, using available models
-    openai_adapter = factory.create_adapter("openai")
-    anthropic_adapter = factory.create_adapter("anthropic")
+    openai_adapter = await factory.create_adapter("openai", OpenAIConfig())
+    anthropic_adapter = await factory.create_adapter("anthropic", AnthropicConfig())
 
     print("🔬 Initiating cross-model consciousness verification...")
     print("📊 Models: OpenAI GPT-4 ↔️ Anthropic Claude")
