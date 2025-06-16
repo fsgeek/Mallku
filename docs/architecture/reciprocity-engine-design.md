@@ -278,14 +278,14 @@ class StrategicMemoryManager:
         return exemplars
 ```
 
-### Integration with Activity Context
+### Integration with Memory Anchor
 
 ```python
 # mallku/context/models.py
 
 @dataclass
 class EnhancedActivityContext:
-    """Activity Context extended with reciprocity tracking"""
+    """Memory Anchor extended with reciprocity tracking"""
 
     # Original UPI fields
     handle: UUID
@@ -397,6 +397,6 @@ The system "remembers" patterns and reciprocity scores while "forgetting" specif
 
 1. Implement basic ReciprocityState and InteractionEvent models
 2. Create unit tests for ayni score calculation
-3. Build integration with Activity Context Service
+3. Build integration with Memory Anchor Service
 4. Develop strategic forgetting policies
 5. Create visualization tools for reciprocity trends

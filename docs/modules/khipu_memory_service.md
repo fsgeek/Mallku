@@ -54,10 +54,10 @@ class PatternSummary(BaseModel):
 
 ## 5. Integration Points
 
-### 5.1 ActivityContextService
+### 5.1 Memory Anchor Service
 - On startup, register each `KhipuEntry` as a context frame:
   ```python
-  context_service.load_khipu(entry.id, entry)
+  memory_anchor_service.load_khipu(entry.id, entry)
   ```
 
 ### 5.2 ConsciousnessFlowOrchestrator
@@ -83,7 +83,7 @@ class PatternSummary(BaseModel):
 ## 7. Timeline (Suggested)
 - Week 1: Scaffold `src/mallku/khipu` module, Pydantic models, file scanning.
 - Week 2: Implement parsing logic, metadata extraction, unit tests.
-- Week 3: API methods, integrate with ActivityContextService, end-to-end tests.
+- Week 3: API methods, integrate with Memory Anchor Service, end-to-end tests.
 - Week 4: Orchestrator and Fire Circle integration, update docs.
 
 ## 8. Future Extensions

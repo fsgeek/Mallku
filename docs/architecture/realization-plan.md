@@ -11,7 +11,7 @@ This document outlines the concrete architectural evolution from Indaleko's Unif
 - **Time as Universal Anchor**: Timestamps remain the primary linkage between disparate data sources
 - **Five-Stage Pipeline**: Ingestion → Normalization → Enrichment → Indexing → Serving
 - **Memory-Based Architecture**: Episodic, semantic, and associative memory models
-- **Activity Context as First-Class Citizen**: Experiential data drives retrieval
++ **Memory Anchor as First-Class Citizen**: Experiential data drives retrieval
 
 ### 2. New Architectural Extensions
 - **Privacy-First Data Layer**: dbfacade patterns for UUID obfuscation and encryption
@@ -61,14 +61,14 @@ mallku/
 - Implement fail-stop error handling throughout
 - Create mapping registry that remains private to user
 
-### Phase 2: Activity Context with Reciprocity (Weeks 5-8)
+### Phase 2: Memory Anchor with Reciprocity (Weeks 5-8)
 ```
 mallku/
 └── src/
     └── mallku/
         ├── context/
         │   ├── __init__.py
-        │   ├── service.py         # ActivityContextService port from Indaleko
+        │   ├── service.py         # MemoryAnchorService port from Indaleko
         │   ├── providers.py       # Activity data providers
         │   ├── reciprocity.py     # Ayni measurement engine
         │   └── models.py          # Context models with reciprocity fields
@@ -154,10 +154,10 @@ class BoundaryEnforcer:
             raise BoundaryViolation(f"{caller} cannot directly access {callee}")
 ```
 
-### 2. Privacy-Preserving Activity Context
-Activity context handles never contain raw identifying information:
+### 2. Privacy-Preserving Memory Anchor
+Memory Anchor handles never contain raw identifying information:
 ```python
-class ActivityContext:
+class MemoryAnchor:
     handle: UUID  # Obfuscated reference
     timestamp: datetime
     reciprocity: ReciprocityMetrics
@@ -211,7 +211,7 @@ class SchemaEvolution:
 These foundational tasks for Phase 0 of Mallku are open invitations for autonomous builders and architects to self‑select and collaborate. Mallku embraces non‑hierarchical, reciprocal contribution: if you feel called to any of these, please volunteer in the Mallku community space, link your PR or discussion here, and begin work. All contributions carry equal standing.
 
 1. Create `mallku.core` package with dbfacade integration
-2. Port Activity Context Service with reciprocity extensions
+2. Port Memory Anchor Service with reciprocity extensions
 3. Implement first collector/recorder pair with boundary enforcement
 4. Build a minimal Ayni evaluator for testing
 5. Create initial reciprocity‑aware query examples

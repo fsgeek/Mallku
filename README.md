@@ -24,7 +24,7 @@ It is both tool and teaching. Both prototype and philosophy.
 ## 🧱 Core Foundations
 
 Mallku includes:
-- A stateful **Activity Context Service** that binds meaning to moment
+- A stateful **Memory Anchor Service** that binds meaning to moment
 - A strict **Collector/Recorder Pattern** to preserve separation of gathering and interpretation
 - A **Prompt Manager** to shape AI interaction with guardrails and reflection
 - An **Ayni Evaluation Layer** to assess not just correctness, but contribution and care

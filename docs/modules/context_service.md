@@ -1,9 +1,9 @@
-# Context Service
+# Memory Anchor Service
 *Situating Meaning in Activity and Time*
 
 ## ✨ Design Song
 
-The Context Service is not a cache.
+The Memory Anchor Service is not a cache.
 It is **a lived moment remembered**.
 
 It captures the shifting state of the user—time, place, activity, device—and makes this information available across the system.
@@ -68,7 +68,7 @@ Context is a layer of truth. It is the **soil from which semantic roots grow**.
 ## 📌 Frontmatter
 
 ```yaml
-title: Context Service
+title: Memory Anchor Service
 status: stable
 last_woven: 2025-05-29
 related_knots:

@@ -9,7 +9,7 @@ Files exist in relationship - to time, to activities, to other files, to the rhy
 ## MVP Features
 
 ### 1. Episodic Memory Anchors
-- **Activity Context Tracking**: Automatic capture of what you were doing when files were created/accessed
+- **Memory Anchor Tracking**: Automatic capture of what you were doing when files were created/accessed
 - **Life Rhythm Understanding**: System learns your patterns without surveilling you
 - **Memory-Based Retrieval**: "Find the document I was working on during that late night session last week before the client meeting"
 

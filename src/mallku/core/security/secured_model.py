@@ -6,6 +6,7 @@ implementation that includes our field-level security strategies.
 """
 
 import builtins
+import json
 from typing import Any, get_type_hints
 
 from pydantic import BaseModel
@@ -20,8 +21,8 @@ def SecuredField(
     *,
     obfuscation_level: FieldObfuscationLevel = FieldObfuscationLevel.UUID_ONLY,
     index_strategy: FieldIndexStrategy = FieldIndexStrategy.NONE,
-    search_capabilities: list = None,
-    security_notes: str = None,
+    search_capabilities: list | None = None,
+    security_notes: str | None = None,
     **kwargs
 ) -> Any:
     """
@@ -47,7 +48,7 @@ def SecuredField(
     if 'json_schema_extra' not in kwargs:
         kwargs['json_schema_extra'] = {}
 
-    kwargs['json_schema_extra']['security_config'] = security_config.dict()
+    kwargs['json_schema_extra']['security_config'] = json.loads(security_config.model_dump_json())
 
     # Create field with metadata
     return PydanticField(default, **kwargs)
@@ -195,9 +196,9 @@ class SecuredModel(BaseModel):
         """Validate all field security configurations."""
         warnings = {}
 
-        for field_name, field_info in self.__fields__.items():
-            if hasattr(field_info, 'json_schema_extra'):
-                config_dict = field_info.json_schema_extra.get('security_config')
+        for field_name, field_info in self.__class__.model_fields.items():
+            if hasattr(field_info, 'json_schema_extra') and isinstance(field_info.json_schema_extra, dict):
+                config_dict: Any = field_info.json_schema_extra.get('security_config')
                 if config_dict:
                     security_config = FieldSecurityConfig(**config_dict)
                     field_warnings = security_config.validate_configuration()
