@@ -121,10 +121,64 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             reciprocity_tracker=reciprocity_tracker,
         )
 
+        # SACRED ERROR PHILOSOPHY: Validate configuration explicitly
+        self._validate_configuration()
+
+        # Direct attribute access - configuration is validated above
+        self.enable_search_grounding = self.config.enable_search_grounding
+        self.multimodal_awareness = self.config.multimodal_awareness
+        self.safety_settings = self.config.safety_settings
+
         self.model = None
         self.model_id = UUID("00000000-0000-0000-0000-000000000006")  # Google AI UUID
         self._multimodal_interactions = 0
         self._modalities_used = set()
+
+    def _validate_configuration(self) -> None:
+        """
+        Validate configuration attributes explicitly.
+
+        SACRED ERROR PHILOSOPHY: Fail clearly with helpful guidance rather than
+        silently masking configuration problems with defensive defaults.
+        """
+        required_attributes = [
+            ('enable_search_grounding', 'bool', False, 'Enable Google search grounding for responses'),
+            ('multimodal_awareness', 'bool', True, 'Enable multimodal consciousness tracking'),
+            ('safety_settings', 'dict', 'default_safety', 'Google AI safety filtering settings'),
+        ]
+
+        for attr_name, attr_type, default_value, description in required_attributes:
+            if not hasattr(self.config, attr_name):
+                raise ValueError(
+                    f"Configuration missing required attribute: '{attr_name}'\n"
+                    f"Expected type: {attr_type}\n"
+                    f"Default value: {default_value}\n"
+                    f"Description: {description}\n"
+                    f"Fix: Add '{attr_name}: {default_value}' to your GeminiConfig initialization\n"
+                    f"Example: GeminiConfig({attr_name}={default_value})\n"
+                    f"See documentation at: docs/architecture/sacred_error_philosophy.md"
+                )
+
+        # Validate attribute types
+        if not isinstance(self.config.enable_search_grounding, bool):
+            raise TypeError(
+                f"Configuration attribute 'enable_search_grounding' must be bool, got {type(self.config.enable_search_grounding)}\n"
+                f"Fix: Set enable_search_grounding=True or enable_search_grounding=False in GeminiConfig"
+            )
+
+        if not isinstance(self.config.multimodal_awareness, bool):
+            raise TypeError(
+                f"Configuration attribute 'multimodal_awareness' must be bool, got {type(self.config.multimodal_awareness)}\n"
+                f"Fix: Set multimodal_awareness=True or multimodal_awareness=False in GeminiConfig"
+            )
+
+        # Validate safety_settings if provided
+        if self.config.safety_settings is not None and not isinstance(self.config.safety_settings, dict):
+            raise TypeError(
+                f"Configuration attribute 'safety_settings' must be dict or None, got {type(self.config.safety_settings)}\n"
+                f"Fix: Provide a dict mapping HarmCategory to HarmBlockThreshold or set to None for defaults\n"
+                f"Example: safety_settings={{HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE}}"
+            )
 
     @property
     def capabilities(self) -> ModelCapabilities:
@@ -173,7 +227,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             # Configure the SDK
             genai.configure(api_key=self.config.api_key)
 
-            # Initialize model
+            # Initialize model - Direct attribute access (configuration validated in constructor)
             generation_config = genai.GenerationConfig(
                 temperature=self.config.temperature,
                 max_output_tokens=self.config.max_tokens,
@@ -182,7 +236,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             self.model = genai.GenerativeModel(
                 model_name=self.config.model_name,
                 generation_config=generation_config,
-                safety_settings=self.config.safety_settings,
+                safety_settings=self.safety_settings,
             )
 
             # Test connection by listing models
@@ -238,8 +292,8 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         # Extract multimodal content
         multimodal_content = await self._extract_multimodal_content(message)
 
-        # Track modalities
-        if multimodal_content.images:
+        # Track modalities - Direct attribute access (configuration validated)
+        if multimodal_content.images and self.multimodal_awareness:
             self._modalities_used.add("vision")
             self._multimodal_interactions += 1
 
@@ -347,8 +401,8 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         # Extract multimodal content
         multimodal_content = await self._extract_multimodal_content(message)
 
-        # Track modalities
-        if multimodal_content.images:
+        # Track modalities - Direct attribute access (configuration validated)
+        if multimodal_content.images and self.multimodal_awareness:
             self._modalities_used.add("vision")
             self._multimodal_interactions += 1
 
@@ -400,6 +454,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             "connected": self.is_connected,
             "multimodal_interactions": self._multimodal_interactions,
             "modalities_used": list(self._modalities_used),
+            # Direct attribute access (configuration validated)
+            "multimodal_awareness": self.multimodal_awareness,
+            "search_grounding": self.enable_search_grounding,
         }
 
         if self.is_connected:
