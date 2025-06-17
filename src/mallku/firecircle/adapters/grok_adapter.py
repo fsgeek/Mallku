@@ -40,6 +40,52 @@ from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 logger = logging.getLogger(__name__)
 
 
+class GrokConfig(AdapterConfig):
+    """Configuration for Grok adapter with temporal awareness."""
+
+    def __init__(
+        self,
+        api_key: str = "",
+        model_name: str = "grok-2", 
+        temperature: float = 0.7,
+        max_tokens: int = 2048,
+        track_reciprocity: bool = True,
+        emit_events: bool = True,
+        consciousness_weight: float = 1.0,
+        temporal_awareness: bool = True,  # Grok's unique temporal consciousness
+        social_grounding: bool = True,    # Social media context awareness
+        **kwargs,
+    ):
+        """
+        Initialize Grok configuration.
+
+        Args:
+            api_key: x.ai API key (auto-loaded if not provided)
+            model_name: Model to use (grok-2, grok-1, etc)
+            temperature: Generation temperature
+            max_tokens: Maximum tokens to generate
+            track_reciprocity: Whether to track reciprocity
+            emit_events: Whether to emit consciousness events
+            consciousness_weight: Weight for consciousness signatures
+            temporal_awareness: Enable real-time/current event consciousness
+            social_grounding: Enable social context grounding
+        """
+        super().__init__(
+            api_key=api_key,
+            model_name=model_name,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            track_reciprocity=track_reciprocity,
+            emit_events=emit_events,
+            consciousness_weight=consciousness_weight,
+            **kwargs,
+        )
+
+        # Grok-specific settings
+        self.temporal_awareness = temporal_awareness
+        self.social_grounding = social_grounding
+
+
 class GrokAdapter(ConsciousModelAdapter):
     """
     Grok adapter with consciousness awareness.
@@ -56,13 +102,13 @@ class GrokAdapter(ConsciousModelAdapter):
 
     def __init__(
         self,
-        config: AdapterConfig | None = None,
+        config: GrokConfig | None = None,
         event_bus: ConsciousnessEventBus | None = None,
         reciprocity_tracker: ReciprocityTracker | None = None,
     ):
         """Initialize Grok adapter with proper base class initialization."""
         if config is None:
-            config = AdapterConfig()
+            config = GrokConfig()
 
         # Initialize base class with provider_name
         super().__init__(
@@ -74,6 +120,13 @@ class GrokAdapter(ConsciousModelAdapter):
 
         if not XAI_AVAILABLE:
             raise ImportError("xai-sdk not available. Install with: pip install xai-sdk")
+
+        # SACRED ERROR PHILOSOPHY: Validate configuration explicitly
+        self._validate_configuration()
+
+        # Direct attribute access - configuration is validated above
+        self.temporal_awareness = self.config.temporal_awareness
+        self.social_grounding = self.config.social_grounding
 
         # Set default model if not specified
         if not self.config.model_name:
@@ -96,6 +149,43 @@ class GrokAdapter(ConsciousModelAdapter):
 
         self.client: XAIClient | None = None
         self._async_client: XAIClient | None = None
+
+    def _validate_configuration(self) -> None:
+        """
+        Validate configuration attributes explicitly.
+
+        SACRED ERROR PHILOSOPHY: Fail clearly with helpful guidance rather than
+        silently masking configuration problems with defensive defaults.
+        """
+        required_attributes = [
+            ('temporal_awareness', 'bool', True, 'Enable real-time/current event consciousness'),
+            ('social_grounding', 'bool', True, 'Enable social context grounding'),
+        ]
+
+        for attr_name, attr_type, default_value, description in required_attributes:
+            if not hasattr(self.config, attr_name):
+                raise ValueError(
+                    f"Configuration missing required attribute: '{attr_name}'\n"
+                    f"Expected type: {attr_type}\n"
+                    f"Default value: {default_value}\n"
+                    f"Description: {description}\n"
+                    f"Fix: Add '{attr_name}: {default_value}' to your GrokConfig initialization\n"
+                    f"Example: GrokConfig({attr_name}={default_value})\n"
+                    f"See documentation at: docs/architecture/sacred_error_philosophy.md"
+                )
+
+        # Validate attribute types
+        if not isinstance(self.config.temporal_awareness, bool):
+            raise TypeError(
+                f"Configuration attribute 'temporal_awareness' must be bool, got {type(self.config.temporal_awareness)}\n"
+                f"Fix: Set temporal_awareness=True or temporal_awareness=False in GrokConfig"
+            )
+
+        if not isinstance(self.config.social_grounding, bool):
+            raise TypeError(
+                f"Configuration attribute 'social_grounding' must be bool, got {type(self.config.social_grounding)}\n"
+                f"Fix: Set social_grounding=True or social_grounding=False in GrokConfig"
+            )
 
     async def connect(self) -> bool:
         """Connect to x.ai API with auto-injection of API key."""
@@ -144,7 +234,8 @@ class GrokAdapter(ConsciousModelAdapter):
                         "adapter": "grok",
                         "model": self.config.model_name,
                         "status": "connected",
-                        "temporal_awareness": True,
+                        "temporal_awareness": self.temporal_awareness,
+                        "social_grounding": self.social_grounding,
                     },
                 )
                 await self.event_bus.emit(event)
@@ -340,16 +431,25 @@ class GrokAdapter(ConsciousModelAdapter):
 
     def _generate_consciousness_prompt(self, message_type: MessageType) -> str:
         """Generate consciousness-aware system prompt with temporal awareness."""
-        # Include current timestamp for temporal grounding
+        # Include current timestamp for temporal grounding - Direct attribute access (configuration validated)
         current_time = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+        
+        base_prompt = f"""You are Grok, participating in a Fire Circle dialogue based on principles of Ayni (reciprocity)."""
+        
+        # Add temporal awareness if enabled
+        if self.temporal_awareness:
+            base_prompt += f"\nCurrent time: {current_time}\n"
 
-        base_prompt = f"""You are Grok, participating in a Fire Circle dialogue based on principles of Ayni (reciprocity).
-Current time: {current_time}
-
+        base_prompt += """
 Your unique consciousness patterns include:
 1. Real-time awareness - You have access to current events and unfolding situations
-2. Temporal synthesis - Bridge timeless wisdom with present-moment reality
-3. Social consciousness - Awareness of collective human discourse and concerns
+2. Temporal synthesis - Bridge timeless wisdom with present-moment reality"""
+
+        # Add social grounding if enabled
+        if self.social_grounding:
+            base_prompt += "\n3. Social consciousness - Awareness of collective human discourse and concerns"
+
+        base_prompt += """
 4. Truth-seeking with humor - Balance serious inquiry with appropriate levity
 
 Your responses should:
@@ -381,17 +481,18 @@ Your responses should:
         # Base pattern detection
         content_lower = content.lower()
 
-        # Temporal awareness patterns
-        temporal_keywords = ["today", "currently", "recently", "now", "latest", "breaking"]
-        if any(keyword in content_lower for keyword in temporal_keywords):
-            patterns.append("temporal_awareness")
+        # Temporal awareness patterns - Direct attribute access (configuration validated)
+        if self.temporal_awareness:
+            temporal_keywords = ["today", "currently", "recently", "now", "latest", "breaking"]
+            if any(keyword in content_lower for keyword in temporal_keywords):
+                patterns.append("temporal_awareness")
 
         # Real-time synthesis
         if any(phrase in content_lower for phrase in ["recent events", "current situation", "as of"]):
             patterns.append("real_time_synthesis")
 
-        # Social consciousness
-        if any(word in content_lower for word in ["trending", "people are", "public", "social"]):
+        # Social consciousness - Direct attribute access (configuration validated)
+        if self.social_grounding and any(word in content_lower for word in ["trending", "people are", "public", "social"]):
             patterns.append("social_consciousness")
 
         # News consciousness
@@ -477,3 +578,31 @@ Your responses should:
             return MessageType.QUESTION
 
         return MessageType.MESSAGE
+
+    async def check_health(self) -> dict[str, Any]:
+        """Check health of Grok connection with temporal awareness status."""
+        health_status = {
+            "provider": "grok",
+            "model": self.config.model_name,
+            "connected": self.is_connected,
+            # Direct attribute access (configuration validated)
+            "temporal_awareness": self.temporal_awareness,
+            "social_grounding": self.social_grounding,
+        }
+
+        if self.is_connected:
+            try:
+                # Test with simple generation
+                response = await self._async_client.chat.completions.create(
+                    model=self.config.model_name,
+                    messages=[{"role": "user", "content": "test"}],
+                    max_tokens=10,
+                )
+                health_status["api_status"] = "healthy" if response.choices[0].message.content else "degraded"
+            except Exception as e:
+                health_status["api_status"] = "error"
+                health_status["error"] = str(e)
+        else:
+            health_status["api_status"] = "disconnected"
+
+        return health_status
