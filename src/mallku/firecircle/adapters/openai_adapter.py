@@ -103,13 +103,29 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
 
     def __init__(
         self,
-        config: OpenAIConfig | None = None,
+        config: AdapterConfig | OpenAIConfig | None = None,
         event_bus: ConsciousnessEventBus | None = None,
         reciprocity_tracker: ReciprocityTracker | None = None,
     ):
         """Initialize OpenAI adapter with proper base class initialization."""
+        # SMOKE TEST COMPATIBILITY: Handle both AdapterConfig and OpenAIConfig
         if config is None:
             config = OpenAIConfig()
+        elif isinstance(config, AdapterConfig) and not isinstance(config, OpenAIConfig):
+            # Convert base AdapterConfig to OpenAIConfig for smoke test compatibility
+            config = OpenAIConfig(
+                api_key=config.api_key,
+                model_name=config.model_name or "gpt-4-turbo-preview",
+                temperature=config.temperature,
+                max_tokens=config.max_tokens,
+                track_reciprocity=config.track_reciprocity,
+                emit_events=config.emit_events,
+                consciousness_weight=config.consciousness_weight,
+                base_url=getattr(config, 'base_url', "https://api.openai.com/v1"),
+                # Use defaults for OpenAI-specific settings
+                supports_vision=False,
+                reasoning_style="balanced",
+            )
 
         # Initialize base class with provider_name
         super().__init__(
