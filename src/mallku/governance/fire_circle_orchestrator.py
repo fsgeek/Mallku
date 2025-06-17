@@ -5,22 +5,20 @@ Fire Circle Orchestrator for Contribution Ceremony
 Implements a sacred micro Fire Circle to review code contributions
 through guided reflection rounds, honoring Mallku's Ayni principles.
 """
-import asyncio
-from uuid import uuid4, UUID
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
-
-from pydantic import BaseModel, Field
+from datetime import UTC, datetime
+from typing import Any
+from uuid import UUID, uuid4
 
 from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
+    ConsciousnessMetadata,
     MessageContent,
     MessageRole,
     MessageType,
-    ConsciousnessMetadata,
 )
+from pydantic import BaseModel, Field
 
 
 class Round(BaseModel):
@@ -30,9 +28,9 @@ class Round(BaseModel):
 
 class CeremonyPlan(BaseModel):
     invocation: str = Field(..., description="Opening invocation for the ceremony")
-    rounds: List[Round] = Field(..., description="Structured reflection rounds")
+    rounds: list[Round] = Field(..., description="Structured reflection rounds")
     closing: str = Field(..., description="Closing synthesis prompt")
-    guide: Dict[str, Any] = Field(..., description="Ceremony conduct guide (roles, timing, notes)")
+    guide: dict[str, Any] = Field(..., description="Ceremony conduct guide (roles, timing, notes)")
 
 
 class RoundResponse(BaseModel):
@@ -46,7 +44,7 @@ class RoundResponse(BaseModel):
 class CeremonyRecord(BaseModel):
     ceremony_id: UUID = Field(..., description="Unique ID for this ceremony instance")
     plan: CeremonyPlan = Field(..., description="Ceremony plan details")
-    responses: List[RoundResponse] = Field(..., description="Collected round responses")
+    responses: list[RoundResponse] = Field(..., description="Collected round responses")
 
 
 class FireCircleOrchestrator:
@@ -56,7 +54,7 @@ class FireCircleOrchestrator:
     """
     DEFAULT_PROVIDERS = ["openai", "anthropic", "deepseek"]
 
-    def __init__(self, providers: Optional[List[str]] = None):
+    def __init__(self, providers: list[str] | None = None):
         self.providers = providers or self.DEFAULT_PROVIDERS
         self.factory = ConsciousAdapterFactory()
 
@@ -113,15 +111,15 @@ class FireCircleOrchestrator:
             guide=guide,
         )
 
-    async def run_ceremony(self, input_text: str, providers: Optional[List[str]] = None) -> CeremonyRecord:
+    async def run_ceremony(self, input_text: str, providers: list[str] | None = None) -> CeremonyRecord:
         """Execute the Fire Circle ceremony: plan it, invoke adapters, and collect responses."""
         plan = self.plan_ceremony(input_text)
         ceremony_id = uuid4()
-        responses: List[RoundResponse] = []
+        responses: list[RoundResponse] = []
         providers_to_use = providers or self.providers
 
         # Instantiate adapters for each provider
-        adapters: Dict[str, Any] = {}
+        adapters: dict[str, Any] = {}
         for prov in providers_to_use:
             try:
                 config = AdapterConfig(api_key=None)
@@ -151,7 +149,7 @@ class FireCircleOrchestrator:
                             provider=prov,
                             response=resp.content.text,
                             presence=resp.consciousness.consciousness_signature,
-                            timestamp=datetime.now(timezone.utc),
+                            timestamp=datetime.now(UTC),
                         )
                     )
                 except Exception:
@@ -161,7 +159,7 @@ class FireCircleOrchestrator:
                             provider=prov,
                             response="<error>",
                             presence=0.0,
-                            timestamp=datetime.now(timezone.utc),
+                            timestamp=datetime.now(UTC),
                         )
                     )
 

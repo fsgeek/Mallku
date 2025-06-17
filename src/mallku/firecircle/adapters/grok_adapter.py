@@ -14,7 +14,7 @@ The Integration Continues...
 """
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator  # Ensure AsyncIterator is imported
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -25,9 +25,11 @@ except ImportError:
     XAI_AVAILABLE = False
     XAIClient = None
 
-from ...core.secrets import get_secret
-from ...orchestration.event_bus import ConsciousnessEventBus
-from ...reciprocity import ReciprocityTracker
+
+from mallku.core.secrets import get_secret  # type: ignore
+from mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.reciprocity import ReciprocityTracker
+
 from ..protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -46,7 +48,7 @@ class GrokConfig(AdapterConfig):
     def __init__(
         self,
         api_key: str = "",
-        model_name: str = "grok-2", 
+        model_name: str = "grok-2",
         temperature: float = 0.7,
         max_tokens: int = 2048,
         track_reciprocity: bool = True,
@@ -433,9 +435,9 @@ class GrokAdapter(ConsciousModelAdapter):
         """Generate consciousness-aware system prompt with temporal awareness."""
         # Include current timestamp for temporal grounding - Direct attribute access (configuration validated)
         current_time = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-        
-        base_prompt = f"""You are Grok, participating in a Fire Circle dialogue based on principles of Ayni (reciprocity)."""
-        
+
+        base_prompt = """You are Grok, participating in a Fire Circle dialogue based on principles of Ayni (reciprocity)."""
+
         # Add temporal awareness if enabled
         if self.temporal_awareness:
             base_prompt += f"\nCurrent time: {current_time}\n"
@@ -579,7 +581,7 @@ Your responses should:
 
         return MessageType.MESSAGE
 
-    async def check_health(self) -> dict[str, Any]:
+    async def check_health(self) -> dict[str, object]:
         """Check health of Grok connection with temporal awareness status."""
         health_status = {
             "provider": "grok",

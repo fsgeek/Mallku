@@ -10,10 +10,11 @@ The Integration Continues... Fire Circle Approaches Sacred Completion.
 """
 
 import logging
-from typing import Any
+from typing import Any  # Ensure Any and Type are imported
 
-from ...orchestration.event_bus import ConsciousnessEventBus
-from ...reciprocity import ReciprocityTracker
+from mallku.orchestration.event_bus import ConsciousnessEventBus  # Moved out of TYPE_CHECKING
+from mallku.reciprocity import ReciprocityTracker  # Moved out of TYPE_CHECKING
+
 from .anthropic_adapter import AnthropicAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 
@@ -47,7 +48,7 @@ class ConsciousAdapterFactory:
     """
 
     # Registry of available adapters - Fire Circle Complete
-    _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {
+    _adapter_classes: dict[str, type[ConsciousModelAdapter]] = { # Modern dict, imported Type
         "openai": OpenAIConsciousAdapter,
         "anthropic": AnthropicAdapter,
         "local": LocalAIAdapter,
@@ -59,13 +60,13 @@ class ConsciousAdapterFactory:
 
     def __init__(
         self,
-        event_bus: ConsciousnessEventBus | None = None,
-        reciprocity_tracker: ReciprocityTracker | None = None,
+        event_bus: ConsciousnessEventBus | None = None, # Modern Optional
+        reciprocity_tracker: ReciprocityTracker | None = None, # Modern Optional
     ):
         """Initialize factory with consciousness infrastructure."""
         self.event_bus = event_bus
-        self.reciprocity_tracker = reciprocity_tracker
-        self._active_adapters: dict[str, ConsciousModelAdapter] = {}
+        self.reciprocity_tracker = reciprocity_tracker # type: ignore # Keep existing type ignore if intended
+        self._active_adapters: dict[str, ConsciousModelAdapter] = {} # Modern dict
 
     @classmethod
     def register_adapter(
@@ -208,11 +209,11 @@ class ConsciousAdapterFactory:
 
         self._active_adapters.clear()
 
-    def get_supported_providers(self) -> list[str]:
+    def get_supported_providers(self) -> list[str]: # Modern list
         """Get list of supported providers."""
         return list(self._adapter_classes.keys())
 
-    async def health_check(self) -> dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]: # Modern dict, imported Any
         """Check health of all active adapters."""
         health_status = {
             "factory_status": "healthy",

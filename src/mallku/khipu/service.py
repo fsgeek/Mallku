@@ -3,7 +3,7 @@ Service for loading, parsing, and querying Khipu (living memory) entries.
 """
 import logging
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .models import KhipuEntry
@@ -54,7 +54,7 @@ class KhipuMemoryService:
             raise ValueError(f"Invalid filename format, expected YYYY-MM-DD-..: {stem}")
         date_part, slug = m.groups()
         try:
-            entry_date = datetime.strptime(date_part, "%Y-%m-%d").date()
+            entry_date = datetime.strptime(date_part, "%Y-%m-%d").replace(tzinfo=UTC).date()
         except ValueError:
             raise ValueError(f"Invalid date in filename: {date_part}")
 
@@ -68,7 +68,7 @@ class KhipuMemoryService:
             title = slug
 
         # File modification time
-        mtime = datetime.fromtimestamp(path.stat().st_mtime)
+        mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
 
         # Optional: extract builder name from content (naive search)
         builder = None

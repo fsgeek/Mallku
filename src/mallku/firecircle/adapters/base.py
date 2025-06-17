@@ -11,8 +11,7 @@ The Integration Continues...
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator
-from typing import Any
+from collections.abc import AsyncIterator  # Ensure AsyncIterator is imported
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -41,7 +40,7 @@ class AdapterConfig(BaseModel):
     # Arbitrary extra configuration knobs that individual adapters may
     # wish to honour.  Using a dict avoids having to modify this shared
     # class for every new provider feature.
-    extra_config: dict[str, Any] = Field(
+    extra_config: dict[str, object] = Field(
         default_factory=dict,
         description="Free-form provider-specific configuration values",
     )
@@ -155,7 +154,7 @@ class ConsciousModelAdapter(ABC):
         self,
         dialogue_context: list[ConsciousMessage],
         max_messages: int | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[dict[str, object]]:
         """
         Prepare context messages for the model.
 
@@ -302,7 +301,7 @@ class ConsciousModelAdapter(ABC):
 
         return min(1.0, signature * self.config.consciousness_weight)
 
-    async def check_health(self) -> dict[str, Any]:
+    async def check_health(self) -> dict[str, object]:
         """Check adapter health and reciprocity status."""
         return {
             "adapter_id": str(self.adapter_id),

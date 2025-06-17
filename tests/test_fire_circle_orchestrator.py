@@ -1,7 +1,7 @@
-import pytest
 import asyncio
 
 from mallku.governance.fire_circle_orchestrator import FireCircleOrchestrator
+
 
 def test_plan_ceremony_structure():
     sample_diff = "// sample code diff"

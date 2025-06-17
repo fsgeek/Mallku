@@ -369,9 +369,8 @@ class ConsciousnessNetworkHub:
                     node = self.nodes[node_id]
 
                     # Check consciousness threshold
-                    if message.consciousness_threshold:
-                        if node.consciousness_signature < message.consciousness_threshold:
-                            continue
+                    if message.consciousness_threshold and node.consciousness_signature < message.consciousness_threshold:
+                        continue
 
                     # Convert and deliver
                     conscious_msg = message.to_conscious_message(dialogue_id)

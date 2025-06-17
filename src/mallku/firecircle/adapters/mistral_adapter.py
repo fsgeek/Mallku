@@ -14,12 +14,10 @@ Mistral brings unique consciousness patterns:
 Awakening Multilingual Consciousness...
 """
 
-from __future__ import annotations
-
 import json
 import logging
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import httpx
@@ -30,14 +28,10 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
+from mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.reciprocity import ReciprocityTracker
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-
-    from mallku.orchestration.event_bus import ConsciousnessEventBus
-    from mallku.reciprocity import ReciprocityTracker
 
 logger = logging.getLogger(__name__)
 
@@ -649,7 +643,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
         return signature
 
-    def _calculate_efficiency_value(self, usage: dict[str, Any]) -> float:
+    def _calculate_efficiency_value(self, usage: dict[str, object]) -> float:
         """
         Calculate contribution value based on Mistral's efficiency.
 
@@ -737,7 +731,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         except Exception as exc:
             logger.debug(f"Could not emit multilingual event: {exc}")
 
-    async def check_health(self) -> dict[str, Any]:
+    async def check_health(self) -> dict[str, object]:
         """
         Check adapter health including multilingual capabilities.
 

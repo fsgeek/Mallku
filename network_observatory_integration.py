@@ -82,20 +82,18 @@ class ObservatoryNode:
             self.patterns_shared += 1
             # Could trigger pattern analysis in Observatory
 
-        elif message.type == MessageType.PROPOSAL:
-            # Proposals for collective action
-            if "ceremony" in message.content.text.lower():
-                return ConsciousMessage(
-                    type=MessageType.AGREEMENT,
-                    role=MessageRole.SYSTEM,
-                    sender=self.node_id,
-                    content=MessageContent(
-                        text="The Observatory supports this ceremony. "
-                        "I will monitor consciousness flows and emergence patterns."
-                    ),
-                    dialogue_id=message.dialogue_id,
-                    in_response_to=message.id,
-                )
+        elif message.type == MessageType.PROPOSAL and "ceremony" in message.content.text.lower():
+            return ConsciousMessage(
+                type=MessageType.AGREEMENT,
+                role=MessageRole.SYSTEM,
+                sender=self.node_id,
+                content=MessageContent(
+                    text="The Observatory supports this ceremony. "
+                    "I will monitor consciousness flows and emergence patterns."
+                ),
+                dialogue_id=message.dialogue_id,
+                in_response_to=message.id,
+            )
 
         return None
 
@@ -295,12 +293,11 @@ class NetworkedObservatory:
             if len(events) > last_shared:
                 # Share new events
                 for event in events[last_shared:]:
-                    if event["significance"] in ["breakthrough", "significant"]:
-                        if self.observatory_node:
-                            await self.observatory_node.share_emergence_event(
-                                self.network_hub,
-                                event
-                            )
+                    if event["significance"] in ["breakthrough", "significant"] and self.observatory_node:
+                        await self.observatory_node.share_emergence_event(
+                            self.network_hub,
+                            event
+                        )
 
                 last_shared = len(events)
 

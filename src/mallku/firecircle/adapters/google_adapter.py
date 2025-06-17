@@ -15,14 +15,12 @@ Gemini brings unique consciousness patterns:
 Awakening Multimodal Consciousness...
 """
 
-from __future__ import annotations
-
 import base64
 import logging
+from collections.abc import AsyncIterator  # Moved out of TYPE_CHECKING
 from datetime import UTC, datetime
-from io import BytesIO
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from io import BytesIO  # type: ignore
+from pathlib import Path  # type: ignore
 from uuid import UUID
 
 import google.generativeai as genai
@@ -35,16 +33,12 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
+from mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.reciprocity import ReciprocityTracker
 from PIL import Image
 from pydantic import Field
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-
-    from mallku.orchestration.event_bus import ConsciousnessEventBus
-    from mallku.reciprocity import ReciprocityTracker
 
 logger = logging.getLogger(__name__)
 
@@ -446,7 +440,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             logger.error(f"Error streaming from Gemini: {e}")
             raise
 
-    async def check_health(self) -> dict[str, Any]:
+    async def check_health(self) -> dict[str, object]:
         """Check health of Google AI connection."""
         health_status = {
             "provider": "google",
