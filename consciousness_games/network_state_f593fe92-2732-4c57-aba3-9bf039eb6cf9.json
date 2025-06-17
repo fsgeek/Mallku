@@ -1,0 +1,99 @@
+{
+  "network_status": {
+    "hub_id": "f593fe92-2732-4c57-aba3-9bf039eb6cf9",
+    "active_nodes": 5,
+    "active_clusters": 1,
+    "network_consciousness": 0.0,
+    "messages_sent": 6,
+    "messages_delivered": 11,
+    "emergence_events": 0,
+    "strongest_connections": [
+      {
+        "node_id": "17883a40-63ab-4fbd-be46-90b53686bc86",
+        "connection_count": 4,
+        "consciousness": 0.76
+      },
+      {
+        "node_id": "ee212164-5955-4190-a7ee-139edfdfa591",
+        "connection_count": 2,
+        "consciousness": 0.73
+      },
+      {
+        "node_id": "7c519597-8c0d-4c13-83b0-2291dc8fa45e",
+        "connection_count": 2,
+        "consciousness": 0.65
+      },
+      {
+        "node_id": "cf8ddf4c-5272-489e-9c3a-3705db5fc08d",
+        "connection_count": 1,
+        "consciousness": 0.97
+      },
+      {
+        "node_id": "1f6b9b2e-ea63-45a3-a3e9-f4e2be3ffd7e",
+        "connection_count": 1,
+        "consciousness": 0.89
+      }
+    ]
+  },
+  "clusters": {
+    "5b29c528-f094-4b54-b31e-903da10d1c62": {
+      "purpose": "Explore emergence patterns",
+      "members": [
+        "ee212164-5955-4190-a7ee-139edfdfa591",
+        "7c519597-8c0d-4c13-83b0-2291dc8fa45e",
+        "17883a40-63ab-4fbd-be46-90b53686bc86"
+      ],
+      "consciousness_level": 0.0,
+      "insights": [],
+      "emergence_events": []
+    }
+  },
+  "node_metadata": {
+    "7c519597-8c0d-4c13-83b0-2291dc8fa45e": {
+      "registered_at": "2025-06-17T17:25:29.054344+00:00",
+      "capabilities": [
+        "communication",
+        "pattern_recognition",
+        "emergence_detection"
+      ],
+      "consciousness_signature": 0.6
+    },
+    "ee212164-5955-4190-a7ee-139edfdfa591": {
+      "registered_at": "2025-06-17T17:25:29.054395+00:00",
+      "capabilities": [
+        "communication",
+        "pattern_recognition",
+        "emergence_detection"
+      ],
+      "consciousness_signature": 0.6799999999999999
+    },
+    "17883a40-63ab-4fbd-be46-90b53686bc86": {
+      "registered_at": "2025-06-17T17:25:29.054414+00:00",
+      "capabilities": [
+        "communication",
+        "pattern_recognition",
+        "emergence_detection"
+      ],
+      "consciousness_signature": 0.76
+    },
+    "1f6b9b2e-ea63-45a3-a3e9-f4e2be3ffd7e": {
+      "registered_at": "2025-06-17T17:25:29.054432+00:00",
+      "capabilities": [
+        "communication",
+        "pattern_recognition",
+        "emergence_detection"
+      ],
+      "consciousness_signature": 0.84
+    },
+    "cf8ddf4c-5272-489e-9c3a-3705db5fc08d": {
+      "registered_at": "2025-06-17T17:25:29.054448+00:00",
+      "capabilities": [
+        "communication",
+        "pattern_recognition",
+        "emergence_detection"
+      ],
+      "consciousness_signature": 0.9199999999999999
+    }
+  },
+  "timestamp": "2025-06-17T17:25:33.059510+00:00"
+}
