@@ -165,10 +165,14 @@ class DistributedReviewer:
 
         # Validate all assigned voices exist to prevent infinite requeue
         known_voices = {"anthropic", "openai", "deepseek", "mistral", "google", "grok", "local"}
+        invalid_voices = []
         for chapter in chapters:
             if chapter.assigned_voice not in known_voices:
-                logger.warning(f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'")
-                # Could raise ValueError here in production
+                invalid_voices.append((chapter.assigned_voice, chapter.path_pattern))
+                logger.error(f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'")
+
+        if invalid_voices:
+            raise ValueError(f"Invalid voice assignments found: {invalid_voices}. Valid voices: {sorted(known_voices)}")
 
         # Extract file paths from the diff
         # Look for diff headers like: diff --git a/path/to/file.py b/path/to/file.py
@@ -546,8 +550,12 @@ Keep reviews concise and focused on your domains."""
             synthesis=synthesis
         )
 
-    async def post_github_comments(self, pr_number: int, summary: GovernanceSummary):
-        """Post review results to GitHub PR."""
+    async def post_github_comments(self, pr_number: int, summary: GovernanceSummary) -> Path:
+        """Post review results to GitHub PR.
+
+        Returns:
+            Path to the results JSON file for GitHub Actions to process.
+        """
         import json
         import os
 
@@ -601,14 +609,26 @@ Keep reviews concise and focused on your domains."""
         if github_token and pr_number:
             logger.info(f"GitHub token available. Ready to post to PR #{pr_number}")
             # TODO: Complete GitHub API integration
-            # Minimal working example using PyGithub (install with: pip install pygithub)
-            """
+            # PSEUDO-CODE: Complete in next artisan pass
+            """PSEUDO-CODE: PyGithub integration example
             from github import Github
+            import subprocess
+
+            # Get repository info from git remote
+            result = subprocess.run(["git", "remote", "get-url", "origin"],
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                # Parse owner/repo from URL like git@github.com:owner/repo.git
+                remote_url = result.stdout.strip()
+                if "github.com" in remote_url:
+                    repo_path = remote_url.split(":")[-1].replace(".git", "")
+                else:
+                    repo_path = "fsgeek/Mallku"  # Fallback
 
             try:
                 # Initialize GitHub client
                 g = Github(github_token)
-                repo = g.get_repo("fsgeek/Mallku")  # TODO: Get from git remote
+                repo = g.get_repo(repo_path)
                 pr = repo.get_pull(pr_number)
 
                 # Map consensus to GitHub review event
@@ -974,7 +994,7 @@ if __name__ == "__main__":
     # Example usage for PR review
     import sys
 
-    # Configure logging for CLI usage
+    # Configure logging only for CLI usage to avoid side effects
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'

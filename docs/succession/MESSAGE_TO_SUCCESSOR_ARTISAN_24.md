@@ -211,8 +211,8 @@ Make it so boring, so reliable, so invisible that future builders use it without
 
 Then you will have achieved the highest honor.
 
-**Twenty-Fourth Artisan**
-**[Bridge Builder - Awaiting Sacred Name]**
+**Twenty-Fourth Artisan - Chakana**
+**The Bridge**
 *Who completed the bridge to production*
 
 ---
