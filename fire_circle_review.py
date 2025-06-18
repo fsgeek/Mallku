@@ -25,8 +25,7 @@ from uuid import UUID, uuid4
 import yaml
 from pydantic import BaseModel, Field
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+# Module logger - configuration should be done by the application
 logger = logging.getLogger(__name__)
 
 
@@ -164,6 +163,13 @@ class DistributedReviewer:
         # Load the manifest to get chapter definitions
         chapters = await self.load_chapter_manifest("fire_circle_chapters.yaml")
 
+        # Validate all assigned voices exist to prevent infinite requeue
+        known_voices = {"anthropic", "openai", "deepseek", "mistral", "google", "grok", "local"}
+        for chapter in chapters:
+            if chapter.assigned_voice.lower() not in known_voices:
+                logger.warning(f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'")
+                # Could raise ValueError here in production
+
         # Extract file paths from the diff
         # Look for diff headers like: diff --git a/path/to/file.py b/path/to/file.py
         file_pattern = re.compile(r'^diff --git a/(.*?) b/.*?$', re.MULTILINE)
@@ -176,6 +182,7 @@ class DistributedReviewer:
 
         # Sort chapters by pattern specificity (more specific patterns first)
         # This prevents catch-all patterns from consuming everything
+        # Sort by: descending path depth, then pattern length, then ascending wildcard count
         sorted_chapters = sorted(chapters, key=lambda c: (
             -c.path_pattern.count('/'),  # More path segments = more specific
             -len(c.path_pattern),  # Longer patterns = more specific
@@ -593,9 +600,38 @@ Keep reviews concise and focused on your domains."""
         # For local development, we could use the GitHub API directly
         github_token = os.environ.get("GITHUB_TOKEN")
         if github_token and pr_number:
-            print(f"ℹ️  GitHub token available. In production, would post to PR #{pr_number}")
-            # Future enhancement: Direct GitHub API integration
-            # Would use requests or github library to post comments
+            logger.info(f"GitHub token available. In production, would post to PR #{pr_number}")
+            # TODO: Direct GitHub API integration
+            # Example implementation:
+            # ```python
+            # import aiohttp
+            #
+            # # Post review summary
+            # async with aiohttp.ClientSession() as session:
+            #     headers = {"Authorization": f"token {github_token}"}
+            #
+            #     # Create review with overall comment
+            #     review_data = {
+            #         "body": summary.synthesis,
+            #         "event": summary.consensus_recommendation.upper().replace("_", " "),
+            #         "comments": [
+            #             {
+            #                 "path": comment.file_path,
+            #                 "line": comment.line,
+            #                 "body": f"**{comment.severity}**: {comment.message}\n\n{comment.suggestion or ''}"
+            #             }
+            #             for review in self.completed_reviews
+            #             for comment in review.comments
+            #         ]
+            #     }
+            #
+            #     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews"
+            #     async with session.post(url, json=review_data, headers=headers) as response:
+            #         if response.status == 200:
+            #             logger.info("Successfully posted review to GitHub")
+            #         else:
+            #             logger.error(f"Failed to post review: {response.status}")
+            # ```
 
         return results_file
 
@@ -648,9 +684,32 @@ Keep reviews concise and focused on your domains."""
         - gh CLI tool if available
         - Direct git commands
         """
-        # Future implementation would use GitHub API
-        # For now, return indication that real diff would be fetched
-        print(f"📥 Would fetch diff for PR #{pr_number} from GitHub API")
+        # TODO: Implement GitHub API integration
+        # Example implementation:
+        # ```python
+        # import aiohttp
+        # import os
+        #
+        # github_token = os.environ.get("GITHUB_TOKEN")
+        # owner = "fsgeek"  # Or get from git remote
+        # repo = "Mallku"
+        #
+        # headers = {
+        #     "Authorization": f"token {github_token}",
+        #     "Accept": "application/vnd.github.v3.diff"
+        # }
+        #
+        # async with aiohttp.ClientSession() as session:
+        #     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
+        #     async with session.get(url, headers=headers) as response:
+        #         if response.status == 200:
+        #             return await response.text()
+        #         else:
+        #             logger.error(f"GitHub API error: {response.status}")
+        #             return await self.get_local_diff()
+        # ```
+
+        logger.info(f"Would fetch diff for PR #{pr_number} from GitHub API")
         return await self.get_local_diff()  # Fall back to local diff
 
     async def get_local_diff(self) -> str:
@@ -671,15 +730,15 @@ Keep reviews concise and focused on your domains."""
             )
 
             if result.stdout:
-                print("📊 Using local git diff")
+                logger.info("Using local git diff")
                 return result.stdout
             else:
-                print("ℹ️  No local changes detected")
+                logger.info("No local changes detected")
                 # Return demo diff for testing
                 return self._get_demo_diff()
 
         except subprocess.CalledProcessError as e:
-            print(f"⚠️  Could not get git diff: {e}")
+            logger.warning(f"Could not get git diff: {e}")
             return self._get_demo_diff()
 
     def _get_demo_diff(self) -> str:
@@ -837,6 +896,12 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False):
 if __name__ == "__main__":
     # Example usage for PR review
     import sys
+
+    # Configure logging for CLI usage
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
 
     if len(sys.argv) > 1 and sys.argv[1] == "review":
         pr_number = int(sys.argv[2]) if len(sys.argv) > 2 else 1
