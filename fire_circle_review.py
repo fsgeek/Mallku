@@ -26,7 +26,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 # Module logger - configuration should be done by the application
-logger = logging.getLogger("fire_circle_review")
+logger = logging.getLogger("mallku.firecircle.review")
 
 
 # Review Models as suggested by reviewer
@@ -108,7 +108,6 @@ class DistributedReviewer:
 
     def __init__(self):
         self.review_queue: asyncio.Queue[ChapterReviewJob] = asyncio.Queue()
-        self.voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]] = {}  # Per-voice queues
         self.completed_reviews: list[ChapterReview] = []
         self.adapter_factory = None  # Will be initialized when needed
         self.voice_adapters = {}  # Cache for voice adapters
@@ -600,38 +599,55 @@ Keep reviews concise and focused on your domains."""
         # For local development, we could use the GitHub API directly
         github_token = os.environ.get("GITHUB_TOKEN")
         if github_token and pr_number:
-            logger.info(f"GitHub token available. In production, would post to PR #{pr_number}")
-            # TODO: Direct GitHub API integration
-            # Example implementation:
-            # ```python
-            # import aiohttp
-            #
-            # # Post review summary
-            # async with aiohttp.ClientSession() as session:
-            #     headers = {"Authorization": f"token {github_token}"}
-            #
-            #     # Create review with overall comment
-            #     review_data = {
-            #         "body": summary.synthesis,
-            #         "event": summary.consensus_recommendation.upper().replace("_", " "),
-            #         "comments": [
-            #             {
-            #                 "path": comment.file_path,
-            #                 "line": comment.line,
-            #                 "body": f"**{comment.severity}**: {comment.message}\n\n{comment.suggestion or ''}"
-            #             }
-            #             for review in self.completed_reviews
-            #             for comment in review.comments
-            #         ]
-            #     }
-            #
-            #     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews"
-            #     async with session.post(url, json=review_data, headers=headers) as response:
-            #         if response.status == 200:
-            #             logger.info("Successfully posted review to GitHub")
-            #         else:
-            #             logger.error(f"Failed to post review: {response.status}")
-            # ```
+            logger.info(f"GitHub token available. Ready to post to PR #{pr_number}")
+            # TODO: Complete GitHub API integration
+            # Minimal working example using PyGithub (install with: pip install pygithub)
+            """
+            from github import Github
+
+            try:
+                # Initialize GitHub client
+                g = Github(github_token)
+                repo = g.get_repo("fsgeek/Mallku")  # TODO: Get from git remote
+                pr = repo.get_pull(pr_number)
+
+                # Map consensus to GitHub review event
+                event_map = {
+                    "approve": "APPROVE",
+                    "request_changes": "REQUEST_CHANGES",
+                    "needs_discussion": "COMMENT"
+                }
+
+                # Create review with summary
+                review = pr.create_review(
+                    body=summary.synthesis,
+                    event=event_map.get(summary.consensus_recommendation, "COMMENT")
+                )
+
+                # Add individual comments
+                for review_item in self.completed_reviews:
+                    for comment in review_item.comments:
+                        try:
+                            # Find the file in the PR
+                            for file in pr.get_files():
+                                if file.filename == comment.file_path:
+                                    # Add review comment
+                                    pr.create_review_comment(
+                                        body=f"**{comment.severity.value}** [{comment.category.value}]: {comment.message}\n\n{comment.suggestion or ''}",
+                                        path=comment.file_path,
+                                        line=comment.line,
+                                        commit_id=pr.head.sha
+                                    )
+                                    break
+                        except Exception as e:
+                            logger.warning(f"Could not add comment to {comment.file_path}:{comment.line}: {e}")
+
+                logger.info(f"Successfully posted review to PR #{pr_number}")
+
+            except Exception as e:
+                logger.error(f"Failed to post GitHub review: {e}")
+                logger.info("Falling back to JSON file output for GitHub Actions")
+            """
 
         return results_file
 
@@ -656,7 +672,7 @@ Keep reviews concise and focused on your domains."""
 
         logger.info("All voice workers started")
 
-    async def start_voice_workers_with_queues(self, voices: list[str]) -> None:
+    async def start_voice_workers_with_queues(self, voices: list[str], voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]]) -> None:
         """
         Start worker tasks for voices with per-voice queues.
 
@@ -670,7 +686,7 @@ Keep reviews concise and focused on your domains."""
             adapter = await self.get_or_create_adapter(voice)
 
             # Get the voice-specific queue
-            voice_queue = self.voice_queues.get(voice)
+            voice_queue = voice_queues.get(voice)
             if not voice_queue:
                 logger.error(f"No queue found for voice {voice}")
                 continue
@@ -821,21 +837,21 @@ index 1234567..abcdefg 100644
         unique_voices = list(set(chapter.assigned_voice for chapter in chapters))
 
         # Create per-voice queues to avoid requeue issues
-        self.voice_queues.clear()
+        voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]] = {}
         for voice in unique_voices:
-            self.voice_queues[voice] = asyncio.Queue()
+            voice_queues[voice] = asyncio.Queue()
 
         # Enqueue review jobs to voice-specific queues
         for chapter in chapters:
             job = ChapterReviewJob(chapter=chapter, pr_diff=pr_diff)
-            await self.voice_queues[chapter.assigned_voice].put(job)
+            await voice_queues[chapter.assigned_voice].put(job)
 
         # Start all voice workers with their specific queues
-        await self.start_voice_workers_with_queues(unique_voices)
+        await self.start_voice_workers_with_queues(unique_voices, voice_queues)
 
         # Wait for all voice queues to be empty
         print("\n⏳ Waiting for all voices to complete reviews...")
-        for queue in self.voice_queues.values():
+        for queue in voice_queues.values():
             await queue.join()
 
         # Shutdown workers gracefully
