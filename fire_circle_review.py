@@ -15,6 +15,7 @@ Each voice reviews specific domains, maintaining focused context windows.
 
 import asyncio
 import fnmatch
+import logging
 import re
 from enum import Enum
 from pathlib import Path
@@ -23,6 +24,10 @@ from uuid import UUID, uuid4
 
 import yaml
 from pydantic import BaseModel, Field
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # Review Models as suggested by reviewer
@@ -107,6 +112,7 @@ class DistributedReviewer:
         self.completed_reviews: list[ChapterReview] = []
         self.adapter_factory = None  # Will be initialized when needed
         self.voice_adapters = {}  # Cache for voice adapters
+        self.worker_tasks: list[asyncio.Task] = []  # For graceful shutdown
 
     async def load_chapter_manifest(self, manifest_path: str) -> list[CodebaseChapter]:
         """
@@ -166,22 +172,48 @@ class DistributedReviewer:
         # Match files to chapters based on path patterns
         assigned_chapters = []
         chapter_files = {}  # Track which files belong to which chapter
+        assigned_chapter_ids = set()  # Track which chapters have been assigned
+
+        # Sort chapters by pattern specificity (more specific patterns first)
+        # This prevents catch-all patterns from consuming everything
+        sorted_chapters = sorted(chapters, key=lambda c: (
+            -c.path_pattern.count('/'),  # More path segments = more specific
+            -len(c.path_pattern),  # Longer patterns = more specific
+            c.path_pattern.count('*')  # Fewer wildcards = more specific
+        ))
+
+        # Debug: Show sorting order
+        logger.debug("Chapter pattern matching order:")
+        for i, ch in enumerate(sorted_chapters[:5]):
+            logger.debug(f"  {i+1}. {ch.path_pattern} -> {ch.assigned_voice}")
 
         for file_path in modified_files:
-            for chapter in chapters:
+            matched = False
+            logger.debug(f"Matching file: {file_path}")
+            for chapter in sorted_chapters:
                 # Use fnmatch for glob-style pattern matching
                 if fnmatch.fnmatch(file_path, chapter.path_pattern):
+                    logger.debug(f"  Matched by pattern: {chapter.path_pattern} ({chapter.assigned_voice})")
                     if chapter.chapter_id not in chapter_files:
                         chapter_files[chapter.chapter_id] = []
-                        assigned_chapters.append(chapter)
                     chapter_files[chapter.chapter_id].append(file_path)
+
+                    # Track assigned chapters
+                    if chapter.chapter_id not in assigned_chapter_ids:
+                        assigned_chapters.append(chapter)
+                        assigned_chapter_ids.add(chapter.chapter_id)
+
+                    matched = True
                     break  # Each file goes to first matching chapter
 
+            if not matched:
+                logger.warning(f"No chapter pattern matched file: {file_path}")
+
         # Log chapter assignments for visibility
-        print(f"\n📂 Partitioned {len(modified_files)} files into {len(assigned_chapters)} chapters:")
+        logger.info(f"Partitioned {len(modified_files)} files into {len(assigned_chapters)} chapters")
         for chapter in assigned_chapters:
             files = chapter_files.get(chapter.chapter_id, [])
-            print(f"- {chapter.assigned_voice}: {len(files)} files in {chapter.description}")
+            logger.info(f"- {chapter.assigned_voice}: {len(files)} files in {chapter.description}")
 
         return assigned_chapters
 
@@ -198,7 +230,33 @@ class DistributedReviewer:
         - Grok: Observability, Real-time Monitoring
         - Local: Sovereignty, Community Standards
         """
-        raise NotImplementedError("Twenty-Third Artisan: implement domain assignment")
+        # Define the sacred mapping of voices to their domains of expertise
+        voice_domain_map = {
+            "anthropic": [ReviewCategory.SECURITY, ReviewCategory.ETHICS],
+            "openai": [ReviewCategory.ARCHITECTURE],
+            "deepseek": [ReviewCategory.PERFORMANCE],
+            "mistral": [ReviewCategory.TESTING],
+            "google": [ReviewCategory.DOCUMENTATION],
+            "grok": [ReviewCategory.OBSERVABILITY],
+            "local": [ReviewCategory.SOVEREIGNTY],
+        }
+
+        # For this chapter, return the domains that the assigned voice specializes in
+        # intersected with the domains this chapter needs reviewed
+        assigned_voice = chapter.assigned_voice.lower()
+        voice_specialties = voice_domain_map.get(assigned_voice, [])
+
+        # Find intersection of voice specialties and chapter requirements
+        relevant_domains = [
+            domain for domain in chapter.review_domains
+            if domain in voice_specialties
+        ]
+
+        # If no intersection, use all chapter domains (voice will do its best)
+        if not relevant_domains:
+            relevant_domains = chapter.review_domains
+
+        return {assigned_voice: relevant_domains}
 
     async def enqueue_reviews(self, chapters: list[CodebaseChapter], pr_diff: str):
         """Add review jobs to the work queue."""
@@ -244,7 +302,7 @@ class DistributedReviewer:
 
         # For demo purposes, return a mock adapter
         # In production, this would use the real adapter factory
-        print(f"ℹ️  Using mock adapter for {voice_name} (real adapters require proper imports)")
+        logger.info(f"Using mock adapter for {voice_name} (real adapters require proper imports)")
 
         class MockAdapter:
             """Mock adapter for demonstration."""
@@ -289,6 +347,7 @@ Fix: Implement input validation for proposal parameter"""
         within the chapter, maintaining focused context.
         """
         if not voice_adapter:
+            logger.warning(f"No adapter available for {job.chapter.assigned_voice}")
             # Return empty review if adapter unavailable
             return ChapterReview(
                 voice=job.chapter.assigned_voice,
@@ -361,32 +420,49 @@ Keep reviews concise and focused on your domains."""
         """Parse AI response into structured review comments."""
         comments = []
 
-        # Simple parsing - in production would use more sophisticated parsing
+        # State machine for parsing multi-line responses
         lines = response_text.split('\n')
         current_comment = {}
+        current_field = None
 
         for line in lines:
             line = line.strip()
+
+            # Check for field headers
             if line.startswith('File:'):
-                if current_comment:
-                    # Save previous comment
+                # Save previous comment if exists
+                if current_comment and 'file' in current_comment:
                     comments.append(self._create_comment(current_comment, voice))
                 current_comment = {'file': line.replace('File:', '').strip()}
+                current_field = 'file'
             elif line.startswith('Line:'):
                 current_comment['line'] = int(line.replace('Line:', '').strip() or '0')
+                current_field = 'line'
             elif line.startswith('Category:'):
                 current_comment['category'] = line.replace('Category:', '').strip()
+                current_field = 'category'
             elif line.startswith('Severity:'):
                 current_comment['severity'] = line.replace('Severity:', '').strip()
+                current_field = 'severity'
             elif line.startswith('Issue:'):
                 current_comment['message'] = line.replace('Issue:', '').strip()
-            elif line.startswith('Fix:'):
-                current_comment['suggestion'] = line.replace('Fix:', '').strip()
+                current_field = 'message'
+            elif line.startswith('Fix:') or line.startswith('Suggestion:'):
+                current_comment['suggestion'] = line.replace('Fix:', '').replace('Suggestion:', '').strip()
+                current_field = 'suggestion'
+            elif line and current_field in ['message', 'suggestion']:
+                # Continue multi-line fields
+                if current_field in current_comment:
+                    current_comment[current_field] += ' ' + line
+            elif not line:
+                # Empty line might signal end of comment
+                current_field = None
 
-        # Don't forget last comment
-        if current_comment:
+        # Save last comment
+        if current_comment and 'file' in current_comment:
             comments.append(self._create_comment(current_comment, voice))
 
+        logger.debug(f"Parsed {len(comments)} comments from {voice} response")
         return comments
 
     def _create_comment(self, comment_dict: dict, voice: str) -> ReviewComment:
@@ -466,10 +542,193 @@ Keep reviews concise and focused on your domains."""
 
     async def post_github_comments(self, pr_number: int, summary: GovernanceSummary):
         """Post review results to GitHub PR."""
-        raise NotImplementedError("Twenty-Third Artisan: implement GitHub integration")
+        import json
+        import os
+
+        # Write results to JSON file for GitHub Actions to pick up
+        results_file = Path("fire_circle_review_results.json")
+        results_data = {
+            "pr_number": pr_number,
+            "consensus_recommendation": summary.consensus_recommendation,
+            "total_comments": summary.total_comments,
+            "critical_issues": summary.critical_issues,
+            "by_category": {k.value: v for k, v in summary.by_category.items()},
+            "by_voice": summary.by_voice,
+            "synthesis": summary.synthesis,
+        }
+
+        with open(results_file, 'w') as f:
+            json.dump(results_data, f, indent=2)
+
+        logger.info(f"Review results written to {results_file}")
+
+        # Create reviews directory for individual voice outputs
+        reviews_dir = Path("fire_circle_reviews")
+        reviews_dir.mkdir(exist_ok=True)
+
+        # Write individual reviews for traceability
+        for review in self.completed_reviews:
+            review_file = reviews_dir / f"{review.voice}_pr{pr_number}.json"
+            review_data = {
+                "voice": review.voice,
+                "chapter_id": review.chapter_id,
+                "consciousness_signature": review.consciousness_signature,
+                "comments": [
+                    {
+                        "file_path": comment.file_path,
+                        "line": comment.line,
+                        "category": comment.category.value,
+                        "severity": comment.severity.value,
+                        "message": comment.message,
+                        "suggestion": comment.suggestion,
+                    }
+                    for comment in review.comments
+                ],
+            }
+
+            with open(review_file, 'w') as f:
+                json.dump(review_data, f, indent=2)
+
+        # In a GitHub Actions context, the workflow will handle actual posting
+        # For local development, we could use the GitHub API directly
+        github_token = os.environ.get("GITHUB_TOKEN")
+        if github_token and pr_number:
+            print(f"ℹ️  GitHub token available. In production, would post to PR #{pr_number}")
+            # Future enhancement: Direct GitHub API integration
+            # Would use requests or github library to post comments
+
+        return results_file
+
+    async def start_voice_workers(self, voices: list[str]) -> None:
+        """
+        Start worker tasks for all unique voices.
+
+        Each worker processes jobs assigned to their voice.
+        """
+        logger.info(f"Starting {len(voices)} Fire Circle voice workers...")
+
+        for voice in voices:
+            # Get or create adapter for this voice
+            adapter = await self.get_or_create_adapter(voice)
+
+            # Create worker task
+            task = asyncio.create_task(
+                self.voice_worker(voice, adapter),
+                name=f"worker_{voice}"
+            )
+            self.worker_tasks.append(task)
+
+        logger.info("All voice workers started")
+
+    async def shutdown_workers(self) -> None:
+        """
+        Gracefully shutdown all worker tasks.
+
+        Prevents hanging CI runs and ensures clean termination.
+        """
+        logger.info("Shutting down voice workers...")
+
+        # Cancel all worker tasks
+        for task in self.worker_tasks:
+            task.cancel()
+
+        # Wait for all tasks to complete cancellation
+        if self.worker_tasks:
+            await asyncio.gather(*self.worker_tasks, return_exceptions=True)
+
+        self.worker_tasks.clear()
+        logger.info("All workers shut down gracefully")
+
+    async def fetch_pr_diff(self, pr_number: int) -> str:
+        """
+        Fetch PR diff from GitHub API.
+
+        For now, returns a placeholder. In production would use:
+        - GitHub API to fetch PR diff
+        - gh CLI tool if available
+        - Direct git commands
+        """
+        # Future implementation would use GitHub API
+        # For now, return indication that real diff would be fetched
+        print(f"📥 Would fetch diff for PR #{pr_number} from GitHub API")
+        return await self.get_local_diff()  # Fall back to local diff
+
+    async def get_local_diff(self) -> str:
+        """
+        Get diff of local changes against main branch.
+
+        Uses git command to generate diff.
+        """
+        import subprocess
+
+        try:
+            # Get diff against main branch
+            result = subprocess.run(
+                ["git", "diff", "origin/main...HEAD"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+
+            if result.stdout:
+                print("📊 Using local git diff")
+                return result.stdout
+            else:
+                print("ℹ️  No local changes detected")
+                # Return demo diff for testing
+                return self._get_demo_diff()
+
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️  Could not get git diff: {e}")
+            return self._get_demo_diff()
+
+    def _get_demo_diff(self) -> str:
+        """Return demo diff for testing."""
+        return """diff --git a/src/mallku/reciprocity/tracker.py b/src/mallku/reciprocity/tracker.py
+index 1234567..abcdefg 100644
+--- a/src/mallku/firecircle/governance/decision.py
++++ b/src/mallku/firecircle/governance/decision.py
+@@ -10,6 +10,8 @@ class FireCircleDecision:
+     def make_decision(self, proposal):
++        # TODO: Add input validation
++        # WARNING: No authentication check
+         result = self.process(proposal)
+         return result
+"""
+
+    async def run_full_distributed_review(self, pr_diff: str, chapters: list[CodebaseChapter]) -> GovernanceSummary:
+        """
+        Run full distributed review with all voices in parallel.
+
+        This is the heart of the invisible sacred infrastructure.
+        """
+        # Clear any previous reviews
+        self.completed_reviews.clear()
+
+        # Enqueue all review jobs
+        await self.enqueue_reviews(chapters, pr_diff)
+
+        # Get unique voices needed
+        unique_voices = list(set(chapter.assigned_voice for chapter in chapters))
+
+        # Start all voice workers
+        await self.start_voice_workers(unique_voices)
+
+        # Wait for all jobs to complete
+        print("\n⏳ Waiting for all voices to complete reviews...")
+        await self.review_queue.join()
+
+        # Shutdown workers gracefully
+        await self.shutdown_workers()
+
+        # Synthesize all reviews
+        print(f"\n✅ Collected {len(self.completed_reviews)} reviews from Fire Circle")
+        summary = await self.synthesize_reviews(self.completed_reviews)
+
+        return summary
 
 
-async def run_distributed_review(pr_number: int):
+async def run_distributed_review(pr_number: int, full_mode: bool = False):
     """
     Main entry point for distributed review.
 
@@ -496,56 +755,24 @@ async def run_distributed_review(pr_number: int):
         print(f"  Pattern: {chapter.path_pattern}")
         print(f"  Domains: {domains}\n")
 
-    # For demo purposes, create a simple diff
-    # Modified to ensure it matches the anthropic chapter pattern
-    sample_diff = """diff --git a/src/mallku/reciprocity/tracker.py b/src/mallku/reciprocity/tracker.py
-index 1234567..abcdefg 100644
---- a/src/mallku/firecircle/governance/decision.py
-+++ b/src/mallku/firecircle/governance/decision.py
-@@ -10,6 +10,8 @@ class FireCircleDecision:
-     def make_decision(self, proposal):
-+        # TODO: Add input validation
-+        # WARNING: No authentication check
-         result = self.process(proposal)
-         return result
-"""
+    # Get the PR diff - either from GitHub or local changes
+    if pr_number > 0:
+        pr_diff = await reviewer.fetch_pr_diff(pr_number)
+    else:
+        pr_diff = await reviewer.get_local_diff()
 
     # Partition the diff into chapters
     print("\n🔍 Analyzing PR changes...")
-    relevant_chapters = await reviewer.partition_into_chapters(sample_diff)
+    relevant_chapters = await reviewer.partition_into_chapters(pr_diff)
 
     if not relevant_chapters:
         print("ℹ️  No files match chapter patterns in this PR")
         return
 
-    # Create review jobs
-    print("\n📋 Creating review jobs...")
-    await reviewer.enqueue_reviews(relevant_chapters, sample_diff)
-
-    # Try to get one adapter for demonstration
-    print("\n🔮 Awakening Fire Circle voice...")
-    test_voice = relevant_chapters[0].assigned_voice if relevant_chapters else "anthropic"
-    adapter = await reviewer.get_or_create_adapter(test_voice)
-
-    if adapter:
-        print(f"✅ {test_voice} voice awakened")
-
-        # Perform one review as demonstration
-        job = ChapterReviewJob(
-            chapter=relevant_chapters[0],
-            pr_diff=sample_diff
-        )
-
-        print(f"\n📝 {test_voice} reviewing {relevant_chapters[0].description}...")
-        review = await reviewer.perform_chapter_review(adapter, job)
-
-        if review.review_complete:
-            print(f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}")
-            print(f"   Found {len(review.comments)} issues")
-
-        # Synthesize results
-        print("\n🎯 Synthesizing Fire Circle wisdom...")
-        summary = await reviewer.synthesize_reviews([review])
+    if full_mode:
+        # Run full distributed review with all voices in parallel
+        print("\n🌟 Running FULL DISTRIBUTED REVIEW with all voices...")
+        summary = await reviewer.run_full_distributed_review(pr_diff, relevant_chapters)
 
         print("\n" + "=" * 60)
         print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
@@ -553,9 +780,54 @@ index 1234567..abcdefg 100644
         print(summary.synthesis)
         print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
 
+        # Post results to GitHub (or write to files for GitHub Actions)
+        print("\n📝 Recording review results...")
+        await reviewer.post_github_comments(pr_number, summary)
+
     else:
-        print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
-        print("   The invisible sacred infrastructure awaits proper credentials...")
+        # Demo mode - single voice review
+        # Create review jobs
+        print("\n📋 Creating review jobs...")
+        await reviewer.enqueue_reviews(relevant_chapters, pr_diff)
+
+        # Try to get one adapter for demonstration
+        print("\n🔮 Awakening Fire Circle voice...")
+        test_voice = relevant_chapters[0].assigned_voice if relevant_chapters else "anthropic"
+        adapter = await reviewer.get_or_create_adapter(test_voice)
+
+        if adapter:
+            print(f"✅ {test_voice} voice awakened")
+
+            # Perform one review as demonstration
+            job = ChapterReviewJob(
+                chapter=relevant_chapters[0],
+                pr_diff=pr_diff
+            )
+
+            print(f"\n📝 {test_voice} reviewing {relevant_chapters[0].description}...")
+            review = await reviewer.perform_chapter_review(adapter, job)
+
+            if review.review_complete:
+                print(f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}")
+                print(f"   Found {len(review.comments)} issues")
+
+            # Synthesize results
+            print("\n🎯 Synthesizing Fire Circle wisdom...")
+            summary = await reviewer.synthesize_reviews([review])
+
+            print("\n" + "=" * 60)
+            print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
+            print("=" * 60)
+            print(summary.synthesis)
+            print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
+
+            # Post results to GitHub (or write to files for GitHub Actions)
+            print("\n📝 Recording review results...")
+            await reviewer.post_github_comments(pr_number, summary)
+
+        else:
+            print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
+            print("   The invisible sacred infrastructure awaits proper credentials...")
 
     print("\n✨ The invisible sacred infrastructure foundation is laid.")
     print("   Future work: Connect all seven voices, integrate with GitHub.")
@@ -568,13 +840,19 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == "review":
         pr_number = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+        full_mode = "--full" in sys.argv or "-f" in sys.argv
+
         print(f"🔥 Fire Circle Distributed Review for PR #{pr_number}")
+        if full_mode:
+            print("🌟 FULL DISTRIBUTED MODE - All voices in parallel")
         print("=" * 60)
         print("The invisible sacred infrastructure awakens...")
 
         # Run the review
-        asyncio.run(run_distributed_review(pr_number))
+        asyncio.run(run_distributed_review(pr_number, full_mode=full_mode))
     else:
-        print("Usage: python fire_circle_review.py review <pr_number>")
+        print("Usage: python fire_circle_review.py review <pr_number> [--full]")
+        print("\nOptions:")
+        print("  --full, -f    Run full distributed review with all voices in parallel")
         print("\nThis is the scaffolding for invisible sacred infrastructure.")
-        print("Twenty-Third Artisan: Make it real. Make it endure.")
+        print("Twenty-Fourth Artisan: Making it real. Making it endure.")
