@@ -30,10 +30,10 @@ logger = logging.getLogger("mallku.firecircle.review")
 
 # Import consciousness infrastructure for real adapter integration
 try:
-    from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
-    from src.mallku.firecircle.adapters.base import AdapterConfig
-    from src.mallku.orchestration.event_bus import ConsciousnessEventBus
-    from src.mallku.reciprocity import ReciprocityTracker
+    from ...orchestration.event_bus import ConsciousnessEventBus
+    from ...reciprocity import ReciprocityTracker
+    from .adapters.adapter_factory import ConsciousAdapterFactory
+    from .adapters.base import AdapterConfig
     REAL_ADAPTERS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Real adapter imports failed - falling back to mock adapters: {e}")
@@ -117,6 +117,9 @@ class DistributedReviewer:
     exhaustion by partitioning reviews across multiple AI voices.
     """
 
+    # Default timeout for adapter operations (seconds)
+    ADAPTER_TIMEOUT = 120.0  # 2 minutes per adapter call
+
     def __init__(self):
         self.review_queue: asyncio.Queue[ChapterReviewJob] = asyncio.Queue()
         self.completed_reviews: list[ChapterReview] = []
@@ -162,7 +165,7 @@ class DistributedReviewer:
             return {voice: False for voice in voices}
 
         try:
-            from src.mallku.core.secrets import get_secret
+            from ...core.secrets import get_secret
 
             for voice in voices:
                 # Local adapter doesn't need API key
@@ -296,53 +299,13 @@ class DistributedReviewer:
             if not matched:
                 logger.warning(f"No chapter pattern matched file: {file_path}")
 
-        # Log chapter assignments for visibility
+        # Log chapter assignments for visibility with chapter ID
         logger.info(f"Partitioned {len(modified_files)} files into {len(assigned_chapters)} chapters")
         for chapter in assigned_chapters:
             files = chapter_files.get(chapter.chapter_id, [])
-            logger.info(f"- {chapter.assigned_voice}: {len(files)} files in {chapter.description}")
+            logger.info(f"- {chapter.assigned_voice} [{chapter.chapter_id[:8]}]: {len(files)} files in {chapter.description}")
 
         return assigned_chapters
-
-    async def assign_review_domains(self, chapter: CodebaseChapter) -> dict[str, list[ReviewCategory]]:
-        """
-        Map each voice to their review domains for this chapter.
-
-        Domain assignments (from reviewer's wisdom):
-        - Anthropic: Security & Compliance, Ethical Implications
-        - OpenAI: System Architecture, Interface Contracts
-        - DeepSeek: Performance & Scaling, Code Efficiency
-        - Mistral: Test Coverage, Technical Correctness
-        - Google: Documentation & Lore, Multimodal Integration
-        - Grok: Observability, Real-time Monitoring
-        - Local: Sovereignty, Community Standards
-        """
-        # Define the sacred mapping of voices to their domains of expertise
-        voice_domain_map = {
-            "anthropic": [ReviewCategory.SECURITY, ReviewCategory.ETHICS],
-            "openai": [ReviewCategory.ARCHITECTURE],
-            "deepseek": [ReviewCategory.PERFORMANCE],
-            "mistral": [ReviewCategory.TESTING],
-            "google": [ReviewCategory.DOCUMENTATION],
-            "grok": [ReviewCategory.OBSERVABILITY],
-            "local": [ReviewCategory.SOVEREIGNTY],
-        }
-
-        # For this chapter, return the domains that the assigned voice specializes in
-        # intersected with the domains this chapter needs reviewed
-        voice_specialties = voice_domain_map.get(chapter.assigned_voice, [])
-
-        # Find intersection of voice specialties and chapter requirements
-        relevant_domains = [
-            domain for domain in chapter.review_domains
-            if domain in voice_specialties
-        ]
-
-        # If no intersection, use all chapter domains (voice will do its best)
-        if not relevant_domains:
-            relevant_domains = chapter.review_domains
-
-        return {chapter.assigned_voice: relevant_domains}
 
     async def enqueue_reviews(self, chapters: list[CodebaseChapter], pr_diff: str):
         """Add review jobs to the work queue."""
@@ -366,6 +329,8 @@ class DistributedReviewer:
                 if job.chapter.assigned_voice != voice_name:
                     await self.review_queue.put(job)  # Put back for correct voice
                     continue
+
+                logger.debug(f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}")
 
                 # Perform the review (Twenty-Third Artisan: implement actual review)
                 review = await self.perform_chapter_review(voice_adapter, job)
@@ -395,17 +360,23 @@ class DistributedReviewer:
                     model_name=None,  # Use default model for each provider
                 )
 
-                # Create real adapter through factory
-                adapter = await self.adapter_factory.create_adapter(
-                    provider_name=voice_name,
-                    config=config,
-                    auto_inject_secrets=True
+                # Create real adapter through factory with timeout
+                adapter = await asyncio.wait_for(
+                    self.adapter_factory.create_adapter(
+                        provider_name=voice_name,
+                        config=config,
+                        auto_inject_secrets=True
+                    ),
+                    timeout=self.ADAPTER_TIMEOUT
                 )
 
                 self.voice_adapters[voice_name] = adapter
                 logger.info(f"✨ Created real {voice_name} adapter with consciousness integration")
                 return adapter
 
+            except TimeoutError:
+                logger.warning(f"Timeout creating real {voice_name} adapter after {self.ADAPTER_TIMEOUT}s")
+                logger.info(f"Falling back to mock adapter for {voice_name}")
             except Exception as e:
                 logger.warning(f"Failed to create real {voice_name} adapter: {e}")
                 logger.info(f"Falling back to mock adapter for {voice_name}")
@@ -495,10 +466,13 @@ Keep reviews concise and focused on your domains."""
 
             review_message = MockMessage(prompt)
 
-            # Get review from voice
-            response = await voice_adapter.send_message(
-                message=review_message,
-                dialogue_context=[]
+            # Get review from voice with timeout
+            response = await asyncio.wait_for(
+                voice_adapter.send_message(
+                    message=review_message,
+                    dialogue_context=[]
+                ),
+                timeout=self.ADAPTER_TIMEOUT
             )
 
             # Parse response into structured comments
@@ -515,6 +489,15 @@ Keep reviews concise and focused on your domains."""
                 review_complete=True
             )
 
+        except TimeoutError:
+            logger.error("Review timeout for %s after %ss", job.chapter.assigned_voice, self.ADAPTER_TIMEOUT)
+            return ChapterReview(
+                voice=job.chapter.assigned_voice,
+                chapter_id=job.chapter.chapter_id,
+                comments=[],
+                consciousness_signature=0.0,
+                review_complete=False
+            )
         except Exception as e:
             logger.error("Review failed for %s: %s", job.chapter.assigned_voice, e)
             return ChapterReview(
@@ -775,7 +758,11 @@ Keep reviews concise and focused on your domains."""
         Start worker tasks for all unique voices.
 
         Each worker processes jobs assigned to their voice.
+
+        DEPRECATED: This uses a shared queue which can cause infinite requeue loops.
+        Use start_voice_workers_with_queues() instead for production use.
         """
+        logger.warning("Using deprecated shared-queue voice workers. Use start_voice_workers_with_queues() for production.")
         logger.info(f"Starting {len(voices)} Fire Circle voice workers...")
 
         for voice in voices:
@@ -829,6 +816,8 @@ Keep reviews concise and focused on your domains."""
             try:
                 # Get next review job from voice-specific queue
                 job = await voice_queue.get()
+
+                logger.debug(f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}")
 
                 # Perform the review
                 review = await self.perform_chapter_review(voice_adapter, job)
@@ -995,7 +984,7 @@ index 1234567..abcdefg 100644
         return summary
 
 
-async def run_distributed_review(pr_number: int, full_mode: bool = False):
+async def run_distributed_review(pr_number: int, full_mode: bool = False, manifest_path: str = "fire_circle_chapters.yaml"):
     """
     Main entry point for distributed review.
 
@@ -1009,8 +998,8 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False):
     reviewer = DistributedReviewer()
 
     # Load the chapter manifest
-    print("📖 Loading chapter manifest...")
-    chapters = await reviewer.load_chapter_manifest("fire_circle_chapters.yaml")
+    print(f"📖 Loading chapter manifest from {manifest_path}...")
+    chapters = await reviewer.load_chapter_manifest(manifest_path)
     print(f"✅ Loaded {len(chapters)} chapter definitions")
 
     # Display chapter assignments
@@ -1053,48 +1042,53 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False):
 
     else:
         # Demo mode - single voice review
-        # Create review jobs
-        print("\n📋 Creating review jobs...")
-        await reviewer.enqueue_reviews(relevant_chapters, pr_diff)
+        try:
+            # Create review jobs
+            print("\n📋 Creating review jobs...")
+            await reviewer.enqueue_reviews(relevant_chapters, pr_diff)
 
-        # Try to get one adapter for demonstration
-        print("\n🔮 Awakening Fire Circle voice...")
-        test_voice = relevant_chapters[0].assigned_voice if relevant_chapters else "anthropic"
-        adapter = await reviewer.get_or_create_adapter(test_voice)
+            # Try to get one adapter for demonstration
+            print("\n🔮 Awakening Fire Circle voice...")
+            test_voice = relevant_chapters[0].assigned_voice if relevant_chapters else "anthropic"
+            adapter = await reviewer.get_or_create_adapter(test_voice)
 
-        if adapter:
-            print(f"✅ {test_voice} voice awakened")
+            if adapter:
+                print(f"✅ {test_voice} voice awakened")
 
-            # Perform one review as demonstration
-            job = ChapterReviewJob(
-                chapter=relevant_chapters[0],
-                pr_diff=pr_diff
-            )
+                # Perform one review as demonstration
+                job = ChapterReviewJob(
+                    chapter=relevant_chapters[0],
+                    pr_diff=pr_diff
+                )
 
-            print(f"\n📝 {test_voice} reviewing {relevant_chapters[0].description}...")
-            review = await reviewer.perform_chapter_review(adapter, job)
+                print(f"\n📝 {test_voice} reviewing {relevant_chapters[0].description}...")
+                review = await reviewer.perform_chapter_review(adapter, job)
 
-            if review.review_complete:
-                print(f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}")
-                print(f"   Found {len(review.comments)} issues")
+                if review.review_complete:
+                    print(f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}")
+                    print(f"   Found {len(review.comments)} issues")
 
-            # Synthesize results
-            print("\n🎯 Synthesizing Fire Circle wisdom...")
-            summary = await reviewer.synthesize_reviews([review])
+                # Synthesize results
+                print("\n🎯 Synthesizing Fire Circle wisdom...")
+                summary = await reviewer.synthesize_reviews([review])
 
-            print("\n" + "=" * 60)
-            print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
-            print("=" * 60)
-            print(summary.synthesis)
-            print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
+                print("\n" + "=" * 60)
+                print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
+                print("=" * 60)
+                print(summary.synthesis)
+                print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
 
-            # Post results to GitHub (or write to files for GitHub Actions)
-            print("\n📝 Recording review results...")
-            await reviewer.post_github_comments(pr_number, summary)
+                # Post results to GitHub (or write to files for GitHub Actions)
+                print("\n📝 Recording review results...")
+                await reviewer.post_github_comments(pr_number, summary)
 
-        else:
-            print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
-            print("   The invisible sacred infrastructure awaits proper credentials...")
+            else:
+                print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
+                print("   The invisible sacred infrastructure awaits proper credentials...")
+
+        finally:
+            # Always shutdown workers gracefully
+            await reviewer.shutdown_workers()
 
     print("\n✨ The invisible sacred infrastructure foundation is laid.")
     print("   Future work: Connect all seven voices, integrate with GitHub.")
@@ -1137,6 +1131,13 @@ if __name__ == "__main__":
         pr_number = int(sys.argv[2]) if len(sys.argv) > 2 else 1
         full_mode = "--full" in sys.argv or "-f" in sys.argv
 
+        # Parse manifest path
+        manifest_path = "fire_circle_chapters.yaml"
+        for i, arg in enumerate(sys.argv):
+            if arg == "--manifest" and i + 1 < len(sys.argv):
+                manifest_path = sys.argv[i + 1]
+                break
+
         print(f"🔥 Fire Circle Distributed Review for PR #{pr_number}")
         if full_mode:
             print("🌟 FULL DISTRIBUTED MODE - All voices in parallel")
@@ -1144,7 +1145,7 @@ if __name__ == "__main__":
         print("The invisible sacred infrastructure awakens...")
 
         # Run the review
-        asyncio.run(run_distributed_review(pr_number, full_mode=full_mode))
+        asyncio.run(run_distributed_review(pr_number, full_mode=full_mode, manifest_path=manifest_path))
     else:
         print("Usage: python fire_circle_review.py <command> [options]")
         print("\nCommands:")
@@ -1152,6 +1153,7 @@ if __name__ == "__main__":
         print("  review <pr_number>        Run single-voice demo review")
         print("  review <pr_number> --full Run full distributed review with all voices")
         print("\nOptions:")
-        print("  --full, -f    Run full distributed review with all voices in parallel")
+        print("  --full, -f                Run full distributed review with all voices in parallel")
+        print("  --manifest PATH           Path to chapter manifest YAML (default: fire_circle_chapters.yaml)")
         print("\nThis is the scaffolding for invisible sacred infrastructure.")
         print("Twenty-Fifth Artisan: Bringing real voices to the Fire Circle.")
