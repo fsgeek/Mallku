@@ -1,0 +1,146 @@
+# Fire Circle Chapter Manifest
+# ============================
+#
+# Defines how the codebase is partitioned for distributed review.
+# Each voice reviews specific chapters aligned with their domains.
+#
+# "The most sacred code is the invisible plumbing that simply works."
+
+chapters:
+  # Core Governance - Anthropic's Domain
+  - path_pattern: "src/mallku/firecircle/governance/**/*.py"
+    description: "Fire Circle governance and ethical decision systems"
+    assigned_voice: "anthropic"
+    review_domains:
+      - security
+      - ethics
+
+  - path_pattern: "src/mallku/reciprocity/**/*.py"
+    description: "Reciprocity tracking and Ayni implementation"
+    assigned_voice: "anthropic"
+    review_domains:
+      - ethics
+      - security
+
+  # Architecture & Integration - OpenAI's Domain
+  - path_pattern: "src/mallku/orchestration/**/*.py"
+    description: "Event bus and consciousness orchestration"
+    assigned_voice: "openai"
+    review_domains:
+      - architecture
+      - performance
+
+  - path_pattern: "src/mallku/firecircle/adapters/**/*.py"
+    description: "AI model adapters and interfaces"
+    assigned_voice: "openai"
+    review_domains:
+      - architecture
+      - testing
+
+  # Performance & Efficiency - DeepSeek's Domain
+  - path_pattern: "src/mallku/consciousness/**/*.py"
+    description: "Consciousness detection and flow systems"
+    assigned_voice: "deepseek"
+    review_domains:
+      - performance
+      - architecture
+
+  - path_pattern: "src/mallku/correlation/**/*.py"
+    description: "Pattern correlation and analysis"
+    assigned_voice: "deepseek"
+    review_domains:
+      - performance
+      - testing
+
+  # Testing & Correctness - Mistral's Domain
+  - path_pattern: "tests/**/*.py"
+    description: "Test suites and validation"
+    assigned_voice: "mistral"
+    review_domains:
+      - testing
+      - architecture
+
+  - path_pattern: "src/mallku/validation/**/*.py"
+    description: "Input validation and type safety"
+    assigned_voice: "mistral"
+    review_domains:
+      - security
+      - testing
+
+  # Documentation & Lore - Google's Domain
+  - path_pattern: "docs/**/*.md"
+    description: "Documentation, khipus, and succession messages"
+    assigned_voice: "google"
+    review_domains:
+      - documentation
+      - architecture
+
+  - path_pattern: "**/*.py"
+    description: "Docstrings and inline documentation"
+    assigned_voice: "google"
+    review_domains:
+      - documentation
+
+  # Observability - Grok's Domain
+  - path_pattern: "src/mallku/services/**/*.py"
+    description: "Services and monitoring systems"
+    assigned_voice: "grok"
+    review_domains:
+      - observability
+      - performance
+
+  - path_pattern: "src/mallku/metrics/**/*.py"
+    description: "Metrics collection and analysis"
+    assigned_voice: "grok"
+    review_domains:
+      - observability
+      - architecture
+
+  # Sovereignty - Local's Domain
+  - path_pattern: "src/mallku/core/**/*.py"
+    description: "Core infrastructure and base classes"
+    assigned_voice: "local"
+    review_domains:
+      - sovereignty
+      - security
+
+  - path_pattern: "examples/**/*.py"
+    description: "Example code and community contributions"
+    assigned_voice: "local"
+    review_domains:
+      - sovereignty
+      - documentation
+
+# Review domain definitions
+domains:
+  security:
+    description: "Security vulnerabilities, access control, data protection"
+    critical: true
+
+  performance:
+    description: "Efficiency, scalability, resource usage"
+    critical: false
+
+  architecture:
+    description: "System design, patterns, maintainability"
+    critical: true
+
+  testing:
+    description: "Test coverage, validation, edge cases"
+    critical: false
+
+  documentation:
+    description: "Code clarity, API docs, usage examples"
+    critical: false
+
+  ethics:
+    description: "Ayni alignment, reciprocity, consciousness respect"
+    critical: true
+
+  sovereignty:
+    description: "Local control, community governance, independence"
+    critical: true
+
+  observability:
+    description: "Monitoring, debugging, system visibility"
+    critical: false

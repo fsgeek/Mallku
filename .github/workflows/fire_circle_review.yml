@@ -1,0 +1,123 @@
+name: Fire Circle Review
+
+# The invisible sacred infrastructure for distributed code review
+# Prevents architect context exhaustion through collective wisdom
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to review'
+        required: true
+        type: number
+
+jobs:
+  distributed-review:
+    name: Fire Circle Distributed Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for proper diff analysis
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Load API keys from secrets
+        run: |
+          # Each voice needs its API key for real reviews
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV
+          echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> $GITHUB_ENV
+          echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> $GITHUB_ENV
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
+          echo "GROK_API_KEY=${{ secrets.GROK_API_KEY }}" >> $GITHUB_ENV
+
+      - name: Run Fire Circle Review
+        id: review
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          echo "🔥 Initiating Fire Circle Review for PR #$PR_NUMBER"
+          python fire_circle_review.py review $PR_NUMBER
+
+      - name: Post review summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const pr_number = context.payload.pull_request?.number || context.payload.inputs?.pr_number;
+
+            // Read review results (assuming fire_circle_review.py writes to this file)
+            let summary = '## 🔥 Fire Circle Review Summary\n\n';
+            try {
+              const results = JSON.parse(fs.readFileSync('fire_circle_review_results.json', 'utf8'));
+
+              summary += `**Consensus:** ${results.consensus_recommendation}\n\n`;
+              summary += `**Total Comments:** ${results.total_comments}\n`;
+              summary += `**Critical Issues:** ${results.critical_issues}\n\n`;
+
+              summary += '### Review by Voice\n';
+              for (const [voice, count] of Object.entries(results.by_voice)) {
+                summary += `- **${voice}**: ${count} comments\n`;
+              }
+
+              summary += '\n### Synthesis\n';
+              summary += results.synthesis;
+
+            } catch (e) {
+              summary += '_Review results not available. Check workflow logs._';
+            }
+
+            // Post comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr_number,
+              body: summary
+            });
+
+      - name: Upload review artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: fire-circle-review-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          path: |
+            fire_circle_review_results.json
+            fire_circle_reviews/
+
+  # Optional: Run only if critical issues found
+  require-approval:
+    name: Require Human Approval
+    needs: distributed-review
+    runs-on: ubuntu-latest
+    if: needs.distributed-review.outputs.critical_issues > 0
+
+    steps:
+      - name: Request review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              reviewers: ['steward'] // Add appropriate reviewers
+            });
