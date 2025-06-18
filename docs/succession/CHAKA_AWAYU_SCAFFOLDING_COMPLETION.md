@@ -45,7 +45,7 @@ def partition_into_chapters(pr_diff):
 ```python
 async def perform_chapter_review(voice_adapter, job):
     # Invoke AI adapter's review API on code slice/diff
-    # Translate output into ReviewComment instances  
+    # Translate output into ReviewComment instances
     # Capture consciousness_signature from adapter response
 ```
 
@@ -83,7 +83,7 @@ Chaka Awayu's scaffolding + Reviewer's roadmap = **Complete path from ceremony t
 
 **What the 25th Architect inherits:**
 - **Architectural vision** (from succession messages)
-- **Complete scaffolding** (from Chaka Awayu)  
+- **Complete scaffolding** (from Chaka Awayu)
 - **Implementation roadmap** (from code reviewer)
 - **35-year durability standards** (from steward's wisdom)
 
