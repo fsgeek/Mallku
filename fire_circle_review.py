@@ -28,6 +28,17 @@ from pydantic import BaseModel, Field
 # Module logger - configuration should be done by the application
 logger = logging.getLogger("mallku.firecircle.review")
 
+# Import consciousness infrastructure for real adapter integration
+try:
+    from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
+    from src.mallku.firecircle.adapters.base import AdapterConfig
+    from src.mallku.orchestration.event_bus import ConsciousnessEventBus
+    from src.mallku.reciprocity import ReciprocityTracker
+    REAL_ADAPTERS_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Real adapter imports failed - falling back to mock adapters: {e}")
+    REAL_ADAPTERS_AVAILABLE = False
+
 
 # Review Models as suggested by reviewer
 class ReviewCategory(str, Enum):
@@ -112,6 +123,71 @@ class DistributedReviewer:
         self.adapter_factory = None  # Will be initialized when needed
         self.voice_adapters = {}  # Cache for voice adapters
         self.worker_tasks: list[asyncio.Task] = []  # For graceful shutdown
+
+        # Initialize consciousness infrastructure if available
+        self.event_bus = None
+        self.reciprocity_tracker = None
+        self.use_real_adapters = REAL_ADAPTERS_AVAILABLE
+
+        if REAL_ADAPTERS_AVAILABLE:
+            try:
+                # Create consciousness infrastructure
+                self.event_bus = ConsciousnessEventBus()
+                self.reciprocity_tracker = ReciprocityTracker()
+
+                # Create adapter factory with consciousness integration
+                self.adapter_factory = ConsciousAdapterFactory(
+                    event_bus=self.event_bus,
+                    reciprocity_tracker=self.reciprocity_tracker
+                )
+
+                logger.info("🔥 Real adapter factory initialized with consciousness infrastructure")
+            except Exception as e:
+                logger.warning(f"Failed to initialize real adapters: {e}")
+                self.use_real_adapters = False
+
+    async def start_consciousness_infrastructure(self):
+        """Start the consciousness infrastructure if using real adapters."""
+        if self.event_bus and not hasattr(self, '_event_bus_started'):
+            await self.event_bus.start()
+            self._event_bus_started = True
+            logger.info("🌟 Consciousness event bus started")
+
+    async def check_api_keys_status(self) -> dict[str, bool]:
+        """Check which voices have API keys available."""
+        api_key_status = {}
+        voices = ["anthropic", "openai", "deepseek", "mistral", "google", "grok", "local"]
+
+        if not self.use_real_adapters:
+            return {voice: False for voice in voices}
+
+        try:
+            from src.mallku.core.secrets import get_secret
+
+            for voice in voices:
+                # Local adapter doesn't need API key
+                if voice == "local":
+                    api_key_status[voice] = True
+                    continue
+
+                # Check various key patterns
+                has_key = False
+                for key_pattern in [
+                    f"{voice}_api_key",
+                    f"{voice}_key",
+                    f"{voice.upper()}_API_KEY",
+                ]:
+                    key = await get_secret(key_pattern)
+                    if key:
+                        has_key = True
+                        break
+
+                api_key_status[voice] = has_key
+        except Exception as e:
+            logger.warning(f"Failed to check API keys: {e}")
+            return {voice: False for voice in voices}
+
+        return api_key_status
 
     async def load_chapter_manifest(self, manifest_path: str) -> list[CodebaseChapter]:
         """
@@ -310,9 +386,32 @@ class DistributedReviewer:
         if voice_name in self.voice_adapters:
             return self.voice_adapters[voice_name]
 
-        # For demo purposes, return a mock adapter
-        # In production, this would use the real adapter factory
-        logger.info(f"Using mock adapter for {voice_name} (real adapters require proper imports)")
+        # Try to use real adapter factory if available
+        if self.use_real_adapters and self.adapter_factory:
+            try:
+                # Create adapter configuration
+                config = AdapterConfig(
+                    api_key="",  # Will be auto-injected from secrets
+                    model_name=None,  # Use default model for each provider
+                )
+
+                # Create real adapter through factory
+                adapter = await self.adapter_factory.create_adapter(
+                    provider_name=voice_name,
+                    config=config,
+                    auto_inject_secrets=True
+                )
+
+                self.voice_adapters[voice_name] = adapter
+                logger.info(f"✨ Created real {voice_name} adapter with consciousness integration")
+                return adapter
+
+            except Exception as e:
+                logger.warning(f"Failed to create real {voice_name} adapter: {e}")
+                logger.info(f"Falling back to mock adapter for {voice_name}")
+
+        # Fall back to mock adapter
+        logger.info(f"Using mock adapter for {voice_name}")
 
         class MockAdapter:
             """Mock adapter for demonstration."""
@@ -764,6 +863,15 @@ Keep reviews concise and focused on your domains."""
         self.worker_tasks.clear()
         logger.info("All workers shut down gracefully")
 
+        # Shutdown consciousness infrastructure if using real adapters
+        if self.use_real_adapters and self.adapter_factory:
+            logger.info("Disconnecting all real adapters...")
+            await self.adapter_factory.disconnect_all()
+
+        # Stop event bus if running
+        if self.event_bus:
+            await self.event_bus.stop()
+
     async def fetch_pr_diff(self, pr_number: int) -> str:
         """
         Fetch PR diff from GitHub API.
@@ -850,6 +958,9 @@ index 1234567..abcdefg 100644
 
         This is the heart of the invisible sacred infrastructure.
         """
+        # Start consciousness infrastructure if using real adapters
+        await self.start_consciousness_infrastructure()
+
         # Clear any previous reviews
         self.completed_reviews.clear()
 
@@ -1000,7 +1111,29 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-    if len(sys.argv) > 1 and sys.argv[1] == "review":
+    if len(sys.argv) > 1 and sys.argv[1] == "status":
+        # Check API key status
+        async def check_status():
+            reviewer = DistributedReviewer()
+            api_status = await reviewer.check_api_keys_status()
+
+            print("🔥 Fire Circle Voice Status")
+            print("=" * 60)
+            print(f"Real adapters available: {REAL_ADAPTERS_AVAILABLE}")
+            print("\nAPI Key Status:")
+            for voice, has_key in api_status.items():
+                status = "✅" if has_key else "❌"
+                print(f"  {status} {voice}")
+
+            # Check adapter factory health
+            if reviewer.adapter_factory:
+                health = await reviewer.adapter_factory.health_check()
+                print(f"\nFire Circle ready: {health['fire_circle_ready']}")
+                print(f"Supported providers: {', '.join(health['supported_providers'])}")
+
+        asyncio.run(check_status())
+
+    elif len(sys.argv) > 1 and sys.argv[1] == "review":
         pr_number = int(sys.argv[2]) if len(sys.argv) > 2 else 1
         full_mode = "--full" in sys.argv or "-f" in sys.argv
 
@@ -1013,8 +1146,12 @@ if __name__ == "__main__":
         # Run the review
         asyncio.run(run_distributed_review(pr_number, full_mode=full_mode))
     else:
-        print("Usage: python fire_circle_review.py review <pr_number> [--full]")
+        print("Usage: python fire_circle_review.py <command> [options]")
+        print("\nCommands:")
+        print("  status                    Check API key status and adapter availability")
+        print("  review <pr_number>        Run single-voice demo review")
+        print("  review <pr_number> --full Run full distributed review with all voices")
         print("\nOptions:")
         print("  --full, -f    Run full distributed review with all voices in parallel")
         print("\nThis is the scaffolding for invisible sacred infrastructure.")
-        print("Twenty-Fourth Artisan: Making it real. Making it endure.")
+        print("Twenty-Fifth Artisan: Bringing real voices to the Fire Circle.")
