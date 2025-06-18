@@ -417,7 +417,7 @@ Keep reviews concise and focused on your domains."""
             )
 
         except Exception as e:
-            print(f"❌ Review failed for {job.chapter.assigned_voice}: {e}")
+            logger.error("Review failed for %s: %s", job.chapter.assigned_voice, e)
             return ChapterReview(
                 voice=job.chapter.assigned_voice,
                 chapter_id=job.chapter.chapter_id,
