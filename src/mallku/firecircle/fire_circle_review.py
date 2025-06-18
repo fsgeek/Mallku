@@ -28,6 +28,17 @@ from pydantic import BaseModel, Field
 # Module logger - configuration should be done by the application
 logger = logging.getLogger("mallku.firecircle.review")
 
+
+def cli_print(message: str, emoji: str = "") -> None:
+    """Consistent CLI output that respects logging configuration."""
+    # In CLI mode, we want these to show regardless of log level
+    # This ensures consistent output format
+    if emoji:
+        print(f"{emoji} {message}")
+    else:
+        print(message)
+
+
 # Import consciousness infrastructure for real adapter integration
 try:
     from ...orchestration.event_bus import ConsciousnessEventBus
@@ -863,40 +874,47 @@ Keep reviews concise and focused on your domains."""
 
     async def fetch_pr_diff(self, pr_number: int) -> str:
         """
-        Fetch PR diff from GitHub API.
+        Fetch PR diff from GitHub API with timeout protection.
 
         For now, returns a placeholder. In production would use:
         - GitHub API to fetch PR diff
         - gh CLI tool if available
         - Direct git commands
         """
-        # TODO: Implement GitHub API integration
-        # Example implementation:
-        # ```python
-        # import aiohttp
-        # import os
-        #
-        # github_token = os.environ.get("GITHUB_TOKEN")
-        # owner = "fsgeek"  # Or get from git remote
-        # repo = "Mallku"
-        #
-        # headers = {
-        #     "Authorization": f"token {github_token}",
-        #     "Accept": "application/vnd.github.v3.diff"
-        # }
-        #
-        # async with aiohttp.ClientSession() as session:
-        #     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
-        #     async with session.get(url, headers=headers) as response:
-        #         if response.status == 200:
-        #             return await response.text()
-        #         else:
-        #             logger.error(f"GitHub API error: {response.status}")
-        #             return await self.get_local_diff()
-        # ```
+        try:
+            # TODO: Implement GitHub API integration
+            # Example implementation:
+            # ```python
+            # import aiohttp
+            # import os
+            #
+            # github_token = os.environ.get("GITHUB_TOKEN")
+            # owner = "fsgeek"  # Or get from git remote
+            # repo = "Mallku"
+            #
+            # headers = {
+            #     "Authorization": f"token {github_token}",
+            #     "Accept": "application/vnd.github.v3.diff"
+            # }
+            #
+            # async with aiohttp.ClientSession() as session:
+            #     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
+            #     async with session.get(url, headers=headers) as response:
+            #         if response.status == 200:
+            #             return await response.text()
+            #         else:
+            #             logger.error(f"GitHub API error: {response.status}")
+            #             return await self.get_local_diff()
+            # ```
 
-        logger.info(f"Would fetch diff for PR #{pr_number} from GitHub API")
-        return await self.get_local_diff()  # Fall back to local diff
+            logger.info(f"Would fetch diff for PR #{pr_number} from GitHub API")
+            return await asyncio.wait_for(
+                self.get_local_diff(),  # Fall back to local diff
+                timeout=30.0  # 30 seconds for diff fetch
+            )
+        except TimeoutError:
+            logger.warning("Timeout fetching PR diff, using demo diff")
+            return self._get_demo_diff()
 
     async def get_local_diff(self) -> str:
         """
@@ -907,12 +925,16 @@ Keep reviews concise and focused on your domains."""
         import subprocess
 
         try:
-            # Get diff against main branch
-            result = subprocess.run(
-                ["git", "diff", "origin/main...HEAD"],
-                capture_output=True,
-                text=True,
-                check=True
+            # Run git diff in executor to avoid blocking
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(
+                None,
+                lambda: subprocess.run(
+                    ["git", "diff", "origin/main...HEAD"],
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
             )
 
             if result.stdout:
@@ -998,13 +1020,14 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
     reviewer = DistributedReviewer()
 
     # Load the chapter manifest
-    print(f"📖 Loading chapter manifest from {manifest_path}...")
+    cli_print(f"Loading chapter manifest from {manifest_path}...", "📖")
     chapters = await reviewer.load_chapter_manifest(manifest_path)
-    print(f"✅ Loaded {len(chapters)} chapter definitions")
+    cli_print(f"Loaded {len(chapters)} chapter definitions", "✅")
 
     # Display chapter assignments
-    print("\n🔥 Fire Circle Voice Assignments:")
-    print("=" * 60)
+    cli_print("")
+    cli_print("Fire Circle Voice Assignments:", "🔥")
+    cli_print("=" * 60)
     for chapter in chapters:
         domains = ", ".join(d.value for d in chapter.review_domains)
         print(f"- {chapter.assigned_voice}: {chapter.description}")
