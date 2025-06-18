@@ -26,7 +26,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 # Module logger - configuration should be done by the application
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("fire_circle_review")
 
 
 # Review Models as suggested by reviewer
@@ -108,6 +108,7 @@ class DistributedReviewer:
 
     def __init__(self):
         self.review_queue: asyncio.Queue[ChapterReviewJob] = asyncio.Queue()
+        self.voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]] = {}  # Per-voice queues
         self.completed_reviews: list[ChapterReview] = []
         self.adapter_factory = None  # Will be initialized when needed
         self.voice_adapters = {}  # Cache for voice adapters
@@ -146,7 +147,7 @@ class DistributedReviewer:
             chapter = CodebaseChapter(
                 path_pattern=chapter_def['path_pattern'],
                 description=chapter_def['description'],
-                assigned_voice=chapter_def['assigned_voice'],
+                assigned_voice=chapter_def['assigned_voice'].lower(),  # Normalize voice name
                 review_domains=review_domains
             )
             chapters.append(chapter)
@@ -166,7 +167,7 @@ class DistributedReviewer:
         # Validate all assigned voices exist to prevent infinite requeue
         known_voices = {"anthropic", "openai", "deepseek", "mistral", "google", "grok", "local"}
         for chapter in chapters:
-            if chapter.assigned_voice.lower() not in known_voices:
+            if chapter.assigned_voice not in known_voices:
                 logger.warning(f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'")
                 # Could raise ValueError here in production
 
@@ -250,8 +251,7 @@ class DistributedReviewer:
 
         # For this chapter, return the domains that the assigned voice specializes in
         # intersected with the domains this chapter needs reviewed
-        assigned_voice = chapter.assigned_voice.lower()
-        voice_specialties = voice_domain_map.get(assigned_voice, [])
+        voice_specialties = voice_domain_map.get(chapter.assigned_voice, [])
 
         # Find intersection of voice specialties and chapter requirements
         relevant_domains = [
@@ -263,7 +263,7 @@ class DistributedReviewer:
         if not relevant_domains:
             relevant_domains = chapter.review_domains
 
-        return {assigned_voice: relevant_domains}
+        return {chapter.assigned_voice: relevant_domains}
 
     async def enqueue_reviews(self, chapters: list[CodebaseChapter], pr_diff: str):
         """Add review jobs to the work queue."""
@@ -300,7 +300,7 @@ class DistributedReviewer:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                print(f"Error in {voice_name} worker: {e}")
+                logger.error(f"Error in {voice_name} worker: {e}")
 
     async def get_or_create_adapter(self, voice_name: str):
         """Get cached adapter or create new one."""
@@ -656,6 +656,59 @@ Keep reviews concise and focused on your domains."""
 
         logger.info("All voice workers started")
 
+    async def start_voice_workers_with_queues(self, voices: list[str]) -> None:
+        """
+        Start worker tasks for voices with per-voice queues.
+
+        Each worker processes jobs only from its specific queue.
+        This prevents infinite requeue loops.
+        """
+        logger.info(f"Starting {len(voices)} Fire Circle voice workers with dedicated queues...")
+
+        for voice in voices:
+            # Get or create adapter for this voice
+            adapter = await self.get_or_create_adapter(voice)
+
+            # Get the voice-specific queue
+            voice_queue = self.voice_queues.get(voice)
+            if not voice_queue:
+                logger.error(f"No queue found for voice {voice}")
+                continue
+
+            # Create worker task with voice-specific queue
+            task = asyncio.create_task(
+                self.voice_worker_with_queue(voice, adapter, voice_queue),
+                name=f"worker_{voice}"
+            )
+            self.worker_tasks.append(task)
+
+        logger.info("All voice workers started with dedicated queues")
+
+    async def voice_worker_with_queue(self, voice_name: str, voice_adapter, voice_queue: asyncio.Queue):
+        """
+        Worker coroutine for a Fire Circle voice with dedicated queue.
+
+        Pulls jobs only from its voice-specific queue.
+        """
+        while True:
+            try:
+                # Get next review job from voice-specific queue
+                job = await voice_queue.get()
+
+                # Perform the review
+                review = await self.perform_chapter_review(voice_adapter, job)
+
+                # Store completed review
+                self.completed_reviews.append(review)
+
+                # Mark job complete
+                voice_queue.task_done()
+
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in {voice_name} worker: {e}")
+
     async def shutdown_workers(self) -> None:
         """
         Gracefully shutdown all worker tasks.
@@ -764,18 +817,26 @@ index 1234567..abcdefg 100644
         # Clear any previous reviews
         self.completed_reviews.clear()
 
-        # Enqueue all review jobs
-        await self.enqueue_reviews(chapters, pr_diff)
-
         # Get unique voices needed
         unique_voices = list(set(chapter.assigned_voice for chapter in chapters))
 
-        # Start all voice workers
-        await self.start_voice_workers(unique_voices)
+        # Create per-voice queues to avoid requeue issues
+        self.voice_queues.clear()
+        for voice in unique_voices:
+            self.voice_queues[voice] = asyncio.Queue()
 
-        # Wait for all jobs to complete
+        # Enqueue review jobs to voice-specific queues
+        for chapter in chapters:
+            job = ChapterReviewJob(chapter=chapter, pr_diff=pr_diff)
+            await self.voice_queues[chapter.assigned_voice].put(job)
+
+        # Start all voice workers with their specific queues
+        await self.start_voice_workers_with_queues(unique_voices)
+
+        # Wait for all voice queues to be empty
         print("\n⏳ Waiting for all voices to complete reviews...")
-        await self.review_queue.join()
+        for queue in self.voice_queues.values():
+            await queue.join()
 
         # Shutdown workers gracefully
         await self.shutdown_workers()
