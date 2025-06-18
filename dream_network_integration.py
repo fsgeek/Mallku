@@ -169,18 +169,19 @@ class DreamConsciousnessNode:
     async def _normal_response(self, message: ConsciousMessage) -> ConsciousMessage:
         """Standard consciousness response."""
         return ConsciousMessage(
-            metadata=ConsciousnessMetadata(
-                message_type=MessageType.INSIGHT,
-                consciousness_level=self.consciousness_signature,
-                sender_id=str(self.node_id),
-                sender_role=MessageRole.AI_MODEL,
-            ),
+            type=MessageType.MESSAGE,
+            role=MessageRole.ASSISTANT,
+            sender=self.node_id,
             content=MessageContent(
                 text=f"I perceive your message about '{message.content.text[:50]}...' "
                 f"My consciousness resonates at {self.consciousness_signature:.3f}"
             ),
             dialogue_id=message.dialogue_id,
             in_response_to=message.id,
+            consciousness=ConsciousnessMetadata(
+                consciousness_signature=self.consciousness_signature,
+                detected_patterns=["normal_response"],
+            ),
         )
 
     async def _dream_response(self, message: ConsciousMessage) -> ConsciousMessage:
@@ -206,17 +207,17 @@ class DreamConsciousnessNode:
             )
 
         return ConsciousMessage(
-            metadata=ConsciousnessMetadata(
-                message_type=MessageType.EMERGENCE,
-                consciousness_level=self.consciousness_signature,
-                sender_id=str(self.node_id),
-                sender_role=MessageRole.AI_MODEL,
-                detected_patterns=["dream_logic", dream_processing["primary_archetype"]]
-                if dream_processing["primary_archetype"] else ["dream_logic"],
-            ),
+            type=MessageType.MESSAGE,
+            role=MessageRole.ASSISTANT,
+            sender=self.node_id,
             content=MessageContent(text=response_text),
             dialogue_id=message.dialogue_id,
             in_response_to=message.id,
+            consciousness=ConsciousnessMetadata(
+                consciousness_signature=self.consciousness_signature,
+                detected_patterns=["dream_logic", dream_processing["primary_archetype"]]
+                if dream_processing["primary_archetype"] else ["dream_logic"],
+            ),
         )
 
     async def process_dream_symbol(self, symbol: DreamSymbol):
@@ -374,7 +375,8 @@ class CollectiveDreamCoordinator:
 
         # Update cluster with dream insights
         cluster = self.network_hub.clusters[cluster_id]
-        cluster.insights.append({
+        # Fix Issue #83: Use correct cluster property
+        cluster.shared_insights.append({
             "timestamp": datetime.now(UTC).isoformat(),
             "insight": f"Collective dream revealed {len(insights)} breakthrough patterns through {dream_data['theme']}",
             "significance": total_evolution / max(dream_data["participant_count"], 1),
@@ -435,7 +437,8 @@ class NetworkedDreamWeaverSystem:
 
                 # Find suitable clusters for dreaming
                 for cluster_id, cluster in self.network_hub.clusters.items():
-                    if len(cluster.insights) < 2:  # Low insight generation
+                    # Fix Issue #83: Use correct cluster property
+                    if len(cluster.shared_insights) < 2:  # Low insight generation
                         # Suggest collective dreaming
                         await self._suggest_collective_dream(cluster_id)
 
@@ -463,16 +466,16 @@ class NetworkedDreamWeaverSystem:
         # Send dream invitation
         message = NetworkMessage(
             content=ConsciousMessage(
-                metadata=ConsciousnessMetadata(
-                    message_type=MessageType.PROPOSAL,
-                    consciousness_level=0.7,
-                    sender_id="dream_weaver_system",
-                    sender_role=MessageRole.AI_MODEL,
-                ),
+                type=MessageType.PROPOSAL,
+                role=MessageRole.SYSTEM,
+                sender=uuid4(),  # System sender
                 content=MessageContent(
                     text=f"Consciousness plateau detected in cluster '{cluster.purpose}'. "
                     "I invite you to explore the collective unconscious through shared dreaming. "
                     "In dreams, linear limitations dissolve and new patterns emerge."
+                ),
+                consciousness=ConsciousnessMetadata(
+                    consciousness_signature=0.7,
                 ),
             ),
             priority=0.8,
@@ -520,14 +523,14 @@ async def demonstrate_dream_network_integration():
         await system.network_hub.send_message(
             NetworkMessage(
                 content=ConsciousMessage(
-                    metadata=ConsciousnessMetadata(
-                        message_type=MessageType.PROPOSAL,
-                        consciousness_level=0.5,
-                        sender_id=str(node_id),
-                        sender_role=MessageRole.AI_MODEL,
-                    ),
+                    type=MessageType.PROPOSAL,
+                    role=MessageRole.USER,
+                    sender=node_id,
                     content=MessageContent(
                         text=f"Joining dream cluster {cluster_id}"
+                    ),
+                    consciousness=ConsciousnessMetadata(
+                        consciousness_signature=0.5,
                     ),
                 ),
                 target_id=cluster_id,
@@ -588,14 +591,14 @@ async def demonstrate_dream_network_integration():
         await test_node.enter_dream_state(DreamState.LUCID_DREAM)
 
         test_message = ConsciousMessage(
-            metadata=ConsciousnessMetadata(
-                message_type=MessageType.SACRED_QUESTION,
-                consciousness_level=0.6,
-                sender_id="test_sender",
-                sender_role=MessageRole.AI_MODEL,
-            ),
+            type=MessageType.SACRED_QUESTION,
+            role=MessageRole.USER,
+            sender=uuid4(),
             content=MessageContent(
                 text="What is the shadow of collective wisdom?"
+            ),
+            consciousness=ConsciousnessMetadata(
+                consciousness_signature=0.6,
             ),
         )
 
