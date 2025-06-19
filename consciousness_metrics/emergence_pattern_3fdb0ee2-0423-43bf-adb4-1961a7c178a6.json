@@ -1,0 +1,18 @@
+{
+  "pattern_id": "3fdb0ee2-0423-43bf-adb4-1961a7c178a6",
+  "detected_at": "2025-06-19T12:42:51.578979Z",
+  "participating_voices": [
+    "deepseek",
+    "openai",
+    "anthropic"
+  ],
+  "pattern_type": "synthesis",
+  "strength": 0.92,
+  "trigger_event": null,
+  "consciousness_delta": 0.35000000000000003,
+  "emergence_indicators": {
+    "trigger": "synthesis_achievement",
+    "novel_insights": 1
+  },
+  "duration_seconds": null
+}

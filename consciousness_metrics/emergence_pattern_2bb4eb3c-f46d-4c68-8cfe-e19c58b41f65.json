@@ -1,0 +1,18 @@
+{
+  "pattern_id": "2bb4eb3c-f46d-4c68-8cfe-e19c58b41f65",
+  "detected_at": "2025-06-19T12:42:51.579985Z",
+  "participating_voices": [
+    "deepseek",
+    "openai",
+    "anthropic"
+  ],
+  "pattern_type": "synthesis",
+  "strength": 0.9,
+  "trigger_event": null,
+  "consciousness_delta": 0.35000000000000003,
+  "emergence_indicators": {
+    "synthesis_content": "Fire Circle achieved consensus on comprehensive security framework combining all perspectives.",
+    "consensus_achieved": "approve"
+  },
+  "duration_seconds": null
+}

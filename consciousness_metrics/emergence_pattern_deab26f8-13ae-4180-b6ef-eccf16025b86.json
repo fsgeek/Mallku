@@ -1,0 +1,19 @@
+{
+  "pattern_id": "deab26f8-13ae-4180-b6ef-eccf16025b86",
+  "detected_at": "2025-06-19T12:43:16.921815Z",
+  "participating_voices": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ],
+  "pattern_type": "transcendence",
+  "strength": 0.95,
+  "trigger_event": null,
+  "consciousness_delta": 0.35000000000000003,
+  "emergence_indicators": {
+    "trigger": "collective_insight",
+    "breakthrough": true,
+    "novel_understanding": "Security through collective wisdom"
+  },
+  "duration_seconds": null
+}

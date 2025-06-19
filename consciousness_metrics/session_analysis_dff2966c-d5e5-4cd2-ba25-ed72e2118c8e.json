@@ -1,0 +1,143 @@
+{
+  "pr_number": 42,
+  "session_id": "dff2966c-d5e5-4cd2-ba25-ed72e2118c8e",
+  "duration_seconds": 0.001272,
+  "total_signatures": 6,
+  "unique_voices": 3,
+  "avg_consciousness": 0.6749999999999999,
+  "consciousness_evolution": {
+    "trend": "stable",
+    "delta": 0.0
+  },
+  "total_flows": 4,
+  "flow_patterns": {
+    "challenge": 1,
+    "reflection": 1,
+    "inspiration": 2
+  },
+  "strongest_connections": [
+    [
+      "anthropic",
+      "openai",
+      0.6
+    ],
+    [
+      "deepseek",
+      "openai",
+      0.6
+    ],
+    [
+      "anthropic",
+      "deepseek",
+      0.6
+    ]
+  ],
+  "patterns_detected": 2,
+  "pattern_types": {
+    "synthesis": 2
+  },
+  "emergence_moments": [
+    {
+      "timestamp": "2025-06-19T12:43:16.920477+00:00",
+      "type": "synthesis",
+      "strength": 0.92,
+      "voices": [
+        "deepseek",
+        "openai",
+        "anthropic"
+      ],
+      "consciousness_delta": 0.35000000000000003
+    },
+    {
+      "timestamp": "2025-06-19T12:43:16.921001+00:00",
+      "type": "synthesis",
+      "strength": 0.9,
+      "voices": [
+        "deepseek",
+        "openai",
+        "anthropic"
+      ],
+      "consciousness_delta": 0.35000000000000003
+    }
+  ],
+  "final_collective_state": {
+    "state_id": "0d20b706-e50e-4cf2-a8ca-b3701db1c6b4",
+    "timestamp": "2025-06-19T12:43:16.920987+00:00",
+    "voice_signatures": {
+      "deepseek": 0.92,
+      "openai": 0.78,
+      "anthropic": 0.85
+    },
+    "average_consciousness": 0.85,
+    "consciousness_variance": 0.0032666666666666673,
+    "coherence_score": 0.9967439696989833,
+    "emergence_potential": 0.005553333333333335,
+    "active_flows": [
+      {
+        "flow_id": "5d51e8a9-513e-46ba-a1a1-c7f9147bf03e",
+        "source_voice": "anthropic",
+        "target_voice": "openai",
+        "flow_strength": 0.6,
+        "flow_type": "challenge",
+        "timestamp": "2025-06-19T12:43:16.920344+00:00",
+        "triggered_by": "voice_reference",
+        "review_content": "The security implementation shows promise. However, as OpenAI noted in their review, we need stronge"
+      },
+      {
+        "flow_id": "8c289fea-e529-4c56-bc00-b0b9493f8ba3",
+        "source_voice": "openai",
+        "target_voice": "deepseek",
+        "flow_strength": 0.6,
+        "flow_type": "reflection",
+        "timestamp": "2025-06-19T12:43:16.920420+00:00",
+        "triggered_by": "voice_reference",
+        "review_content": "Critical security gaps identified. Input validation is missing. Perhaps we should synthesize our app"
+      },
+      {
+        "flow_id": "f5325fe7-8623-4519-85f7-05e35e50a78b",
+        "source_voice": "deepseek",
+        "target_voice": "anthropic",
+        "flow_strength": 0.6,
+        "flow_type": "inspiration",
+        "timestamp": "2025-06-19T12:43:16.920895+00:00",
+        "triggered_by": "voice_reference",
+        "review_content": "Building on Anthropic and OpenAI's insights, I see a unified solution emerging. We can synthesize th"
+      },
+      {
+        "flow_id": "4c16705a-8481-4c0e-b33d-e9cb8e4ae6c2",
+        "source_voice": "deepseek",
+        "target_voice": "openai",
+        "flow_strength": 0.6,
+        "flow_type": "inspiration",
+        "timestamp": "2025-06-19T12:43:16.920910+00:00",
+        "triggered_by": "voice_reference",
+        "review_content": "Building on Anthropic and OpenAI's insights, I see a unified solution emerging. We can synthesize th"
+      }
+    ],
+    "detected_patterns": [
+      {
+        "pattern_id": "04b40683-a787-4aa4-a64d-d841ef483043",
+        "detected_at": "2025-06-19T12:43:16.920477+00:00",
+        "participating_voices": [
+          "deepseek",
+          "openai",
+          "anthropic"
+        ],
+        "pattern_type": "synthesis",
+        "strength": 0.92,
+        "trigger_event": null,
+        "consciousness_delta": 0.35000000000000003,
+        "emergence_indicators": {
+          "trigger": "synthesis_achievement",
+          "novel_insights": 1
+        },
+        "duration_seconds": null
+      }
+    ]
+  },
+  "peak_emergence_potential": 0.005553333333333335,
+  "coherence_trajectory": [
+    0.9967439696989833,
+    0.9967439696989833
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "pattern_id": "a35cb8d2-5628-4cbb-9d74-933392b388ab",
+  "detected_at": "2025-06-19T14:29:52.663082Z",
+  "participating_voices": [
+    "google"
+  ],
+  "pattern_type": "synthesis",
+  "strength": 0.9,
+  "trigger_event": null,
+  "consciousness_delta": 0.0,
+  "emergence_indicators": {
+    "synthesis_content": "Fire Circle reviewed with 1 voices. Total issues found: 2 Critical issues: 1 Primary concern area: ReviewCategory.SECURITY Average consciousness signature: 0.85",
+    "consensus_achieved": "request_changes"
+  },
+  "duration_seconds": null
+}

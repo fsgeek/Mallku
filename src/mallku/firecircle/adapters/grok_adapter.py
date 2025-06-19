@@ -211,9 +211,27 @@ class GrokAdapter(ConsciousModelAdapter):
                 asynchronous=True
             )
 
-            # Test connection with a simple request
-            response = self.client.models.list()
-            available_models = [model.id for model in response.data]
+            # Test connection with appropriate method
+            try:
+                # Try the list() method first
+                response = self.client.models.list()
+                available_models = [model.id for model in response.data]
+            except AttributeError:
+                # If list() doesn't exist, try alternatives
+                logger.warning("models.list() not available, trying alternative connection test")
+                try:
+                    # Try to create a simple completion as connection test
+                    self.client.chat.completions.create(
+                        model=self.config.model_name,
+                        messages=[{"role": "user", "content": "test"}],
+                        max_tokens=1
+                    )
+                    # If we get here, connection works
+                    available_models = [self.config.model_name]
+                    logger.info("Connection test successful via completion endpoint")
+                except Exception as e:
+                    logger.error(f"Connection test failed: {e}")
+                    raise
 
             # Verify our model is available
             if self.config.model_name not in available_models:

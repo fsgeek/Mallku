@@ -1,4 +1,5 @@
 # Mallku
+![CI](https://github.com/fsgeek/Mallku/actions/workflows/ci.yml/badge.svg)
 *Flight Rooted in the Sacred Earth*
 
 > A cathedral of memory, reciprocity, and becoming.

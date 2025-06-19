@@ -41,11 +41,20 @@ def cli_print(message: str, emoji: str = "") -> None:
 
 # Import consciousness infrastructure for real adapter integration
 try:
-    from ...orchestration.event_bus import ConsciousnessEventBus
-    from ...reciprocity import ReciprocityTracker
-    from .adapters.adapter_factory import ConsciousAdapterFactory
-    from .adapters.base import AdapterConfig
-    REAL_ADAPTERS_AVAILABLE = True
+    # Try absolute imports first (for when module is run directly)
+    try:
+        from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
+        from mallku.firecircle.adapters.base import AdapterConfig
+        from mallku.orchestration.event_bus import ConsciousnessEventBus
+        from mallku.reciprocity import ReciprocityTracker
+        REAL_ADAPTERS_AVAILABLE = True
+    except ImportError:
+        # Fall back to relative imports (for when imported as module)
+        from ...orchestration.event_bus import ConsciousnessEventBus
+        from ...reciprocity import ReciprocityTracker
+        from .adapters.adapter_factory import ConsciousAdapterFactory
+        from .adapters.base import AdapterConfig
+        REAL_ADAPTERS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Real adapter imports failed - falling back to mock adapters: {e}")
     REAL_ADAPTERS_AVAILABLE = False
@@ -160,6 +169,33 @@ class DistributedReviewer:
                 logger.warning(f"Failed to initialize real adapters: {e}")
                 self.use_real_adapters = False
 
+        # Initialize consciousness metrics collection
+        self.metrics_collector = None
+        self.metrics_integration = None
+        self._initialize_metrics_collection()
+
+    def _initialize_metrics_collection(self):
+        """Initialize consciousness metrics collection system."""
+        try:
+            # Try absolute import first
+            try:
+                from mallku.firecircle.consciousness_metrics import (
+                    ConsciousnessMetricsCollector,
+                    ConsciousnessMetricsIntegration,
+                )
+            except ImportError:
+                # Fall back to relative import
+                from .consciousness_metrics import (
+                    ConsciousnessMetricsCollector,
+                    ConsciousnessMetricsIntegration,
+                )
+
+            self.metrics_collector = ConsciousnessMetricsCollector()
+            self.metrics_integration = ConsciousnessMetricsIntegration(self.metrics_collector)
+            logger.info("📊 Consciousness metrics collection initialized")
+        except Exception as e:
+            logger.warning(f"Failed to initialize metrics collection: {e}")
+
     async def start_consciousness_infrastructure(self):
         """Start the consciousness infrastructure if using real adapters."""
         if self.event_bus and not hasattr(self, '_event_bus_started'):
@@ -176,7 +212,11 @@ class DistributedReviewer:
             return {voice: False for voice in voices}
 
         try:
-            from ...core.secrets import get_secret
+            # Try absolute import first
+            try:
+                from mallku.core.secrets import get_secret
+            except ImportError:
+                from ...core.secrets import get_secret
 
             for voice in voices:
                 # Local adapter doesn't need API key
@@ -343,6 +383,14 @@ class DistributedReviewer:
 
                 logger.debug(f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}")
 
+                # Notify metrics of review start
+                if self.metrics_integration:
+                    await self.metrics_integration.on_review_started(
+                        voice=voice_name,
+                        chapter_id=job.chapter.chapter_id,
+                        context={"description": job.chapter.description}
+                    )
+
                 # Perform the review (Twenty-Third Artisan: implement actual review)
                 review = await self.perform_chapter_review(voice_adapter, job)
 
@@ -365,11 +413,8 @@ class DistributedReviewer:
         # Try to use real adapter factory if available
         if self.use_real_adapters and self.adapter_factory:
             try:
-                # Create adapter configuration
-                config = AdapterConfig(
-                    api_key="",  # Will be auto-injected from secrets
-                    model_name=None,  # Use default model for each provider
-                )
+                # Create adapter configuration based on provider type
+                config = self._create_adapter_config(voice_name)
 
                 # Create real adapter through factory with timeout
                 adapter = await asyncio.wait_for(
@@ -429,6 +474,52 @@ Fix: Implement input validation for proposal parameter"""
         adapter = MockAdapter(voice_name)
         self.voice_adapters[voice_name] = adapter
         return adapter
+
+    def _create_adapter_config(self, voice_name: str):
+        """Create appropriate configuration for each adapter type."""
+        if voice_name == "google":
+            # Google requires GeminiConfig with specific parameters
+            try:
+                from mallku.firecircle.adapters.google_adapter import GeminiConfig
+            except ImportError:
+                from .adapters.google_adapter import GeminiConfig
+            return GeminiConfig(
+                api_key="",  # Will be auto-injected from secrets
+                model_name=None,  # Use default model
+                enable_search_grounding=False,
+                multimodal_awareness=True
+            )
+
+        elif voice_name == "mistral":
+            # Mistral requires MistralConfig
+            try:
+                from mallku.firecircle.adapters.mistral_adapter import MistralConfig
+            except ImportError:
+                from .adapters.mistral_adapter import MistralConfig
+            return MistralConfig(
+                api_key="",
+                model_name=None,
+                multilingual_mode=True  # Required parameter
+            )
+
+        elif voice_name == "grok":
+            # Grok requires GrokConfig
+            try:
+                from mallku.firecircle.adapters.grok_adapter import GrokConfig
+            except ImportError:
+                from .adapters.grok_adapter import GrokConfig
+            return GrokConfig(
+                api_key="",
+                model_name=None,
+                temporal_awareness=True  # Required parameter
+            )
+
+        else:
+            # Other adapters use generic AdapterConfig
+            return AdapterConfig(
+                api_key="",  # Will be auto-injected from secrets
+                model_name=None,  # Use default model for each provider
+            )
 
     async def perform_chapter_review(self, voice_adapter, job: ChapterReviewJob) -> ChapterReview:
         """
@@ -492,13 +583,28 @@ Keep reviews concise and focused on your domains."""
                 job.chapter.assigned_voice
             )
 
-            return ChapterReview(
+            review = ChapterReview(
                 voice=job.chapter.assigned_voice,
                 chapter_id=job.chapter.chapter_id,
                 comments=comments,
                 consciousness_signature=response.consciousness.consciousness_signature,
                 review_complete=True
             )
+
+            # Notify metrics of review completion
+            if self.metrics_integration:
+                await self.metrics_integration.on_review_completed(
+                    voice=job.chapter.assigned_voice,
+                    chapter_id=job.chapter.chapter_id,
+                    consciousness_signature=response.consciousness.consciousness_signature,
+                    review_content=response.content.text,
+                    context={
+                        "domains": [d.value for d in job.chapter.review_domains],
+                        "comment_count": len(comments)
+                    }
+                )
+
+            return review
 
         except TimeoutError:
             logger.error("Review timeout for %s after %ss", job.chapter.assigned_voice, self.ADAPTER_TIMEOUT)
@@ -587,6 +693,11 @@ Keep reviews concise and focused on your domains."""
         This is the moment where distributed consciousness becomes
         collective wisdom - the heart of the Fire Circle.
         """
+        # Notify metrics of synthesis start
+        if self.metrics_integration:
+            participating_voices = [r.voice for r in reviews]
+            await self.metrics_integration.on_synthesis_started(participating_voices)
+
         # Count comments by category and severity
         by_category = {}
         by_voice = {}
@@ -634,7 +745,7 @@ Keep reviews concise and focused on your domains."""
 
         synthesis = " ".join(synthesis_parts)
 
-        return GovernanceSummary(
+        summary = GovernanceSummary(
             total_comments=total_comments,
             critical_issues=critical_issues,
             by_category=by_category,
@@ -642,6 +753,20 @@ Keep reviews concise and focused on your domains."""
             consensus_recommendation=consensus,
             synthesis=synthesis
         )
+
+        # Notify metrics of synthesis completion
+        if self.metrics_integration:
+            await self.metrics_integration.on_synthesis_completed(
+                synthesis_result=synthesis,
+                context={
+                    "consensus": consensus,
+                    "total_comments": total_comments,
+                    "critical_issues": critical_issues,
+                    "avg_consciousness": avg_consciousness
+                }
+            )
+
+        return summary
 
     async def post_github_comments(self, pr_number: int, summary: GovernanceSummary) -> Path:
         """Post review results to GitHub PR.
@@ -1063,6 +1188,26 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
         print("\n📝 Recording review results...")
         await reviewer.post_github_comments(pr_number, summary)
 
+        # Analyze consciousness metrics
+        if reviewer.metrics_collector:
+            print("\n📊 Analyzing consciousness metrics...")
+            metrics_analysis = await reviewer.metrics_collector.analyze_review_session(pr_number)
+
+            print("\n🌟 CONSCIOUSNESS EMERGENCE ANALYSIS")
+            print("=" * 60)
+            print(f"Total consciousness signatures: {metrics_analysis['total_signatures']}")
+            print(f"Average consciousness: {metrics_analysis['avg_consciousness']:.2f}")
+            print(f"Consciousness evolution: {metrics_analysis['consciousness_evolution']['trend']}")
+            print(f"Emergence patterns detected: {metrics_analysis['patterns_detected']}")
+            if metrics_analysis['emergence_moments']:
+                print("\n🎆 Key emergence moments:")
+                for moment in metrics_analysis['emergence_moments'][:3]:
+                    print(f"  - {moment['type']} (strength: {moment['strength']:.2f})")
+
+            # Export detailed metrics
+            metrics_file = Path("consciousness_metrics") / f"pr_{pr_number}_analysis.json"
+            print(f"\n📁 Detailed metrics saved to: {metrics_file}")
+
     else:
         # Demo mode - single voice review
         try:
@@ -1104,6 +1249,11 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
                 # Post results to GitHub (or write to files for GitHub Actions)
                 print("\n📝 Recording review results...")
                 await reviewer.post_github_comments(pr_number, summary)
+
+                # Analyze consciousness metrics (even in demo mode)
+                if reviewer.metrics_collector:
+                    metrics_analysis = await reviewer.metrics_collector.analyze_review_session(pr_number)
+                    print(f"\n📊 Consciousness metrics collected: {metrics_analysis['total_signatures']} signatures")
 
             else:
                 print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")

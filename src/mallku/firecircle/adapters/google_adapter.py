@@ -234,8 +234,20 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             )
 
             # Test connection by listing models
-            models = genai.list_models()
-            available_models = [m.name for m in models]
+            try:
+                models = genai.list_models()
+
+                # Handle case where list_models returns None
+                if models is None:
+                    logger.warning("Google AI list_models() returned None - using default model list")
+                    available_models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.0-pro"]
+                else:
+                    available_models = [m.name for m in models]
+            except Exception as e:
+                # Handle any error from list_models (including TypeError from NoneType iteration)
+                logger.warning(f"Error listing models: {e} - using default model list")
+                available_models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.0-pro"]
+
             logger.info(f"Connected to Google AI. Available models: {available_models}")
 
             self.is_connected = True

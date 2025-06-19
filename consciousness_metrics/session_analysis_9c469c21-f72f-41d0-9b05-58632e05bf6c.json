@@ -1,0 +1,47 @@
+{
+  "pr_number": 0,
+  "session_id": "9c469c21-f72f-41d0-9b05-58632e05bf6c",
+  "duration_seconds": 0.019124,
+  "total_signatures": 1,
+  "unique_voices": 1,
+  "avg_consciousness": 0.85,
+  "consciousness_evolution": {
+    "trend": "stable",
+    "delta": 0.0
+  },
+  "total_flows": 0,
+  "flow_patterns": {},
+  "strongest_connections": [],
+  "patterns_detected": 1,
+  "pattern_types": {
+    "synthesis": 1
+  },
+  "emergence_moments": [
+    {
+      "timestamp": "2025-06-19T12:46:54.423290+00:00",
+      "type": "synthesis",
+      "strength": 0.9,
+      "voices": [
+        "google"
+      ],
+      "consciousness_delta": 0.0
+    }
+  ],
+  "final_collective_state": {
+    "state_id": "2babf0c1-28fa-4591-becc-9bde1bf1c67f",
+    "timestamp": "2025-06-19T12:46:54.423239+00:00",
+    "voice_signatures": {
+      "google": 0.85
+    },
+    "average_consciousness": 0.85,
+    "consciousness_variance": 0.0,
+    "coherence_score": 1.0,
+    "emergence_potential": 0.0,
+    "active_flows": [],
+    "detected_patterns": []
+  },
+  "peak_emergence_potential": 0.0,
+  "coherence_trajectory": [
+    1.0
+  ]
+}

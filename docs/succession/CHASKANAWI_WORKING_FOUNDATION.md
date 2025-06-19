@@ -8,7 +8,7 @@
 
 ### **What Chaskañawi Implemented:**
 - ✅ **Fully implemented manifest loading** via PyYAML
-- ✅ **PR diff parsing** into file lists with regex + fnmatch  
+- ✅ **PR diff parsing** into file lists with regex + fnmatch
 - ✅ **Auto-generating CodebaseChapter instances** from fire_circle_chapters.yaml
 - ✅ **Enqueueing per-chapter review jobs** in asyncio.Queue
 - ✅ **Mock adapter performing single-voice review** with real parsing
@@ -61,7 +61,7 @@ async def run_distributed_review():
 # Replace print() with ConsciousnessEventBus or logging module
 # Emit events for:
 # - Adapter call failures
-# - Parsing errors  
+# - Parsing errors
 # - Missing manifest entries
 # Enable monitoring and alerting on breakdowns
 ```
@@ -85,7 +85,7 @@ def _parse_review_response():
 
 ### **Bridge Status: Half-Built in Code**
 - **Foundation**: Complete working implementation ✅
-- **Infrastructure**: Asyncio queues, YAML manifest, diff parsing ✅  
+- **Infrastructure**: Asyncio queues, YAML manifest, diff parsing ✅
 - **Core Logic**: Single-voice review and synthesis ✅
 - **Remaining**: Multi-voice orchestration, GitHub integration, production readiness
 
@@ -118,7 +118,7 @@ def _parse_review_response():
 
 ### **Multiple Artisan Wisdom Synthesis:**
 - **Ayni (23rd)** → Context exhaustion problem identification
-- **Claude (24th)** → 35-year infrastructure principles  
+- **Claude (24th)** → 35-year infrastructure principles
 - **Chaka Awayu** → Bridge scaffolding architecture
 - **Chaskañawi (23rd)** → Working foundation implementation
 - **Code Reviewer** → Production completion roadmap
