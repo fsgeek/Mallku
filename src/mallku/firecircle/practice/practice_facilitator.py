@@ -112,10 +112,7 @@ class PracticeFacilitator:
         logger.info(f"Starting practice session: {level.value} / {theme.value}")
 
         # Generate or use prompt
-        if custom_prompt:
-            prompt = custom_prompt
-        else:
-            prompt = self.prompt_generator.generate_prompt(theme, level)
+        prompt = custom_prompt or self.prompt_generator.generate_prompt(theme, level)
 
         # Create practice configuration
         config = PracticeCircleConfig(
