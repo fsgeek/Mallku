@@ -69,21 +69,29 @@ class MemoryAnchorQueryService:
 
             # Execute based on query type
             if query_type == QueryType.TEMPORAL:
-                results, explanation = await self._execute_temporal_query(parsed_query, query_request)
+                results, explanation = await self._execute_temporal_query(
+                    parsed_query, query_request
+                )
             elif query_type == QueryType.PATTERN:
-                results, explanation = await self._execute_pattern_query(parsed_query, query_request)
+                results, explanation = await self._execute_pattern_query(
+                    parsed_query, query_request
+                )
             elif query_type == QueryType.CONTEXTUAL:
-                results, explanation = await self._execute_contextual_query(parsed_query, query_request)
+                results, explanation = await self._execute_contextual_query(
+                    parsed_query, query_request
+                )
             else:
                 # Default to contextual
-                results, explanation = await self._execute_contextual_query(parsed_query, query_request)
+                results, explanation = await self._execute_contextual_query(
+                    parsed_query, query_request
+                )
 
             # Filter and rank results
             filtered_results = self._filter_results(results, query_request)
             ranked_results = self._rank_results(filtered_results, query_type)
 
             # Limit results
-            final_results = ranked_results[:query_request.max_results]
+            final_results = ranked_results[: query_request.max_results]
 
             processing_time = int((time.time() - start_time) * 1000)
 
@@ -95,7 +103,7 @@ class MemoryAnchorQueryService:
                 results_returned=len(final_results),
                 explanation=explanation if query_request.include_explanations else None,
                 query_confidence=parsed_query.get("confidence", 0.7),
-                processing_time_ms=processing_time
+                processing_time_ms=processing_time,
             )
 
         except Exception as e:
@@ -109,13 +117,11 @@ class MemoryAnchorQueryService:
                 total_results=0,
                 results_returned=0,
                 query_confidence=0.0,
-                processing_time_ms=processing_time
+                processing_time_ms=processing_time,
             )
 
     async def _execute_temporal_query(
-        self,
-        parsed_query: dict[str, Any],
-        request: QueryRequest
+        self, parsed_query: dict[str, Any], request: QueryRequest
     ) -> tuple[list[QueryResult], QueryExplanation]:
         """Execute temporal-based query."""
 
@@ -130,8 +136,12 @@ class MemoryAnchorQueryService:
             temporal_filter.append(f"anchor.timestamp <= '{temporal_query.end_time.isoformat()}'")
         elif temporal_query.time_window_minutes and request.temporal_context:
             # Use window around reference time
-            start_time = request.temporal_context - timedelta(minutes=temporal_query.time_window_minutes // 2)
-            end_time = request.temporal_context + timedelta(minutes=temporal_query.time_window_minutes // 2)
+            start_time = request.temporal_context - timedelta(
+                minutes=temporal_query.time_window_minutes // 2
+            )
+            end_time = request.temporal_context + timedelta(
+                minutes=temporal_query.time_window_minutes // 2
+            )
             temporal_filter.append(f"anchor.timestamp >= '{start_time.isoformat()}'")
             temporal_filter.append(f"anchor.timestamp <= '{end_time.isoformat()}'")
 
@@ -152,17 +162,21 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
+            query_results = await self.db.execute_secured_query(
+                aql_query, collection_name="memory_anchors"
+            )
 
             for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     result = QueryResult.from_memory_anchor_and_file(
                         anchor_id=UUID(doc["anchor_id"]),
-                        anchor_timestamp=datetime.fromisoformat(doc["anchor_timestamp"].replace('Z', '+00:00')),
+                        anchor_timestamp=datetime.fromisoformat(
+                            doc["anchor_timestamp"].replace("Z", "+00:00")
+                        ),
                         file_info=doc["file_info"],
                         correlation_type=doc["correlation_type"],
                         confidence_score=doc["confidence"],
-                        correlation_tags=["temporal", "filesystem"]
+                        correlation_tags=["temporal", "filesystem"],
                     )
                     results.append(result)
 
@@ -175,15 +189,13 @@ class MemoryAnchorQueryService:
             filters_applied=["temporal_range", "filesystem_cursors"],
             anchors_searched=len(results),
             correlations_found=len(results),
-            ranking_factors=["temporal_proximity", "confidence_score"]
+            ranking_factors=["temporal_proximity", "confidence_score"],
         )
 
         return results, explanation
 
     async def _execute_pattern_query(
-        self,
-        parsed_query: dict[str, Any],
-        request: QueryRequest
+        self, parsed_query: dict[str, Any], request: QueryRequest
     ) -> tuple[list[QueryResult], QueryExplanation]:
         """Execute pattern-based query."""
 
@@ -196,7 +208,9 @@ class MemoryAnchorQueryService:
         if pattern_query.context_keywords:
             keyword_conditions = []
             for keyword in pattern_query.context_keywords:
-                keyword_conditions.append(f'CONTAINS(LOWER(TO_STRING(anchor.metadata)), "{keyword}")')
+                keyword_conditions.append(
+                    f'CONTAINS(LOWER(TO_STRING(anchor.metadata)), "{keyword}")'
+                )
             context_filter.append(f"({' OR '.join(keyword_conditions)})")
 
         # Look for recurring patterns in correlation data
@@ -221,17 +235,25 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
+            query_results = await self.db.execute_secured_query(
+                aql_query, collection_name="memory_anchors"
+            )
 
             for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     result = QueryResult.from_memory_anchor_and_file(
                         anchor_id=UUID(doc["anchor_id"]),
-                        anchor_timestamp=datetime.fromisoformat(doc["anchor_timestamp"].replace('Z', '+00:00')),
+                        anchor_timestamp=datetime.fromisoformat(
+                            doc["anchor_timestamp"].replace("Z", "+00:00")
+                        ),
                         file_info=doc["file_info"],
                         correlation_type=doc["correlation_type"],
                         confidence_score=min(1.0, doc["confidence"]),
-                        correlation_tags=["pattern", "behavioral", f"frequency_{doc['pattern_frequency']}"]
+                        correlation_tags=[
+                            "pattern",
+                            "behavioral",
+                            f"frequency_{doc['pattern_frequency']}",
+                        ],
                     )
                     result.context["pattern_frequency"] = doc["pattern_frequency"]
                     results.append(result)
@@ -242,18 +264,19 @@ class MemoryAnchorQueryService:
         explanation = QueryExplanation(
             query_interpretation=f"Searching for behavioral patterns with context: {', '.join(pattern_query.context_keywords)}",
             search_strategy="Frequency analysis across memory anchor correlations",
-            filters_applied=["context_keywords", f"min_frequency_{pattern_query.frequency_threshold}"],
+            filters_applied=[
+                "context_keywords",
+                f"min_frequency_{pattern_query.frequency_threshold}",
+            ],
             anchors_searched=len(results),
             correlations_found=len(results),
-            ranking_factors=["pattern_frequency", "confidence_score", "recency"]
+            ranking_factors=["pattern_frequency", "confidence_score", "recency"],
         )
 
         return results, explanation
 
     async def _execute_contextual_query(
-        self,
-        parsed_query: dict[str, Any],
-        request: QueryRequest
+        self, parsed_query: dict[str, Any], request: QueryRequest
     ) -> tuple[list[QueryResult], QueryExplanation]:
         """Execute contextual/similarity-based query."""
 
@@ -272,7 +295,9 @@ class MemoryAnchorQueryService:
 
         if contextual_query.reference_file:
             # Find anchors related to the reference file
-            filters.append(f'CONTAINS(anchor.cursors.filesystem.file_path, "{contextual_query.reference_file}")')
+            filters.append(
+                f'CONTAINS(anchor.cursors.filesystem.file_path, "{contextual_query.reference_file}")'
+            )
 
         # Base query for contextual search
         contextual_filter_clause = f"FILTER {' AND '.join(filters)}" if filters else ""
@@ -292,25 +317,27 @@ class MemoryAnchorQueryService:
         """
 
         try:
-            query_results = await self.db.execute_secured_query(aql_query, collection_name="memory_anchors")
+            query_results = await self.db.execute_secured_query(
+                aql_query, collection_name="memory_anchors"
+            )
 
             for doc in query_results:
                 if isinstance(doc["file_info"], dict) and "file_path" in doc["file_info"]:
                     # Calculate contextual similarity score
                     similarity_score = self._calculate_contextual_similarity(
-                        doc["file_info"],
-                        context_tags,
-                        contextual_query.reference_file
+                        doc["file_info"], context_tags, contextual_query.reference_file
                     )
 
                     if similarity_score >= contextual_query.similarity_threshold:
                         result = QueryResult.from_memory_anchor_and_file(
                             anchor_id=UUID(doc["anchor_id"]),
-                            anchor_timestamp=datetime.fromisoformat(doc["anchor_timestamp"].replace('Z', '+00:00')),
+                            anchor_timestamp=datetime.fromisoformat(
+                                doc["anchor_timestamp"].replace("Z", "+00:00")
+                            ),
                             file_info=doc["file_info"],
                             correlation_type=doc["correlation_type"],
                             confidence_score=similarity_score,
-                            correlation_tags=["contextual"] + context_tags
+                            correlation_tags=["contextual"] + context_tags,
                         )
                         result.context["similarity_score"] = similarity_score
                         results.append(result)
@@ -321,19 +348,19 @@ class MemoryAnchorQueryService:
         explanation = QueryExplanation(
             query_interpretation=f"Searching for contextually similar files with tags: {', '.join(context_tags)}",
             search_strategy="Contextual similarity matching across memory anchor metadata",
-            filters_applied=["context_tags", f"similarity_threshold_{contextual_query.similarity_threshold}"],
+            filters_applied=[
+                "context_tags",
+                f"similarity_threshold_{contextual_query.similarity_threshold}",
+            ],
             anchors_searched=len(results),
             correlations_found=len(results),
-            ranking_factors=["contextual_similarity", "recency", "confidence_score"]
+            ranking_factors=["contextual_similarity", "recency", "confidence_score"],
         )
 
         return results, explanation
 
     def _calculate_contextual_similarity(
-        self,
-        file_info: dict[str, Any],
-        context_tags: list[str],
-        reference_file: str | None
+        self, file_info: dict[str, Any], context_tags: list[str], reference_file: str | None
     ) -> float:
         """Calculate contextual similarity score for a file."""
         score = 0.5  # Base score
@@ -362,7 +389,9 @@ class MemoryAnchorQueryService:
 
         return min(1.0, score)
 
-    def _filter_results(self, results: list[QueryResult], request: QueryRequest) -> list[QueryResult]:
+    def _filter_results(
+        self, results: list[QueryResult], request: QueryRequest
+    ) -> list[QueryResult]:
         """Filter results based on request criteria."""
         filtered = []
 
@@ -420,9 +449,7 @@ class MemoryAnchorQueryService:
             """
 
             query_results = await self.db.execute_secured_query(
-                aql_query,
-                bind_vars={"anchor_id": str(anchor_id)},
-                collection_name="memory_anchors"
+                aql_query, bind_vars={"anchor_id": str(anchor_id)}, collection_name="memory_anchors"
             )
 
             for doc in query_results:
@@ -430,7 +457,7 @@ class MemoryAnchorQueryService:
                     "anchor": doc["anchor"],
                     "predecessor": doc["predecessor"],
                     "successors": doc["successors"],
-                    "lineage_depth": len(doc["successors"]) + (1 if doc["predecessor"] else 0)
+                    "lineage_depth": len(doc["successors"]) + (1 if doc["predecessor"] else 0),
                 }
 
         except Exception as e:

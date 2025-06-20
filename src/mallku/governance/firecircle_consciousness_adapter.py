@@ -47,8 +47,7 @@ class FireCircleConsciousnessAdapter:
 
         # Create wranglers for Fire Circle components
         self.fire_circle_wrangler = EventEmittingWrangler(
-            name="fire_circle_protocol",
-            event_bus=event_bus
+            name="fire_circle_protocol", event_bus=event_bus
         )
 
         # Consciousness signatures now built into ConsciousMessage
@@ -59,7 +58,7 @@ class FireCircleConsciousnessAdapter:
         title: str,
         participants: list[dict[str, Any]],
         config: dict[str, Any] | None = None,
-        initiating_event: ConsciousnessEvent | None = None
+        initiating_event: ConsciousnessEvent | None = None,
     ) -> str:
         """
         Create a Fire Circle dialogue that flows through consciousness.
@@ -87,20 +86,16 @@ class FireCircleConsciousnessAdapter:
                 type=p.get("type", "ai_model"),
                 provider=p.get("provider"),
                 model=p.get("model"),
-                capabilities=p.get("capabilities", [])
+                capabilities=p.get("capabilities", []),
             )
             fc_participants.append(participant)
 
         # Create dialogue config
-        dialogue_config = ConsciousDialogueConfig(
-            title=title,
-            **(config or {})
-        )
+        dialogue_config = ConsciousDialogueConfig(title=title, **(config or {}))
 
         # Create Fire Circle dialogue
         dialogue = await self.dialogue_manager.create_dialogue(
-            config=dialogue_config,
-            participants=fc_participants
+            config=dialogue_config, participants=fc_participants
         )
 
         # Map to consciousness correlation
@@ -117,10 +112,10 @@ class FireCircleConsciousnessAdapter:
                 "title": title,
                 "participants": [p.get("name") for p in participants],
                 "fire_circle_active": True,
-                "config": config or {}
+                "config": config or {},
             },
             correlation_id=correlation_id,
-            caused_by=initiating_event.event_id if initiating_event else None
+            caused_by=initiating_event.event_id if initiating_event else None,
         )
 
         await self.event_bus.emit(convening_event)
@@ -128,11 +123,7 @@ class FireCircleConsciousnessAdapter:
         return str(dialogue.id)
 
     async def send_message_to_dialogue(
-        self,
-        dialogue_id: str,
-        sender_name: str,
-        content: str,
-        message_type: str = "message"
+        self, dialogue_id: str, sender_name: str, content: str, message_type: str = "message"
     ) -> ConsciousnessEvent:
         """
         Send a message to Fire Circle dialogue and emit as consciousness event.
@@ -149,13 +140,9 @@ class FireCircleConsciousnessAdapter:
         # Get consciousness signature for this message type
         if FIRECIRCLE_AVAILABLE:
             fc_message_type = MessageType(message_type.lower())
-            consciousness_sig = self.consciousness_signatures.get(
-                fc_message_type, 0.7
-            )
+            consciousness_sig = self.consciousness_signatures.get(fc_message_type, 0.7)
         else:
-            consciousness_sig = self.consciousness_signatures.get(
-                message_type.lower(), 0.7
-            )
+            consciousness_sig = self.consciousness_signatures.get(message_type.lower(), 0.7)
 
         # Create consciousness event
         # Handle both full dialogue IDs and UUIDs
@@ -165,8 +152,7 @@ class FireCircleConsciousnessAdapter:
             try:
                 dialogue_uuid = UUID(dialogue_id) if isinstance(dialogue_id, str) else dialogue_id
                 correlation_id = self.dialogue_mappings.get(
-                    dialogue_uuid,
-                    f"fire_circle_{dialogue_id}"
+                    dialogue_uuid, f"fire_circle_{dialogue_id}"
                 )
             except ValueError:
                 correlation_id = f"fire_circle_{dialogue_id}"
@@ -180,9 +166,9 @@ class FireCircleConsciousnessAdapter:
                 "sender": sender_name,
                 "message_type": message_type,
                 "content": content,
-                "fire_circle_protocol": True
+                "fire_circle_protocol": True,
             },
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
         await self.event_bus.emit(message_event)
@@ -197,7 +183,7 @@ class FireCircleConsciousnessAdapter:
 
     async def translate_fire_circle_message(
         self,
-        message: Any  # Fire Circle Message type
+        message: Any,  # Fire Circle Message type
     ) -> ConsciousnessEvent:
         """
         Translate a Fire Circle message to consciousness event.
@@ -208,13 +194,10 @@ class FireCircleConsciousnessAdapter:
         Returns:
             Consciousness event representing the message
         """
-        consciousness_sig = self.consciousness_signatures.get(
-            message.type, 0.7
-        )
+        consciousness_sig = self.consciousness_signatures.get(message.type, 0.7)
 
         correlation_id = self.dialogue_mappings.get(
-            message.metadata.dialogue_id,
-            f"fire_circle_{message.metadata.dialogue_id}"
+            message.metadata.dialogue_id, f"fire_circle_{message.metadata.dialogue_id}"
         )
 
         return ConsciousnessEvent(
@@ -228,17 +211,19 @@ class FireCircleConsciousnessAdapter:
                 "type": message.type.value,
                 "content": message.content.text,
                 "perspective": message.perspective,
-                "in_response_to": str(message.metadata.in_response_to) if message.metadata.in_response_to else None,
-                "fire_circle_native": True
+                "in_response_to": str(message.metadata.in_response_to)
+                if message.metadata.in_response_to
+                else None,
+                "fire_circle_native": True,
             },
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
     async def _create_consciousness_only_dialogue(
         self,
         title: str,
         participants: list[dict[str, Any]],
-        initiating_event: ConsciousnessEvent | None
+        initiating_event: ConsciousnessEvent | None,
     ) -> str:
         """
         Create dialogue using only consciousness events when Fire Circle unavailable.
@@ -254,20 +239,17 @@ class FireCircleConsciousnessAdapter:
                 "dialogue_id": dialogue_id,
                 "title": title,
                 "participants": [p.get("name") for p in participants],
-                "consciousness_only_mode": True
+                "consciousness_only_mode": True,
             },
             correlation_id=dialogue_id,
-            caused_by=initiating_event.event_id if initiating_event else None
+            caused_by=initiating_event.event_id if initiating_event else None,
         )
 
         await self.event_bus.emit(convening_event)
 
         return dialogue_id
 
-    def get_dialogue_consciousness_flow(
-        self,
-        dialogue_id: str | UUID
-    ) -> str:
+    def get_dialogue_consciousness_flow(self, dialogue_id: str | UUID) -> str:
         """
         Get the consciousness correlation ID for a Fire Circle dialogue.
 
@@ -285,10 +267,7 @@ class FireCircleConsciousnessAdapter:
         try:
             if isinstance(dialogue_id, str):
                 dialogue_id = UUID(dialogue_id)
-            return self.dialogue_mappings.get(
-                dialogue_id,
-                f"fire_circle_{dialogue_id}"
-            )
+            return self.dialogue_mappings.get(dialogue_id, f"fire_circle_{dialogue_id}")
         except ValueError:
             # Fallback for non-UUID dialogue IDs
             return f"fire_circle_{dialogue_id}"
@@ -303,9 +282,7 @@ class ConsciousnessAwareDialogueManager:
     """
 
     def __init__(
-        self,
-        dialogue_manager: ConsciousDialogueManager,
-        adapter: FireCircleConsciousnessAdapter
+        self, dialogue_manager: ConsciousDialogueManager, adapter: FireCircleConsciousnessAdapter
     ):
         """Initialize with Fire Circle manager and consciousness adapter."""
         self.dialogue_manager = dialogue_manager
@@ -314,7 +291,7 @@ class ConsciousnessAwareDialogueManager:
     async def advance_dialogue(
         self,
         dialogue_id: UUID,
-        message: Any  # Fire Circle Message type
+        message: Any,  # Fire Circle Message type
     ) -> ConsciousnessEvent:
         """
         Advance dialogue and emit consciousness event.
@@ -341,7 +318,4 @@ class ConsciousnessAwareDialogueManager:
 
 
 # Bridge between Fire Circle protocol and consciousness circulation
-__all__ = [
-    'FireCircleConsciousnessAdapter',
-    'ConsciousnessAwareDialogueManager'
-]
+__all__ = ["FireCircleConsciousnessAdapter", "ConsciousnessAwareDialogueManager"]

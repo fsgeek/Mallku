@@ -32,7 +32,7 @@ class AyniScorer:
         value_received: float,
         value_type: str,
         quality: float = 1.0,
-        is_system_failure: bool = False
+        is_system_failure: bool = False,
     ) -> dict:
         """
         Score a single interaction for reciprocity.
@@ -56,7 +56,7 @@ class AyniScorer:
                 "weighted_delta": 0.0,
                 "quality_adjusted": 0.0,
                 "is_neutral": True,
-                "reason": "system_failure_excluded"
+                "reason": "system_failure_excluded",
             }
 
         # Apply type-specific weights
@@ -84,14 +84,11 @@ class AyniScorer:
             "value_type": value_type,
             "quality_score": quality,
             "balance_direction": balance_direction,
-            "is_neutral": False
+            "is_neutral": False,
         }
 
     def calculate_balance_decay(
-        self,
-        current_balance: float,
-        last_decay: datetime,
-        now: datetime | None = None
+        self, current_balance: float, last_decay: datetime, now: datetime | None = None
     ) -> tuple[float, bool]:
         """
         Apply strategic forgetting to reciprocity balance.
@@ -140,7 +137,7 @@ class AyniScorer:
         interaction_type: str,
         content_complexity: float,
         response_length: int,
-        computation_time: float
+        computation_time: float,
     ) -> tuple[str, float]:
         """
         Classify the type and amount of value in an interaction.
@@ -176,9 +173,7 @@ class AyniScorer:
             return ValueType.KNOWLEDGE, 0.3
 
     def generate_rebalancing_suggestions(
-        self,
-        balance: float,
-        recent_interactions: list[ReciprocityActivityData]
+        self, balance: float, recent_interactions: list[ReciprocityActivityData]
     ) -> list[str]:
         """
         Generate suggestions for rebalancing reciprocity.
@@ -223,11 +218,7 @@ class AyniScorer:
 
         return suggestions
 
-    def calculate_interaction_hash(
-        self,
-        interaction_data: dict,
-        participants: list[str]
-    ) -> str:
+    def calculate_interaction_hash(self, interaction_data: dict, participants: list[str]) -> str:
         """
         Generate a privacy-preserving hash of interaction content.
 
@@ -235,5 +226,7 @@ class AyniScorer:
         """
 
         # Create stable hash from interaction characteristics
-        hash_input = f"{participants}:{interaction_data.get('type')}:{interaction_data.get('timestamp')}"
+        hash_input = (
+            f"{participants}:{interaction_data.get('type')}:{interaction_data.get('timestamp')}"
+        )
         return hashlib.sha256(hash_input.encode()).hexdigest()[:16]

@@ -30,15 +30,13 @@ from .pattern_poetry import (
 
 __all__ = [
     # Consciousness Interface Components
-    'ConsciousnessInterface',
-    'RecognitionMirror',
-    'UnderstandingPathExperience',
-
+    "ConsciousnessInterface",
+    "RecognitionMirror",
+    "UnderstandingPathExperience",
     # Pattern Poetry and Visualization
-    'PatternPoetry',
-    'TemporalStoryWeaver',
-    'ConsciousnessVisualization',
-
+    "PatternPoetry",
+    "TemporalStoryWeaver",
+    "ConsciousnessVisualization",
     # Journey Interface Components (to be implemented)
     # 'ConsciousnessJourneyInterface',
     # 'UnderstandingJourneyExperience',

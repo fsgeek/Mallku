@@ -20,10 +20,12 @@ sys.path.insert(0, str(src_path))
 try:
     from mallku.core.database import get_database, get_db_config
     from mallku.models import MemoryAnchor
+
     print("✓ Successfully imported Mallku database modules")
 except ImportError as e:
     print(f"✗ Failed to import modules: {e}")
     sys.exit(1)
+
 
 def test_database_connection():
     """Test basic database connection."""
@@ -44,6 +46,7 @@ def test_database_connection():
         print(f"   ✗ Database connection error: {e}")
         return False
 
+
 def test_collection_creation():
     """Test collection creation."""
     print("\n2. Testing collection creation...")
@@ -57,6 +60,7 @@ def test_collection_creation():
         print(f"   ✗ Collection creation failed: {e}")
         return False
 
+
 def test_memory_anchor_model():
     """Test MemoryAnchor model creation and serialization."""
     print("\n3. Testing MemoryAnchor model...")
@@ -66,14 +70,8 @@ def test_memory_anchor_model():
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
-            cursors={
-                "temporal": datetime.now(UTC).isoformat(),
-                "test_cursor": "test_value"
-            },
-            metadata={
-                "providers": ["test_provider"],
-                "creation_trigger": "manual_test"
-            }
+            cursors={"temporal": datetime.now(UTC).isoformat(), "test_cursor": "test_value"},
+            metadata={"providers": ["test_provider"], "creation_trigger": "manual_test"},
         )
         print("   ✓ MemoryAnchor created successfully")
 
@@ -83,12 +81,15 @@ def test_memory_anchor_model():
 
         # Test deserialization
         restored = MemoryAnchor.from_arangodb_document(doc)
-        print(f"   ✓ Deserialized successfully, ID matches: {restored.anchor_id == anchor.anchor_id}")
+        print(
+            f"   ✓ Deserialized successfully, ID matches: {restored.anchor_id == anchor.anchor_id}"
+        )
 
         return True
     except Exception as e:
         print(f"   ✗ MemoryAnchor model test failed: {e}")
         return False
+
 
 def test_database_operations():
     """Test basic database operations."""
@@ -96,14 +97,14 @@ def test_database_operations():
 
     try:
         db = get_database()
-        collection = db.collection('memory_anchors')
+        collection = db.collection("memory_anchors")
 
         # Create test anchor
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
             cursors={"test": "value"},
-            metadata={"test": True}
+            metadata={"test": True},
         )
 
         # Insert into database
@@ -112,18 +113,21 @@ def test_database_operations():
         print(f"   ✓ Inserted document with key: {result['_key']}")
 
         # Read back from database
-        retrieved_doc = collection.get(result['_key'])
+        retrieved_doc = collection.get(result["_key"])
         retrieved_anchor = MemoryAnchor.from_arangodb_document(retrieved_doc)
-        print(f"   ✓ Retrieved document, ID matches: {retrieved_anchor.anchor_id == anchor.anchor_id}")
+        print(
+            f"   ✓ Retrieved document, ID matches: {retrieved_anchor.anchor_id == anchor.anchor_id}"
+        )
 
         # Clean up
-        collection.delete(result['_key'])
+        collection.delete(result["_key"])
         print("   ✓ Test document cleaned up")
 
         return True
     except Exception as e:
         print(f"   ✗ Database operations test failed: {e}")
         return False
+
 
 def main():
     """Run all tests."""
@@ -137,7 +141,7 @@ def main():
         test_database_connection,
         test_collection_creation,
         test_memory_anchor_model,
-        test_database_operations
+        test_database_operations,
     ]
 
     passed = 0
@@ -159,6 +163,7 @@ def main():
     else:
         print("❌ Some tests failed. Check the output above.")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

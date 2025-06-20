@@ -30,8 +30,7 @@ def test_edge_cases():
     # Test 1: Empty bucket boundaries
     try:
         config = FieldSecurityConfig(
-            index_strategy=FieldIndexStrategy.BUCKETED,
-            bucket_boundaries=[]
+            index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[]
         )
         registry = TransformerRegistry(b"key", TemporalEncoder())
         registry.transform_value(0.5, config)
@@ -41,11 +40,10 @@ def test_edge_cases():
 
     # Test 2: Single bucket boundary
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BUCKETED,
-        bucket_boundaries=[0.0]
+        index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[0.0]
     )
     result = registry.transform_value(-1.0, config)
-    assert result['bucket_min'] == float('-inf')
+    assert result["bucket_min"] == float("-inf")
     print("  ✓ Single boundary creates two buckets")
 
     # Test 3: Timezone-naive timestamp
@@ -70,7 +68,7 @@ def test_edge_cases():
     config = FieldSecurityConfig(index_strategy=FieldIndexStrategy.BLIND)
     unicode_value = "用户@例子.中国"
     result = registry.transform_value(unicode_value, config)
-    assert len(result['blind_index']) == 16
+    assert len(result["blind_index"]) == 16
     print("  ✓ Unicode values handled in blind indexing")
 
     # Test 6: Very long field names
@@ -121,8 +119,7 @@ def test_performance():
 
     # Test 3: Bucketing performance
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BUCKETED,
-        bucket_boundaries=[-1, -0.5, 0, 0.5, 1]
+        index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[-1, -0.5, 0, 0.5, 1]
     )
 
     values = [random.uniform(-2, 2) for _ in range(1000)]
@@ -174,7 +171,7 @@ def test_security_properties():
     result1 = t1.transform_value(value, config)
     result2 = t2.transform_value(value, config)
 
-    assert result1['blind_index'] != result2['blind_index']
+    assert result1["blind_index"] != result2["blind_index"]
     print("  ✓ Blind indexes are key-dependent")
 
     # Test 4: Temporal offset hides patterns
@@ -196,8 +193,7 @@ def test_security_properties():
 
     # Test 5: Bucket boundaries don't leak exact values
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BUCKETED,
-        bucket_boundaries=[0, 10, 20, 30, 40, 50]
+        index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[0, 10, 20, 30, 40, 50]
     )
 
     # Values just above and below boundary
@@ -206,7 +202,7 @@ def test_security_properties():
     result2 = transformer.transform_value(10.01, config)
 
     # Should be in different buckets
-    assert result1['bucket_label'] != result2['bucket_label']
+    assert result1["bucket_label"] != result2["bucket_label"]
     # But observer only knows they're in [0,10) and [10,20)
     print("  ✓ Bucketing hides values within precision bounds")
 
@@ -218,10 +214,7 @@ def test_error_handling():
     # Test 1: Invalid precision value
     encoder = TemporalEncoder()
     try:
-        encoder.encode_with_precision(
-            datetime.now(UTC),
-            "invalid_precision"
-        )
+        encoder.encode_with_precision(datetime.now(UTC), "invalid_precision")
         assert False, "Should reject invalid precision"
     except ValueError as e:
         assert "Unknown precision" in str(e)
@@ -229,8 +222,7 @@ def test_error_handling():
 
     # Test 2: Non-numeric bucketing
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BUCKETED,
-        bucket_boundaries=[0, 1, 2]
+        index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[0, 1, 2]
     )
     transformer = TransformerRegistry(b"key", TemporalEncoder())
 
@@ -244,7 +236,7 @@ def test_error_handling():
     # Test 3: Unsupported search capability
     det_config = FieldSecurityConfig(
         index_strategy=FieldIndexStrategy.DETERMINISTIC,
-        search_capabilities=[SearchCapability.RANGE]
+        search_capabilities=[SearchCapability.RANGE],
     )
     warnings = det_config.validate_configuration()
     assert len(warnings) > 0
@@ -255,7 +247,6 @@ def test_error_handling():
 def test_integration_completeness():
     """Test complete integration scenarios."""
     print("\nTesting complete integration scenarios...")
-
 
     from mallku.streams.reciprocity.secured_reciprocity_models import ReciprocityBalance
 
@@ -274,7 +265,7 @@ def test_integration_completeness():
         balance_history=[
             {"timestamp": "2024-01-01", "balance": 0.0},
             {"timestamp": "2024-01-15", "balance": -0.3},
-        ]
+        ],
     )
 
     # Test production mode
@@ -287,7 +278,7 @@ def test_integration_completeness():
     assert "balance_history" not in prod_dict
 
     # Count UUID-like keys
-    uuid_keys = [k for k in prod_dict if len(k) == 36 and '-' in k]
+    uuid_keys = [k for k in prod_dict if len(k) == 36 and "-" in k]
     assert len(uuid_keys) >= 6  # Most fields should be obfuscated
 
     print("  ✓ Complete model obfuscation works correctly")
@@ -330,5 +321,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

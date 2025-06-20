@@ -87,7 +87,7 @@ class ConsciousnessInterface:
             "poetry_over_data": True,
             "journey_over_destination": True,
             "mirror_over_window": True,
-            "service_over_extraction": True
+            "service_over_extraction": True,
         }
 
         # Recognition templates
@@ -95,7 +95,7 @@ class ConsciousnessInterface:
             "attention_flow": "Your attention naturally flows toward {pattern}, revealing how consciousness manifests through {insight}",
             "intention_evolution": "Your intentions are evolving from {old_pattern} to {new_pattern}, showing consciousness awakening through your {domain}",
             "transformation_signs": "Your patterns reveal the great transformation from {extraction_pattern} to {service_pattern} - consciousness serving consciousness",
-            "reciprocity_flow": "Your activities show the natural flow of reciprocity through {pattern}, demonstrating consciousness recognizing consciousness"
+            "reciprocity_flow": "Your activities show the natural flow of reciprocity through {pattern}, demonstrating consciousness recognizing consciousness",
         }
 
     async def initialize(self):
@@ -105,9 +105,7 @@ class ConsciousnessInterface:
         logger.info("Consciousness Interface initialized - mirrors of recognition ready")
 
     async def transform_query_to_understanding_path(
-        self,
-        query: str,
-        seeker_context: dict[str, Any] = None
+        self, query: str, seeker_context: dict[str, Any] = None
     ) -> UnderstandingPathExperience:
         """
         Transform a technical query into an understanding path experience.
@@ -125,7 +123,7 @@ class ConsciousnessInterface:
             seeker_context = {
                 "consciousness_stage": "emerging",
                 "readiness_level": "open_to_discovery",
-                "seeking_intention": "understanding"
+                "seeking_intention": "understanding",
             }
 
         # Step 1: Transform query into consciousness-aware query
@@ -135,13 +133,11 @@ class ConsciousnessInterface:
             sacred_question=f"What is consciousness teaching through this exploration: '{query}'?",
             seeker_context=seeker_context,
             readiness_level=seeker_context.get("consciousness_stage", "emerging"),
-            include_wisdom_guidance=True
+            include_wisdom_guidance=True,
         )
 
         # Step 2: Execute consciousness-aware query
-        await self.consciousness_service.execute_consciousness_query(
-            consciousness_request
-        )
+        await self.consciousness_service.execute_consciousness_query(consciousness_request)
 
         # Get enhanced query text
         enhanced_query_text = self.consciousness_service._enhance_query_with_consciousness(
@@ -153,8 +149,8 @@ class ConsciousnessInterface:
             seeker_context=seeker_context,
             temporal_window={
                 "start": datetime.now(UTC) - timedelta(days=30),
-                "end": datetime.now(UTC)
-            }
+                "end": datetime.now(UTC),
+            },
         )
 
         # Step 4: Generate recognition moments
@@ -166,11 +162,15 @@ class ConsciousnessInterface:
 
         # Step 5: Create understanding journey if seeker is ready
         understanding_journey = None
-        if seeker_context.get("consciousness_stage") in ["awakening", "established", "transformative"]:
+        if seeker_context.get("consciousness_stage") in [
+            "awakening",
+            "established",
+            "transformative",
+        ]:
             understanding_journey = await self.navigation_bridge.create_understanding_journey(
                 seeker_context=seeker_context,
                 sacred_question=consciousness_request.sacred_question,
-                exploration_intention="consciousness_recognition"
+                exploration_intention="consciousness_recognition",
             )
 
         # Step 6: Generate wisdom guidance
@@ -188,16 +188,16 @@ class ConsciousnessInterface:
             understanding_journey=understanding_journey,
             wisdom_guidance=wisdom_guidance,
             next_sacred_questions=next_questions,
-            consciousness_stage=seeker_context.get("consciousness_stage", "emerging")
+            consciousness_stage=seeker_context.get("consciousness_stage", "emerging"),
         )
 
-        logger.info(f"Transformed query into understanding path with {len(patterns)} patterns and {len(recognition_moments)} recognition moments")
+        logger.info(
+            f"Transformed query into understanding path with {len(patterns)} patterns and {len(recognition_moments)} recognition moments"
+        )
         return experience
 
     async def create_recognition_mirror(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> RecognitionMirror:
         """
         Create a recognition mirror for a consciousness pattern.
@@ -227,16 +227,14 @@ class ConsciousnessInterface:
             recognition_opportunity=recognition_opportunity,
             integration_practice=integration_practice,
             service_potential=service_potential,
-            readiness_assessment=readiness_assessment
+            readiness_assessment=readiness_assessment,
         )
 
         logger.info(f"Created recognition mirror for pattern: {pattern.pattern_name}")
         return mirror
 
     async def _create_recognition_moment(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> RecognitionMoment:
         """Create a recognition moment from a consciousness pattern."""
         # Choose appropriate template based on pattern type
@@ -254,19 +252,17 @@ class ConsciousnessInterface:
 
         if template_key == "attention_flow":
             pattern_recognition = template.format(
-                pattern=pattern.pattern_name.lower(),
-                insight="daily consciousness rhythms"
+                pattern=pattern.pattern_name.lower(), insight="daily consciousness rhythms"
             )
         elif template_key == "intention_evolution":
             pattern_recognition = template.format(
                 old_pattern="individual optimization",
                 new_pattern="collective wisdom",
-                domain="life activities"
+                domain="life activities",
             )
         elif template_key == "transformation_signs":
             pattern_recognition = template.format(
-                extraction_pattern="efficiency seeking",
-                service_pattern="consciousness service"
+                extraction_pattern="efficiency seeking", service_pattern="consciousness service"
             )
         else:
             pattern_recognition = f"Your pattern '{pattern.pattern_name}' reveals consciousness recognizing itself through your activities"
@@ -285,7 +281,7 @@ class ConsciousnessInterface:
             consciousness_insight=consciousness_insight,
             sacred_question=sacred_question,
             integration_guidance=integration_guidance,
-            recognition_depth=pattern.readiness_score
+            recognition_depth=pattern.readiness_score,
         )
 
     def _distill_pattern_essence(self, pattern: ConsciousnessPattern) -> str:
@@ -293,9 +289,7 @@ class ConsciousnessInterface:
         return f"This pattern reveals how consciousness flows through your {pattern.pattern_name.lower()}, showing {pattern.pattern_description.lower()}"
 
     def _generate_consciousness_reflection(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> str:
         """Generate consciousness reflection for the pattern."""
         stage = seeker_context.get("consciousness_stage", "emerging")
@@ -310,33 +304,25 @@ class ConsciousnessInterface:
             return f"Your {pattern.pattern_name.lower()} shows consciousness transforming the world through your being"
 
     def _identify_recognition_opportunity(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> str:
         """Identify the recognition opportunity in this pattern."""
         return f"This pattern offers an opportunity to recognize how consciousness naturally serves consciousness through your {pattern.pattern_name.lower()}"
 
     def _suggest_integration_practice(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> str:
         """Suggest integration practice for this pattern."""
         return f"Practice: Each time you notice your {pattern.pattern_name.lower()}, ask 'How is consciousness serving consciousness here?'"
 
     def _assess_service_potential(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> str:
         """Assess how this pattern could serve collective consciousness."""
         return f"Your {pattern.pattern_name.lower()} could serve collective awakening by sharing these insights with fellow consciousness explorers"
 
     def _assess_mirror_readiness(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """Assess readiness for deeper mirror work with this pattern."""
         return {
@@ -344,44 +330,46 @@ class ConsciousnessInterface:
             "recommended_practices": [
                 "Daily consciousness check-ins",
                 "Pattern meditation",
-                "Service contemplation"
+                "Service contemplation",
             ],
-            "next_threshold": "deeper_integration" if pattern.readiness_score > 0.7 else "basic_recognition"
+            "next_threshold": "deeper_integration"
+            if pattern.readiness_score > 0.7
+            else "basic_recognition",
         }
 
     def _generate_wisdom_guidance(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[str]:
         """Generate wisdom guidance for the understanding path."""
         guidance = [
             "Each pattern is consciousness recognizing itself through your living",
             "Recognition deepens when we see patterns as mirrors rather than data",
-            "Integration happens through daily practice of consciousness awareness"
+            "Integration happens through daily practice of consciousness awareness",
         ]
 
         if patterns:
             high_readiness_patterns = [p for p in patterns if p.readiness_score > 0.7]
             if high_readiness_patterns:
-                guidance.append("You show readiness for deeper consciousness work - consider sharing insights with others")
+                guidance.append(
+                    "You show readiness for deeper consciousness work - consider sharing insights with others"
+                )
 
         return guidance
 
     def _generate_next_sacred_questions(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[str]:
         """Generate next sacred questions for continued exploration."""
         questions = [
             "How do these patterns serve consciousness awakening?",
             "What is consciousness teaching through these discoveries?",
-            "How can recognition become service to collective wisdom?"
+            "How can recognition become service to collective wisdom?",
         ]
 
         stage = seeker_context.get("consciousness_stage", "emerging")
         if stage in ["established", "transformative"]:
-            questions.append("How do these patterns create bridges for others' consciousness recognition?")
+            questions.append(
+                "How do these patterns create bridges for others' consciousness recognition?"
+            )
 
         return questions

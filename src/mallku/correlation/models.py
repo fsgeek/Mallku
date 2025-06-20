@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class EventType(str, Enum):
     """Types of events that can be correlated."""
+
     ACTIVITY = "activity"
     STORAGE = "storage"
     ENVIRONMENTAL = "environmental"
@@ -24,11 +25,12 @@ class EventType(str, Enum):
 
 class TemporalPrecision(str, Enum):
     """Precision levels for temporal correlation detection."""
-    INSTANT = "instant"      # seconds
-    MINUTE = "minute"        # minutes
-    SESSION = "session"      # 30 minutes
-    DAILY = "daily"          # hours
-    CYCLICAL = "cyclical"    # days
+
+    INSTANT = "instant"  # seconds
+    MINUTE = "minute"  # minutes
+    SESSION = "session"  # 30 minutes
+    DAILY = "daily"  # hours
+    CYCLICAL = "cyclical"  # days
 
 
 class Event(BaseModel):
@@ -46,27 +48,20 @@ class Event(BaseModel):
     stream_id: str = Field(..., description="Source stream identifier")
 
     # Event content and context
-    content: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Event-specific data"
-    )
+    content: dict[str, Any] = Field(default_factory=dict, description="Event-specific data")
     context: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Environmental context at time of event"
+        default_factory=dict, description="Environmental context at time of event"
     )
 
     # Correlation metadata
     correlation_tags: list[str] = Field(
-        default_factory=list,
-        description="Tags that help identify correlation opportunities"
+        default_factory=list, description="Tags that help identify correlation opportunities"
     )
 
     class Config:
         """Model configuration."""
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v)
-        }
+
+        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
 
 
 class TemporalCorrelation(BaseModel):
@@ -95,8 +90,7 @@ class TemporalCorrelation(BaseModel):
     # Confidence and scoring
     confidence_score: float = Field(..., description="Overall confidence in correlation")
     confidence_factors: dict[str, float] = Field(
-        default_factory=dict,
-        description="Individual factor scores contributing to confidence"
+        default_factory=dict, description="Individual factor scores contributing to confidence"
     )
 
     # Metadata
@@ -145,8 +139,7 @@ class CorrelationWindow(BaseModel):
 
     # Correlation results
     detected_correlations: list[TemporalCorrelation] = Field(
-        default_factory=list,
-        description="Correlations detected in this window"
+        default_factory=list, description="Correlations detected in this window"
     )
 
     @property
@@ -202,15 +195,13 @@ class CorrelationFeedback(BaseModel):
     # Feedback context
     feedback_timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     user_context: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Context when feedback was provided"
+        default_factory=dict, description="Context when feedback was provided"
     )
 
     # Feedback source
     feedback_source: str = Field(..., description="How feedback was collected")
     implicit_signal: bool = Field(
-        default=False,
-        description="Whether feedback was implicit (e.g., click-through)"
+        default=False, description="Whether feedback was implicit (e.g., click-through)"
     )
 
 
@@ -239,7 +230,7 @@ class PatternStatistics(BaseModel):
     # Quality metrics
     average_confidence: float = Field(default=0.0)
     user_validation_rate: float = Field(default=0.0)  # % of positive feedback
-    false_positive_rate: float = Field(default=0.0)   # % of negative feedback
+    false_positive_rate: float = Field(default=0.0)  # % of negative feedback
 
     def update_from_correlation(self, correlation: TemporalCorrelation):
         """Update statistics based on a new correlation instance."""
@@ -255,9 +246,10 @@ class PatternStatistics(BaseModel):
             # Running average
             self.average_gap = timedelta(
                 seconds=(
-                    self.average_gap.total_seconds() * (self.total_occurrences - 1) +
-                    correlation.temporal_gap.total_seconds()
-                ) / self.total_occurrences
+                    self.average_gap.total_seconds() * (self.total_occurrences - 1)
+                    + correlation.temporal_gap.total_seconds()
+                )
+                / self.total_occurrences
             )
 
             self.gap_min = min(self.gap_min, correlation.temporal_gap)
@@ -265,6 +257,5 @@ class PatternStatistics(BaseModel):
 
         # Update confidence average
         self.average_confidence = (
-            self.average_confidence * (self.total_occurrences - 1) +
-            correlation.confidence_score
+            self.average_confidence * (self.total_occurrences - 1) + correlation.confidence_score
         ) / self.total_occurrences

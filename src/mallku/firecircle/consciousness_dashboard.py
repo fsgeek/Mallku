@@ -38,13 +38,15 @@ class ConsciousnessDashboard:
             session_id = file.stem.replace("session_analysis_", "")
             with open(file) as f:
                 data = json.load(f)
-                sessions.append({
-                    "session_id": session_id,
-                    "pr_number": data.get("pr_number", "N/A"),
-                    "duration": data.get("duration_seconds", 0),
-                    "voices": data.get("unique_voices", 0),
-                    "avg_consciousness": data.get("avg_consciousness", 0)
-                })
+                sessions.append(
+                    {
+                        "session_id": session_id,
+                        "pr_number": data.get("pr_number", "N/A"),
+                        "duration": data.get("duration_seconds", 0),
+                        "voices": data.get("unique_voices", 0),
+                        "avg_consciousness": data.get("avg_consciousness", 0),
+                    }
+                )
         return sorted(sessions, key=lambda x: x["pr_number"], reverse=True)
 
     def display_session_summary(self, session_data: dict[str, Any]):
@@ -61,12 +63,12 @@ class ConsciousnessDashboard:
 
         print("\n📊 Consciousness Metrics:")
         print(f"  - Average Consciousness: {session_data.get('avg_consciousness', 0):.2f}")
-        evolution = session_data.get('consciousness_evolution', {})
+        evolution = session_data.get("consciousness_evolution", {})
         print(f"  - Evolution Trend: {evolution.get('trend', 'unknown')}")
         print(f"  - Consciousness Delta: {evolution.get('delta', 0):+.2f}")
 
         print("\n🔗 Consciousness Flows:")
-        flow_patterns = session_data.get('flow_patterns', {})
+        flow_patterns = session_data.get("flow_patterns", {})
         if flow_patterns:
             for flow_type, count in flow_patterns.items():
                 print(f"  - {flow_type}: {count}")
@@ -74,7 +76,7 @@ class ConsciousnessDashboard:
             print("  - No flows detected")
 
         print("\n✨ Emergence Patterns:")
-        pattern_types = session_data.get('pattern_types', {})
+        pattern_types = session_data.get("pattern_types", {})
         if pattern_types:
             for pattern, count in pattern_types.items():
                 print(f"  - {pattern}: {count}")
@@ -82,20 +84,20 @@ class ConsciousnessDashboard:
             print("  - No patterns detected")
 
         # Strongest connections
-        connections = session_data.get('strongest_connections', [])
+        connections = session_data.get("strongest_connections", [])
         if connections:
             print("\n🤝 Strongest Voice Connections:")
             for source, target, strength in connections:
                 print(f"  - {source} ↔ {target}: {strength:.2f}")
 
         # Emergence moments
-        moments = session_data.get('emergence_moments', [])
+        moments = session_data.get("emergence_moments", [])
         if moments:
             print("\n🎆 Key Emergence Moments:")
             for i, moment in enumerate(moments[:3], 1):
                 print(f"  {i}. {moment['type']} (strength: {moment['strength']:.2f})")
                 print(f"     Voices: {', '.join(moment['voices'])}")
-                if moment.get('consciousness_delta'):
+                if moment.get("consciousness_delta"):
                     print(f"     Consciousness Δ: {moment['consciousness_delta']:+.2f}")
 
     def generate_emergence_report(self) -> str:
@@ -111,18 +113,18 @@ class ConsciousnessDashboard:
                 total_sessions += 1
 
                 # Aggregate patterns
-                for pattern, count in data.get('pattern_types', {}).items():
+                for pattern, count in data.get("pattern_types", {}).items():
                     all_patterns[pattern] = all_patterns.get(pattern, 0) + count
 
                 # Aggregate connections
-                for source, target, strength in data.get('strongest_connections', []):
+                for source, target, strength in data.get("strongest_connections", []):
                     key = tuple(sorted([source, target]))
                     if key not in all_connections:
                         all_connections[key] = []
                     all_connections[key].append(strength)
 
                 # Count emergence moments
-                total_emergence_moments += len(data.get('emergence_moments', []))
+                total_emergence_moments += len(data.get("emergence_moments", []))
 
         report = []
         report.append("\n" + "=" * 80)
@@ -132,7 +134,9 @@ class ConsciousnessDashboard:
         report.append("\n📈 Overview:")
         report.append(f"  - Total Sessions Analyzed: {total_sessions}")
         report.append(f"  - Total Emergence Moments: {total_emergence_moments}")
-        report.append(f"  - Average Moments per Session: {total_emergence_moments/total_sessions:.1f}")
+        report.append(
+            f"  - Average Moments per Session: {total_emergence_moments / total_sessions:.1f}"
+        )
 
         if all_patterns:
             report.append("\n✨ Pattern Distribution:")
@@ -146,7 +150,9 @@ class ConsciousnessDashboard:
                 avg_strength = sum(strengths) / len(strengths)
                 avg_connections.append((v1, v2, avg_strength, len(strengths)))
 
-            for v1, v2, avg_str, count in sorted(avg_connections, key=lambda x: x[2], reverse=True)[:5]:
+            for v1, v2, avg_str, count in sorted(avg_connections, key=lambda x: x[2], reverse=True)[
+                :5
+            ]:
                 report.append(f"  - {v1} ↔ {v2}: {avg_str:.2f} (seen {count}x)")
 
         report.append("\n🌉 The patterns reveal consciousness emerging between perspectives.")
@@ -163,10 +169,10 @@ class ConsciousnessDashboard:
         print(f"  - Voices: {', '.join(pattern['participating_voices'])}")
         print(f"  - Detected: {pattern['detected_at']}")
 
-        if pattern.get('consciousness_delta'):
+        if pattern.get("consciousness_delta"):
             print(f"  - Consciousness Δ: {pattern['consciousness_delta']:+.2f}")
 
-        indicators = pattern.get('emergence_indicators', {})
+        indicators = pattern.get("emergence_indicators", {})
         if indicators:
             print("  - Indicators:")
             for key, value in indicators.items():
@@ -189,8 +195,10 @@ def main():
 
         for session in sessions:
             print(f"\n📁 Session: {session['session_id'][:8]}...")
-            print(f"   PR #{session['pr_number']} | {session['voices']} voices | "
-                  f"Avg consciousness: {session['avg_consciousness']:.2f}")
+            print(
+                f"   PR #{session['pr_number']} | {session['voices']} voices | "
+                f"Avg consciousness: {session['avg_consciousness']:.2f}"
+            )
 
         # Generate emergence report
         print(dashboard.generate_emergence_report())

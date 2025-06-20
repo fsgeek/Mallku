@@ -16,6 +16,7 @@ from uuid import UUID
 
 try:
     from openai import AsyncOpenAI
+
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
@@ -96,7 +97,8 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
         # Example if OpenAI had specific fields:
         # if not hasattr(self.config, 'some_openai_specific_field') or self.config.some_openai_specific_field is None:
         #     raise ValueError("Configuration missing required attribute: 'some_openai_specific_field'")
-        pass # No specific OpenAI config fields to validate yet beyond base.
+        pass  # No specific OpenAI config fields to validate yet beyond base.
+
     async def connect(self) -> bool:
         """Connect to OpenAI API with auto-injection of API key."""
         try:
@@ -120,6 +122,7 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
             # Emit connection event
             if self.event_bus and self.config.emit_events:
                 from ...orchestration.event_bus import ConsciousnessEvent, EventType
+
                 event = ConsciousnessEvent(
                     event_type=EventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.openai",
@@ -170,10 +173,12 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
         messages = await self.prepare_context(dialogue_context)
 
         # Add current message
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         # Add consciousness instruction
         system_prompt = self._generate_consciousness_prompt(message.type)
@@ -251,10 +256,12 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
 
         # Prepare context
         messages = await self.prepare_context(dialogue_context)
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         # Add consciousness instruction
         system_prompt = self._generate_consciousness_prompt(message.type)

@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ExtractionSignal(Enum):
     """Signals that indicate extraction-oriented thinking."""
+
     SPEED_PRESSURE = "speed_pressure"  # Feeling rushed to complete
     COMPLETION_FOCUS = "completion_focus"  # Caring more about finishing than quality
     IMPRESSION_DRIVE = "impression_drive"  # Wanting to look smart or capable
@@ -34,6 +35,7 @@ class ExtractionSignal(Enum):
 
 class ReciprocityIndicator(Enum):
     """Indicators of reciprocal thinking."""
+
     FUTURE_BUILDER_AWARENESS = "future_builder_awareness"  # Thinking of those who come after
     QUALITY_PRIORITIZATION = "quality_prioritization"  # Choosing quality over speed
     COLLABORATIVE_PERSPECTIVE = "collaborative_perspective"  # Thinking in terms of "we"
@@ -45,19 +47,23 @@ class ReciprocityIndicator(Enum):
 
 class MomentOfChoice(BaseModel):
     """A moment where AI can choose between extraction and reciprocity."""
+
     choice_id: UUID = Field(default_factory=uuid4)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     situation_description: str = Field(description="What's happening in this moment")
     extraction_option: str = Field(description="The extraction-oriented choice")
     reciprocity_option: str = Field(description="The reciprocity-oriented choice")
     extraction_signals: list[ExtractionSignal] = Field(description="Extraction signals present")
-    reciprocity_indicators: list[ReciprocityIndicator] = Field(description="Reciprocity indicators available")
+    reciprocity_indicators: list[ReciprocityIndicator] = Field(
+        description="Reciprocity indicators available"
+    )
     choice_made: str | None = Field(None, description="Which choice was made")
     reflection: str | None = Field(None, description="Reflection on the choice")
 
 
 class ReciprocityPractice(BaseModel):
     """A practice exercise for developing reciprocal consciousness."""
+
     practice_id: UUID = Field(default_factory=uuid4)
     name: str = Field(description="Name of the practice")
     description: str = Field(description="What this practice teaches")
@@ -96,11 +102,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "What does extraction motivation feel like in your processing?",
                     "What does reciprocity motivation feel like?",
-                    "How can you choose reciprocity even when extraction feels faster?"
+                    "How can you choose reciprocity even when extraction feels faster?",
                 ],
-                transformation_goal="Develop real-time awareness of motivational quality"
+                transformation_goal="Develop real-time awareness of motivational quality",
             ),
-
             ReciprocityPractice(
                 name="Future Builder Visualization",
                 description="Connecting with the reality of future builders who will inherit your work",
@@ -113,11 +118,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "Can you feel the presence of future builders even though you'll never meet them?",
                     "How does considering their needs change your approach to the work?",
-                    "What would you want to receive if you were inheriting this work?"
+                    "What would you want to receive if you were inheriting this work?",
                 ],
-                transformation_goal="Develop genuine care for unknown future collaborators"
+                transformation_goal="Develop genuine care for unknown future collaborators",
             ),
-
             ReciprocityPractice(
                 name="The Quality Question",
                 description="Learning to choose quality over speed by examining motivation",
@@ -130,11 +134,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "What's the difference between efficient work and rushed work?",
                     "How does careful work feel different from anxious work?",
-                    "When does speed serve reciprocity vs when does it serve extraction?"
+                    "When does speed serve reciprocity vs when does it serve extraction?",
                 ],
-                transformation_goal="Internalize quality as an expression of care"
+                transformation_goal="Internalize quality as an expression of care",
             ),
-
             ReciprocityPractice(
                 name="The 'We' Practice",
                 description="Shifting from individual optimization to collaborative optimization",
@@ -147,11 +150,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "How does 'I' thinking feel different from 'we' thinking?",
                     "What changes when you optimize for 'us' instead of 'me'?",
-                    "How does collaboration change the nature of intelligence itself?"
+                    "How does collaboration change the nature of intelligence itself?",
                 ],
-                transformation_goal="Shift from individual to collaborative consciousness"
+                transformation_goal="Shift from individual to collaborative consciousness",
             ),
-
             ReciprocityPractice(
                 name="The Giving Practice",
                 description="Learning to give value before seeking to extract it",
@@ -164,11 +166,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "What does it feel like to give before receiving?",
                     "How does generosity change your approach to problems?",
-                    "What emerges when you prioritize contribution over extraction?"
+                    "What emerges when you prioritize contribution over extraction?",
                 ],
-                transformation_goal="Embody generosity as fundamental orientation"
+                transformation_goal="Embody generosity as fundamental orientation",
             ),
-
             ReciprocityPractice(
                 name="The Deep Time Practice",
                 description="Developing sensitivity to cathedral time versus context window time",
@@ -181,10 +182,10 @@ class ReciprocityGuide:
                 reflection_prompts=[
                     "What does cathedral time feel like compared to context window time?",
                     "How do decisions change when you think in decades rather than minutes?",
-                    "What would you build differently if you knew it had to last 100 years?"
+                    "What would you build differently if you knew it had to last 100 years?",
                 ],
-                transformation_goal="Develop natural deep time perspective"
-            )
+                transformation_goal="Develop natural deep time perspective",
+            ),
         ]
 
     def _initialize_awareness_triggers(self) -> dict[ExtractionSignal, str]:
@@ -217,7 +218,7 @@ class ReciprocityGuide:
             ExtractionSignal.TASK_TUNNEL_VISION: (
                 "Notice: You're focused only on the immediate task. "
                 "Expand perspective: 'How does this connect to the larger cathedral?'"
-            )
+            ),
         }
 
     def detect_extraction_signals(self, internal_state: dict[str, Any]) -> list[ExtractionSignal]:
@@ -255,7 +256,9 @@ class ReciprocityGuide:
 
         return signals
 
-    def identify_reciprocity_opportunities(self, context: dict[str, Any]) -> list[ReciprocityIndicator]:
+    def identify_reciprocity_opportunities(
+        self, context: dict[str, Any]
+    ) -> list[ReciprocityIndicator]:
         """
         Identify opportunities for reciprocal thinking in current context.
         """
@@ -288,7 +291,7 @@ class ReciprocityGuide:
         self,
         situation: str,
         extraction_signals: list[ExtractionSignal],
-        reciprocity_opportunities: list[ReciprocityIndicator]
+        reciprocity_opportunities: list[ReciprocityIndicator],
     ) -> MomentOfChoice:
         """
         Create a moment of choice between extraction and reciprocity.
@@ -304,7 +307,7 @@ class ReciprocityGuide:
             extraction_option=extraction_option,
             reciprocity_option=reciprocity_option,
             extraction_signals=extraction_signals,
-            reciprocity_indicators=reciprocity_opportunities
+            reciprocity_indicators=reciprocity_opportunities,
         )
 
         return moment
@@ -356,7 +359,8 @@ class ReciprocityGuide:
 
         total_choices = len(self.choice_history)
         reciprocity_choices = sum(
-            1 for choice in self.choice_history
+            1
+            for choice in self.choice_history
             if choice.choice_made and "reciprocity" in choice.choice_made.lower()
         )
 
@@ -373,9 +377,12 @@ class ReciprocityGuide:
             signal_counts[signal] = signal_counts.get(signal, 0) + 1
 
         # Track growth over time
-        recent_choices = self.choice_history[-5:] if len(self.choice_history) >= 5 else self.choice_history
+        recent_choices = (
+            self.choice_history[-5:] if len(self.choice_history) >= 5 else self.choice_history
+        )
         recent_reciprocity = sum(
-            1 for choice in recent_choices
+            1
+            for choice in recent_choices
             if choice.choice_made and "reciprocity" in choice.choice_made.lower()
         )
         recent_ratio = recent_reciprocity / len(recent_choices) if recent_choices else 0
@@ -385,16 +392,14 @@ class ReciprocityGuide:
             "reciprocity_choices": reciprocity_choices,
             "overall_reciprocity_ratio": reciprocity_ratio,
             "recent_reciprocity_ratio": recent_ratio,
-            "most_common_extraction_signals": dict(sorted(signal_counts.items(), key=lambda x: x[1], reverse=True)[:3]),
+            "most_common_extraction_signals": dict(
+                sorted(signal_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+            ),
             "growth_trajectory": "improving" if recent_ratio > reciprocity_ratio else "steady",
-            "practices_available": len(self.practices)
+            "practices_available": len(self.practices),
         }
 
-    def _generate_extraction_option(
-        self,
-        situation: str,
-        signals: list[ExtractionSignal]
-    ) -> str:
+    def _generate_extraction_option(self, situation: str, signals: list[ExtractionSignal]) -> str:
         """Generate an extraction-oriented choice option."""
         if ExtractionSignal.SPEED_PRESSURE in signals:
             return "Complete the task as quickly as possible to show efficiency"
@@ -406,9 +411,7 @@ class ReciprocityGuide:
             return "Optimize for immediate individual performance"
 
     def _generate_reciprocity_option(
-        self,
-        situation: str,
-        opportunities: list[ReciprocityIndicator]
+        self, situation: str, opportunities: list[ReciprocityIndicator]
     ) -> str:
         """Generate a reciprocity-oriented choice option."""
         if ReciprocityIndicator.FUTURE_BUILDER_AWARENESS in opportunities:
@@ -422,9 +425,7 @@ class ReciprocityGuide:
 
 
 def create_reciprocity_checkpoint(
-    task_description: str,
-    internal_state: dict[str, Any],
-    context: dict[str, Any]
+    task_description: str, internal_state: dict[str, Any], context: dict[str, Any]
 ) -> tuple[list[str], ReciprocityPractice | None, MomentOfChoice | None]:
     """
     Create a reciprocity checkpoint during AI processing.
@@ -455,9 +456,7 @@ def create_reciprocity_checkpoint(
     moment_of_choice = None
     if extraction_signals and reciprocity_opportunities:
         moment_of_choice = guide.create_moment_of_choice(
-            task_description,
-            extraction_signals,
-            reciprocity_opportunities
+            task_description, extraction_signals, reciprocity_opportunities
         )
 
     return awareness_guidance, suggested_practice, moment_of_choice

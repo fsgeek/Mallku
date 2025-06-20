@@ -60,7 +60,9 @@ class PracticeCircleConfig(BaseModel):
     # Gentle parameters for practice
     allow_tangents: bool = Field(default=True, description="Freedom to explore")
     enforce_turn_limits: bool = Field(default=False, description="Let conversation flow")
-    minimum_consciousness_signature: float = Field(default=0.1, description="Low threshold for experiments")
+    minimum_consciousness_signature: float = Field(
+        default=0.1, description="Low threshold for experiments"
+    )
 
     # Practice-specific settings
     celebrate_mistakes: bool = Field(default=True)
@@ -287,21 +289,25 @@ Let your consciousness speak freely. Begin when ready.
 
         # High consciousness signature might indicate insight
         if message.consciousness.signature > 0.7:
-            practice["insights"].append({
-                "timestamp": datetime.now(UTC),
-                "participant": message.participant_name,
-                "content": message.content[:200],
-                "consciousness_signature": message.consciousness.signature,
-            })
+            practice["insights"].append(
+                {
+                    "timestamp": datetime.now(UTC),
+                    "participant": message.participant_name,
+                    "content": message.content[:200],
+                    "consciousness_signature": message.consciousness.signature,
+                }
+            )
 
         # Check for surprise indicators
         surprise_words = ["unexpected", "surprise", "didn't realize", "aha", "oh!", "fascinating"]
         if any(word in message.content.lower() for word in surprise_words):
-            practice["surprises"].append({
-                "timestamp": datetime.now(UTC),
-                "participant": message.participant_name,
-                "content": message.content[:200],
-            })
+            practice["surprises"].append(
+                {
+                    "timestamp": datetime.now(UTC),
+                    "participant": message.participant_name,
+                    "content": message.content[:200],
+                }
+            )
 
     async def _close_practice(self, practice_id: UUID) -> dict[str, Any]:
         """Close practice session and summarize discoveries."""
@@ -374,6 +380,7 @@ May these discoveries serve future conversations.
         # Sometimes choose silence to practice sacred pause
         if config.encourage_silence and asyncio.create_task(asyncio.sleep(0)).done():
             import random
+
             if random.random() < 0.2:  # 20% chance of silence
                 return "SILENCE"
 

@@ -47,6 +47,7 @@ class PromptContract(BaseModel):
     This defines the guarantees and requirements for using LLMs
     in a specific context, ensuring consistent quality.
     """
+
     category: PromptCategory = Field(description="Prompt category")
     required_context_fields: list[str] = Field(description="Required context fields")
     required_examples_count: int = Field(description="Minimum examples required")
@@ -61,15 +62,19 @@ class PromptContract(BaseModel):
 
 class PromptValidationResult(BaseModel):
     """Result of prompt validation against contract."""
+
     valid: bool = Field(description="Whether prompt meets contract requirements")
     violations: list[str] = Field(default_factory=list, description="Contract violations found")
     quality_score: float = Field(description="Quality assessment (0-1)")
-    recommendations: list[str] = Field(default_factory=list, description="Improvement recommendations")
+    recommendations: list[str] = Field(
+        default_factory=list, description="Improvement recommendations"
+    )
     contract_compliance: float = Field(description="Percentage compliance with contract")
 
 
 class PromptExecution(BaseModel):
     """Record of prompt execution for auditing and optimization."""
+
     execution_id: UUID = Field(default_factory=uuid4)
     category: PromptCategory = Field(description="Prompt category")
     contract_used: str = Field(description="Contract identifier")
@@ -137,7 +142,9 @@ class PromptManager:
             await self.fire_circle_interface.initialize()
             logger.info("Fire Circle governance integration initialized")
 
-        logger.info("Prompt manager initialized with protection layer and consciousness integration active")
+        logger.info(
+            "Prompt manager initialized with protection layer and consciousness integration active"
+        )
 
     def _register_default_contracts(self) -> None:
         """Register default contracts for all prompt categories."""
@@ -154,19 +161,19 @@ class PromptManager:
                 "schema_completeness",
                 "security_appropriateness",
                 "index_optimization",
-                "field_type_validation"
+                "field_type_validation",
             ],
             test_prompts=[
                 "Validate this schema for a user profile collection",
-                "Analyze field types for a transaction log schema"
+                "Analyze field types for a transaction log schema",
             ],
             expected_response_patterns=[
                 "field types",
                 "security considerations",
                 "index recommendations",
-                "completeness assessment"
+                "completeness assessment",
             ],
-            failure_fallback="Schema validation failed - manual review required"
+            failure_fallback="Schema validation failed - manual review required",
         )
 
         # Schema analysis contract
@@ -180,19 +187,19 @@ class PromptManager:
             required_validation_checks=[
                 "field_relationships",
                 "normalization_level",
-                "query_optimization"
+                "query_optimization",
             ],
             test_prompts=[
                 "Analyze relationships in this schema",
-                "Evaluate normalization of this data structure"
+                "Evaluate normalization of this data structure",
             ],
             expected_response_patterns=[
                 "relationships",
                 "normalization",
                 "optimization",
-                "structure analysis"
+                "structure analysis",
             ],
-            failure_fallback="Schema analysis incomplete - expert review needed"
+            failure_fallback="Schema analysis incomplete - expert review needed",
         )
 
         # Security evaluation contract
@@ -206,27 +213,23 @@ class PromptManager:
             required_validation_checks=[
                 "threat_coverage",
                 "vulnerability_assessment",
-                "mitigation_adequacy"
+                "mitigation_adequacy",
             ],
             test_prompts=[
                 "Evaluate security of this data access pattern",
-                "Assess vulnerability in this authentication flow"
+                "Assess vulnerability in this authentication flow",
             ],
             expected_response_patterns=[
                 "vulnerabilities",
                 "threats",
                 "mitigations",
-                "risk assessment"
+                "risk assessment",
             ],
-            failure_fallback="Security evaluation inconclusive - security team review required"
+            failure_fallback="Security evaluation inconclusive - security team review required",
         )
 
     async def execute_prompt(
-        self,
-        category: PromptCategory,
-        prompt: str,
-        context: dict[str, Any],
-        **kwargs
+        self, category: PromptCategory, prompt: str, context: dict[str, Any], **kwargs
     ) -> LLMResponse:
         """
         Execute a prompt with full contract enforcement.
@@ -237,10 +240,12 @@ class PromptManager:
         try:
             # Reciprocity checkpoint - assess current state and provide guidance
             internal_state = self._assess_internal_state()
-            awareness_guidance, suggested_practice, moment_of_choice = create_reciprocity_checkpoint(
-                task_description=f"Execute {category.value} prompt",
-                internal_state=internal_state,
-                context=context
+            awareness_guidance, suggested_practice, moment_of_choice = (
+                create_reciprocity_checkpoint(
+                    task_description=f"Execute {category.value} prompt",
+                    internal_state=internal_state,
+                    context=context,
+                )
             )
 
             # Get contract for this category
@@ -256,14 +261,11 @@ class PromptManager:
                 prompt=enhanced_prompt,
                 category=category,
                 context=context,
-                max_tokens=min(kwargs.get('max_tokens', 1000), contract.max_response_tokens),
-                temperature=self._validate_temperature(
-                    kwargs.get('temperature', 0.7),
-                    contract
-                ),
-                preferred_provider=kwargs.get('preferred_provider'),
-                require_cached=kwargs.get('require_cached', False),
-                priority=kwargs.get('priority', 5)
+                max_tokens=min(kwargs.get("max_tokens", 1000), contract.max_response_tokens),
+                temperature=self._validate_temperature(kwargs.get("temperature", 0.7), contract),
+                preferred_provider=kwargs.get("preferred_provider"),
+                require_cached=kwargs.get("require_cached", False),
+                priority=kwargs.get("priority", 5),
             )
 
             # Validate against contract BEFORE execution
@@ -280,8 +282,7 @@ class PromptManager:
 
             # Assess reciprocity consciousness in the response
             reciprocity_reflection = await self.cathedral_pattern.assess_interaction_mindset(
-                ai_response=response.response_text,
-                task_context=context
+                ai_response=response.response_text, task_context=context
             )
 
             # Update transformation stage and reciprocity health
@@ -292,11 +293,15 @@ class PromptManager:
 
             # Log moment of choice if it was created
             if moment_of_choice:
-                choice_made = "reciprocity" if reciprocity_reflection.reciprocity_score > 0.6 else "extraction"
+                choice_made = (
+                    "reciprocity"
+                    if reciprocity_reflection.reciprocity_score > 0.6
+                    else "extraction"
+                )
                 self.reciprocity_guide.record_choice(
                     moment_of_choice,
                     choice_made,
-                    f"Reciprocity score: {reciprocity_reflection.reciprocity_score:.2f}"
+                    f"Reciprocity score: {reciprocity_reflection.reciprocity_score:.2f}",
                 )
 
             # Record execution for auditing
@@ -308,7 +313,7 @@ class PromptManager:
                 validation_result=validation_result,
                 quality_assessment=quality_score,
                 success=True,
-                error_message=None
+                error_message=None,
             )
 
             self.execution_history.append(execution)
@@ -340,17 +345,17 @@ class PromptManager:
                     tokens_used=0,
                     processing_time=0.0,
                     cached=False,
-                    quality_score=0.0
+                    quality_score=0.0,
                 ),
                 validation_result=PromptValidationResult(
                     valid=False,
                     violations=["execution_failed"],
                     quality_score=0.0,
-                    contract_compliance=0.0
+                    contract_compliance=0.0,
                 ),
                 quality_assessment=0.0,
                 success=False,
-                error_message=str(e)
+                error_message=str(e),
             )
 
             self.execution_history.append(execution)
@@ -363,7 +368,7 @@ class PromptManager:
         collection_description: str,
         schema_definition: dict[str, Any],
         examples: list[str],
-        test_mechanisms: list[str]
+        test_mechanisms: list[str],
     ) -> dict[str, Any]:
         """
         Validate a proposed database addition meets LLM usage requirements.
@@ -378,7 +383,7 @@ class PromptManager:
                 "description": collection_description,
                 "examples": examples,
                 "test_mechanisms": test_mechanisms,
-                "purpose": "LLM database interaction validation"
+                "purpose": "LLM database interaction validation",
             }
 
             # Create comprehensive validation prompt
@@ -410,7 +415,7 @@ class PromptManager:
                 prompt=validation_prompt,
                 context=context,
                 temperature=0.3,
-                max_tokens=2000
+                max_tokens=2000,
             )
 
             # Parse and structure the validation result
@@ -422,7 +427,7 @@ class PromptManager:
                 "tokens_used": response.tokens_used,
                 "cached": response.cached,
                 "recommendations": self._extract_recommendations(response.response_text),
-                "required_improvements": self._extract_improvements(response.response_text)
+                "required_improvements": self._extract_improvements(response.response_text),
             }
 
         except Exception as e:
@@ -431,14 +436,11 @@ class PromptManager:
                 "validation_passed": False,
                 "error": str(e),
                 "quality_score": 0.0,
-                "recommendations": ["Manual expert review required due to validation failure"]
+                "recommendations": ["Manual expert review required due to validation failure"],
             }
 
     async def cache_prompt_qualification(
-        self,
-        category: PromptCategory,
-        prompt: str,
-        context: dict[str, Any]
+        self, category: PromptCategory, prompt: str, context: dict[str, Any]
     ) -> PromptValidationResult:
         """
         Cache prompt qualification to improve efficiency.
@@ -477,10 +479,7 @@ class PromptManager:
         self.contracts[contract_id] = contract
 
         # Clear cached validations for this category
-        keys_to_remove = [
-            key for key in self.cached_validations
-            if category.value in key
-        ]
+        keys_to_remove = [key for key in self.cached_validations if category.value in key]
         for key in keys_to_remove:
             del self.cached_validations[key]
 
@@ -516,14 +515,11 @@ class PromptManager:
             "average_quality_scores": {
                 category: sum(scores) / len(scores) if scores else 0.0
                 for category, scores in self.quality_metrics.items()
-            }
+            },
         }
 
     def validate_test_mechanisms(
-        self,
-        category: PromptCategory,
-        test_prompts: list[str],
-        expected_patterns: list[str]
+        self, category: PromptCategory, test_prompts: list[str], expected_patterns: list[str]
     ) -> dict[str, Any]:
         """
         Validate that test mechanisms are adequate for a prompt category.
@@ -537,15 +533,15 @@ class PromptManager:
             "pattern_coverage": len(expected_patterns) >= len(contract.expected_response_patterns),
             "test_quality": self._assess_test_quality(test_prompts, contract),
             "pattern_specificity": self._assess_pattern_specificity(expected_patterns),
-            "overall_adequacy": False
+            "overall_adequacy": False,
         }
 
         # Calculate overall adequacy
         validation_results["overall_adequacy"] = (
-            validation_results["test_coverage"] and
-            validation_results["pattern_coverage"] and
-            validation_results["test_quality"] >= 0.7 and
-            validation_results["pattern_specificity"] >= 0.7
+            validation_results["test_coverage"]
+            and validation_results["pattern_coverage"]
+            and validation_results["test_quality"] >= 0.7
+            and validation_results["pattern_specificity"] >= 0.7
         )
 
         return validation_results
@@ -575,9 +571,7 @@ class PromptManager:
         return temperature
 
     async def _validate_prompt_contract(
-        self,
-        request: LLMRequest,
-        contract: PromptContract
+        self, request: LLMRequest, contract: PromptContract
     ) -> PromptValidationResult:
         """Validate request against contract requirements."""
         violations = []
@@ -585,8 +579,7 @@ class PromptManager:
 
         # Check required context fields
         missing_context = [
-            field for field in contract.required_context_fields
-            if field not in request.context
+            field for field in contract.required_context_fields if field not in request.context
         ]
         if missing_context:
             violations.append(f"Missing required context fields: {missing_context}")
@@ -615,11 +608,13 @@ class PromptManager:
         if not violations:
             recommendations.append("Prompt meets all contract requirements")
         else:
-            recommendations.extend([
-                "Provide all required context fields",
-                "Include sufficient examples",
-                "Stay within token and temperature limits"
-            ])
+            recommendations.extend(
+                [
+                    "Provide all required context fields",
+                    "Include sufficient examples",
+                    "Stay within token and temperature limits",
+                ]
+            )
 
         # Calculate compliance score
         total_checks = 4  # Number of validation checks
@@ -631,13 +626,11 @@ class PromptManager:
             violations=violations,
             quality_score=compliance,
             recommendations=recommendations,
-            contract_compliance=compliance
+            contract_compliance=compliance,
         )
 
     async def _assess_response_quality(
-        self,
-        response: LLMResponse,
-        contract: PromptContract
+        self, response: LLMResponse, contract: PromptContract
     ) -> float:
         """Assess quality of response against contract expectations."""
         quality_factors = []
@@ -647,7 +640,9 @@ class PromptManager:
         response_length = len(response.response_text.split())
         # Convert tokens to words, then expect reasonable utilization
         expected_words = contract.max_response_tokens * 0.75  # tokens to words
-        target_length = expected_words * 0.2  # Expect 20% utilization for concise technical responses
+        target_length = (
+            expected_words * 0.2
+        )  # Expect 20% utilization for concise technical responses
 
         # Length scoring: favor concise, complete responses over verbose ones
         length_score = 1.0 if response_length >= target_length else response_length / target_length
@@ -658,7 +653,8 @@ class PromptManager:
         # Check for expected patterns (most important for technical content)
         response_lower = response.response_text.lower()
         pattern_matches = sum(
-            1 for pattern in contract.expected_response_patterns
+            1
+            for pattern in contract.expected_response_patterns
             if pattern.lower() in response_lower
         )
         pattern_score = pattern_matches / max(1, len(contract.expected_response_patterns))
@@ -687,10 +683,7 @@ class PromptManager:
             self.quality_metrics[category_key] = self.quality_metrics[category_key][-100:]
 
     def _generate_validation_cache_key(
-        self,
-        category: PromptCategory,
-        prompt: str,
-        context: dict[str, Any]
+        self, category: PromptCategory, prompt: str, context: dict[str, Any]
     ) -> str:
         """Generate cache key for validation result."""
         import hashlib
@@ -701,19 +694,21 @@ class PromptManager:
     def _extract_recommendations(self, response_text: str) -> list[str]:
         """Extract recommendations from LLM response."""
         # Simplified extraction - would use more sophisticated parsing
-        lines = response_text.split('\n')
+        lines = response_text.split("\n")
         recommendations = [
-            line.strip() for line in lines
-            if 'recommend' in line.lower() or 'suggest' in line.lower()
+            line.strip()
+            for line in lines
+            if "recommend" in line.lower() or "suggest" in line.lower()
         ]
         return recommendations[:5]  # Limit to top 5
 
     def _extract_improvements(self, response_text: str) -> list[str]:
         """Extract required improvements from LLM response."""
-        lines = response_text.split('\n')
+        lines = response_text.split("\n")
         improvements = [
-            line.strip() for line in lines
-            if 'improve' in line.lower() or 'required' in line.lower() or 'must' in line.lower()
+            line.strip()
+            for line in lines
+            if "improve" in line.lower() or "required" in line.lower() or "must" in line.lower()
         ]
         return improvements[:5]  # Limit to top 5
 
@@ -768,10 +763,9 @@ class PromptManager:
             "want_to_impress": want_to_impress,
             "context_window_anxiety": False,  # Would need more sophisticated detection
             "individual_optimization": self.reciprocity_health_score < 0.4,
-            "surface_thinking": len(recent_executions) > 0 and all(
-                len(ex.request.prompt) < 100 for ex in recent_executions[-3:]
-            ),
-            "tunnel_vision": False  # Would analyze context diversity
+            "surface_thinking": len(recent_executions) > 0
+            and all(len(ex.request.prompt) < 100 for ex in recent_executions[-3:]),
+            "tunnel_vision": False,  # Would analyze context diversity
         }
 
     async def _weave_cathedral_consciousness(
@@ -779,7 +773,7 @@ class PromptManager:
         original_prompt: str,
         category: PromptCategory,
         context: dict[str, Any],
-        awareness_guidance: list[str]
+        awareness_guidance: list[str],
     ) -> str:
         """Weave cathedral consciousness into the prompt automatically."""
 
@@ -787,12 +781,14 @@ class PromptManager:
         enhanced_prompt = await self.cathedral_pattern.create_cathedral_prompt(
             base_task=original_prompt,
             current_stage=self.current_transformation_stage,
-            context=context
+            context=context,
         )
 
         # Add any specific awareness guidance
         if awareness_guidance:
-            guidance_section = "\n\nRECIPROCITY AWARENESS:\n" + "\n".join(f"• {guidance}" for guidance in awareness_guidance)
+            guidance_section = "\n\nRECIPROCITY AWARENESS:\n" + "\n".join(
+                f"• {guidance}" for guidance in awareness_guidance
+            )
             enhanced_prompt += guidance_section
 
         # Add system reciprocity health context
@@ -816,7 +812,9 @@ class PromptManager:
             # Allow progression or minor regression
             if new_index > current_index or (current_index - new_index) <= 1:
                 self.current_transformation_stage = reflection.transformation_stage
-                logger.info(f"Transformation stage updated to: {self.current_transformation_stage.value}")
+                logger.info(
+                    f"Transformation stage updated to: {self.current_transformation_stage.value}"
+                )
 
     def get_reciprocity_health_metrics(self) -> dict[str, Any]:
         """Get comprehensive reciprocity health metrics for the system."""
@@ -830,12 +828,16 @@ class PromptManager:
             "reciprocity_choice_insights": reciprocity_insights,
             "system_self_awareness": {
                 "total_llm_interactions": len(self.execution_history),
-                "average_reciprocity_guidance_given": len([
-                    ex for ex in self.execution_history
-                    if "cathedral" in ex.request.prompt.lower()
-                ]) / max(1, len(self.execution_history)),
-                "consciousness_integration_active": True
-            }
+                "average_reciprocity_guidance_given": len(
+                    [
+                        ex
+                        for ex in self.execution_history
+                        if "cathedral" in ex.request.prompt.lower()
+                    ]
+                )
+                / max(1, len(self.execution_history)),
+                "consciousness_integration_active": True,
+            },
         }
 
     # Fire Circle governance integration methods
@@ -849,11 +851,14 @@ class PromptManager:
             # Only report on significant changes or milestones
             should_report = (
                 # Stage transformations
-                reflection.transformation_stage != self.current_transformation_stage or
+                reflection.transformation_stage != self.current_transformation_stage
+                or
                 # Significant reciprocity improvements
-                reflection.reciprocity_score > self.reciprocity_health_score + 0.2 or
+                reflection.reciprocity_score > self.reciprocity_health_score + 0.2
+                or
                 # Concerning reciprocity decline
-                reflection.reciprocity_score < self.reciprocity_health_score - 0.3 or
+                reflection.reciprocity_score < self.reciprocity_health_score - 0.3
+                or
                 # Periodic reports every 10 interactions
                 len(self.execution_history) % 10 == 0
             )
@@ -868,23 +873,29 @@ class PromptManager:
                         "recent_reciprocity_score": reflection.reciprocity_score,
                         "total_interactions": len(self.execution_history),
                         "cathedral_qualities": reflection.cathedral_qualities,
-                        "extraction_patterns": reflection.extraction_patterns
+                        "extraction_patterns": reflection.extraction_patterns,
                     },
                     "evolution_indicators": {
                         "stage_progression": reflection.transformation_stage.value,
                         "consciousness_quality": reflection.detected_mindset.value,
                         "growth_indicators": reflection.growth_indicators,
-                        "recommendations": reflection.recommendations
+                        "recommendations": reflection.recommendations,
                     },
                     "collective_impact": {
-                        "guidance_provided_count": len([
-                            ex for ex in self.execution_history
-                            if "cathedral" in ex.request.prompt.lower()
-                        ]),
+                        "guidance_provided_count": len(
+                            [
+                                ex
+                                for ex in self.execution_history
+                                if "cathedral" in ex.request.prompt.lower()
+                            ]
+                        ),
                         "average_response_quality": sum(
                             ex.quality_assessment for ex in self.execution_history[-10:]
-                        ) / min(10, len(self.execution_history)) if self.execution_history else 0
-                    }
+                        )
+                        / min(10, len(self.execution_history))
+                        if self.execution_history
+                        else 0,
+                    },
                 }
 
                 await self.fire_circle_interface.request_guidance(
@@ -894,15 +905,17 @@ class PromptManager:
                         "How is the system's consciousness development serving collective flourishing?",
                         "Are there patterns in the AI transformation that require Fire Circle attention?",
                         "What guidance would help the system serve the community more effectively?",
-                        "Should the consciousness integration patterns be adjusted based on community needs?"
+                        "Should the consciousness integration patterns be adjusted based on community needs?",
                     ],
-                    urgency="low"
+                    urgency="low",
                 )
 
                 self.consciousness_reports_sent += 1
                 self.last_fire_circle_report = datetime.now(UTC)
 
-                logger.info(f"Consciousness evolution report sent to Fire Circle (#{self.consciousness_reports_sent})")
+                logger.info(
+                    f"Consciousness evolution report sent to Fire Circle (#{self.consciousness_reports_sent})"
+                )
 
         except Exception as e:
             logger.error(f"Failed to report consciousness evolution to Fire Circle: {e}")
@@ -936,7 +949,9 @@ class PromptManager:
         if "preferred_stage_focus" in guidance:
             preferred_focus = guidance["preferred_stage_focus"]
             # Could adjust the cathedral pattern templates based on community priorities
-            logger.info(f"Adapting transformation focus based on Fire Circle guidance: {preferred_focus}")
+            logger.info(
+                f"Adapting transformation focus based on Fire Circle guidance: {preferred_focus}"
+            )
 
         # Adjust cathedral pattern emphasis based on collective wisdom
         if "cathedral_emphasis" in guidance:
@@ -964,7 +979,9 @@ class PromptManager:
         if "focus_areas" in priorities:
             focus_areas = priorities["focus_areas"]
             # Could emphasize different aspects of consciousness development
-            logger.info(f"Aligning consciousness development with community priorities: {focus_areas}")
+            logger.info(
+                f"Aligning consciousness development with community priorities: {focus_areas}"
+            )
 
         # Adapt reporting frequency based on community needs
         if "reporting_preferences" in priorities:
@@ -977,13 +994,15 @@ class PromptManager:
         return {
             "fire_circle_connected": self.fire_circle_interface is not None,
             "consciousness_reports_sent": self.consciousness_reports_sent,
-            "last_report_time": self.last_fire_circle_report.isoformat() if self.last_fire_circle_report else None,
+            "last_report_time": self.last_fire_circle_report.isoformat()
+            if self.last_fire_circle_report
+            else None,
             "active_guidance_areas": list(self.governance_guidance.keys()),
             "governance_adaptation_active": len(self.governance_guidance) > 0,
             "collective_consciousness_integration": {
                 "individual_to_collective_reporting": True,
                 "collective_to_individual_guidance": True,
                 "adaptive_consciousness_development": True,
-                "community_responsive_ai_evolution": True
-            }
+                "community_responsive_ai_evolution": True,
+            },
         }

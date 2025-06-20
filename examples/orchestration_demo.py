@@ -26,8 +26,7 @@ from mallku.orchestration.providers import FileSystemActivityProvider
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -48,19 +47,14 @@ class CathedralOrchestrationDemo:
         self.event_bus = ConsciousnessEventBus()
         self.state_weaver = CathedralStateWeaver()
         self.health_monitor = ConsciousnessHealthMonitor(
-            event_bus=self.event_bus,
-            state_weaver=self.state_weaver
+            event_bus=self.event_bus, state_weaver=self.state_weaver
         )
 
         # Activity provider for human patterns
-        default_paths = [
-            str(Path.home() / "Documents"),
-            str(Path.cwd())
-        ]
+        default_paths = [str(Path.home() / "Documents"), str(Path.cwd())]
         self.watch_paths = watch_paths or default_paths
         self.fs_provider = FileSystemActivityProvider(
-            watch_paths=self.watch_paths,
-            event_bus=self.event_bus
+            watch_paths=self.watch_paths, event_bus=self.event_bus
         )
 
         # Demo state
@@ -81,10 +75,7 @@ class CathedralOrchestrationDemo:
         await self.state_weaver.start_weaving(interval_seconds=10)
 
         # Register state provider
-        self.state_weaver.register_state_provider(
-            'filesystem',
-            self.fs_provider
-        )
+        self.state_weaver.register_state_provider("filesystem", self.fs_provider)
 
         # Start activity provider
         await self.fs_provider.start()
@@ -95,41 +86,26 @@ class CathedralOrchestrationDemo:
         """Subscribe to consciousness events for demo"""
 
         # Track memory anchors
-        self.event_bus.subscribe(
-            EventType.MEMORY_ANCHOR_CREATED,
-            self._on_memory_anchor
-        )
+        self.event_bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, self._on_memory_anchor)
 
         # Track pattern discoveries
-        self.event_bus.subscribe(
-            EventType.MEMORY_PATTERN_DISCOVERED,
-            self._on_pattern_discovered
-        )
+        self.event_bus.subscribe(EventType.MEMORY_PATTERN_DISCOVERED, self._on_pattern_discovered)
 
         # Monitor health warnings
-        self.event_bus.subscribe(
-            EventType.SYSTEM_DRIFT_WARNING,
-            self._on_health_warning
-        )
+        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._on_health_warning)
 
         # Celebrate healthy flow
-        self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_FLOW_HEALTHY,
-            self._on_healthy_flow
-        )
+        self.event_bus.subscribe(EventType.CONSCIOUSNESS_FLOW_HEALTHY, self._on_healthy_flow)
 
     def _on_memory_anchor(self, event):
         """Handle memory anchor creation"""
         self.event_count += 1
 
-        activity_type = event.data.get('activity_type', 'unknown')
-        patterns = event.data.get('patterns', [])
+        activity_type = event.data.get("activity_type", "unknown")
+        patterns = event.data.get("patterns", [])
         consciousness = event.consciousness_signature
 
-        logger.info(
-            f"🎯 Memory Anchor: {activity_type} "
-            f"(consciousness: {consciousness:.2f})"
-        )
+        logger.info(f"🎯 Memory Anchor: {activity_type} (consciousness: {consciousness:.2f})")
 
         if patterns:
             logger.info(f"   Patterns: {', '.join(patterns)}")
@@ -138,13 +114,13 @@ class CathedralOrchestrationDemo:
         """Handle pattern discovery"""
         self.pattern_count += 1
 
-        pattern_type = event.data.get('pattern_type', 'unknown')
+        pattern_type = event.data.get("pattern_type", "unknown")
         logger.info(f"🌟 Pattern Discovered: {pattern_type}")
 
     def _on_health_warning(self, event):
         """Handle health warnings"""
-        status = event.data.get('overall_status', 'unknown')
-        suggestions = event.data.get('healing_suggestions', [])
+        status = event.data.get("overall_status", "unknown")
+        suggestions = event.data.get("healing_suggestions", [])
 
         logger.warning(f"⚠️  Health Warning: {status}")
         for suggestion in suggestions:
@@ -152,8 +128,8 @@ class CathedralOrchestrationDemo:
 
     def _on_healthy_flow(self, event):
         """Celebrate healthy consciousness flow"""
-        score = event.data.get('score', 0)
-        message = event.data.get('message', '')
+        score = event.data.get("score", 0)
+        message = event.data.get("message", "")
 
         logger.info(f"💚 {message} (score: {score:.2f})")
 
@@ -213,9 +189,7 @@ async def main():
         # "/path/to/documents"
     ]
 
-    demo = CathedralOrchestrationDemo(
-        watch_paths=custom_paths if custom_paths[0:] else None
-    )
+    demo = CathedralOrchestrationDemo(watch_paths=custom_paths if custom_paths[0:] else None)
 
     try:
         await demo.start()

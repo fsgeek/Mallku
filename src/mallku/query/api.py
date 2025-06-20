@@ -38,7 +38,7 @@ app = FastAPI(
     title="Memory Anchor Query Interface",
     description="Query interface for contextual search through memory anchors",
     version="0.1.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Enable CORS for web frontend integration
@@ -64,7 +64,9 @@ async def execute_query(query_request: QueryRequest):
     try:
         logger.info(f"Executing query: {query_request.query_text}")
         response = await query_service.execute_query(query_request)
-        logger.info(f"Query completed: {response.results_returned} results in {response.processing_time_ms}ms")
+        logger.info(
+            f"Query completed: {response.results_returned} results in {response.processing_time_ms}ms"
+        )
         return response
     except Exception as e:
         logger.error(f"Query execution failed: {e}")
@@ -77,7 +79,7 @@ async def simple_query(
     max_results: int = Query(default=20, description="Maximum number of results"),
     min_confidence: float = Query(default=0.3, description="Minimum confidence threshold"),
     include_explanations: bool = Query(default=True, description="Include query explanations"),
-    query_type: QueryType | None = Query(default=None, description="Explicit query type")
+    query_type: QueryType | None = Query(default=None, description="Explicit query type"),
 ):
     """
     Simple GET endpoint for quick queries.
@@ -89,7 +91,7 @@ async def simple_query(
         query_type=query_type,
         max_results=max_results,
         min_confidence=min_confidence,
-        include_explanations=include_explanations
+        include_explanations=include_explanations,
     )
 
     return await execute_query(request)
@@ -128,28 +130,28 @@ async def get_query_examples():
             "documents I worked on last Tuesday",
             "edits made 3 hours ago",
             "files from this morning's work session",
-            "documents modified during last week"
+            "documents modified during last week",
         ],
         "pattern_queries": [
             "files I typically edit after meetings",
             "documents I usually work on in the morning",
             "files I often access after email notifications",
             "code I typically modify during standup meetings",
-            "documents I create when working from home"
+            "documents I create when working from home",
         ],
         "contextual_queries": [
             "files related to my current project",
             "documents similar to project_plan.md",
             "files associated with client presentation",
             "documents connected to the weekly report",
-            "files related to development work"
+            "files related to development work",
         ],
         "mixed_queries": [
             "project files I typically edit after Monday meetings",
             "documents similar to quarterly_report.pdf from last week",
             "code files I usually modify during afternoon sessions",
-            "meeting notes I created during client calls this month"
-        ]
+            "meeting notes I created during client calls this month",
+        ],
     }
 
 
@@ -162,27 +164,24 @@ async def get_query_types():
         "temporal": {
             "description": "Time-based queries that find files based on when activities occurred",
             "keywords": ["yesterday", "today", "last week", "3 hours ago", "morning", "afternoon"],
-            "examples": [
-                "files from yesterday afternoon",
-                "documents edited last Tuesday"
-            ]
+            "examples": ["files from yesterday afternoon", "documents edited last Tuesday"],
         },
         "pattern": {
             "description": "Behavioral pattern queries that find files based on recurring activities",
             "keywords": ["typically", "usually", "often", "always", "after", "before", "during"],
             "examples": [
                 "files I typically edit after meetings",
-                "documents I usually work on in the morning"
-            ]
+                "documents I usually work on in the morning",
+            ],
         },
         "contextual": {
             "description": "Context-based queries that find files through relationships and similarity",
             "keywords": ["related", "similar", "like", "associated", "connected"],
             "examples": [
                 "files related to my current project",
-                "documents similar to project_plan.md"
-            ]
-        }
+                "documents similar to project_plan.md",
+            ],
+        },
     }
 
 
@@ -193,7 +192,12 @@ async def health_check():
         "status": "healthy",
         "service": "Memory Anchor Query Interface",
         "timestamp": datetime.now(UTC).isoformat(),
-        "capabilities": ["temporal_queries", "pattern_queries", "contextual_queries", "anchor_traversal"]
+        "capabilities": [
+            "temporal_queries",
+            "pattern_queries",
+            "contextual_queries",
+            "anchor_traversal",
+        ],
     }
 
 

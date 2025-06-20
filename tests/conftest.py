@@ -49,13 +49,15 @@ sys.path[:] = [p for p in sys.path if p not in UNWANTED_PATHS]
 
 
 # Reload the top-level package so it is sourced from the local checkout
-if 'mallku' in sys.modules:
-    importlib.reload(sys.modules['mallku'])
+if "mallku" in sys.modules:
+    importlib.reload(sys.modules["mallku"])
 
 # Patch reciprocity tracker alias if required
 try:
-    tracker_mod = importlib.import_module('mallku.reciprocity.tracker')
-    if not hasattr(tracker_mod, 'ReciprocityTracker') and hasattr(tracker_mod, 'SecureReciprocityTracker'):
+    tracker_mod = importlib.import_module("mallku.reciprocity.tracker")
+    if not hasattr(tracker_mod, "ReciprocityTracker") and hasattr(
+        tracker_mod, "SecureReciprocityTracker"
+    ):
         tracker_mod.ReciprocityTracker = tracker_mod.SecureReciprocityTracker  # type: ignore[attr-defined]
 except ImportError:
     # Module might not be available yet; individual tests will fail and

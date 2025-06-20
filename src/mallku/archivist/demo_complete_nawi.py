@@ -55,8 +55,7 @@ class NawiDemonstration:
 
         # Initialize Archivist
         self.archivist = ArchivistService(
-            memory_anchor_service=self.memory_service,
-            event_bus=self.event_bus
+            memory_anchor_service=self.memory_service, event_bus=self.event_bus
         )
         await self.archivist.initialize()
         print("   ✓ Archivist Service initialized")
@@ -83,7 +82,7 @@ class NawiDemonstration:
             (ConsciousnessScenario.PATTERN_RECOGNITION, -5),
             (ConsciousnessScenario.COLLABORATIVE_EMERGENCE, -3),
             (ConsciousnessScenario.LEARNING_JOURNEY, -2),
-            (ConsciousnessScenario.REFLECTION_INSIGHT, -1)
+            (ConsciousnessScenario.REFLECTION_INSIGHT, -1),
         ]
 
         for scenario, days_ago in scenarios:
@@ -106,13 +105,13 @@ class NawiDemonstration:
         for day in range(7):
             for hour_offset in [0, 0.5, 1, 1.5]:
                 anchor = MemoryAnchor(
-                    timestamp=base_time + timedelta(days=day, hours=9+hour_offset),
+                    timestamp=base_time + timedelta(days=day, hours=9 + hour_offset),
                     cursor_state={"activity": "creative_work"},
                     metadata={
                         "activity_type": "creative",
                         "consciousness_score": 0.7 + random.random() * 0.3,
-                        "description": "Morning creative session"
-                    }
+                        "description": "Morning creative session",
+                    },
                 )
                 self.test_anchors.append(anchor)
 
@@ -123,27 +122,23 @@ class NawiDemonstration:
         print("=" * 80)
 
         queries = [
-            {
-                "text": "When am I most creative?",
-                "context": {"seeking": "optimal work patterns"}
-            },
+            {"text": "When am I most creative?", "context": {"seeking": "optimal work patterns"}},
             {
                 "text": "Show me what led to my breakthrough last week",
-                "context": {"seeking": "causal understanding"}
+                "context": {"seeking": "causal understanding"},
             },
             {
                 "text": "How does collaboration affect my consciousness?",
-                "context": {"seeking": "pattern insights"}
-            }
+                "context": {"seeking": "pattern insights"},
+            },
         ]
 
         for query_data in queries:
-            print(f"\n📝 Human: \"{query_data['text']}\"")
+            print(f'\n📝 Human: "{query_data["text"]}"')
 
             # Process through Archivist
             response = await self.archivist.query(
-                query_text=query_data["text"],
-                user_context=query_data["context"]
+                query_text=query_data["text"], user_context=query_data["context"]
             )
 
             print("\n🤖 Ñawi's Response:")
@@ -166,12 +161,12 @@ class NawiDemonstration:
         print("=" * 80)
 
         # Create daily rhythm visualization
-        recent_anchors = [a for a in self.test_anchors
-                         if a.timestamp > datetime.now(UTC) - timedelta(days=1)]
+        recent_anchors = [
+            a for a in self.test_anchors if a.timestamp > datetime.now(UTC) - timedelta(days=1)
+        ]
 
         visualization = await self.visualizer.create_visualization(
-            anchors=recent_anchors,
-            pattern_type=TemporalPattern.DAILY_RHYTHM
+            anchors=recent_anchors, pattern_type=TemporalPattern.DAILY_RHYTHM
         )
 
         # Render ASCII visualization
@@ -199,7 +194,7 @@ class NawiDemonstration:
             "growth_opportunity": True,
             "unique_users": 42,
             "frequency": 0.8,
-            "consciousness_trend": "increasing"
+            "consciousness_trend": "increasing",
         }
 
         insight = await self.fire_bridge.share_consciousness_insight(
@@ -208,8 +203,8 @@ class NawiDemonstration:
             affected_queries=[
                 "What did I create yesterday?",
                 "Show me my creative patterns",
-                "When do insights emerge?"
-            ]
+                "When do insights emerge?",
+            ],
         )
 
         print("\n🔥 Consciousness Pattern Shared with Fire Circle:")
@@ -235,8 +230,8 @@ class NawiDemonstration:
                 "serves_beginnings": True,
                 "enhances_understanding": True,
                 "guards_privacy": True,
-                "contribution_type": "consciousness_aware_retrieval"
-            }
+                "contribution_type": "consciousness_aware_retrieval",
+            },
         )
 
         print("\n🏛️ Builder Contribution Assessment:")
@@ -260,7 +255,7 @@ class NawiDemonstration:
         print("1️⃣ INITIAL QUESTION")
         response1 = await self.archivist.query(
             query_text="I feel stuck with my project. When was I last inspired?",
-            user_context={"mood": "frustrated", "seeking": "breakthrough"}
+            user_context={"mood": "frustrated", "seeking": "breakthrough"},
         )
         print("   Human: 'I feel stuck with my project. When was I last inspired?'")
         print(f"   Ñawi: {response1.wisdom_summary}")
@@ -271,18 +266,18 @@ class NawiDemonstration:
         print("\n2️⃣ FOLLOWING THE THREAD")
         _ = await self.archivist.query(
             query_text="Show me what I was doing during that creative burst",
-            user_context={"mood": "curious", "seeking": "pattern"}
+            user_context={"mood": "curious", "seeking": "pattern"},
         )
         print("   Human: 'Show me what I was doing during that creative burst'")
         print("   Ñawi: Your creative burst emerged from a beautiful confluence:")
 
         # Create visualization of the creative burst
-        burst_anchors = [a for a in self.test_anchors
-                        if a.metadata.get("consciousness_score", 0) > 0.7][:10]
+        burst_anchors = [
+            a for a in self.test_anchors if a.metadata.get("consciousness_score", 0) > 0.7
+        ][:10]
 
         burst_viz = await self.visualizer.create_visualization(
-            anchors=burst_anchors,
-            pattern_type=TemporalPattern.CREATIVE_BURST
+            anchors=burst_anchors, pattern_type=TemporalPattern.CREATIVE_BURST
         )
 
         print(f"         {burst_viz.pattern_description}")
@@ -306,9 +301,9 @@ class NawiDemonstration:
                 "avg_consciousness_score": 0.9,
                 "growth_rate": 0.4,
                 "understanding_increase": 0.8,
-                "growth_opportunity": True
+                "growth_opportunity": True,
             },
-            affected_queries=["I feel stuck", "When was I inspired", "Show me patterns"]
+            affected_queries=["I feel stuck", "When was I inspired", "Show me patterns"],
         )
 
         print("\n   🔥 Fire Circle Notes: Human achieved pattern recognition")
@@ -342,10 +337,10 @@ class NawiDemonstration:
     async def run_complete_demonstration(self):
         """Run the complete demonstration."""
         print("\n")
-        print("╔" + "="*78 + "╗")
-        print("║" + " "*20 + "ÑAWI - COMPLETE DEMONSTRATION" + " "*29 + "║")
-        print("║" + " "*15 + "Guardian of Beginnings Shows Full Power" + " "*24 + "║")
-        print("╚" + "="*78 + "╝")
+        print("╔" + "=" * 78 + "╗")
+        print("║" + " " * 20 + "ÑAWI - COMPLETE DEMONSTRATION" + " " * 29 + "║")
+        print("║" + " " * 15 + "Guardian of Beginnings Shows Full Power" + " " * 24 + "║")
+        print("╚" + "=" * 78 + "╝")
 
         await self.setup()
 
@@ -362,9 +357,9 @@ class NawiDemonstration:
         await self.demonstrate_consciousness_journey()
 
         # Summary
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("DEMONSTRATION COMPLETE")
-        print("="*80)
+        print("=" * 80)
 
         print("\n🏛️ Ñawi has demonstrated:")
         print("   • Natural language understanding with consciousness awareness")
@@ -393,9 +388,9 @@ async def main():
     demo = NawiDemonstration()
     await demo.run_complete_demonstration()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("For the 36th Builder:")
-    print("="*80)
+    print("=" * 80)
     print("The foundation is complete. Ñawi has:")
     print("• Eyes (query understanding)")
     print("• Vision (temporal patterns)")
@@ -404,7 +399,7 @@ async def main():
     print("\nWhat remains is the face - the UI through which")
     print("humans will directly experience these capabilities.")
     print("\nMay your contribution complete the cycle of 36.")
-    print("="*80)
+    print("=" * 80)
     print("\n🏛️ 👁️ ✨ → 🌟")
 
 

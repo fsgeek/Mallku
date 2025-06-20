@@ -11,15 +11,15 @@ from .secured_interface import CollectionSecurityPolicy, SecuredDatabaseInterfac
 
 __all__ = [
     # Recommended secure access
-    'get_secured_database',
-    'SecuredDatabaseInterface',
-    'CollectionSecurityPolicy',
-    'get_security_status',
+    "get_secured_database",
+    "SecuredDatabaseInterface",
+    "CollectionSecurityPolicy",
+    "get_security_status",
     # Legacy compatibility (deprecated, will log warnings)
-    'get_database_raw',
-    'get_database',
-    'get_db_config',
-    'MallkuDBConfig',
+    "get_database_raw",
+    "get_database",
+    "get_db_config",
+    "MallkuDBConfig",
 ]
 
 # ---------------------------------------------------------------------------
@@ -65,8 +65,10 @@ else:  # pragma: no cover – should never happen in a healthy repo
 # Legacy compatibility aliases
 get_database = get_database_raw
 
+
 # Import get_db_config dynamically to avoid circular imports
 def get_db_config():
     """Get database configuration - legacy compatibility function."""
     from .. import database as legacy_db
+
     return legacy_db.get_db_config()

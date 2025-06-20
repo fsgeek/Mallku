@@ -24,7 +24,7 @@ class MemoryAnchorClient:
         service_url: str = "http://localhost:8000",
         provider_id: str | None = None,
         provider_type: str | None = None,
-        cursor_types: list | None = None
+        cursor_types: list | None = None,
     ):
         self.service_url = service_url
         self.ws_url = service_url.replace("http", "ws") + "/ws"
@@ -44,8 +44,8 @@ class MemoryAnchorClient:
                     "provider_id": self.provider_id,
                     "provider_type": self.provider_type,
                     "cursor_types": self.cursor_types,
-                    "metadata": metadata or {}
-                }
+                    "metadata": metadata or {},
+                },
             )
             response.raise_for_status()
             result = response.json()
@@ -53,10 +53,7 @@ class MemoryAnchorClient:
             return result
 
     async def update_cursor(
-        self,
-        cursor_type: str,
-        cursor_value: Any,
-        metadata: dict[str, Any] | None = None
+        self, cursor_type: str, cursor_value: Any, metadata: dict[str, Any] | None = None
     ) -> dict:
         """Send cursor update to the service"""
         async with httpx.AsyncClient() as client:
@@ -66,8 +63,8 @@ class MemoryAnchorClient:
                     "provider_id": self.provider_id,
                     "cursor_type": cursor_type,
                     "cursor_value": cursor_value,
-                    "metadata": metadata or {}
-                }
+                    "metadata": metadata or {},
+                },
             )
             response.raise_for_status()
             result = response.json()
@@ -96,10 +93,7 @@ class MemoryAnchorClient:
             self._ws_connection = websocket
 
             # Send initial connection message
-            await websocket.send(json.dumps({
-                "type": "connect",
-                "provider_id": self.provider_id
-            }))
+            await websocket.send(json.dumps({"type": "connect", "provider_id": self.provider_id}))
 
             # Listen for updates
             async for message in websocket:
@@ -119,6 +113,7 @@ class MemoryAnchorClient:
 
 # --- Example Provider Implementation ---
 
+
 class ExampleLocationProvider:
     """
     Example provider that reports location changes to Memory Anchor Service
@@ -128,21 +123,16 @@ class ExampleLocationProvider:
         self.client = MemoryAnchorClient(
             provider_id="location_provider_001",
             provider_type="gps",
-            cursor_types=["spatial", "temporal"]
+            cursor_types=["spatial", "temporal"],
         )
         self.last_location = None
 
     async def initialize(self):
         """Initialize provider and register with service"""
-        await self.client.register(metadata={
-            "accuracy": "high",
-            "update_frequency": "on_change"
-        })
+        await self.client.register(metadata={"accuracy": "high", "update_frequency": "on_change"})
 
         # Set up websocket for notifications
-        asyncio.create_task(
-            self.client.connect_websocket(self.on_anchor_change)
-        )
+        asyncio.create_task(self.client.connect_websocket(self.on_anchor_change))
 
     async def on_anchor_change(self, new_anchor_id: UUID, data: dict):
         """Handle anchor change notifications"""
@@ -154,14 +144,14 @@ class ExampleLocationProvider:
         location_data = {
             "latitude": latitude,
             "longitude": longitude,
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         # Update spatial cursor
         result = await self.client.update_cursor(
             cursor_type="spatial",
             cursor_value=location_data,
-            metadata={"source": "gps", "accuracy_meters": 5.0}
+            metadata={"source": "gps", "accuracy_meters": 5.0},
         )
 
         self.last_location = location_data
@@ -169,8 +159,7 @@ class ExampleLocationProvider:
 
         # Also update temporal cursor
         await self.client.update_cursor(
-            cursor_type="temporal",
-            cursor_value=datetime.now(UTC).isoformat()
+            cursor_type="temporal", cursor_value=datetime.now(UTC).isoformat()
         )
 
     async def run_simulation(self):
@@ -192,6 +181,7 @@ class ExampleLocationProvider:
 
 # --- Usage Example ---
 
+
 async def main():
     """Example usage of Memory Anchor Client"""
 
@@ -205,9 +195,7 @@ async def main():
 
     # Get lineage
     async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"http://localhost:8000/anchors/{current['anchor_id']}/lineage"
-        )
+        response = await client.get(f"http://localhost:8000/anchors/{current['anchor_id']}/lineage")
         lineage = response.json()
         print(f"Anchor lineage ({len(lineage)} entries):")
         for anchor in lineage:

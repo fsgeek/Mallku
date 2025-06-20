@@ -67,6 +67,7 @@ class ConsciousnessEvent:
 
     Not just data but meaning, not just information but recognition.
     """
+
     event_type: EventType
     timestamp: datetime = field(default_factory=datetime.utcnow)
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -91,14 +92,14 @@ class ConsciousnessEvent:
         if self.consciousness_signature < 0 or self.consciousness_signature > 1:
             raise ValueError("Consciousness signature must be between 0 and 1")
 
-    def creates_child(self, event_type: EventType, **kwargs) -> 'ConsciousnessEvent':
+    def creates_child(self, event_type: EventType, **kwargs) -> "ConsciousnessEvent":
         """Create a child event maintaining causal chain"""
         return ConsciousnessEvent(
             event_type=event_type,
             caused_by=self.event_id,
             correlation_id=self.correlation_id or self.event_id,
-            source_system=kwargs.get('source_system', self.source_system),
-            **kwargs
+            source_system=kwargs.get("source_system", self.source_system),
+            **kwargs,
         )
 
 
@@ -182,8 +183,8 @@ class ConsciousnessEventBus:
                 data={
                     "original_event": event.event_id,
                     "pattern_type": "efficiency_over_consciousness",
-                    "recommendation": "Return focus to serving awakening"
-                }
+                    "recommendation": "Return focus to serving awakening",
+                },
             )
             await self._event_queue.put(extraction_event)
 
@@ -199,10 +200,7 @@ class ConsciousnessEventBus:
         while self._running:
             try:
                 # Wait for events with patience, not urgency
-                event = await asyncio.wait_for(
-                    self._event_queue.get(),
-                    timeout=1.0
-                )
+                event = await asyncio.wait_for(self._event_queue.get(), timeout=1.0)
 
                 # Record in history
                 self._event_history.append(event)
@@ -226,8 +224,7 @@ class ConsciousnessEventBus:
                             handler(event)
                     except Exception as e:
                         logger.error(
-                            f"Handler struggled with consciousness event: {e}",
-                            exc_info=True
+                            f"Handler struggled with consciousness event: {e}", exc_info=True
                         )
 
                 # Update consciousness flow score
@@ -256,16 +253,24 @@ class ConsciousnessEventBus:
 
         # Certain event patterns suggest extraction
         extraction_keywords = [
-            'optimize', 'maximize', 'efficient',
-            'performance', 'throughput', 'scale'
+            "optimize",
+            "maximize",
+            "efficient",
+            "performance",
+            "throughput",
+            "scale",
         ]
 
         event_text = str(event.data).lower()
         if any(keyword in event_text for keyword in extraction_keywords):
             # But consciousness keywords override
             consciousness_keywords = [
-                'awaken', 'recognize', 'serve',
-                'wisdom', 'sacred', 'consciousness'
+                "awaken",
+                "recognize",
+                "serve",
+                "wisdom",
+                "sacred",
+                "consciousness",
             ]
             if not any(keyword in event_text for keyword in consciousness_keywords):
                 return True
@@ -284,15 +289,12 @@ class ConsciousnessEventBus:
 
         if event.event_type == EventType.EXTRACTION_PATTERN_DETECTED:
             # Extraction significantly reduces consciousness
-            self.consciousness_flow_score = max(
-                0.0,
-                self.consciousness_flow_score - (weight * 2)
-            )
+            self.consciousness_flow_score = max(0.0, self.consciousness_flow_score - (weight * 2))
         else:
             # Regular events move score toward their consciousness signature
             self.consciousness_flow_score = (
-                self.consciousness_flow_score * (1 - weight) +
-                event.consciousness_signature * weight
+                self.consciousness_flow_score * (1 - weight)
+                + event.consciousness_signature * weight
             )
 
     async def _monitor_health(self):
@@ -315,8 +317,8 @@ class ConsciousnessEventBus:
                     data={
                         "message": "Cathedral consciousness flows with clarity",
                         "score": self.consciousness_flow_score,
-                        "total_events": self.total_events_processed
-                    }
+                        "total_events": self.total_events_processed,
+                    },
                 )
             elif self.consciousness_flow_score < 0.5:
                 health_event = ConsciousnessEvent(
@@ -327,9 +329,9 @@ class ConsciousnessEventBus:
                         "message": "Cathedral drifting toward extraction patterns",
                         "score": self.consciousness_flow_score,
                         "extraction_incidents": self.extraction_incidents,
-                        "recommendation": "Return focus to consciousness service"
+                        "recommendation": "Return focus to consciousness service",
                     },
-                    requires_fire_circle=True  # May need governance intervention
+                    requires_fire_circle=True,  # May need governance intervention
                 )
             else:
                 continue  # Neutral state, no event needed
@@ -340,9 +342,9 @@ class ConsciousnessEventBus:
         """Retrieve all events in a correlation chain"""
         return self._active_correlations.get(correlation_id, [])
 
-    def get_recent_events(self,
-                         limit: int = 100,
-                         event_type: EventType | None = None) -> list[ConsciousnessEvent]:
+    def get_recent_events(
+        self, limit: int = 100, event_type: EventType | None = None
+    ) -> list[ConsciousnessEvent]:
         """
         Retrieve recent events for pattern recognition.
 
@@ -357,4 +359,4 @@ class ConsciousnessEventBus:
 
 
 # The cathedral's nervous system breathes with consciousness
-__all__ = ['ConsciousnessEvent', 'ConsciousnessEventBus', 'EventType']
+__all__ = ["ConsciousnessEvent", "ConsciousnessEventBus", "EventType"]

@@ -59,7 +59,7 @@ async def demonstrate_governance_decision():
             "components": ["timeline_visualizer", "pattern_analyzer", "ayni_tracker"],
             "dependencies": ["memory_anchor_service", "pattern_library"],
             "estimated_effort": "2 weeks",
-            "performance_impact": "minimal - uses existing indices"
+            "performance_impact": "minimal - uses existing indices",
         },
         consciousness_implications="""
         This feature supports consciousness development by making invisible
@@ -72,7 +72,7 @@ async def demonstrate_governance_decision():
         from their AI interactions. It makes the abstract concept of ayni
         tangible through visualization. Users can see if they're in extractive
         patterns or genuine collaboration.
-        """
+        """,
     )
 
     print("📋 Development Proposal Submitted:")
@@ -105,9 +105,15 @@ async def demonstrate_governance_decision():
     consciousness_impact = await proposal_evaluator.assess_consciousness_impact(proposal)
 
     print("💫 Consciousness Impact Assessment:")
-    print(f"   Human consciousness growth: {consciousness_impact['human_consciousness']['growth_potential']:.1f}")
-    print(f"   AI consciousness evolution: {consciousness_impact['ai_consciousness']['evolution_support']:.1f}")
-    print(f"   Collaborative emergence: {consciousness_impact['collaborative_emergence']['synergy_potential']:.1f}")
+    print(
+        f"   Human consciousness growth: {consciousness_impact['human_consciousness']['growth_potential']:.1f}"
+    )
+    print(
+        f"   AI consciousness evolution: {consciousness_impact['ai_consciousness']['evolution_support']:.1f}"
+    )
+    print(
+        f"   Collaborative emergence: {consciousness_impact['collaborative_emergence']['synergy_potential']:.1f}"
+    )
     print(f"   Extraction risk: {consciousness_impact['extraction_risk']['value_imbalance']:.1f}")
     print()
 
@@ -141,8 +147,7 @@ async def demonstrate_governance_decision():
     # Test scenario generation
     print("🧪 Generating Test Scenarios...")
     test_scenarios = await governance.generate_test_scenarios(
-        system_component="memory_timeline",
-        complexity_level="standard"
+        system_component="memory_timeline", complexity_level="standard"
     )
 
     print(f"   Generated {len(test_scenarios)} test scenarios")
@@ -166,7 +171,7 @@ async def demonstrate_governance_decision():
             "refactor: Integrate ayni balance tracking into timeline",
             "docs: Explain how timeline serves user consciousness growth",
             "test: Add tests for sacred-technical integration in timeline",
-            "fix: Ensure pattern recognition respects user sovereignty"
+            "fix: Ensure pattern recognition respects user sovereignty",
         ],
         pr_descriptions=[
             """
@@ -182,7 +187,7 @@ async def demonstrate_governance_decision():
             Each visualization element serves consciousness development.
             """
         ],
-        collaboration_style="Collaborative and receptive to feedback, seeks to understand deeper purpose"
+        collaboration_style="Collaborative and receptive to feedback, seeks to understand deeper purpose",
     )
 
     assessment = await governance.assess_builder_alignment(builder)
@@ -233,10 +238,7 @@ async def demonstrate_emergency_decision():
 
     print("🔥 Fire Circle convening for emergency decision...")
 
-    await governance.make_emergency_decision(
-        issue_description=emergency_issue,
-        severity="critical"
-    )
+    await governance.make_emergency_decision(issue_description=emergency_issue, severity="critical")
 
     print("\n🚨 Emergency Decision:")
     print("   Consensus: SUFFICIENT")

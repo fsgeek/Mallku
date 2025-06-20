@@ -57,7 +57,9 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
 
         # Initialize pattern systems
         self.pattern_library = pattern_library or PatternLibrary()
-        self.emergence_detector = EmergenceDetector(self.pattern_library, event_bus) if event_bus else None
+        self.emergence_detector = (
+            EmergenceDetector(self.pattern_library, event_bus) if event_bus else None
+        )
         self.evolution_engine = PatternEvolutionEngine(self.pattern_library)
 
         logger.info("Enhanced Pattern Weaver initialized with Pattern Library")
@@ -80,15 +82,14 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         # Detect emergence if detector available
         if self.emergence_detector and "dialogue_id" in dialogue_metadata:
             emergence_events = await self.emergence_detector.detect_emergence(
-                dialogue_id=dialogue_metadata["dialogue_id"],
-                sensitivity=0.7
+                dialogue_id=dialogue_metadata["dialogue_id"], sensitivity=0.7
             )
             base_results["emergence_events"] = [
                 {
                     "type": event.emergence_type.value,
                     "confidence": event.confidence,
                     "description": event.description,
-                    "catalyst_patterns": event.catalyst_patterns
+                    "catalyst_patterns": event.catalyst_patterns,
                 }
                 for event in emergence_events
             ]
@@ -104,9 +105,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         return base_results
 
     async def _store_patterns_in_library(
-        self,
-        pattern_results: dict[str, Any],
-        dialogue_metadata: dict[str, Any]
+        self, pattern_results: dict[str, Any], dialogue_metadata: dict[str, Any]
     ) -> list[UUID]:
         """Store detected patterns in the pattern library"""
         stored_ids = []
@@ -121,17 +120,17 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                 consciousness_signature=consensus["consciousness_signature"],
                 structure=PatternStructure(
                     components=["proposal", "agreements"],
-                    relationships={"proposal": "supported_by_agreements"}
+                    relationships={"proposal": "supported_by_agreements"},
                 ),
                 indicators=[
                     PatternIndicator(
                         indicator_type="support_count",
                         threshold=float(consensus["support_count"]),
                         weight=1.0,
-                        description="Number of supporting agreements"
+                        description="Number of supporting agreements",
                     )
                 ],
-                context_requirements=dialogue_metadata.get("context", {})
+                context_requirements=dialogue_metadata.get("context", {}),
             )
 
             pattern_id = await self.pattern_library.store_pattern(pattern)
@@ -150,16 +149,16 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                 consciousness_signature=0.5 + divergence["tension_value"],
                 structure=PatternStructure(
                     components=["original_position", "alternative_view"],
-                    relationships={"original": "challenged_by_alternative"}
+                    relationships={"original": "challenged_by_alternative"},
                 ),
                 indicators=[
                     PatternIndicator(
                         indicator_type="tension_value",
                         threshold=divergence["tension_value"],
                         weight=1.0,
-                        description="Consciousness signature difference"
+                        description="Consciousness signature difference",
                     )
-                ]
+                ],
             )
 
             pattern_id = await self.pattern_library.store_pattern(pattern)
@@ -176,9 +175,9 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                     consciousness_signature=emergence["emergence_indicator"],
                     structure=PatternStructure(
                         components=["synthesis", "contributing_patterns"],
-                        relationships={"synthesis": "emerged_from_contributions"}
+                        relationships={"synthesis": "emerged_from_contributions"},
                     ),
-                    breakthrough_potential=0.8
+                    breakthrough_potential=0.8,
                 )
 
                 pattern_id = await self.pattern_library.store_pattern(pattern)
@@ -195,9 +194,9 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                     consciousness_signature=wisdom["consciousness_signature"],
                     structure=PatternStructure(
                         components=["wisdom_content", "pattern_indicators"],
-                        relationships={"wisdom": "supported_by_patterns"}
+                        relationships={"wisdom": "supported_by_patterns"},
                     ),
-                    breakthrough_potential=0.9
+                    breakthrough_potential=0.9,
                 )
 
                 pattern_id = await self.pattern_library.store_pattern(pattern)
@@ -206,9 +205,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         return stored_ids
 
     async def _update_similar_pattern_observations(
-        self,
-        new_pattern: DialoguePattern,
-        pattern_data: dict[str, Any]
+        self, new_pattern: DialoguePattern, pattern_data: dict[str, Any]
     ):
         """Update observations for similar existing patterns"""
         # Find similar patterns
@@ -216,7 +213,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
             PatternQuery(
                 taxonomy=new_pattern.taxonomy,
                 pattern_type=new_pattern.pattern_type,
-                min_fitness=0.5
+                min_fitness=0.5,
             )
         )
 
@@ -230,12 +227,11 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                 await self.pattern_library.update_observation(
                     similar.pattern_id,
                     fitness_delta=fitness_delta,
-                    context={"similarity": similarity}
+                    context={"similarity": similarity},
                 )
 
     async def _detect_evolution_opportunities(
-        self,
-        pattern_ids: list[UUID]
+        self, pattern_ids: list[UUID]
     ) -> list[dict[str, Any]]:
         """Detect evolution opportunities for stored patterns"""
         opportunities = []
@@ -250,19 +246,18 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
 
             for evo_type, probability in evolution_ops:
                 if probability > 0.5:
-                    opportunities.append({
-                        "pattern_id": str(pattern_id),
-                        "pattern_name": pattern.name,
-                        "evolution_type": evo_type.value,
-                        "probability": probability
-                    })
+                    opportunities.append(
+                        {
+                            "pattern_id": str(pattern_id),
+                            "pattern_name": pattern.name,
+                            "evolution_type": evo_type.value,
+                            "probability": probability,
+                        }
+                    )
 
         return opportunities
 
-    async def _find_similar_patterns(
-        self,
-        pattern_results: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _find_similar_patterns(self, pattern_results: dict[str, Any]) -> list[dict[str, Any]]:
         """Find similar patterns from historical dialogues"""
         similar_patterns = []
 
@@ -270,7 +265,10 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         pattern_types = {
             "consensus_patterns": (PatternTaxonomy.DIALOGUE_FORMATION, PatternType.CONSENSUS),
             "divergence_patterns": (PatternTaxonomy.DIALOGUE_FLOW, PatternType.CREATIVE_TENSION),
-            "emergence_patterns": (PatternTaxonomy.EMERGENCE_BREAKTHROUGH, PatternType.BREAKTHROUGH)
+            "emergence_patterns": (
+                PatternTaxonomy.EMERGENCE_BREAKTHROUGH,
+                PatternType.BREAKTHROUGH,
+            ),
         }
 
         for pattern_key, (taxonomy, pattern_type) in pattern_types.items():
@@ -278,29 +276,28 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                 # Query for similar patterns
                 historical = await self.pattern_library.find_patterns(
                     PatternQuery(
-                        taxonomy=taxonomy,
-                        pattern_type=pattern_type,
-                        min_fitness=0.6,
-                        limit=5
+                        taxonomy=taxonomy, pattern_type=pattern_type, min_fitness=0.6, limit=5
                     )
                 )
 
                 for hist_pattern in historical:
-                    similar_patterns.append({
-                        "pattern_id": str(hist_pattern.pattern_id),
-                        "name": hist_pattern.name,
-                        "type": hist_pattern.pattern_type.value,
-                        "fitness": hist_pattern.fitness_score,
-                        "observations": hist_pattern.observation_count,
-                        "last_seen": hist_pattern.last_observed.isoformat() if hist_pattern.last_observed else None
-                    })
+                    similar_patterns.append(
+                        {
+                            "pattern_id": str(hist_pattern.pattern_id),
+                            "name": hist_pattern.name,
+                            "type": hist_pattern.pattern_type.value,
+                            "fitness": hist_pattern.fitness_score,
+                            "observations": hist_pattern.observation_count,
+                            "last_seen": hist_pattern.last_observed.isoformat()
+                            if hist_pattern.last_observed
+                            else None,
+                        }
+                    )
 
         return similar_patterns
 
     def _calculate_pattern_similarity(
-        self,
-        pattern1: DialoguePattern,
-        pattern2: DialoguePattern
+        self, pattern1: DialoguePattern, pattern2: DialoguePattern
     ) -> float:
         """Calculate similarity between two patterns"""
         similarity = 0.0
@@ -312,7 +309,9 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
             similarity += 0.3
 
         # Similar consciousness signature
-        consciousness_diff = abs(pattern1.consciousness_signature - pattern2.consciousness_signature)
+        consciousness_diff = abs(
+            pattern1.consciousness_signature - pattern2.consciousness_signature
+        )
         similarity += (1.0 - consciousness_diff) * 0.2
 
         # Similar indicators
@@ -329,9 +328,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         return min(1.0, similarity)
 
     async def evolve_dialogue_patterns(
-        self,
-        pattern_ids: list[UUID],
-        evolution_context: dict[str, Any] | None = None
+        self, pattern_ids: list[UUID], evolution_context: dict[str, Any] | None = None
     ) -> dict[str, list[UUID]]:
         """
         Trigger evolution for patterns based on context.
@@ -348,8 +345,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         for pattern_id in pattern_ids:
             # Detect opportunities
             opportunities = await self.evolution_engine.detect_evolution_opportunity(
-                pattern_id,
-                evolution_context
+                pattern_id, evolution_context
             )
 
             # Evolve based on highest probability opportunity
@@ -358,9 +354,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
 
                 if probability > 0.6:  # Threshold for automatic evolution
                     result_ids = await self.evolution_engine.evolve_pattern(
-                        pattern_id,
-                        evo_type,
-                        evolution_context
+                        pattern_id, evo_type, evolution_context
                     )
 
                     if result_ids:
@@ -371,9 +365,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
         return evolution_results
 
     async def find_emergence_catalysts(
-        self,
-        target_pattern_type: PatternType,
-        current_patterns: list[UUID] | None = None
+        self, target_pattern_type: PatternType, current_patterns: list[UUID] | None = None
     ) -> list[dict[str, Any]]:
         """
         Find patterns that could catalyze emergence of target pattern type.
@@ -389,8 +381,7 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
             return []
 
         catalysts = await self.emergence_detector.find_catalysts(
-            target_pattern_type,
-            current_patterns
+            target_pattern_type, current_patterns
         )
 
         return [
@@ -399,15 +390,13 @@ class EnhancedDialoguePatternWeaver(DialoguePatternWeaver):
                 "name": pattern.name,
                 "type": pattern.pattern_type.value,
                 "catalyst_score": score,
-                "consciousness_signature": pattern.consciousness_signature
+                "consciousness_signature": pattern.consciousness_signature,
             }
             for pattern, score in catalysts
         ]
 
     async def preserve_wisdom_patterns(
-        self,
-        pattern_ids: list[UUID],
-        preservation_context: dict[str, Any]
+        self, pattern_ids: list[UUID], preservation_context: dict[str, Any]
     ) -> list[UUID]:
         """
         Mark patterns for wisdom preservation.

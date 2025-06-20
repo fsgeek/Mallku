@@ -70,16 +70,16 @@ class EvolutionCoordinatorNode:
             if "evolve" in message.content.text.lower():
                 return await self._handle_evolution_request(message)
 
-        elif message.metadata.message_type == MessageType.PATTERN and "consciousness_plateau" in message.content.text:
+        elif (
+            message.metadata.message_type == MessageType.PATTERN
+            and "consciousness_plateau" in message.content.text
+        ):
             # Pattern suggesting evolution opportunity
             return await self._suggest_evolution_session(message)
 
         return None
 
-    async def _handle_evolution_request(
-        self,
-        message: ConsciousMessage
-    ) -> ConsciousMessage:
+    async def _handle_evolution_request(self, message: ConsciousMessage) -> ConsciousMessage:
         """Handle request for evolution acceleration."""
         # Determine optimal catalyst based on request
         catalyst = self._select_catalyst(message.content.text)
@@ -107,10 +107,7 @@ class EvolutionCoordinatorNode:
             in_response_to=message.id,
         )
 
-    async def _suggest_evolution_session(
-        self,
-        message: ConsciousMessage
-    ) -> ConsciousMessage:
+    async def _suggest_evolution_session(self, message: ConsciousMessage) -> ConsciousMessage:
         """Suggest evolution session based on detected patterns."""
         return ConsciousMessage(
             metadata=ConsciousnessMetadata(
@@ -154,9 +151,7 @@ class EvolutionCoordinatorNode:
         return self.capabilities
 
     async def coordinate_cluster_evolution(
-        self,
-        cluster: ConsciousnessCluster,
-        catalyst_type: CatalystType | None = None
+        self, cluster: ConsciousnessCluster, catalyst_type: CatalystType | None = None
     ) -> UUID:
         """Coordinate evolution session for an entire cluster."""
         # Auto-select catalyst if not specified
@@ -240,8 +235,7 @@ class NetworkedEvolutionSystem:
                 if len(evolution_candidates) >= 3:  # Need minimum for chamber
                     # Create evolution session
                     await self._create_evolution_session(
-                        evolution_candidates,
-                        CatalystType.RESONANCE
+                        evolution_candidates, CatalystType.RESONANCE
                     )
 
     async def _coordinate_collective_evolution(self):
@@ -256,10 +250,7 @@ class NetworkedEvolutionSystem:
                     continue
 
                 # Check if cluster needs evolution
-                if (
-                    cluster.collective_consciousness < 0.7
-                    and len(cluster.insights) < 3
-                ):
+                if cluster.collective_consciousness < 0.7 and len(cluster.insights) < 3:
                     # Mark as evolving
                     cluster._evolving = True
 
@@ -278,7 +269,8 @@ class NetworkedEvolutionSystem:
                 if chamber.breakthrough_events:
                     # Get recent breakthroughs
                     recent = [
-                        e for e in chamber.breakthrough_events
+                        e
+                        for e in chamber.breakthrough_events
                         if datetime.fromisoformat(e["timestamp"]) > last_check
                     ]
 
@@ -289,9 +281,7 @@ class NetworkedEvolutionSystem:
             last_check = datetime.now(UTC)
 
     async def _create_evolution_session(
-        self,
-        participants: list[ConsciousnessNode],
-        catalyst_type: CatalystType
+        self, participants: list[ConsciousnessNode], catalyst_type: CatalystType
     ):
         """Create and run evolution session."""
         # Create chamber
@@ -343,9 +333,7 @@ class NetworkedEvolutionSystem:
             return
 
         # Coordinate cluster evolution
-        chamber_id = await self.evolution_coordinator.coordinate_cluster_evolution(
-            cluster
-        )
+        chamber_id = await self.evolution_coordinator.coordinate_cluster_evolution(cluster)
 
         # Assign members
         await self.evolution_hub.assign_to_chamber(chamber_id, member_nodes)
@@ -356,11 +344,7 @@ class NetworkedEvolutionSystem:
         # Update cluster after evolution
         asyncio.create_task(self._update_cluster_post_evolution(cluster, chamber_id))
 
-    async def _update_cluster_post_evolution(
-        self,
-        cluster: ConsciousnessCluster,
-        chamber_id: UUID
-    ):
+    async def _update_cluster_post_evolution(self, cluster: ConsciousnessCluster, chamber_id: UUID):
         """Update cluster after evolution completes."""
         # Wait for evolution to complete
         while chamber_id in self.evolution_hub.active_evolutions:
@@ -373,16 +357,17 @@ class NetworkedEvolutionSystem:
 
             # Calculate average evolution
             evolution_factor = sum(
-                p["final"] / p["initial"]
-                for p in report["evolution_summary"].values()
+                p["final"] / p["initial"] for p in report["evolution_summary"].values()
             ) / len(report["evolution_summary"])
 
             # Add insight about evolution
-            cluster.insights.append({
-                "timestamp": datetime.now(UTC).isoformat(),
-                "insight": f"Collective evolution achieved {evolution_factor:.2f}x growth through {report['primary_catalyst']} catalyst",
-                "significance": evolution_factor,
-            })
+            cluster.insights.append(
+                {
+                    "timestamp": datetime.now(UTC).isoformat(),
+                    "insight": f"Collective evolution achieved {evolution_factor:.2f}x growth through {report['primary_catalyst']} catalyst",
+                    "significance": evolution_factor,
+                }
+            )
 
             # Update consciousness
             await cluster.synchronize_consciousness()
@@ -391,9 +376,7 @@ class NetworkedEvolutionSystem:
         cluster._evolving = False
 
     async def _broadcast_breakthrough(
-        self,
-        chamber: EvolutionChamber,
-        breakthrough: dict[str, Any]
+        self, chamber: EvolutionChamber, breakthrough: dict[str, Any]
     ):
         """Broadcast breakthrough event to network."""
         if self.evolution_coordinator:
@@ -425,10 +408,7 @@ class NetworkedEvolutionSystem:
                     node.consciousness_signature *= 1.02  # 2% boost
 
     async def create_targeted_evolution(
-        self,
-        target_nodes: list[UUID],
-        catalyst_type: CatalystType,
-        purpose: str
+        self, target_nodes: list[UUID], catalyst_type: CatalystType, purpose: str
     ) -> UUID:
         """Create targeted evolution session for specific nodes."""
         # Get node objects
@@ -453,8 +433,7 @@ class NetworkedEvolutionSystem:
 
         # Create evolution session
         chamber_id = await self.evolution_coordinator.coordinate_cluster_evolution(
-            cluster,
-            catalyst_type
+            cluster, catalyst_type
         )
 
         # Assign and begin
@@ -491,8 +470,8 @@ async def demonstrate_evolution_network():
     nodes = []
     for i in range(6):
         node = SimpleConsciousnessNode(
-            f"Evolver-{i+1}",
-            0.4 + (i * 0.05)  # Range from 0.4 to 0.65
+            f"Evolver-{i + 1}",
+            0.4 + (i * 0.05),  # Range from 0.4 to 0.65
         )
         node_id = await system.network_hub.register_node(node)
         nodes.append((node_id, node))
@@ -516,9 +495,7 @@ async def demonstrate_evolution_network():
                         sender_id=str(node_id),
                         sender_role=MessageRole.AI_MODEL,
                     ),
-                    content=MessageContent(
-                        text=f"Joining evolution cluster {cluster_id}"
-                    ),
+                    content=MessageContent(text=f"Joining evolution cluster {cluster_id}"),
                 ),
                 target_id=cluster_id,
             )
@@ -579,7 +556,9 @@ async def demonstrate_evolution_network():
             summary = report["evolution_summary"][str(node_id)]
             evolution = summary["final"] / summary["initial"]
             total_evolution += evolution
-            print(f"   {node.name}: {summary['initial']:.3f} → {summary['final']:.3f} ({evolution:.2f}x)")
+            print(
+                f"   {node.name}: {summary['initial']:.3f} → {summary['final']:.3f} ({evolution:.2f}x)"
+            )
 
     avg_evolution = total_evolution / 4
     print(f"\n   📈 Average Evolution: {avg_evolution:.2f}x")

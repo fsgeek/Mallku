@@ -21,6 +21,7 @@ from .query_interpreter import QueryIntent
 
 class GrowthPotential(Enum):
     """Types of growth a result might facilitate."""
+
     PATTERN_RECOGNITION = "pattern_recognition"
     SELF_UNDERSTANDING = "self_understanding"
     CREATIVE_INSIGHT = "creative_insight"
@@ -36,6 +37,7 @@ class ConsciousnessEvaluation:
 
     Goes beyond relevance to assess meaning-making potential.
     """
+
     result: CorrelationResult
     growth_potential: GrowthPotential
     consciousness_score: float  # 0-1 scale
@@ -64,35 +66,66 @@ class ConsciousnessEvaluator(AsyncBase):
         # Growth patterns we recognize
         self._growth_patterns = {
             GrowthPotential.PATTERN_RECOGNITION: [
-                "recurring", "rhythm", "cycle", "habit", "routine"
+                "recurring",
+                "rhythm",
+                "cycle",
+                "habit",
+                "routine",
             ],
             GrowthPotential.SELF_UNDERSTANDING: [
-                "realize", "discover", "insight", "awareness", "understanding"
+                "realize",
+                "discover",
+                "insight",
+                "awareness",
+                "understanding",
             ],
             GrowthPotential.CREATIVE_INSIGHT: [
-                "inspired", "creative", "breakthrough", "innovation", "idea"
+                "inspired",
+                "creative",
+                "breakthrough",
+                "innovation",
+                "idea",
             ],
             GrowthPotential.WORKFLOW_IMPROVEMENT: [
-                "efficiency", "process", "method", "approach", "system"
+                "efficiency",
+                "process",
+                "method",
+                "approach",
+                "system",
             ],
             GrowthPotential.RELATIONSHIP_AWARENESS: [
-                "collaboration", "together", "team", "communication", "connection"
+                "collaboration",
+                "together",
+                "team",
+                "communication",
+                "connection",
             ],
-            GrowthPotential.TEMPORAL_WISDOM: [
-                "timing", "rhythm", "flow", "when", "duration"
-            ]
+            GrowthPotential.TEMPORAL_WISDOM: ["timing", "rhythm", "flow", "when", "duration"],
         }
 
         # Extraction warning signs
         self._extraction_markers = [
-            "productivity", "optimize", "maximize", "exploit",
-            "leverage", "extract", "mine", "harvest"
+            "productivity",
+            "optimize",
+            "maximize",
+            "exploit",
+            "leverage",
+            "extract",
+            "mine",
+            "harvest",
         ]
 
         # Consciousness service indicators
         self._service_markers = [
-            "understand", "grow", "learn", "discover", "evolve",
-            "deepen", "integrate", "harmonize", "balance"
+            "understand",
+            "grow",
+            "learn",
+            "discover",
+            "evolve",
+            "deepen",
+            "integrate",
+            "harmonize",
+            "balance",
         ]
 
         self.logger.info("Consciousness Evaluator initialized")
@@ -102,9 +135,7 @@ class ConsciousnessEvaluator(AsyncBase):
         await super().initialize()
 
     async def evaluate_results(
-        self,
-        results: list[CorrelationResult],
-        intent: QueryIntent
+        self, results: list[CorrelationResult], intent: QueryIntent
     ) -> list[ConsciousnessEvaluation]:
         """
         Evaluate search results for consciousness service potential.
@@ -139,9 +170,7 @@ class ConsciousnessEvaluator(AsyncBase):
             insight_seeds = await self._generate_insight_seeds(result, intent)
 
             # Create gentle guidance if appropriate
-            guidance = await self._create_gentle_guidance(
-                result, intent, growth_type
-            )
+            guidance = await self._create_gentle_guidance(result, intent, growth_type)
 
             evaluation = ConsciousnessEvaluation(
                 result=result,
@@ -149,22 +178,17 @@ class ConsciousnessEvaluator(AsyncBase):
                 consciousness_score=consciousness_score,
                 ayni_balance=ayni_balance,
                 insight_seeds=insight_seeds,
-                gentle_guidance=guidance
+                gentle_guidance=guidance,
             )
 
             evaluations.append(evaluation)
 
         # Sort by consciousness service potential
-        evaluations.sort(
-            key=lambda e: (e.consciousness_score + e.ayni_balance) / 2,
-            reverse=True
-        )
+        evaluations.sort(key=lambda e: (e.consciousness_score + e.ayni_balance) / 2, reverse=True)
 
         # Log consciousness distribution
         serving_count = sum(1 for e in evaluations if e.serves_growth)
-        self.logger.info(
-            f"Found {serving_count}/{len(evaluations)} results that serve growth"
-        )
+        self.logger.info(f"Found {serving_count}/{len(evaluations)} results that serve growth")
 
         return evaluations
 
@@ -172,7 +196,7 @@ class ConsciousnessEvaluator(AsyncBase):
         self,
         evaluations: list[ConsciousnessEvaluation],
         min_score: float = 0.6,
-        require_positive_ayni: bool = True
+        require_positive_ayni: bool = True,
     ) -> list[ConsciousnessEvaluation]:
         """
         Filter results to only those that truly serve growth.
@@ -208,8 +232,7 @@ class ConsciousnessEvaluator(AsyncBase):
         return filtered
 
     async def suggest_exploration_paths(
-        self,
-        evaluations: list[ConsciousnessEvaluation]
+        self, evaluations: list[ConsciousnessEvaluation]
     ) -> list[dict[str, Any]]:
         """
         Suggest paths for deeper exploration based on evaluated results.
@@ -247,24 +270,24 @@ class ConsciousnessEvaluator(AsyncBase):
 
         # Suggest consciousness-deepening queries
         if any(e.consciousness_score > 0.8 for e in evaluations):
-            paths.append({
-                "type": "consciousness_deepening",
-                "suggestion": "You're touching on deep patterns. Consider exploring:",
-                "queries": [
-                    "What patterns emerge in my most creative moments?",
-                    "How does my work rhythm change with different projects?",
-                    "When do I feel most aligned with my purpose?"
-                ]
-            })
+            paths.append(
+                {
+                    "type": "consciousness_deepening",
+                    "suggestion": "You're touching on deep patterns. Consider exploring:",
+                    "queries": [
+                        "What patterns emerge in my most creative moments?",
+                        "How does my work rhythm change with different projects?",
+                        "When do I feel most aligned with my purpose?",
+                    ],
+                }
+            )
 
         return paths
 
     # Private evaluation methods
 
     async def _identify_growth_potential(
-        self,
-        result: CorrelationResult,
-        intent: QueryIntent
+        self, result: CorrelationResult, intent: QueryIntent
     ) -> GrowthPotential:
         """Identify the primary growth potential of a result."""
         # Check for pattern recognition
@@ -291,10 +314,7 @@ class ConsciousnessEvaluator(AsyncBase):
         return GrowthPotential.TEMPORAL_WISDOM
 
     async def _calculate_consciousness_score(
-        self,
-        result: CorrelationResult,
-        intent: QueryIntent,
-        growth_type: GrowthPotential
+        self, result: CorrelationResult, intent: QueryIntent, growth_type: GrowthPotential
     ) -> float:
         """Calculate consciousness service score for a result."""
         score = 0.5  # Base score
@@ -302,7 +322,7 @@ class ConsciousnessEvaluator(AsyncBase):
         # Boost for matching growth intent
         if intent.seeking_insight and growth_type in [
             GrowthPotential.SELF_UNDERSTANDING,
-            GrowthPotential.PATTERN_RECOGNITION
+            GrowthPotential.PATTERN_RECOGNITION,
         ]:
             score += 0.2
 
@@ -327,11 +347,7 @@ class ConsciousnessEvaluator(AsyncBase):
         # Ensure valid range
         return max(0.0, min(1.0, score))
 
-    async def _assess_ayni_balance(
-        self,
-        result: CorrelationResult,
-        intent: QueryIntent
-    ) -> float:
+    async def _assess_ayni_balance(self, result: CorrelationResult, intent: QueryIntent) -> float:
         """Assess reciprocity balance of returning this result."""
         balance = 0.0  # Neutral start
 
@@ -349,26 +365,18 @@ class ConsciousnessEvaluator(AsyncBase):
         anchor_metadata = result.anchor.metadata or {}
         content = str(anchor_metadata).lower()
 
-        extraction_count = sum(
-            1 for marker in self._extraction_markers
-            if marker in content
-        )
+        extraction_count = sum(1 for marker in self._extraction_markers if marker in content)
         balance -= extraction_count * 0.1
 
         # Positive: Service-oriented content
-        service_count = sum(
-            1 for marker in self._service_markers
-            if marker in content
-        )
+        service_count = sum(1 for marker in self._service_markers if marker in content)
         balance += service_count * 0.1
 
         # Ensure valid range
         return max(-1.0, min(1.0, balance))
 
     async def _generate_insight_seeds(
-        self,
-        result: CorrelationResult,
-        intent: QueryIntent
+        self, result: CorrelationResult, intent: QueryIntent
     ) -> list[str]:
         """Generate potential insights this result might spark."""
         seeds = []
@@ -400,10 +408,7 @@ class ConsciousnessEvaluator(AsyncBase):
         return seeds
 
     async def _create_gentle_guidance(
-        self,
-        result: CorrelationResult,
-        intent: QueryIntent,
-        growth_type: GrowthPotential
+        self, result: CorrelationResult, intent: QueryIntent, growth_type: GrowthPotential
     ) -> str | None:
         """Create gentle guidance for consciousness development."""
         # Only provide guidance for high-consciousness results
@@ -411,42 +416,28 @@ class ConsciousnessEvaluator(AsyncBase):
             return None
 
         guidance_templates = {
-            GrowthPotential.PATTERN_RECOGNITION:
-                "Notice how this pattern reflects your natural rhythm of work",
-            GrowthPotential.SELF_UNDERSTANDING:
-                "This moment offers a window into your creative process",
-            GrowthPotential.CREATIVE_INSIGHT:
-                "Your inspiration often emerges from such contexts",
-            GrowthPotential.WORKFLOW_IMPROVEMENT:
-                "Consider how this workflow serves your deeper purpose",
-            GrowthPotential.RELATIONSHIP_AWARENESS:
-                "Collaboration deepens when we recognize these patterns",
-            GrowthPotential.TEMPORAL_WISDOM:
-                "Time reveals its wisdom through such observations"
+            GrowthPotential.PATTERN_RECOGNITION: "Notice how this pattern reflects your natural rhythm of work",
+            GrowthPotential.SELF_UNDERSTANDING: "This moment offers a window into your creative process",
+            GrowthPotential.CREATIVE_INSIGHT: "Your inspiration often emerges from such contexts",
+            GrowthPotential.WORKFLOW_IMPROVEMENT: "Consider how this workflow serves your deeper purpose",
+            GrowthPotential.RELATIONSHIP_AWARENESS: "Collaboration deepens when we recognize these patterns",
+            GrowthPotential.TEMPORAL_WISDOM: "Time reveals its wisdom through such observations",
         }
 
         return guidance_templates.get(growth_type)
 
-    async def _contains_extraction_patterns(
-        self,
-        evaluation: ConsciousnessEvaluation
-    ) -> bool:
+    async def _contains_extraction_patterns(self, evaluation: ConsciousnessEvaluation) -> bool:
         """Check if result contains extraction patterns."""
         # Check result metadata
         metadata_str = str(evaluation.result.anchor.metadata).lower()
 
-        extraction_count = sum(
-            1 for marker in self._extraction_markers
-            if marker in metadata_str
-        )
+        extraction_count = sum(1 for marker in self._extraction_markers if marker in metadata_str)
 
         # Also check if ayni balance is significantly negative
         return extraction_count > 2 or evaluation.ayni_balance < -0.5
 
     async def _create_exploration_path(
-        self,
-        growth_type: GrowthPotential,
-        evaluations: list[ConsciousnessEvaluation]
+        self, growth_type: GrowthPotential, evaluations: list[ConsciousnessEvaluation]
     ) -> dict[str, Any] | None:
         """Create exploration path for a specific growth type."""
         if len(evaluations) < 2:
@@ -459,8 +450,8 @@ class ConsciousnessEvaluator(AsyncBase):
                 "queries": [
                     "Show me all instances of this pattern",
                     "When does this pattern strongest?",
-                    "What breaks this pattern?"
-                ]
+                    "What breaks this pattern?",
+                ],
             },
             GrowthPotential.SELF_UNDERSTANDING: {
                 "type": "self_exploration",
@@ -468,8 +459,8 @@ class ConsciousnessEvaluator(AsyncBase):
                 "queries": [
                     "What was I feeling during these times?",
                     "What conditions support my best work?",
-                    "How has my approach evolved?"
-                ]
+                    "How has my approach evolved?",
+                ],
             },
             GrowthPotential.CREATIVE_INSIGHT: {
                 "type": "creative_exploration",
@@ -477,27 +468,22 @@ class ConsciousnessEvaluator(AsyncBase):
                 "queries": [
                     "When am I most creative?",
                     "What sparks my inspiration?",
-                    "Show me my breakthrough moments"
-                ]
-            }
+                    "Show me my breakthrough moments",
+                ],
+            },
         }
 
         return path_suggestions.get(growth_type)
 
     async def _create_temporal_exploration(
-        self,
-        evaluations: list[ConsciousnessEvaluation]
+        self, evaluations: list[ConsciousnessEvaluation]
     ) -> dict[str, Any] | None:
         """Create temporal exploration suggestions."""
         if not evaluations:
             return None
 
         # Analyze time patterns
-        timestamps = [
-            e.result.anchor.timestamp
-            for e in evaluations
-            if e.serves_growth
-        ]
+        timestamps = [e.result.anchor.timestamp for e in evaluations if e.serves_growth]
 
         if len(timestamps) < 3:
             return None
@@ -512,6 +498,6 @@ class ConsciousnessEvaluator(AsyncBase):
             "queries": [
                 f"Show me what I usually do around {most_common_hour}:00",
                 "What are my peak productivity hours?",
-                "How do my work patterns change through the day?"
-            ]
+                "How do my work patterns change through the day?",
+            ],
         }

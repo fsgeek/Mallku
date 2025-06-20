@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 class LLMProvider(str, Enum):
     """Supported LLM providers."""
+
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     AZURE_OPENAI = "azure_openai"
@@ -39,6 +40,7 @@ class LLMProvider(str, Enum):
 
 class PromptCategory(str, Enum):
     """Categories of prompts for protection and caching."""
+
     DATABASE_VALIDATION = "database_validation"
     SCHEMA_ANALYSIS = "schema_analysis"
     DATA_CLASSIFICATION = "data_classification"
@@ -49,18 +51,22 @@ class PromptCategory(str, Enum):
 
 class LLMRequest(BaseModel):
     """Request to the LLM layer."""
+
     prompt: str = Field(description="The prompt to send to the LLM")
     category: PromptCategory = Field(description="Category for protection and caching")
     context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
     max_tokens: int = Field(default=1000, description="Maximum tokens to generate")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="Sampling temperature")
-    preferred_provider: LLMProvider | None = Field(default=None, description="Preferred LLM provider")
+    preferred_provider: LLMProvider | None = Field(
+        default=None, description="Preferred LLM provider"
+    )
     require_cached: bool = Field(default=False, description="Only use cached responses")
     priority: int = Field(default=5, ge=1, le=10, description="Request priority (1=highest)")
 
 
 class LLMResponse(BaseModel):
     """Response from the LLM layer."""
+
     response_text: str = Field(description="Generated response")
     provider_used: LLMProvider = Field(description="Which provider generated this response")
     model_name: str = Field(description="Specific model used")
@@ -74,6 +80,7 @@ class LLMResponse(BaseModel):
 
 class PromptCacheEntry(BaseModel):
     """Cached prompt and response."""
+
     prompt_hash: str = Field(description="Hash of the prompt and context")
     category: PromptCategory = Field(description="Prompt category")
     original_request: LLMRequest = Field(description="Original request")
@@ -86,6 +93,7 @@ class PromptCacheEntry(BaseModel):
 
 class LLMMetrics(BaseModel):
     """Metrics for LLM usage and performance."""
+
     total_requests: int = Field(default=0)
     cached_responses: int = Field(default=0)
     total_tokens_used: int = Field(default=0)
@@ -97,6 +105,7 @@ class LLMMetrics(BaseModel):
 
 
 # === LLM Provider Interfaces ===
+
 
 class BaseLLMProvider(ABC):
     """Base class for LLM providers."""
@@ -153,7 +162,7 @@ class AnthropicProvider(BaseLLMProvider):
                 tokens_used=tokens_used,
                 processing_time=processing_time,
                 cached=False,
-                quality_score=0.9  # Would be calculated based on actual response
+                quality_score=0.9,  # Would be calculated based on actual response
             )
 
         except Exception as e:
@@ -194,7 +203,7 @@ class OpenAIProvider(BaseLLMProvider):
                 tokens_used=tokens_used,
                 processing_time=processing_time,
                 cached=False,
-                quality_score=0.85
+                quality_score=0.85,
             )
 
         except Exception as e:
@@ -211,6 +220,7 @@ class OpenAIProvider(BaseLLMProvider):
 
 
 # === Prompt Cache Manager ===
+
 
 class PromptCacheManager:
     """
@@ -232,7 +242,7 @@ class PromptCacheManager:
             "category": request.category.value,
             "context": request.context,
             "max_tokens": request.max_tokens,
-            "temperature": request.temperature
+            "temperature": request.temperature,
         }
 
         cache_str = str(sorted(cache_data.items()))
@@ -278,7 +288,7 @@ class PromptCacheManager:
             prompt_hash=cache_key,
             category=request.category,
             original_request=request,
-            response=response
+            response=response,
         )
 
         self.cache[cache_key] = entry
@@ -287,10 +297,7 @@ class PromptCacheManager:
     async def _evict_old_entries(self) -> None:
         """Evict old cache entries using LRU strategy."""
         # Sort by last accessed time
-        sorted_entries = sorted(
-            self.cache.items(),
-            key=lambda x: x[1].last_accessed
-        )
+        sorted_entries = sorted(self.cache.items(), key=lambda x: x[1].last_accessed)
 
         # Remove oldest 20% of entries
         evict_count = max(1, len(sorted_entries) // 5)
@@ -314,11 +321,12 @@ class PromptCacheManager:
             "max_size": self.max_cache_size,
             "category_distribution": category_counts,
             "oldest_entry": min((e.created_at for e in self.cache.values()), default=None),
-            "newest_entry": max((e.created_at for e in self.cache.values()), default=None)
+            "newest_entry": max((e.created_at for e in self.cache.values()), default=None),
         }
 
 
 # === Protection Layer ===
+
 
 class PromptProtectionLayer:
     """
@@ -339,19 +347,19 @@ class PromptProtectionLayer:
         self.validation_rules[PromptCategory.DATABASE_VALIDATION] = [
             self._validate_contains_schema_context,
             self._validate_no_injection_patterns,
-            self._validate_required_examples
+            self._validate_required_examples,
         ]
 
         # Schema analysis rules
         self.validation_rules[PromptCategory.SCHEMA_ANALYSIS] = [
             self._validate_contains_field_descriptions,
-            self._validate_security_context
+            self._validate_security_context,
         ]
 
         # Security evaluation rules
         self.validation_rules[PromptCategory.SECURITY_EVALUATION] = [
             self._validate_security_scope,
-            self._validate_no_sensitive_exposure
+            self._validate_no_sensitive_exposure,
         ]
 
     async def validate_and_preprocess(self, request: LLMRequest) -> LLMRequest:
@@ -438,7 +446,9 @@ class PromptProtectionLayer:
 
     async def _add_safety_context(self, request: LLMRequest) -> LLMRequest:
         """Add safety context to the prompt."""
-        safety_suffix = "\n\nIMPORTANT: Provide analysis only. Do not execute any operations or modifications."
+        safety_suffix = (
+            "\n\nIMPORTANT: Provide analysis only. Do not execute any operations or modifications."
+        )
 
         processed_request = request.copy()
         processed_request.prompt += safety_suffix
@@ -447,6 +457,7 @@ class PromptProtectionLayer:
 
 
 # === Main Multi-LLM Service ===
+
 
 class MultiLLMService:
     """
@@ -472,9 +483,7 @@ class MultiLLMService:
                 )
 
             if "openai" in provider_configs:
-                self.providers[LLMProvider.OPENAI] = OpenAIProvider(
-                    provider_configs["openai"]
-                )
+                self.providers[LLMProvider.OPENAI] = OpenAIProvider(provider_configs["openai"])
 
             # Add more providers as needed
 
@@ -494,7 +503,9 @@ class MultiLLMService:
             # Update metrics
             self.metrics.total_requests += 1
             category_key = request.category.value
-            self.metrics.category_usage[category_key] = self.metrics.category_usage.get(category_key, 0) + 1
+            self.metrics.category_usage[category_key] = (
+                self.metrics.category_usage.get(category_key, 0) + 1
+            )
 
             # Check cache first
             if not request.require_cached:
@@ -520,7 +531,9 @@ class MultiLLMService:
             # Update metrics
             self.metrics.total_tokens_used += response.tokens_used
             provider_key = response.provider_used.value
-            self.metrics.provider_usage[provider_key] = self.metrics.provider_usage.get(provider_key, 0) + 1
+            self.metrics.provider_usage[provider_key] = (
+                self.metrics.provider_usage.get(provider_key, 0) + 1
+            )
 
             # Cache response
             await self.cache_manager.cache_response(protected_request, response)
@@ -562,7 +575,9 @@ class MultiLLMService:
     def _update_cache_hit_rate(self) -> None:
         """Update cache hit rate metric."""
         if self.metrics.total_requests > 0:
-            self.metrics.cache_hit_rate = self.metrics.cached_responses / self.metrics.total_requests
+            self.metrics.cache_hit_rate = (
+                self.metrics.cached_responses / self.metrics.total_requests
+            )
 
     def _update_average_response_time(self, response_time: float) -> None:
         """Update average response time metric."""
@@ -574,8 +589,8 @@ class MultiLLMService:
         else:
             # Incremental average calculation
             self.metrics.average_response_time = (
-                (current_avg * (total_requests - 1) + response_time) / total_requests
-            )
+                current_avg * (total_requests - 1) + response_time
+            ) / total_requests
 
     async def get_service_metrics(self) -> LLMMetrics:
         """Get comprehensive service metrics."""
@@ -586,10 +601,7 @@ class MultiLLMService:
         return self.cache_manager.get_cache_stats()
 
     async def validate_database_schema(
-        self,
-        schema_definition: dict,
-        collection_description: str,
-        examples: list[str]
+        self, schema_definition: dict, collection_description: str, examples: list[str]
     ) -> dict[str, Any]:
         """
         Validate database schema using LLM analysis.
@@ -616,10 +628,10 @@ class MultiLLMService:
             context={
                 "schema": schema_definition,
                 "description": collection_description,
-                "examples": examples
+                "examples": examples,
             },
             max_tokens=1500,
-            temperature=0.3  # Lower temperature for analytical tasks
+            temperature=0.3,  # Lower temperature for analytical tasks
         )
 
         response = await self.generate_response(request)
@@ -628,5 +640,5 @@ class MultiLLMService:
             "validation_result": response.response_text,
             "quality_score": response.quality_score,
             "provider_used": response.provider_used.value,
-            "tokens_used": response.tokens_used
+            "tokens_used": response.tokens_used,
         }

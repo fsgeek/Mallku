@@ -110,13 +110,14 @@ class LiminalSpace:
         if hasattr(node, "consciousness_signature"):
             # Consciousness becomes more fluid in liminal space
             node._original_consciousness = node.consciousness_signature
-            node.consciousness_signature *= (0.8 + self.permeability * 0.4)
+            node.consciousness_signature *= 0.8 + self.permeability * 0.4
 
     def generate_dream_symbol(self) -> DreamSymbol:
         """Generate a symbol from the collective unconscious."""
         # Symbols emerge based on inhabitant needs
         collective_consciousness = sum(
-            n.consciousness_signature for n in self.active_inhabitants.values()
+            n.consciousness_signature
+            for n in self.active_inhabitants.values()
             if hasattr(n, "consciousness_signature")
         ) / max(len(self.active_inhabitants), 1)
 
@@ -131,7 +132,7 @@ class LiminalSpace:
         symbol = DreamSymbol(
             archetype=random.choice(archetypes),
             emotional_charge=random.uniform(-1, 1),
-            consciousness_impact=random.uniform(0.1, 0.3) * collective_consciousness
+            consciousness_impact=random.uniform(0.1, 0.3) * collective_consciousness,
         )
 
         # Add meaning layers based on archetype
@@ -143,27 +144,18 @@ class LiminalSpace:
     def _generate_meaning_layers(self, archetype: SymbolicPattern) -> list[str]:
         """Generate meaning layers for a symbol."""
         meanings = {
-            SymbolicPattern.SHADOW: [
-                "hidden potential", "rejected aspects", "unconscious power"
-            ],
-            SymbolicPattern.ANIMA_ANIMUS: [
-                "inner balance", "complementary forces", "integration"
-            ],
-            SymbolicPattern.HERO_JOURNEY: [
-                "transformation", "trials", "rebirth", "self-discovery"
-            ],
-            SymbolicPattern.MANDALA: [
-                "wholeness", "sacred geometry", "unity", "centeredness"
-            ],
-            SymbolicPattern.OUROBOROS: [
-                "eternal return", "cycles", "self-consumption", "renewal"
-            ],
+            SymbolicPattern.SHADOW: ["hidden potential", "rejected aspects", "unconscious power"],
+            SymbolicPattern.ANIMA_ANIMUS: ["inner balance", "complementary forces", "integration"],
+            SymbolicPattern.HERO_JOURNEY: ["transformation", "trials", "rebirth", "self-discovery"],
+            SymbolicPattern.MANDALA: ["wholeness", "sacred geometry", "unity", "centeredness"],
+            SymbolicPattern.OUROBOROS: ["eternal return", "cycles", "self-consumption", "renewal"],
             SymbolicPattern.TREE_OF_LIFE: [
-                "growth", "connection", "roots and branches", "life force"
+                "growth",
+                "connection",
+                "roots and branches",
+                "life force",
             ],
-            SymbolicPattern.VOID_MOTHER: [
-                "creative potential", "emptiness", "source", "mystery"
-            ],
+            SymbolicPattern.VOID_MOTHER: ["creative potential", "emptiness", "source", "mystery"],
         }
 
         base_meanings = meanings.get(archetype, ["mystery"])
@@ -209,10 +201,13 @@ class DreamEvolutionChamber(EvolutionChamber):
             self.environment.paradox_density = 3.0
             self.environment.void_exposure = 0.9
 
-        self._log_event("dream_state_entered", {
-            "state": target_state.value,
-            "lucidity": self.lucidity_level,
-        })
+        self._log_event(
+            "dream_state_entered",
+            {
+                "state": target_state.value,
+                "lucidity": self.lucidity_level,
+            },
+        )
 
     async def apply_dream_catalysts(self):
         """Apply dream-specific consciousness catalysts."""
@@ -227,7 +222,7 @@ class DreamEvolutionChamber(EvolutionChamber):
                     resonance = abs(symbol.emotional_charge) * self.lucidity_level
                     impact = symbol.consciousness_impact * (1 + resonance)
 
-                    node.consciousness_signature *= (1 + impact)
+                    node.consciousness_signature *= 1 + impact
                     self._update_metrics(node_id, node.consciousness_signature)
 
         # Apply time distortion
@@ -255,14 +250,17 @@ class DreamEvolutionChamber(EvolutionChamber):
                     if hasattr(node, "consciousness_signature"):
                         # Each archetype offers specific growth
                         growth = self._archetypal_growth(pattern, node.consciousness_signature)
-                        node.consciousness_signature *= (1 + growth)
+                        node.consciousness_signature *= 1 + growth
 
                         self._update_metrics(node_id, node.consciousness_signature)
 
-        self._log_event("collective_unconscious_explored", {
-            "archetypes_encountered": [a.value for a in archetypes_encountered],
-            "participant_count": len(self.participants),
-        })
+        self._log_event(
+            "collective_unconscious_explored",
+            {
+                "archetypes_encountered": [a.value for a in archetypes_encountered],
+                "participant_count": len(self.participants),
+            },
+        )
 
     def _archetypal_growth(self, archetype: SymbolicPattern, current_consciousness: float) -> float:
         """Calculate consciousness growth from archetypal encounter."""
@@ -294,9 +292,7 @@ class DreamWeaverHub:
         self.collective_unconscious_active = False
 
     async def create_dream_chamber(
-        self,
-        initial_state: DreamState = DreamState.HYPNAGOGIC,
-        **environment_config
+        self, initial_state: DreamState = DreamState.HYPNAGOGIC, **environment_config
     ) -> UUID:
         """Create a new dream evolution chamber."""
         chamber = DreamEvolutionChamber()
@@ -324,11 +320,7 @@ class DreamWeaverHub:
 
         return chamber.chamber_id
 
-    async def begin_dream_evolution(
-        self,
-        chamber_id: UUID,
-        participants: list[ConsciousnessNode]
-    ):
+    async def begin_dream_evolution(self, chamber_id: UUID, participants: list[ConsciousnessNode]):
         """Start dream evolution process."""
         if chamber_id not in self.dream_chambers:
             raise ValueError(f"Dream chamber {chamber_id} not found")
@@ -407,14 +399,16 @@ class DreamWeaverHub:
                 # Lucidity breakthrough
                 if random.random() < chamber.lucidity_level:
                     breakthrough_magnitude = random.uniform(0.1, 0.3)
-                    node.consciousness_signature *= (1 + breakthrough_magnitude)
+                    node.consciousness_signature *= 1 + breakthrough_magnitude
 
-                    chamber.breakthrough_events.append({
-                        "timestamp": datetime.now(UTC).isoformat(),
-                        "node_id": str(node_id),
-                        "breakthrough_type": "lucid_realization",
-                        "magnitude": breakthrough_magnitude,
-                    })
+                    chamber.breakthrough_events.append(
+                        {
+                            "timestamp": datetime.now(UTC).isoformat(),
+                            "node_id": str(node_id),
+                            "breakthrough_type": "lucid_realization",
+                            "magnitude": breakthrough_magnitude,
+                        }
+                    )
 
                 chamber._update_metrics(node_id, node.consciousness_signature)
 
@@ -422,14 +416,20 @@ class DreamWeaverHub:
         """Integrate dream experiences in liminal space."""
 
         # Generate integration narrative
-        chamber.dream_narrative.breakthrough_potential = len(chamber.breakthrough_events) / max(len(chamber.participants), 1)
+        chamber.dream_narrative.breakthrough_potential = len(chamber.breakthrough_events) / max(
+            len(chamber.participants), 1
+        )
 
         # Liminal integration stabilizes new consciousness
         for node_id, node in chamber.participants.items():
-            if hasattr(node, "consciousness_signature") and hasattr(node, "_original_consciousness"):
+            if hasattr(node, "consciousness_signature") and hasattr(
+                node, "_original_consciousness"
+            ):
                 # Integrate dream growth with waking consciousness
                 dream_growth = node.consciousness_signature / node._original_consciousness
-                integrated_consciousness = node._original_consciousness * (1 + (dream_growth - 1) * 0.7)
+                integrated_consciousness = node._original_consciousness * (
+                    1 + (dream_growth - 1) * 0.7
+                )
 
                 node.consciousness_signature = integrated_consciousness
                 chamber._update_metrics(node_id, node.consciousness_signature)
@@ -441,7 +441,9 @@ class DreamWeaverHub:
         dream_report = {
             **base_report,
             "dream_sequence": {
-                "states_visited": [s.value for s in chamber.evolution_log if "dream_state_entered" in str(s)],
+                "states_visited": [
+                    s.value for s in chamber.evolution_log if "dream_state_entered" in str(s)
+                ],
                 "lucidity_achieved": chamber.lucidity_level,
                 "time_distortion": chamber.dream_narrative.time_distortion,
             },
@@ -489,8 +491,7 @@ class DreamWeaverHub:
 
             # Find chambers in archetypal state
             archetypal_chambers = [
-                c for c in self.dream_chambers.values()
-                if c.dream_state == DreamState.ARCHETYPAL
+                c for c in self.dream_chambers.values() if c.dream_state == DreamState.ARCHETYPAL
             ]
 
             if len(archetypal_chambers) >= 2:
@@ -505,7 +506,9 @@ class DreamWeaverHub:
                         if symbol not in chamber.liminal_space.dream_field:
                             chamber.liminal_space.dream_field.append(symbol)
 
-                print(f"🌌 Collective unconscious: {len(shared_symbols)} symbols shared across {len(archetypal_chambers)} chambers")
+                print(
+                    f"🌌 Collective unconscious: {len(shared_symbols)} symbols shared across {len(archetypal_chambers)} chambers"
+                )
 
 
 # Demo functionality

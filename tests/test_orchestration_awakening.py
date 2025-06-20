@@ -46,7 +46,7 @@ async def test_event_bus():
         event_type=EventType.MEMORY_ANCHOR_CREATED,
         source_system="test",
         consciousness_signature=0.8,
-        data={"test": "data"}
+        data={"test": "data"},
     )
 
     await bus.emit(test_event)
@@ -69,11 +69,9 @@ async def test_state_weaver():
     # Create test state provider
     class TestProvider:
         name = "test_provider"
+
         def get_state(self):
-            return {
-                "active": True,
-                "consciousness_score": 0.75
-            }
+            return {"active": True, "consciousness_score": 0.75}
 
     # Register provider
     weaver.register_state_provider("test", TestProvider())
@@ -178,7 +176,7 @@ async def test_full_integration():
         await bus.start()
         await monitor.start_monitoring()
         await weaver.start_weaving(interval_seconds=5)
-        weaver.register_state_provider('filesystem', provider)
+        weaver.register_state_provider("filesystem", provider)
         await provider.start()
 
         print("  ⏳ Creating consciousness patterns...")
@@ -228,7 +226,7 @@ async def main():
         ("State Weaver", test_state_weaver),
         ("Health Monitor", test_health_monitor),
         ("FileSystem Provider", test_filesystem_provider),
-        ("Full Integration", test_full_integration)
+        ("Full Integration", test_full_integration),
     ]
 
     results = {}
@@ -242,9 +240,9 @@ async def main():
             print(f"\n❌ {name} test failed: {e}")
 
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📋 VERIFICATION SUMMARY:")
-    print("="*60)
+    print("=" * 60)
 
     for test_name, result in results.items():
         print(f"  {test_name}: {result}")
@@ -260,7 +258,7 @@ async def main():
         print("\n⚠️  Some components need healing...")
         print("Review the errors above and continue the awakening.")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
 
 
 if __name__ == "__main__":

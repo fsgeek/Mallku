@@ -33,23 +33,16 @@ def test_security_integration():
         memory_anchor_uuid=uuid4(),
         timestamp=datetime.now(UTC),
         interaction_id=uuid4(),
-        interaction={
-            "type": "query",
-            "content_hash": "sha256:abcd1234",
-            "complexity": 0.7
-        },
+        interaction={"type": "query", "content_hash": "sha256:abcd1234", "complexity": 0.7},
         initiator="human",
         participants=["human", "claude"],
         ayni_score={
             "value_given": 0.3,
             "value_received": 0.8,
             "value_delta": -0.5,
-            "balance_direction": "ai_gave_more"
+            "balance_direction": "ai_gave_more",
         },
-        system_health={
-            "is_system_failure": False,
-            "response_coherence": 0.98
-        }
+        system_health={"is_system_failure": False, "response_coherence": 0.98},
     )
 
     # Test production mode (default)
@@ -103,7 +96,7 @@ def test_security_integration():
         participant_b_id="claude_456_obfuscated",
         current_balance=-0.6,  # Will be bucketed
         total_interactions=42,
-        relationship_health=0.7  # Will be bucketed
+        relationship_health=0.7,  # Will be bucketed
     )
 
     balance_dict = balance.dict()

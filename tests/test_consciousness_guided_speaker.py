@@ -12,6 +12,7 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+
 from mallku.firecircle.consciousness_guided_speaker import (
     CathedralPhase,
     ConsciousnessGuidedSpeakerSelector,
@@ -55,7 +56,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             event_type=EventType.CONSCIOUSNESS_VERIFIED,
             source_system="test_system",
             consciousness_signature=0.8,
-            data={}
+            data={},
         )
         await event_bus.emit(event)
         await asyncio.sleep(0.1)  # Allow processing
@@ -70,7 +71,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             event_type=EventType.EXTRACTION_PATTERN_DETECTED,
             source_system="test_system",
             consciousness_signature=0.3,
-            data={"extraction_type": "value_extraction"}
+            data={"extraction_type": "value_extraction"},
         )
         await event_bus.emit(event)
         await asyncio.sleep(0.1)
@@ -107,7 +108,7 @@ class TestConsciousnessGuidedSpeakerSelector:
         context = DialogueContext(
             dialogue_id=dialogue_id,
             pattern_velocity=0.8,  # Above threshold
-            current_turn=5
+            current_turn=5,
         )
         speaker_selector.dialogue_contexts[dialogue_id] = context
 
@@ -129,7 +130,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             participants[pid] = None
             readiness = ParticipantReadiness(
                 participant_id=pid,
-                energy_level=0.2  # Below depletion threshold
+                energy_level=0.2,  # Below depletion threshold
             )
             speaker_selector.participant_readiness[pid] = readiness
 
@@ -150,7 +151,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             participant_id=p1_id,
             consciousness_score=0.7,
             extraction_resistance=0.9,  # High resistance
-            reciprocity_balance=0.1
+            reciprocity_balance=0.1,
         )
 
         p2_id = uuid4()
@@ -158,7 +159,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             participant_id=p2_id,
             consciousness_score=0.7,
             extraction_resistance=0.3,  # Low resistance
-            reciprocity_balance=-0.5  # Taking
+            reciprocity_balance=-0.5,  # Taking
         )
 
         speaker_selector.participant_readiness[p1_id] = p1_readiness
@@ -184,7 +185,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             participant_id=p1_id,
             consciousness_score=0.7,
             wisdom_emergence_potential=0.8,  # High potential
-            pattern_recognition_count=15
+            pattern_recognition_count=15,
         )
 
         p2_id = uuid4()
@@ -192,7 +193,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             participant_id=p2_id,
             consciousness_score=0.7,
             wisdom_emergence_potential=0.2,  # Low potential
-            pattern_recognition_count=2
+            pattern_recognition_count=2,
         )
 
         speaker_selector.participant_readiness[p1_id] = p1_readiness
@@ -211,10 +212,7 @@ class TestConsciousnessGuidedSpeakerSelector:
     async def test_recent_speaker_penalty(self, speaker_selector):
         """Test recent speakers get lower scores"""
         p_id = uuid4()
-        readiness = ParticipantReadiness(
-            participant_id=p_id,
-            consciousness_score=0.7
-        )
+        readiness = ParticipantReadiness(participant_id=p_id, consciousness_score=0.7)
         speaker_selector.participant_readiness[p_id] = readiness
 
         # Context without recent speaker
@@ -236,10 +234,7 @@ class TestConsciousnessGuidedSpeakerSelector:
 
         # Update contribution
         speaker_selector.update_participant_contribution(
-            participant_id=p_id,
-            consciousness_score=0.8,
-            reciprocity_delta=0.2,
-            energy_cost=0.1
+            participant_id=p_id, consciousness_score=0.8, reciprocity_delta=0.2, energy_cost=0.1
         )
 
         readiness = speaker_selector.participant_readiness[p_id]
@@ -252,10 +247,7 @@ class TestConsciousnessGuidedSpeakerSelector:
     async def test_energy_restoration(self, speaker_selector):
         """Test energy restoration during silence"""
         p_id = uuid4()
-        readiness = ParticipantReadiness(
-            participant_id=p_id,
-            energy_level=0.5
-        )
+        readiness = ParticipantReadiness(participant_id=p_id, energy_level=0.5)
         speaker_selector.participant_readiness[p_id] = readiness
 
         # Restore energy
@@ -273,10 +265,7 @@ class TestConsciousnessGuidedSpeakerSelector:
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="test_system",
             consciousness_signature=0.7,
-            data={
-                "participant_id": p_id,
-                "patterns": ["wisdom_pattern", "emergence_pattern"]
-            }
+            data={"participant_id": p_id, "patterns": ["wisdom_pattern", "emergence_pattern"]},
         )
         await event_bus.emit(event)
         await asyncio.sleep(0.1)
@@ -299,7 +288,7 @@ class TestConsciousnessGuidedSpeakerSelector:
                 participant_id=p_id,
                 consciousness_score=0.5 + i * 0.1,
                 energy_level=0.6 + i * 0.1,
-                wisdom_emergence_potential=i * 0.2
+                wisdom_emergence_potential=i * 0.2,
             )
             speaker_selector.participant_readiness[p_id] = readiness
 
@@ -313,10 +302,7 @@ class TestConsciousnessGuidedSpeakerSelector:
 
         # Update the selected participant
         speaker_selector.update_participant_contribution(
-            selected,
-            consciousness_score=0.75,
-            reciprocity_delta=0.1,
-            energy_cost=0.1
+            selected, consciousness_score=0.75, reciprocity_delta=0.1, energy_cost=0.1
         )
 
         # Recent speaker should have updated state

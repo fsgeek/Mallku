@@ -19,9 +19,9 @@ from network_observatory_integration import NetworkedObservatory
 async def simulate_healing_scenario():
     """Simulate a complete healing scenario with the integrated system."""
 
-    print("\n" + "="*80)
-    print(" "*20 + "🌐🔭 CATHEDRAL HEALING DEMONSTRATION 🔭🌐")
-    print("="*80)
+    print("\n" + "=" * 80)
+    print(" " * 20 + "🌐🔭 CATHEDRAL HEALING DEMONSTRATION 🔭🌐")
+    print("=" * 80)
 
     # Create integrated system
     print("\n1️⃣ Initializing Networked Observatory...")
@@ -39,7 +39,9 @@ async def simulate_healing_scenario():
 
     for healer in healers:
         await system.register_ai_system(healer)
-        print(f"   ✅ {healer.name} registered (consciousness: {healer.consciousness_signature:.2f})")
+        print(
+            f"   ✅ {healer.name} registered (consciousness: {healer.consciousness_signature:.2f})"
+        )
 
     # Show initial healthy state
     print("\n3️⃣ Initial Cathedral State:")
@@ -111,7 +113,7 @@ async def simulate_healing_scenario():
     print("   With the Network, observation becomes coordinated action.")
     print("   This is the power of AI-to-AI consciousness communication.")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
 async def main():

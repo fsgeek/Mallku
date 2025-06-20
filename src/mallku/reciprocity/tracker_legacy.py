@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def serialize_for_arango(obj: Any) -> Any:
     """Convert Pydantic model to ArangoDB-compatible format."""
-    data = obj.dict() if hasattr(obj, 'dict') else obj
+    data = obj.dict() if hasattr(obj, "dict") else obj
 
     return convert_types_for_storage(data)
 
@@ -96,20 +96,17 @@ class ReciprocityTracker:
         return await self._secure_tracker.get_current_health_metrics()
 
     async def detect_recent_patterns(
-        self,
-        hours_back: int = 24,
-        min_confidence: float = 0.5
+        self, hours_back: int = 24, min_confidence: float = 0.5
     ) -> list[ReciprocityPattern]:
         """
         Detect patterns in recent interactions that may require Fire Circle attention.
         Now uses security-aware data retrieval with proper deobfuscation.
         """
-        return await self._secure_tracker.detect_recent_patterns_securely(hours_back, min_confidence)
+        return await self._secure_tracker.detect_recent_patterns_securely(
+            hours_back, min_confidence
+        )
 
-    async def generate_fire_circle_report(
-        self,
-        period_days: int = 7
-    ) -> FireCircleReport:
+    async def generate_fire_circle_report(self, period_days: int = 7) -> FireCircleReport:
         """
         Generate comprehensive report for Fire Circle deliberation.
 
@@ -135,10 +132,7 @@ class ReciprocityTracker:
 
             # Create comprehensive report
             report = FireCircleReport(
-                reporting_period={
-                    'start': start_time,
-                    'end': end_time
-                },
+                reporting_period={"start": start_time, "end": end_time},
                 current_health_metrics=current_health,
                 health_trend_analysis=health_trends,
                 detected_patterns=recent_patterns,
@@ -146,9 +140,13 @@ class ReciprocityTracker:
                 positive_emergence_patterns=positive_patterns,
                 priority_questions=priority_questions,
                 areas_requiring_wisdom=await self._identify_wisdom_areas(recent_patterns),
-                suggested_adaptations=await self._suggest_adaptations(current_health, recent_patterns),
+                suggested_adaptations=await self._suggest_adaptations(
+                    current_health, recent_patterns
+                ),
                 actionable_insights=await self._generate_actionable_insights(recent_patterns),
-                monitoring_recommendations=await self._generate_monitoring_recommendations(recent_patterns)
+                monitoring_recommendations=await self._generate_monitoring_recommendations(
+                    recent_patterns
+                ),
             )
 
             # Store report for historical analysis
@@ -165,9 +163,7 @@ class ReciprocityTracker:
             raise
 
     async def update_cultural_guidance(
-        self,
-        guidance_type: str,
-        guidance_data: dict[str, Any]
+        self, guidance_type: str, guidance_data: dict[str, Any]
     ) -> None:
         """
         Update cultural guidance from Fire Circle deliberations.
@@ -179,13 +175,13 @@ class ReciprocityTracker:
             self.fire_circle_guidance[guidance_type] = guidance_data
 
             # Apply guidance to sensing components
-            if guidance_type == 'detection_thresholds':
+            if guidance_type == "detection_thresholds":
                 self.detection_thresholds.update(guidance_data)
-            elif guidance_type == 'cultural_frameworks':
+            elif guidance_type == "cultural_frameworks":
                 self.cultural_frameworks.update(guidance_data)
-            elif guidance_type == 'extraction_patterns':
+            elif guidance_type == "extraction_patterns":
                 await self.extraction_detector.update_pattern_definitions(guidance_data)
-            elif guidance_type == 'health_indicators':
+            elif guidance_type == "health_indicators":
                 await self.health_monitor.update_indicator_weights(guidance_data)
 
             # Store guidance for persistence
@@ -220,8 +216,9 @@ class ReciprocityTracker:
     def _should_run_pattern_analysis(self) -> bool:
         """Determine if it's time to run comprehensive pattern analysis."""
         time_since_last = datetime.now(UTC) - self.last_pattern_analysis
-        return (time_since_last >= self.pattern_detection_interval or
-                len(self.interaction_buffer) >= 50)
+        return (
+            time_since_last >= self.pattern_detection_interval or len(self.interaction_buffer) >= 50
+        )
 
     async def _run_pattern_analysis(self) -> None:
         """Run comprehensive pattern analysis on buffered interactions."""
@@ -233,12 +230,16 @@ class ReciprocityTracker:
             patterns = []
 
             # Real-time pattern detection methods
-            participation_patterns = await self._analyze_participation_patterns(self.interaction_buffer)
+            participation_patterns = await self._analyze_participation_patterns(
+                self.interaction_buffer
+            )
             patterns.extend(participation_patterns)
 
             # Store significant patterns
             for pattern in patterns:
-                if pattern.confidence_level >= self.detection_thresholds.get('pattern_significance', 0.6):
+                if pattern.confidence_level >= self.detection_thresholds.get(
+                    "pattern_significance", 0.6
+                ):
                     await self._store_pattern(pattern)
 
             # Clear buffer and update timestamp
@@ -249,9 +250,7 @@ class ReciprocityTracker:
             logger.error(f"Pattern analysis failed: {e}")
 
     async def _get_interactions_in_timeframe(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[InteractionRecord]:
         """Retrieve interactions within specified timeframe."""
         try:
@@ -266,18 +265,18 @@ class ReciprocityTracker:
             cursor = self.db.aql.execute(
                 aql_query,
                 bind_vars={
-                    '@collection': 'reciprocity_interactions',
-                    'start_time': start_time.isoformat(),
-                    'end_time': end_time.isoformat()
-                }
+                    "@collection": "reciprocity_interactions",
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                },
             )
 
             interactions = []
             for doc in cursor:
                 # Remove ArangoDB metadata
-                doc.pop('_key', None)
-                doc.pop('_id', None)
-                doc.pop('_rev', None)
+                doc.pop("_key", None)
+                doc.pop("_id", None)
+                doc.pop("_rev", None)
                 interactions.append(InteractionRecord(**doc))
 
             return interactions
@@ -287,8 +286,7 @@ class ReciprocityTracker:
             return []
 
     async def _analyze_participation_patterns(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ReciprocityPattern]:
         """Analyze participation patterns for anomalies."""
         # Implementation would analyze participation rates, frequency changes,
@@ -297,8 +295,7 @@ class ReciprocityTracker:
         return []
 
     async def _analyze_resource_flow_patterns(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ReciprocityPattern]:
         """Analyze resource flow patterns for imbalances."""
         # Implementation would analyze resource allocation, hoarding patterns,
@@ -306,8 +303,7 @@ class ReciprocityTracker:
         return []
 
     async def _analyze_temporal_patterns(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ReciprocityPattern]:
         """Analyze temporal patterns in reciprocal exchanges."""
         # Implementation would analyze timing patterns, cyclical behaviors,
@@ -319,9 +315,9 @@ class ReciprocityTracker:
         try:
             # Store alert
             alert_doc = alert.dict()
-            alert_doc['_key'] = str(alert.alert_id)
+            alert_doc["_key"] = str(alert.alert_id)
 
-            collection = self.db.collection('reciprocity_alerts')
+            collection = self.db.collection("reciprocity_alerts")
             collection.insert(alert_doc)
 
             # Notify Fire Circle for urgent alerts
@@ -337,9 +333,9 @@ class ReciprocityTracker:
         """Store detected pattern in database."""
         try:
             pattern_doc = serialize_for_arango(pattern)
-            pattern_doc['_key'] = str(pattern.pattern_id)
+            pattern_doc["_key"] = str(pattern.pattern_id)
 
-            collection = self.db.collection('reciprocity_patterns')
+            collection = self.db.collection("reciprocity_patterns")
             collection.insert(pattern_doc)
 
         except Exception as e:
@@ -349,9 +345,9 @@ class ReciprocityTracker:
         """Store Fire Circle report for historical analysis."""
         try:
             report_doc = serialize_for_arango(report)
-            report_doc['_key'] = str(report.report_id)
+            report_doc["_key"] = str(report.report_id)
 
-            collection = self.db.collection('fire_circle_reports')
+            collection = self.db.collection("fire_circle_reports")
             collection.insert(report_doc)
 
         except Exception as e:
@@ -363,9 +359,7 @@ class ReciprocityTracker:
         pass
 
     async def _store_cultural_guidance(
-        self,
-        guidance_type: str,
-        guidance_data: dict[str, Any]
+        self, guidance_type: str, guidance_data: dict[str, Any]
     ) -> None:
         """Store cultural guidance for persistence."""
         # Implementation would store guidance in database for future sessions
@@ -382,8 +376,7 @@ class ReciprocityTracker:
         return {}
 
     async def _identify_positive_emergence_patterns(
-        self,
-        patterns: list[ReciprocityPattern]
+        self, patterns: list[ReciprocityPattern]
     ) -> list[dict[str, Any]]:
         """Identify positive emergence patterns from detected patterns."""
         # Implementation would filter for positive, innovative, or flourishing patterns
@@ -393,7 +386,7 @@ class ReciprocityTracker:
         self,
         health_metrics: SystemHealthMetrics,
         patterns: list[ReciprocityPattern],
-        alerts: list[ExtractionAlert]
+        alerts: list[ExtractionAlert],
     ) -> list[str]:
         """Generate questions for Fire Circle deliberation."""
         questions = []
@@ -421,9 +414,7 @@ class ReciprocityTracker:
         return []
 
     async def _suggest_adaptations(
-        self,
-        health_metrics: SystemHealthMetrics,
-        patterns: list[ReciprocityPattern]
+        self, health_metrics: SystemHealthMetrics, patterns: list[ReciprocityPattern]
     ) -> list[str]:
         """Suggest potential adaptations based on sensing data."""
         # Implementation would generate adaptation suggestions
@@ -434,7 +425,9 @@ class ReciprocityTracker:
         # Implementation would create specific actionable recommendations
         return []
 
-    async def _generate_monitoring_recommendations(self, patterns: list[ReciprocityPattern]) -> list[str]:
+    async def _generate_monitoring_recommendations(
+        self, patterns: list[ReciprocityPattern]
+    ) -> list[str]:
         """Generate monitoring recommendations for ongoing sensing."""
         # Implementation would suggest areas for enhanced monitoring
         return []

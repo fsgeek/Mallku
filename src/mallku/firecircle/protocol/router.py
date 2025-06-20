@@ -127,10 +127,7 @@ class ConsciousMessageRouter:
         # Determine recipients
         if recipients is None:
             # Broadcast to all participants except sender
-            recipients = [
-                pid for pid in self.participant_queues
-                if pid != message.sender
-            ]
+            recipients = [pid for pid in self.participant_queues if pid != message.sender]
 
         # Emit routing event
         if self.event_bus:
@@ -305,24 +302,14 @@ class ConsciousMessageRouter:
         """Get router performance metrics."""
         total_messages = len(self.delivery_status)
         delivered_messages = sum(
-            1 for status in self.delivery_status.values()
-            if status.sent_to == status.confirmed_by
+            1 for status in self.delivery_status.values() if status.sent_to == status.confirmed_by
         )
 
-        read_messages = sum(
-            1 for status in self.delivery_status.values()
-            if status.read_by
-        )
+        read_messages = sum(1 for status in self.delivery_status.values() if status.read_by)
 
-        failed_messages = sum(
-            1 for status in self.delivery_status.values()
-            if status.errors
-        )
+        failed_messages = sum(1 for status in self.delivery_status.values() if status.errors)
 
-        queue_sizes = {
-            str(pid): queue.qsize()
-            for pid, queue in self.participant_queues.items()
-        }
+        queue_sizes = {str(pid): queue.qsize() for pid, queue in self.participant_queues.items()}
 
         return {
             "total_messages_routed": total_messages,

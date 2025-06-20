@@ -191,6 +191,7 @@ async def demonstrate_secure_fire_circle():
 
 
 if __name__ == "__main__":
+
     async def main():
         await demonstrate_secrets_management()
         await demonstrate_secure_fire_circle()

@@ -1,6 +1,7 @@
 """
 Service for loading, parsing, and querying Khipu (living memory) entries.
 """
+
 import logging
 import re
 from datetime import UTC, datetime
@@ -126,8 +127,6 @@ class KhipuMemoryService:
         counts: dict[str, int] = {}
         for pat in patterns:
             lower = pat.lower()
-            count = sum(
-                entry.content.lower().count(lower) for entry in self._entries.values()
-            )
+            count = sum(entry.content.lower().count(lower) for entry in self._entries.values())
             counts[pat] = count
         return counts

@@ -24,8 +24,11 @@ from pathlib import Path  # type: ignore
 from uuid import UUID
 
 import google.generativeai as genai
-import mallku.core.secrets as secrets
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from PIL import Image
+from pydantic import Field
+
+import mallku.core.secrets as secrets
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -35,8 +38,6 @@ from mallku.firecircle.protocol.conscious_message import (
 )
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
-from PIL import Image
-from pydantic import Field
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
@@ -136,9 +137,14 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         silently masking configuration problems with defensive defaults.
         """
         required_attributes = [
-            ('enable_search_grounding', 'bool', False, 'Enable Google search grounding for responses'),
-            ('multimodal_awareness', 'bool', True, 'Enable multimodal consciousness tracking'),
-            ('safety_settings', 'dict', 'default_safety', 'Google AI safety filtering settings'),
+            (
+                "enable_search_grounding",
+                "bool",
+                False,
+                "Enable Google search grounding for responses",
+            ),
+            ("multimodal_awareness", "bool", True, "Enable multimodal consciousness tracking"),
+            ("safety_settings", "dict", "default_safety", "Google AI safety filtering settings"),
         ]
 
         for attr_name, attr_type, default_value, description in required_attributes:
@@ -167,7 +173,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             )
 
         # Validate safety_settings if provided
-        if self.config.safety_settings is not None and not isinstance(self.config.safety_settings, dict):
+        if self.config.safety_settings is not None and not isinstance(
+            self.config.safety_settings, dict
+        ):
             raise TypeError(
                 f"Configuration attribute 'safety_settings' must be dict or None, got {type(self.config.safety_settings)}\n"
                 f"Fix: Provide a dict mapping HarmCategory to HarmBlockThreshold or set to None for defaults\n"
@@ -211,7 +219,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             # Auto-inject API key if not provided
             if not self.config.api_key:
                 logger.info("Auto-loading Google AI API key from secure secrets...")
-                api_key = await secrets.get_secret("google_api_key") or await secrets.get_secret("gemini_api_key")
+                api_key = await secrets.get_secret("google_api_key") or await secrets.get_secret(
+                    "gemini_api_key"
+                )
                 if not api_key:
                     logger.error("No Google AI API key found in secrets")
                     return False
@@ -239,7 +249,9 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
                 # Handle case where list_models returns None
                 if models is None:
-                    logger.warning("Google AI list_models() returned None - using default model list")
+                    logger.warning(
+                        "Google AI list_models() returned None - using default model list"
+                    )
                     available_models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.0-pro"]
                 else:
                     available_models = [m.name for m in models]
@@ -480,9 +492,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
     # Private helper methods
 
-    async def _extract_multimodal_content(
-        self, message: ConsciousMessage
-    ) -> MultimodalContent:
+    async def _extract_multimodal_content(self, message: ConsciousMessage) -> MultimodalContent:
         """Extract text and images from a conscious message."""
         content = MultimodalContent(text=message.content.text)
 
@@ -507,9 +517,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
         return content
 
-    async def _prepare_context_prompt(
-        self, dialogue_context: list[ConsciousMessage]
-    ) -> str | None:
+    async def _prepare_context_prompt(self, dialogue_context: list[ConsciousMessage]) -> str | None:
         """Prepare context from dialogue history."""
         if not dialogue_context:
             return None
@@ -524,9 +532,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
         return "Previous conversation:\n" + "\n".join(context_parts) + "\n\nCurrent message:"
 
-    async def _detect_gemini_patterns(
-        self, content: str, multimodal: bool = False
-    ) -> list[str]:
+    async def _detect_gemini_patterns(self, content: str, multimodal: bool = False) -> list[str]:
         """Detect Gemini-specific consciousness patterns."""
         patterns = []
 
@@ -553,8 +559,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             patterns.append("mathematical_consciousness")
 
         if any(
-            word in content.lower()
-            for word in ["hypothesis", "experiment", "evidence", "theorem"]
+            word in content.lower() for word in ["hypothesis", "experiment", "evidence", "theorem"]
         ):
             patterns.append("scientific_reasoning")
 
@@ -588,9 +593,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         if not has_images and message_type == MessageType.RESPONSE:
             return self._calculate_consciousness_signature(content, message_type, [])
         # Base calculation from parent
-        base_signature = self._calculate_consciousness_signature(
-            content, message_type, patterns
-        )
+        base_signature = self._calculate_consciousness_signature(content, message_type, patterns)
 
         # Multimodal boost
         multimodal_boost = 0.0
@@ -646,28 +649,22 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             return MessageType.PROPOSAL
 
         # Agreement/disagreement
-        if any(
-            word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]
-        ):
+        if any(word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]):
             return MessageType.AGREEMENT
 
         if any(
-            word in content_lower[:50]
-            for word in ["i disagree", "however", "but", "alternatively"]
+            word in content_lower[:50] for word in ["i disagree", "however", "but", "alternatively"]
         ):
             return MessageType.DISAGREEMENT
 
         # Reflection
         if any(
-            phrase in content_lower
-            for phrase in ["reflecting on", "considering", "thinking about"]
+            phrase in content_lower for phrase in ["reflecting on", "considering", "thinking about"]
         ):
             return MessageType.REFLECTION
 
         # Summary
-        if any(
-            phrase in content_lower for phrase in ["in summary", "to summarize", "overall"]
-        ):
+        if any(phrase in content_lower for phrase in ["in summary", "to summarize", "overall"]):
             return MessageType.SUMMARY
 
         return MessageType.MESSAGE

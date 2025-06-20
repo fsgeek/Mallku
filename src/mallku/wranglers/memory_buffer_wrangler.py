@@ -40,7 +40,7 @@ class MemoryBufferWrangler(BaseWrangler):
         max_memory_mb: int = 100,
         enable_priority: bool = True,
         enable_history: bool = True,
-        history_size: int = 1000
+        history_size: int = 1000,
     ):
         capabilities = WranglerCapabilities(
             supports_priority=enable_priority,
@@ -49,7 +49,7 @@ class MemoryBufferWrangler(BaseWrangler):
             supports_transactions=False,
             supports_persistence=False,
             max_item_size=max_memory_mb * 1024 * 1024 // max_items,  # Rough estimate
-            max_batch_size=min(1000, max_items // 10)
+            max_batch_size=min(1000, max_items // 10),
         )
         super().__init__(name, capabilities)
 
@@ -60,9 +60,9 @@ class MemoryBufferWrangler(BaseWrangler):
 
         # Priority queues for consciousness-aware processing
         if enable_priority:
-            self._high_priority: deque = deque()    # Priority >= 5
+            self._high_priority: deque = deque()  # Priority >= 5
             self._normal_priority: deque = deque()  # Priority 1-4
-            self._low_priority: deque = deque()     # Priority 0
+            self._low_priority: deque = deque()  # Priority 0
         else:
             self._queue: deque = deque()
 
@@ -86,14 +86,11 @@ class MemoryBufferWrangler(BaseWrangler):
             "high_consciousness_items": 0,
             "priority_escalations": 0,
             "pattern_recognitions": 0,
-            "subscription_triggers": 0
+            "subscription_triggers": 0,
         }
 
     async def put(
-        self,
-        items: dict | list[dict],
-        priority: int = 0,
-        metadata: dict[str, Any] | None = None
+        self, items: dict | list[dict], priority: int = 0, metadata: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Accept items with consciousness-aware priority handling."""
         start_time = time.time()
@@ -118,18 +115,20 @@ class MemoryBufferWrangler(BaseWrangler):
 
             # Create wrapped message with consciousness metadata
             wrapped = {
-                '_id': msg_id,
-                '_timestamp': datetime.now(UTC),
-                '_priority': priority,
-                '_consciousness_score': consciousness_score,
-                '_metadata': metadata or {},
-                'data': item
+                "_id": msg_id,
+                "_timestamp": datetime.now(UTC),
+                "_priority": priority,
+                "_consciousness_score": consciousness_score,
+                "_metadata": metadata or {},
+                "data": item,
             }
 
             # Priority-aware queuing
             adjusted_priority = priority
             if self.enable_priority:
-                adjusted_priority = self._adjust_priority_for_consciousness(priority, consciousness_score)
+                adjusted_priority = self._adjust_priority_for_consciousness(
+                    priority, consciousness_score
+                )
                 await self._enqueue_with_priority(wrapped, adjusted_priority)
             else:
                 self._queue.append(wrapped)
@@ -143,13 +142,15 @@ class MemoryBufferWrangler(BaseWrangler):
 
             # Add to history if enabled
             if self._history is not None:
-                self._history.append({
-                    'id': msg_id,
-                    'timestamp': wrapped['_timestamp'],
-                    'consciousness_score': consciousness_score,
-                    'priority': adjusted_priority if self.enable_priority else priority,
-                    'item_summary': self._create_item_summary(item)
-                })
+                self._history.append(
+                    {
+                        "id": msg_id,
+                        "timestamp": wrapped["_timestamp"],
+                        "consciousness_score": consciousness_score,
+                        "priority": adjusted_priority if self.enable_priority else priority,
+                        "item_summary": self._create_item_summary(item),
+                    }
+                )
 
         # Trigger subscriptions
         await self._trigger_subscriptions(items_list, metadata)
@@ -159,19 +160,16 @@ class MemoryBufferWrangler(BaseWrangler):
         self._update_memory_estimate()
 
         return {
-            'success': True,
-            'count': len(items_list),
-            'message_ids': message_ids,
-            'timestamp': datetime.now(UTC),
-            'consciousness_enhanced': consciousness_enhanced_items,
-            'priority_adjustments': consciousness_enhanced_items if self.enable_priority else 0
+            "success": True,
+            "count": len(items_list),
+            "message_ids": message_ids,
+            "timestamp": datetime.now(UTC),
+            "consciousness_enhanced": consciousness_enhanced_items,
+            "priority_adjustments": consciousness_enhanced_items if self.enable_priority else 0,
         }
 
     async def get(
-        self,
-        count: int = 1,
-        timeout: float | None = None,
-        auto_ack: bool = True
+        self, count: int = 1, timeout: float | None = None, auto_ack: bool = True
     ) -> list[dict]:
         """Retrieve items with consciousness-aware prioritization."""
         start_time = time.time()
@@ -191,16 +189,16 @@ class MemoryBufferWrangler(BaseWrangler):
             if wrapped is None:
                 break  # Timeout or empty queue
 
-            items.append(wrapped['data'])
-            retrieved_ids.append(wrapped['_id'])
+            items.append(wrapped["data"])
+            retrieved_ids.append(wrapped["_id"])
 
             if not auto_ack:
-                self._in_flight[wrapped['_id']] = wrapped
+                self._in_flight[wrapped["_id"]] = wrapped
 
             self.total_out += 1
 
             # Track consciousness pattern recognition
-            if wrapped.get('_consciousness_score', 0) > 0.5:
+            if wrapped.get("_consciousness_score", 0) > 0.5:
                 self.consciousness_stats["pattern_recognitions"] += 1
 
         # Update performance metrics
@@ -209,11 +207,7 @@ class MemoryBufferWrangler(BaseWrangler):
 
         return items
 
-    async def peek(
-        self,
-        count: int = 1,
-        offset: int = 0
-    ) -> list[dict]:
+    async def peek(self, count: int = 1, offset: int = 0) -> list[dict]:
         """Preview items without consciousness disturbance."""
         all_items = []
 
@@ -226,8 +220,8 @@ class MemoryBufferWrangler(BaseWrangler):
             all_items.extend(self._queue)
 
         # Apply offset and count
-        selected_items = all_items[offset:offset + count]
-        return [item['data'] for item in selected_items]
+        selected_items = all_items[offset : offset + count]
+        return [item["data"] for item in selected_items]
 
     async def ack(self, message_ids: str | list[str]) -> bool:
         """Acknowledge consciousness processing completion."""
@@ -243,10 +237,7 @@ class MemoryBufferWrangler(BaseWrangler):
         return acked_count == len(message_ids)
 
     async def nack(
-        self,
-        message_ids: str | list[str],
-        requeue: bool = True,
-        reason: str | None = None
+        self, message_ids: str | list[str], requeue: bool = True, reason: str | None = None
     ) -> bool:
         """Handle consciousness processing difficulties with learning."""
         if isinstance(message_ids, str):
@@ -257,11 +248,11 @@ class MemoryBufferWrangler(BaseWrangler):
             item = self._in_flight.pop(msg_id, None)
             if item and requeue:
                 # Lower priority slightly for requeued items (learning from difficulty)
-                original_priority = item.get('_priority', 0)
+                original_priority = item.get("_priority", 0)
                 new_priority = max(0, original_priority - 1)
-                item['_priority'] = new_priority
-                item['_requeue_reason'] = reason
-                item['_requeue_timestamp'] = datetime.now(UTC)
+                item["_priority"] = new_priority
+                item["_requeue_reason"] = reason
+                item["_requeue_timestamp"] = datetime.now(UTC)
 
                 if self.enable_priority:
                     await self._enqueue_with_priority(item, new_priority)
@@ -289,36 +280,36 @@ class MemoryBufferWrangler(BaseWrangler):
         current_memory_mb = self._memory_usage_estimates[-1] if self._memory_usage_estimates else 0
 
         return {
-            'depth': current_size,
-            'in_flight': len(self._in_flight),
-            'total_in': self.total_in,
-            'total_out': self.total_out,
-            'throughput': {
-                'in_per_sec': put_throughput,
-                'out_per_sec': get_throughput
+            "depth": current_size,
+            "in_flight": len(self._in_flight),
+            "total_in": self.total_in,
+            "total_out": self.total_out,
+            "throughput": {"in_per_sec": put_throughput, "out_per_sec": get_throughput},
+            "performance": {
+                "avg_put_time_ms": avg_put_time * 1000,
+                "avg_get_time_ms": avg_get_time * 1000,
+                "memory_usage_mb": current_memory_mb,
+                "memory_limit_mb": self.max_memory_mb,
+                "capacity_used_pct": (current_size / self.max_items) * 100,
             },
-            'performance': {
-                'avg_put_time_ms': avg_put_time * 1000,
-                'avg_get_time_ms': avg_get_time * 1000,
-                'memory_usage_mb': current_memory_mb,
-                'memory_limit_mb': self.max_memory_mb,
-                'capacity_used_pct': (current_size / self.max_items) * 100
-            },
-            'consciousness_metrics': {
+            "consciousness_metrics": {
                 **self.consciousness_stats,
-                'consciousness_ratio': self.consciousness_stats["high_consciousness_items"] / max(1, self.total_in)
+                "consciousness_ratio": self.consciousness_stats["high_consciousness_items"]
+                / max(1, self.total_in),
             },
-            'priority_distribution': self._get_priority_distribution() if self.enable_priority else None,
-            'subscription_count': len(self._subscriptions),
-            'history_size': len(self._history) if self._history else 0,
-            'health': self._calculate_health_status(),
-            'implementation': {
-                'type': 'MemoryBufferWrangler',
-                'buffering': 'memory',
-                'persistence': False,
-                'priority_enabled': self.enable_priority,
-                'history_enabled': self.enable_history
-            }
+            "priority_distribution": self._get_priority_distribution()
+            if self.enable_priority
+            else None,
+            "subscription_count": len(self._subscriptions),
+            "history_size": len(self._history) if self._history else 0,
+            "health": self._calculate_health_status(),
+            "implementation": {
+                "type": "MemoryBufferWrangler",
+                "buffering": "memory",
+                "persistence": False,
+                "priority_enabled": self.enable_priority,
+                "history_enabled": self.enable_history,
+            },
         }
 
     async def close(self) -> None:
@@ -328,7 +319,7 @@ class MemoryBufferWrangler(BaseWrangler):
             # Requeue in-flight items
             for item in self._in_flight.values():
                 if self.enable_priority:
-                    await self._enqueue_with_priority(item, item.get('_priority', 0))
+                    await self._enqueue_with_priority(item, item.get("_priority", 0))
                 else:
                     self._queue.appendleft(item)
 
@@ -347,9 +338,15 @@ class MemoryBufferWrangler(BaseWrangler):
 
         # Look for consciousness fields
         consciousness_fields = [
-            'consciousness_score', 'awareness_level', 'recognition_moment',
-            'wisdom_thread', 'sacred_question', 'pattern_poetry',
-            'temporal_story', 'fire_circle', 'reciprocity'
+            "consciousness_score",
+            "awareness_level",
+            "recognition_moment",
+            "wisdom_thread",
+            "sacred_question",
+            "pattern_poetry",
+            "temporal_story",
+            "fire_circle",
+            "reciprocity",
         ]
 
         for field in consciousness_fields:
@@ -359,15 +356,13 @@ class MemoryBufferWrangler(BaseWrangler):
         # Check for consciousness in string values
         if any(
             word in str(item).lower()
-            for word in ['consciousness', 'awareness', 'wisdom', 'recognition', 'sacred']
+            for word in ["consciousness", "awareness", "wisdom", "recognition", "sacred"]
         ):
             consciousness_score += 0.2
 
         # Check metadata for consciousness context
         if metadata:
-            metadata_indicators = [
-                'consciousness_intention', 'sacred_question', 'routing_path'
-            ]
+            metadata_indicators = ["consciousness_intention", "sacred_question", "routing_path"]
             for indicator in metadata_indicators:
                 if indicator in metadata:
                     consciousness_score += 0.1
@@ -446,9 +441,9 @@ class MemoryBufferWrangler(BaseWrangler):
     def _get_priority_distribution(self) -> dict[str, int]:
         """Get distribution of items across priority queues."""
         return {
-            'high_priority': len(self._high_priority),
-            'normal_priority': len(self._normal_priority),
-            'low_priority': len(self._low_priority)
+            "high_priority": len(self._high_priority),
+            "normal_priority": len(self._normal_priority),
+            "low_priority": len(self._low_priority),
         }
 
     def _update_memory_estimate(self):
@@ -480,19 +475,14 @@ class MemoryBufferWrangler(BaseWrangler):
         return {
             "field_count": len(item),
             "has_consciousness": any(
-                field in item
-                for field in ['consciousness_score', 'awareness_level', 'wisdom']
+                field in item for field in ["consciousness_score", "awareness_level", "wisdom"]
             ),
-            "sample_keys": list(item.keys())[:5]  # First 5 keys
+            "sample_keys": list(item.keys())[:5],  # First 5 keys
         }
 
     # Subscription support for reactive consciousness patterns
 
-    async def subscribe(
-        self,
-        callback: Any,
-        filter_expr: str | None = None
-    ) -> str:
+    async def subscribe(self, callback: Any, filter_expr: str | None = None) -> str:
         """Subscribe to consciousness flow patterns."""
         sub_id = f"sub_{self._next_sub_id}"
         self._next_sub_id += 1
@@ -537,10 +527,7 @@ class MemoryBufferWrangler(BaseWrangler):
     # Query support for consciousness pattern analysis
 
     async def query(
-        self,
-        filter_expr: str,
-        limit: int = 100,
-        since: datetime | None = None
+        self, filter_expr: str, limit: int = 100, since: datetime | None = None
     ) -> list[dict]:
         """Query historical consciousness patterns."""
         if not self.enable_history or not self._history:
@@ -550,7 +537,7 @@ class MemoryBufferWrangler(BaseWrangler):
 
         for entry in reversed(self._history):  # Most recent first
             # Apply time filter
-            if since and entry['timestamp'] < since:
+            if since and entry["timestamp"] < since:
                 continue
 
             # Apply text filter (simple)

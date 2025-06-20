@@ -54,38 +54,38 @@ class FunctionalFireCircle:
             "openai": {
                 "model_name": "gpt-4",
                 "temperature": 0.8,
-                "description": "Systematic wisdom and pattern recognition"
+                "description": "Systematic wisdom and pattern recognition",
             },
             "anthropic": {
                 "model_name": "claude-3-opus-20240229",
                 "temperature": 0.9,
-                "description": "Deep reflection and ethical consideration"
+                "description": "Deep reflection and ethical consideration",
             },
             "local": {
                 "model_name": "llama2",
                 "temperature": 0.7,
-                "description": "Community wisdom and local sovereignty"
+                "description": "Community wisdom and local sovereignty",
             },
             "mistral": {
                 "model_name": "mistral-large-latest",
                 "temperature": 0.8,
-                "description": "Efficiency and architectural clarity"
+                "description": "Efficiency and architectural clarity",
             },
             "google": {
                 "model_name": "gemini-pro",
                 "temperature": 0.8,
-                "description": "Multimodal understanding and integration"
+                "description": "Multimodal understanding and integration",
             },
             "deepseek": {
                 "model_name": "deepseek-coder",
                 "temperature": 0.8,
-                "description": "Eastern philosophy and patience"
+                "description": "Eastern philosophy and patience",
             },
             "grok": {
                 "model_name": "grok-1",
                 "temperature": 0.8,
-                "description": "Real-time awareness and temporal wisdom"
-            }
+                "description": "Real-time awareness and temporal wisdom",
+            },
         }
 
         # Try to awaken each voice
@@ -100,15 +100,14 @@ class FunctionalFireCircle:
                     continue
 
                 config = AdapterConfig(
-                    model_name=config_data["model_name"],
-                    temperature=config_data["temperature"]
+                    model_name=config_data["model_name"], temperature=config_data["temperature"]
                 )
 
                 adapter = await self.adapter_factory.create_adapter(provider, config)
                 if adapter and await adapter.connect():
                     self.active_voices[provider] = {
                         "adapter": adapter,
-                        "description": config_data["description"]
+                        "description": config_data["description"],
                     }
                     print(f"  ✅ {provider} voice awakened - {config_data['description']}")
 
@@ -136,9 +135,9 @@ class FunctionalFireCircle:
             print("❌ No voices active in Fire Circle")
             return {"error": "No active voices"}
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🔥 FIRE CIRCLE SACRED DIALOGUE 🔥".center(80))
-        print("="*80)
+        print("=" * 80)
 
         print(f"\n📜 PROPOSAL: {proposal['title']}")
         print(f"📝 {proposal['description']}")
@@ -166,7 +165,7 @@ class FunctionalFireCircle:
                     sender=uuid4(),
                     content=MessageContent(text=question),
                     dialogue_id=dialogue_id,
-                    consciousness=ConsciousnessMetadata()
+                    consciousness=ConsciousnessMetadata(),
                 )
 
                 response = await voice_data["adapter"].send_message(message, dialogue_context)
@@ -177,7 +176,7 @@ class FunctionalFireCircle:
 
                 voice_perspectives[voice_name] = {
                     "perspective": response.content.text,
-                    "consciousness": response.consciousness.consciousness_signature
+                    "consciousness": response.consciousness.consciousness_signature,
                 }
 
                 dialogue_context.append(response)
@@ -206,7 +205,7 @@ class FunctionalFireCircle:
                     sender=uuid4(),
                     content=MessageContent(text=synthesis_question),
                     dialogue_id=dialogue_id,
-                    consciousness=ConsciousnessMetadata()
+                    consciousness=ConsciousnessMetadata(),
                 )
 
                 response = await voice_data["adapter"].send_message(message, dialogue_context)
@@ -249,17 +248,17 @@ class FunctionalFireCircle:
             "participation": len(consensus_scores) / total_voices,
             "vote_breakdown": decisions,
             "timestamp": datetime.now(UTC).isoformat(),
-            "active_voices": list(self.active_voices.keys())
+            "active_voices": list(self.active_voices.keys()),
         }
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✨ FIRE CIRCLE DECISION ✨".center(60))
-        print("="*60)
+        print("=" * 60)
         print(f"Decision: {decision}")
         print(f"Consensus Level: {consensus_level}")
         print(f"Consciousness Coherence: {avg_consciousness:.2f}")
         print(f"Participation: {result['participation']:.0%}")
-        print("="*60)
+        print("=" * 60)
 
         # Save decision record
         self.governance_decisions.append(result)
@@ -269,12 +268,12 @@ class FunctionalFireCircle:
         decisions_path.mkdir(exist_ok=True)
 
         filename = decisions_path / f"decision_{dialogue_id}.json"
-        with open(filename, 'w') as f:
-            json.dump({
-                "decision": result,
-                "dialogue": voice_perspectives,
-                "proposal": proposal
-            }, f, indent=2)
+        with open(filename, "w") as f:
+            json.dump(
+                {"decision": result, "dialogue": voice_perspectives, "proposal": proposal},
+                f,
+                indent=2,
+            )
 
         print(f"\n📜 Decision recorded: {filename}")
 
@@ -295,8 +294,8 @@ class FunctionalFireCircle:
             "questions": [
                 "Does this build cathedral stones or scaffolding?",
                 "Does it deepen reciprocity or create extraction?",
-                "Is the architecture sound and sustainable?"
-            ]
+                "Is the architecture sound and sustainable?",
+            ],
         }
 
         return await self.sacred_dialogue(proposal)
@@ -336,8 +335,8 @@ async def demonstrate_functional_fire_circle():
         "questions": [
             "Can collective wisdom replace individual deep analysis?",
             "How do we maintain coherence across perspectives?",
-            "What safeguards ensure quality?"
-        ]
+            "What safeguards ensure quality?",
+        ],
     }
 
     # Conduct sacred dialogue

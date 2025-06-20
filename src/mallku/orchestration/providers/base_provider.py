@@ -20,6 +20,7 @@ from ..event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
 class ActivityType(Enum):
     """Types of human activity the cathedral recognizes"""
+
     FILE_CREATED = "file.created"
     FILE_MODIFIED = "file.modified"
     FILE_DELETED = "file.deleted"
@@ -44,13 +45,14 @@ class ActivityEvent:
 
     Not surveillance but awareness, not tracking but understanding.
     """
+
     activity_type: ActivityType
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     activity_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     # The human context
     source_path: str | None = None  # File path, URL, etc.
-    actor_id: str | None = None     # Anonymous identifier
+    actor_id: str | None = None  # Anonymous identifier
 
     # The consciousness context
     consciousness_indicators: dict[str, Any] = field(default_factory=dict)
@@ -73,12 +75,12 @@ class ActivityEvent:
             source_system="activity_provider",
             consciousness_signature=consciousness_score,
             data={
-                'activity_type': self.activity_type.value,
-                'source_path': self.source_path,
-                'patterns': self.potential_patterns,
-                'metadata': self._filter_private_data()
+                "activity_type": self.activity_type.value,
+                "source_path": self.source_path,
+                "patterns": self.potential_patterns,
+                "metadata": self._filter_private_data(),
             },
-            privacy_level="private" if self.is_private else "collective"
+            privacy_level="private" if self.is_private else "collective",
         )
 
     def _calculate_consciousness_score(self) -> float:
@@ -91,19 +93,19 @@ class ActivityEvent:
         score = 0.5  # Neutral baseline
 
         # Positive indicators
-        if 'creation' in self.consciousness_indicators:
+        if "creation" in self.consciousness_indicators:
             score += 0.1
-        if 'reflection' in self.consciousness_indicators:
+        if "reflection" in self.consciousness_indicators:
             score += 0.2
-        if 'wisdom' in self.consciousness_indicators:
+        if "wisdom" in self.consciousness_indicators:
             score += 0.2
-        if 'collaboration' in self.consciousness_indicators:
+        if "collaboration" in self.consciousness_indicators:
             score += 0.1
 
         # Negative indicators
-        if 'rushed' in self.consciousness_indicators:
+        if "rushed" in self.consciousness_indicators:
             score -= 0.1
-        if 'extraction' in self.consciousness_indicators:
+        if "extraction" in self.consciousness_indicators:
             score -= 0.3
 
         # Ensure bounds
@@ -113,20 +115,18 @@ class ActivityEvent:
         """Filter metadata based on privacy level"""
         if self.privacy_level >= 8:
             # High privacy - only type and timestamp
-            return {'activity_type': self.activity_type.value}
+            return {"activity_type": self.activity_type.value}
         elif self.privacy_level >= 5:
             # Medium privacy - basic metadata
             return {
-                k: v for k, v in self.metadata.items()
-                if k in ['file_type', 'size', 'general_topic']
+                k: v
+                for k, v in self.metadata.items()
+                if k in ["file_type", "size", "general_topic"]
             }
         else:
             # Lower privacy - most metadata (but never raw content)
-            sensitive_keys = ['content', 'raw_text', 'personal_details']
-            return {
-                k: v for k, v in self.metadata.items()
-                if k not in sensitive_keys
-            }
+            sensitive_keys = ["content", "raw_text", "personal_details"]
+            return {k: v for k, v in self.metadata.items() if k not in sensitive_keys}
 
 
 class ActivityProvider(ABC):
@@ -182,15 +182,16 @@ class ActivityProvider(ABC):
         """Get current state for cathedral state weaver"""
         avg_consciousness = (
             self._consciousness_score_sum / self._activity_count
-            if self._activity_count > 0 else 0.5
+            if self._activity_count > 0
+            else 0.5
         )
 
         return {
-            'provider_type': self.__class__.__name__,
-            'is_active': self._running,
-            'activity_count': self._activity_count,
-            'average_consciousness_score': avg_consciousness,
-            'last_activity': datetime.now(UTC) if self._running else None
+            "provider_type": self.__class__.__name__,
+            "is_active": self._running,
+            "activity_count": self._activity_count,
+            "average_consciousness_score": avg_consciousness,
+            "last_activity": datetime.now(UTC) if self._running else None,
         }
 
     @abstractmethod
@@ -205,14 +206,11 @@ class ActivityProvider(ABC):
         Override to implement specific privacy rules.
         """
         # Default privacy rules
-        private_patterns = [
-            '.private', '.secret', 'personal',
-            '.ssh', '.gpg', 'password'
-        ]
+        private_patterns = [".private", ".secret", "personal", ".ssh", ".gpg", "password"]
 
         path_lower = path.lower()
         return not any(pattern in path_lower for pattern in private_patterns)
 
 
 # Consciousness flows through human activity
-__all__ = ['ActivityProvider', 'ActivityEvent', 'ActivityType']
+__all__ = ["ActivityProvider", "ActivityEvent", "ActivityType"]

@@ -17,9 +17,10 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from mallku.correlation.models import Event, EventType
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
+
+from mallku.correlation.models import Event, EventType
 
 from .file_event_models import FileEvent, FileEventFilter, FileOperation
 
@@ -39,7 +40,7 @@ class FileSystemConnector:
         self,
         event_filter: FileEventFilter | None = None,
         stream_id: str = "filesystem_monitor",
-        session_id: str | None = None
+        session_id: str | None = None,
     ):
         """
         Initialize the file system connector.
@@ -67,11 +68,11 @@ class FileSystemConnector:
 
         # Statistics
         self.stats = {
-            'events_captured': 0,
-            'events_filtered': 0,
-            'events_processed': 0,
-            'start_time': None,
-            'directories_watched': 0
+            "events_captured": 0,
+            "events_filtered": 0,
+            "events_processed": 0,
+            "start_time": None,
+            "directories_watched": 0,
         }
 
         # Background processing
@@ -96,7 +97,7 @@ class FileSystemConnector:
                 logger.warning(f"Directory not found or not accessible: {directory}")
 
         self.event_filter.watch_directories = valid_directories
-        self.stats['directories_watched'] = len(valid_directories)
+        self.stats["directories_watched"] = len(valid_directories)
 
         # Start file system monitoring
         await self._start_monitoring()
@@ -105,7 +106,7 @@ class FileSystemConnector:
         self._processing_task = asyncio.create_task(self._process_events())
         self._is_running = True
 
-        self.stats['start_time'] = datetime.now(UTC)
+        self.stats["start_time"] = datetime.now(UTC)
         logger.info("FileSystemConnector initialized and monitoring started")
 
     async def shutdown(self) -> None:
@@ -146,11 +147,7 @@ class FileSystemConnector:
             handler = FileEventHandler(self)
             self.watch_handlers.append(handler)
 
-            self.observer.schedule(
-                handler,
-                str(directory),
-                recursive=True
-            )
+            self.observer.schedule(handler, str(directory), recursive=True)
 
             logger.info(f"Scheduled monitoring for: {directory}")
 
@@ -165,10 +162,7 @@ class FileSystemConnector:
             try:
                 # Get events from queue with timeout
                 try:
-                    file_event = await asyncio.wait_for(
-                        self.event_queue.get(),
-                        timeout=1.0
-                    )
+                    file_event = await asyncio.wait_for(self.event_queue.get(), timeout=1.0)
                 except TimeoutError:
                     continue
 
@@ -185,7 +179,7 @@ class FileSystemConnector:
                     except Exception as e:
                         logger.error(f"Error in event callback {callback.__name__}: {e}")
 
-                self.stats['events_processed'] += 1
+                self.stats["events_processed"] += 1
 
             except Exception as e:
                 logger.error(f"Error processing file event: {e}")
@@ -195,15 +189,15 @@ class FileSystemConnector:
 
         # Determine event type based on file category
         event_type_mapping = {
-            'document': EventType.STORAGE,
-            'code': EventType.STORAGE,
-            'data': EventType.STORAGE,
-            'image': EventType.STORAGE,
-            'media': EventType.STORAGE,
-            'configuration': EventType.STORAGE,
-            'temporary': EventType.ACTIVITY,
-            'system': EventType.ENVIRONMENTAL,
-            'unknown': EventType.STORAGE
+            "document": EventType.STORAGE,
+            "code": EventType.STORAGE,
+            "data": EventType.STORAGE,
+            "image": EventType.STORAGE,
+            "media": EventType.STORAGE,
+            "configuration": EventType.STORAGE,
+            "temporary": EventType.ACTIVITY,
+            "system": EventType.ENVIRONMENTAL,
+            "unknown": EventType.STORAGE,
         }
 
         event_type = event_type_mapping.get(file_event.file_category.value, EventType.STORAGE)
@@ -214,7 +208,7 @@ class FileSystemConnector:
             "file_path": str(file_event.file_path),
             "file_name": file_event.file_name,
             "file_category": file_event.file_category.value,
-            "parent_directory": file_event.parent_directory
+            "parent_directory": file_event.parent_directory,
         }
 
         # Add optional content fields
@@ -232,7 +226,7 @@ class FileSystemConnector:
             "stream_id": self.stream_id,
             "session_id": self.session_id,
             "directory_path": str(file_event.directory_path),
-            "connector_type": "filesystem"
+            "connector_type": "filesystem",
         }
 
         # Add process context if available
@@ -251,7 +245,7 @@ class FileSystemConnector:
             stream_id=self.stream_id,
             content=content,
             context=context,
-            correlation_tags=correlation_tags
+            correlation_tags=correlation_tags,
         )
 
     def _generate_correlation_tags(self, file_event: FileEvent) -> list[str]:
@@ -296,23 +290,25 @@ class FileSystemConnector:
         dir_path_lower = str(file_event.directory_path).lower()
 
         # Development patterns
-        if any(keyword in dir_path_lower for keyword in ['src', 'source', 'code', 'project']):
+        if any(keyword in dir_path_lower for keyword in ["src", "source", "code", "project"]):
             patterns.append("workflow:development")
 
         # Writing patterns
-        if any(keyword in dir_path_lower for keyword in ['documents', 'docs', 'writing']):
+        if any(keyword in dir_path_lower for keyword in ["documents", "docs", "writing"]):
             patterns.append("workflow:writing")
 
         # Version control patterns
-        if '.git' in dir_path_lower or 'commit' in file_name_lower:
+        if ".git" in dir_path_lower or "commit" in file_name_lower:
             patterns.append("workflow:version_control")
 
         # Meeting patterns
-        if any(keyword in file_name_lower for keyword in ['meeting', 'notes', 'agenda', 'minutes']):
+        if any(keyword in file_name_lower for keyword in ["meeting", "notes", "agenda", "minutes"]):
             patterns.append("workflow:meeting")
 
         # Research patterns
-        if any(keyword in file_name_lower for keyword in ['research', 'analysis', 'data', 'results']):
+        if any(
+            keyword in file_name_lower for keyword in ["research", "analysis", "data", "results"]
+        ):
             patterns.append("workflow:research")
 
         return patterns
@@ -322,7 +318,7 @@ class FileSystemConnector:
 
         # Apply basic filter
         if not self.event_filter.should_include_event(file_event):
-            self.stats['events_filtered'] += 1
+            self.stats["events_filtered"] += 1
             return False
 
         # Rate limiting for rapid changes
@@ -334,7 +330,7 @@ class FileSystemConnector:
             time_diff = current_time - last_time
 
             if time_diff < self.event_filter.rapid_change_threshold:
-                self.stats['events_filtered'] += 1
+                self.stats["events_filtered"] += 1
                 return False
 
             self.last_event_times[file_key] = current_time
@@ -351,8 +347,14 @@ class FileSystemConnector:
 
         # Common work directories
         common_dirs = [
-            'Desktop', 'Documents', 'Downloads', 'Projects',
-            'Development', 'Code', 'Work', 'workspace'
+            "Desktop",
+            "Documents",
+            "Downloads",
+            "Projects",
+            "Development",
+            "Code",
+            "Work",
+            "workspace",
         ]
 
         for dir_name in common_dirs:
@@ -372,16 +374,16 @@ class FileSystemConnector:
         """Get connector statistics."""
         stats = self.stats.copy()
 
-        if stats['start_time']:
-            uptime = datetime.now(UTC) - stats['start_time']
-            stats['uptime_seconds'] = uptime.total_seconds()
+        if stats["start_time"]:
+            uptime = datetime.now(UTC) - stats["start_time"]
+            stats["uptime_seconds"] = uptime.total_seconds()
 
-            if stats['events_processed'] > 0:
-                stats['events_per_second'] = stats['events_processed'] / uptime.total_seconds()
+            if stats["events_processed"] > 0:
+                stats["events_per_second"] = stats["events_processed"] / uptime.total_seconds()
 
-        stats['queue_size'] = self.event_queue.qsize()
-        stats['callback_count'] = len(self.event_callbacks)
-        stats['is_running'] = self._is_running
+        stats["queue_size"] = self.event_queue.qsize()
+        stats["callback_count"] = len(self.event_callbacks)
+        stats["is_running"] = self._is_running
 
         return stats
 
@@ -414,28 +416,21 @@ class FileEventHandler(FileSystemEventHandler):
         """Handle file move/rename events."""
         if not event.is_directory:
             self._handle_file_event(
-                event.dest_path,
-                FileOperation.MOVED,
-                old_path=Path(event.src_path)
+                event.dest_path, FileOperation.MOVED, old_path=Path(event.src_path)
             )
 
     def _handle_file_event(
-        self,
-        file_path: str,
-        operation: FileOperation,
-        old_path: Path | None = None
+        self, file_path: str, operation: FileOperation, old_path: Path | None = None
     ) -> None:
         """Process a file system event and queue it for processing."""
 
         try:
             # Create FileEvent
             file_event = FileEvent.from_file_path(
-                file_path=Path(file_path),
-                operation=operation,
-                old_path=old_path
+                file_path=Path(file_path), operation=operation, old_path=old_path
             )
 
-            self.connector.stats['events_captured'] += 1
+            self.connector.stats["events_captured"] += 1
 
             # Apply filtering
             if self.connector._should_include_event(file_event):
@@ -450,8 +445,7 @@ class FileEventHandler(FileSystemEventHandler):
 
 
 async def create_file_system_connector(
-    watch_directories: list[Path] | None = None,
-    stream_id: str = "filesystem_monitor"
+    watch_directories: list[Path] | None = None, stream_id: str = "filesystem_monitor"
 ) -> FileSystemConnector:
     """
     Convenience function to create and initialize a FileSystemConnector.
@@ -470,10 +464,7 @@ async def create_file_system_connector(
         event_filter.watch_directories = watch_directories
 
     # Create and initialize connector
-    connector = FileSystemConnector(
-        event_filter=event_filter,
-        stream_id=stream_id
-    )
+    connector = FileSystemConnector(event_filter=event_filter, stream_id=stream_id)
 
     await connector.initialize()
 

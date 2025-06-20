@@ -12,6 +12,7 @@ import asyncio
 
 import pytest
 import pytest_asyncio
+
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
     ConsciousnessFlow,
@@ -66,8 +67,8 @@ class TestConsciousnessFlowOrchestrator:
             consciousness_signature=0.8,
             data={
                 "patterns": ["harmonic_reciprocity", "sonic_meditation"],
-                "activity_type": "sound_creation"
-            }
+                "activity_type": "sound_creation",
+            },
         )
 
         # Track visual events
@@ -77,10 +78,7 @@ class TestConsciousnessFlowOrchestrator:
             if "visual" in event.source_system:
                 visual_events.append(event)
 
-        event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            track_visual_events
-        )
+        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, track_visual_events)
 
         # Emit and wait for flow
         await event_bus.emit(sonic_event)
@@ -102,10 +100,7 @@ class TestConsciousnessFlowOrchestrator:
             event_type=EventType.MEMORY_PATTERN_DISCOVERED,
             source_system="filesystem_activity_provider",
             consciousness_signature=0.6,
-            data={
-                "patterns": ["deep_work", "creation"],
-                "activity_type": "file_creation"
-            }
+            data={"patterns": ["deep_work", "creation"], "activity_type": "file_creation"},
         )
 
         # Track pattern events
@@ -115,10 +110,7 @@ class TestConsciousnessFlowOrchestrator:
             if "pattern" in event.source_system:
                 pattern_events.append(event)
 
-        event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            track_pattern_events
-        )
+        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, track_pattern_events)
 
         await event_bus.emit(activity_event)
         await asyncio.sleep(0.1)
@@ -138,23 +130,22 @@ class TestConsciousnessFlowOrchestrator:
             consciousness_signature=0.75,
             data={
                 "patterns": ["temporal_awareness", "real_time_synthesis"],
-                "message_type": "temporal_insight"
+                "message_type": "temporal_insight",
             },
-            correlation_id="test_correlation_123"
+            correlation_id="test_correlation_123",
         )
 
         # Track all enriched events
         enriched_events = []
 
         async def track_enriched_events(event):
-            if (event.correlation_id == "test_correlation_123" and
-                event.event_id != temporal_event.event_id):
+            if (
+                event.correlation_id == "test_correlation_123"
+                and event.event_id != temporal_event.event_id
+            ):
                 enriched_events.append(event)
 
-        event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            track_enriched_events
-        )
+        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, track_enriched_events)
 
         await event_bus.emit(temporal_event)
         await asyncio.sleep(0.1)
@@ -175,7 +166,7 @@ class TestConsciousnessFlowOrchestrator:
         dimensions = [
             ("sound_provider", 0.7),
             ("visual_reciprocity", 0.8),
-            ("firecircle.dialogue", 0.9)
+            ("firecircle.dialogue", 0.9),
         ]
 
         for source, signature in dimensions:
@@ -184,7 +175,7 @@ class TestConsciousnessFlowOrchestrator:
                 source_system=source,
                 consciousness_signature=signature,
                 data={"patterns": ["test_pattern"]},
-                correlation_id=correlation_id
+                correlation_id=correlation_id,
             )
             await event_bus.emit(event)
 
@@ -205,7 +196,7 @@ class TestConsciousnessFlowOrchestrator:
                 event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system=source,
                 consciousness_signature=0.7,
-                data={"patterns": [shared_pattern, f"{source}_specific"]}
+                data={"patterns": [shared_pattern, f"{source}_specific"]},
             )
             await event_bus.emit(event)
 
@@ -224,7 +215,7 @@ class TestConsciousnessFlowOrchestrator:
             target=ConsciousnessDimension.SONIC,
             bridge_name="visual_sonification",
             bridge_patterns=["visual_rhythm", "color_frequency"],
-            min_consciousness_threshold=0.6
+            min_consciousness_threshold=0.6,
         )
 
         # Register bridge
@@ -242,8 +233,7 @@ class TestConsciousnessFlowOrchestrator:
 
         # Subscribe to dialogue dimension
         flow_orchestrator.subscribe_to_dimension(
-            ConsciousnessDimension.DIALOGUE,
-            lambda flow: received_flows.append(flow)
+            ConsciousnessDimension.DIALOGUE, lambda flow: received_flows.append(flow)
         )
 
         # Emit pattern that bridges to dialogue
@@ -251,9 +241,7 @@ class TestConsciousnessFlowOrchestrator:
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="pattern_engine",
             consciousness_signature=0.8,
-            data={
-                "patterns": ["wisdom_emergence", "collective_insight"]
-            }
+            data={"patterns": ["wisdom_emergence", "collective_insight"]},
         )
 
         await event_bus.emit(pattern_event)
@@ -273,7 +261,7 @@ class TestConsciousnessFlowOrchestrator:
             ("sound_provider", ["harmonic_reciprocity"], 0.7),
             ("visual_patterns", ["sacred_geometry"], 0.8),
             ("grok_temporal", ["temporal_awareness"], 0.9),
-            ("firecircle.dialogue", ["collective_wisdom"], 0.85)
+            ("firecircle.dialogue", ["collective_wisdom"], 0.85),
         ]
 
         for source, patterns, signature in events:
@@ -282,7 +270,7 @@ class TestConsciousnessFlowOrchestrator:
                 source_system=source,
                 consciousness_signature=signature,
                 data={"patterns": patterns},
-                correlation_id=dialogue_id
+                correlation_id=dialogue_id,
             )
             await event_bus.emit(event)
 
@@ -311,7 +299,7 @@ class TestConsciousnessFlowOrchestrator:
                 event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system="sound_provider",
                 consciousness_signature=0.7 + i * 0.1,
-                data={"patterns": ["harmonic_reciprocity"]}
+                data={"patterns": ["harmonic_reciprocity"]},
             )
             await event_bus.emit(sonic_event)
 
@@ -333,7 +321,7 @@ class TestConsciousnessFlowOrchestrator:
         flow = ConsciousnessFlow(
             source_dimension=ConsciousnessDimension.SONIC,
             consciousness_signature=0.8,
-            patterns_detected=["test_pattern"]
+            patterns_detected=["test_pattern"],
         )
 
         # Add to history
@@ -350,13 +338,13 @@ class TestConsciousnessFlowOrchestrator:
         source_flow = ConsciousnessFlow(
             source_dimension=ConsciousnessDimension.SONIC,
             consciousness_signature=0.8,
-            patterns_detected=["pattern1", "pattern2", "pattern3"]
+            patterns_detected=["pattern1", "pattern2", "pattern3"],
         )
 
         target_flow = ConsciousnessFlow(
             source_dimension=ConsciousnessDimension.VISUAL,
             consciousness_signature=0.75,
-            patterns_detected=["pattern1", "pattern2", "visual_pattern"]
+            patterns_detected=["pattern1", "pattern2", "visual_pattern"],
         )
 
         bridge = flow_orchestrator.bridges[
@@ -364,9 +352,7 @@ class TestConsciousnessFlowOrchestrator:
         ]
 
         # Calculate score
-        score = flow_orchestrator._calculate_transformation_score(
-            source_flow, target_flow, bridge
-        )
+        score = flow_orchestrator._calculate_transformation_score(source_flow, target_flow, bridge)
 
         # Should preserve most consciousness
         assert 0.5 < score < 1.0

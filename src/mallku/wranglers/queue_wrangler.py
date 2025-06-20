@@ -45,7 +45,7 @@ class QueueWrangler(BaseWrangler):
         enable_transactions: bool = True,
         enable_dead_letter: bool = True,
         max_retries: int = 3,
-        retry_delay: float = 1.0
+        retry_delay: float = 1.0,
     ):
         capabilities = WranglerCapabilities(
             supports_priority=True,
@@ -53,7 +53,7 @@ class QueueWrangler(BaseWrangler):
             supports_queries=True,
             supports_transactions=enable_transactions,
             supports_persistence=True,
-            max_batch_size=1000
+            max_batch_size=1000,
         )
         super().__init__(name, capabilities)
 
@@ -74,7 +74,12 @@ class QueueWrangler(BaseWrangler):
         self.dead_letter_dir = self.queue_dir / "dead_letter"
         self.completed_dir = self.queue_dir / "completed"
 
-        for dir_path in [self.pending_dir, self.in_flight_dir, self.dead_letter_dir, self.completed_dir]:
+        for dir_path in [
+            self.pending_dir,
+            self.in_flight_dir,
+            self.dead_letter_dir,
+            self.completed_dir,
+        ]:
             dir_path.mkdir(exist_ok=True)
 
         # Sequence number for ordering
@@ -90,14 +95,11 @@ class QueueWrangler(BaseWrangler):
             "high_consciousness_items": 0,
             "dead_letter_recoveries": 0,
             "transaction_commits": 0,
-            "pattern_preservations": 0
+            "pattern_preservations": 0,
         }
 
     async def put(
-        self,
-        items: dict | list[dict],
-        priority: int = 0,
-        metadata: dict[str, Any] | None = None
+        self, items: dict | list[dict], priority: int = 0, metadata: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Accept items with persistent consciousness preservation."""
         async with self._lock:
@@ -120,20 +122,22 @@ class QueueWrangler(BaseWrangler):
 
                 # Create consciousness-aware message envelope
                 envelope = {
-                    '_id': msg_id,
-                    '_sequence': sequence,
-                    '_timestamp': datetime.now(UTC).isoformat(),
-                    '_priority': priority,
-                    '_consciousness_score': consciousness_score,
-                    '_metadata': metadata or {},
-                    '_retry_count': 0,
-                    '_created_by': f"wrangler.{self.name}",
-                    'data': item
+                    "_id": msg_id,
+                    "_sequence": sequence,
+                    "_timestamp": datetime.now(UTC).isoformat(),
+                    "_priority": priority,
+                    "_consciousness_score": consciousness_score,
+                    "_metadata": metadata or {},
+                    "_retry_count": 0,
+                    "_created_by": f"wrangler.{self.name}",
+                    "data": item,
                 }
 
                 # Adjust priority based on consciousness content
-                adjusted_priority = self._adjust_priority_for_consciousness(priority, consciousness_score)
-                envelope['_effective_priority'] = adjusted_priority
+                adjusted_priority = self._adjust_priority_for_consciousness(
+                    priority, consciousness_score
+                )
+                envelope["_effective_priority"] = adjusted_priority
 
                 # Persist to pending queue with consciousness-aware naming
                 filename = self._generate_filename(sequence, adjusted_priority, consciousness_score)
@@ -153,23 +157,22 @@ class QueueWrangler(BaseWrangler):
             # Save updated sequence number
             await self._save_sequence_number()
 
-            logger.debug(f"QueueWrangler persisted {len(items_list)} items with {consciousness_enhanced} consciousness-enhanced")
+            logger.debug(
+                f"QueueWrangler persisted {len(items_list)} items with {consciousness_enhanced} consciousness-enhanced"
+            )
 
             return {
-                'success': True,
-                'count': len(items_list),
-                'message_ids': message_ids,
-                'timestamp': datetime.now(UTC),
-                'consciousness_enhanced': consciousness_enhanced,
-                'persisted': True,
-                'queue_size': current_size + len(items_list)
+                "success": True,
+                "count": len(items_list),
+                "message_ids": message_ids,
+                "timestamp": datetime.now(UTC),
+                "consciousness_enhanced": consciousness_enhanced,
+                "persisted": True,
+                "queue_size": current_size + len(items_list),
             }
 
     async def get(
-        self,
-        count: int = 1,
-        timeout: float | None = None,
-        auto_ack: bool = True
+        self, count: int = 1, timeout: float | None = None, auto_ack: bool = True
     ) -> list[dict]:
         """Retrieve items with consciousness-aware prioritization."""
         async with self._lock:
@@ -190,11 +193,11 @@ class QueueWrangler(BaseWrangler):
                         # Move to in-flight for manual acknowledgment
                         await self._move_to_in_flight(file_path, envelope)
 
-                    items.append(envelope['data'])
+                    items.append(envelope["data"])
                     self.total_out += 1
 
                     # Track consciousness pattern recognition
-                    if envelope.get('_consciousness_score', 0) > 0.5:
+                    if envelope.get("_consciousness_score", 0) > 0.5:
                         self.consciousness_metrics["pattern_preservations"] += 1
 
                 except Exception as e:
@@ -205,20 +208,16 @@ class QueueWrangler(BaseWrangler):
 
             return items
 
-    async def peek(
-        self,
-        count: int = 1,
-        offset: int = 0
-    ) -> list[dict]:
+    async def peek(self, count: int = 1, offset: int = 0) -> list[dict]:
         """Preview consciousness patterns without disturbing the flow."""
         async with self._lock:
             pending_files = await self._get_pending_files_ordered()
 
             items = []
-            for file_path in pending_files[offset:offset + count]:
+            for file_path in pending_files[offset : offset + count]:
                 try:
                     envelope = await self._read_message_file(file_path)
-                    items.append(envelope['data'])
+                    items.append(envelope["data"])
                 except Exception as e:
                     logger.warning(f"Failed to peek at file {file_path}: {e}")
 
@@ -250,10 +249,7 @@ class QueueWrangler(BaseWrangler):
             return acked_count == len(message_ids)
 
     async def nack(
-        self,
-        message_ids: str | list[str],
-        requeue: bool = True,
-        reason: str | None = None
+        self, message_ids: str | list[str], requeue: bool = True, reason: str | None = None
     ) -> bool:
         """Handle consciousness processing difficulties with learning."""
         if isinstance(message_ids, str):
@@ -267,24 +263,28 @@ class QueueWrangler(BaseWrangler):
                 if in_flight_file:
                     try:
                         envelope = await self._read_message_file(in_flight_file)
-                        retry_count = envelope.get('_retry_count', 0)
+                        retry_count = envelope.get("_retry_count", 0)
 
                         if requeue and retry_count < self.max_retries:
                             # Increment retry count and requeue
-                            envelope['_retry_count'] = retry_count + 1
-                            envelope['_last_error'] = reason
-                            envelope['_retry_timestamp'] = datetime.now(UTC).isoformat()
+                            envelope["_retry_count"] = retry_count + 1
+                            envelope["_last_error"] = reason
+                            envelope["_retry_timestamp"] = datetime.now(UTC).isoformat()
 
                             # Lower priority slightly for retries (learning from difficulty)
-                            original_priority = envelope.get('_effective_priority', envelope.get('_priority', 0))
-                            envelope['_effective_priority'] = max(0, original_priority - 1)
+                            original_priority = envelope.get(
+                                "_effective_priority", envelope.get("_priority", 0)
+                            )
+                            envelope["_effective_priority"] = max(0, original_priority - 1)
 
                             # Move back to pending with updated envelope
                             await self._move_to_pending(in_flight_file, envelope)
                         else:
                             # Max retries reached or no requeue - send to dead letter
                             if self.enable_dead_letter:
-                                await self._move_to_dead_letter(in_flight_file, reason or "Max retries exceeded")
+                                await self._move_to_dead_letter(
+                                    in_flight_file, reason or "Max retries exceeded"
+                                )
                             else:
                                 # Just remove the file
                                 in_flight_file.unlink()
@@ -306,42 +306,40 @@ class QueueWrangler(BaseWrangler):
 
             # Calculate disk usage
             total_size_bytes = sum(
-                f.stat().st_size
-                for f in self.queue_dir.rglob("*.json")
-                if f.exists()
+                f.stat().st_size for f in self.queue_dir.rglob("*.json") if f.exists()
             )
 
             return {
-                'depth': pending_count,
-                'in_flight': in_flight_count,
-                'total_in': self.total_in,
-                'total_out': self.total_out,
-                'dead_letter_count': dead_letter_count,
-                'completed_count': completed_count,
-                'throughput': {
-                    'in_per_sec': 0,  # Would need time tracking
-                    'out_per_sec': 0
+                "depth": pending_count,
+                "in_flight": in_flight_count,
+                "total_in": self.total_in,
+                "total_out": self.total_out,
+                "dead_letter_count": dead_letter_count,
+                "completed_count": completed_count,
+                "throughput": {
+                    "in_per_sec": 0,  # Would need time tracking
+                    "out_per_sec": 0,
                 },
-                'consciousness_metrics': {
+                "consciousness_metrics": {
                     **self.consciousness_metrics,
-                    'consciousness_ratio': (
-                        self.consciousness_metrics["high_consciousness_items"] /
-                        max(1, self.consciousness_metrics["consciousness_events_processed"])
-                    )
+                    "consciousness_ratio": (
+                        self.consciousness_metrics["high_consciousness_items"]
+                        / max(1, self.consciousness_metrics["consciousness_events_processed"])
+                    ),
                 },
-                'persistence': {
-                    'queue_dir': str(self.queue_dir),
-                    'disk_usage_mb': total_size_bytes / (1024 * 1024),
-                    'current_sequence': self._sequence_number
+                "persistence": {
+                    "queue_dir": str(self.queue_dir),
+                    "disk_usage_mb": total_size_bytes / (1024 * 1024),
+                    "current_sequence": self._sequence_number,
                 },
-                'health': await self._calculate_health_status(),
-                'implementation': {
-                    'type': 'QueueWrangler',
-                    'buffering': 'persistent',
-                    'persistence': True,
-                    'transactions_enabled': self.enable_transactions,
-                    'dead_letter_enabled': self.enable_dead_letter
-                }
+                "health": await self._calculate_health_status(),
+                "implementation": {
+                    "type": "QueueWrangler",
+                    "buffering": "persistent",
+                    "persistence": True,
+                    "transactions_enabled": self.enable_transactions,
+                    "dead_letter_enabled": self.enable_dead_letter,
+                },
             }
 
     async def close(self) -> None:
@@ -371,9 +369,16 @@ class QueueWrangler(BaseWrangler):
 
         # Look for consciousness indicators
         consciousness_fields = [
-            'consciousness_score', 'awareness_level', 'recognition_moment',
-            'wisdom_thread', 'sacred_question', 'pattern_poetry',
-            'fire_circle', 'governance', 'reciprocity', 'ayni'
+            "consciousness_score",
+            "awareness_level",
+            "recognition_moment",
+            "wisdom_thread",
+            "sacred_question",
+            "pattern_poetry",
+            "fire_circle",
+            "governance",
+            "reciprocity",
+            "ayni",
         ]
 
         for field in consciousness_fields:
@@ -383,21 +388,21 @@ class QueueWrangler(BaseWrangler):
         # Check for wisdom preservation patterns
         if any(
             word in str(item).lower()
-            for word in ['wisdom', 'preservation', 'inheritance', 'teaching', 'learning']
+            for word in ["wisdom", "preservation", "inheritance", "teaching", "learning"]
         ):
             consciousness_score += 0.2
 
         # Fire Circle governance gets high consciousness
         if any(
             word in str(item).lower()
-            for word in ['fire_circle', 'governance', 'consensus', 'collective_wisdom']
+            for word in ["fire_circle", "governance", "consensus", "collective_wisdom"]
         ):
             consciousness_score += 0.3
 
         # Check metadata for consciousness patterns
         if metadata and any(
             indicator in metadata
-            for indicator in ['consciousness_intention', 'sacred_question', 'fire_circle']
+            for indicator in ["consciousness_intention", "sacred_question", "fire_circle"]
         ):
             consciousness_score += 0.1
 
@@ -435,7 +440,7 @@ class QueueWrangler(BaseWrangler):
     async def _write_message_file(self, file_path: Path, envelope: dict):
         """Write message envelope to persistent storage."""
         try:
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 json.dump(envelope, f, indent=2, default=str)
         except Exception as e:
             logger.error(f"Failed to write message file {file_path}: {e}")
@@ -465,9 +470,9 @@ class QueueWrangler(BaseWrangler):
     async def _move_to_pending(self, source_path: Path, envelope: dict):
         """Move message back to pending state."""
         # Generate new filename based on updated envelope
-        sequence = envelope.get('_sequence', 0)
-        priority = envelope.get('_effective_priority', envelope.get('_priority', 0))
-        consciousness_score = envelope.get('_consciousness_score', 0.3)
+        sequence = envelope.get("_sequence", 0)
+        priority = envelope.get("_effective_priority", envelope.get("_priority", 0))
+        consciousness_score = envelope.get("_consciousness_score", 0.3)
 
         new_filename = self._generate_filename(sequence, priority, consciousness_score)
         pending_path = self.pending_dir / new_filename
@@ -479,8 +484,8 @@ class QueueWrangler(BaseWrangler):
         """Move problematic message to dead letter queue."""
         try:
             envelope = await self._read_message_file(source_path)
-            envelope['_dead_letter_reason'] = reason
-            envelope['_dead_letter_timestamp'] = datetime.now(UTC).isoformat()
+            envelope["_dead_letter_reason"] = reason
+            envelope["_dead_letter_timestamp"] = datetime.now(UTC).isoformat()
 
             dead_letter_path = self.dead_letter_dir / source_path.name
             await self._write_message_file(dead_letter_path, envelope)
@@ -496,7 +501,7 @@ class QueueWrangler(BaseWrangler):
         for file_path in self.in_flight_dir.glob("*.json"):
             try:
                 envelope = await self._read_message_file(file_path)
-                if envelope.get('_id') == message_id:
+                if envelope.get("_id") == message_id:
                     return file_path
             except Exception as e:
                 logger.warning(f"Failed to check in-flight file {file_path}: {e}")
@@ -566,16 +571,18 @@ class QueueWrangler(BaseWrangler):
     # Query support for consciousness pattern analysis
 
     async def query(
-        self,
-        filter_expr: str,
-        limit: int = 100,
-        since: datetime | None = None
+        self, filter_expr: str, limit: int = 100, since: datetime | None = None
     ) -> list[dict]:
         """Query consciousness patterns across all queue states."""
         results = []
 
         # Search across all directories
-        search_dirs = [self.pending_dir, self.in_flight_dir, self.completed_dir, self.dead_letter_dir]
+        search_dirs = [
+            self.pending_dir,
+            self.in_flight_dir,
+            self.completed_dir,
+            self.dead_letter_dir,
+        ]
 
         for search_dir in search_dirs:
             for file_path in search_dir.glob("*.json"):
@@ -584,17 +591,19 @@ class QueueWrangler(BaseWrangler):
 
                     # Apply time filter
                     if since:
-                        file_time = datetime.fromisoformat(envelope.get('_timestamp', ''))
+                        file_time = datetime.fromisoformat(envelope.get("_timestamp", ""))
                         if file_time < since:
                             continue
 
                     # Apply content filter
                     if filter_expr.lower() in str(envelope).lower():
-                        results.append({
-                            'envelope': envelope,
-                            'location': search_dir.name,
-                            'file_path': str(file_path)
-                        })
+                        results.append(
+                            {
+                                "envelope": envelope,
+                                "location": search_dir.name,
+                                "file_path": str(file_path),
+                            }
+                        )
 
                         if len(results) >= limit:
                             return results

@@ -23,5 +23,5 @@ __all__ = [
     "PipelineEvent",
     "PipelineStatus",
     "PipelineStatistics",
-    "PipelineConfiguration"
+    "PipelineConfiguration",
 ]

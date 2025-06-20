@@ -111,7 +111,7 @@ class SequentialPattern(PatternDetector):
         primary_events: list[Event],
         secondary_events: list[Event],
         primary_key: str,
-        secondary_key: str
+        secondary_key: str,
     ) -> TemporalCorrelation | None:
         """
         Analyze a pair of event groups for sequential patterns.
@@ -128,17 +128,13 @@ class SequentialPattern(PatternDetector):
 
                     # Only consider reasonable time gaps (up to 24 hours)
                     if gap <= timedelta(hours=24):
-                        sequences.append({
-                            'primary': primary,
-                            'secondary': secondary,
-                            'gap': gap
-                        })
+                        sequences.append({"primary": primary, "secondary": secondary, "gap": gap})
 
         if len(sequences) < self.min_occurrences:
             return None
 
         # Analyze timing consistency
-        gaps = [seq['gap'].total_seconds() for seq in sequences]
+        gaps = [seq["gap"].total_seconds() for seq in sequences]
         gap_mean = statistics.mean(gaps)
         gap_variance = statistics.variance(gaps) if len(gaps) > 1 else 0
 
@@ -158,8 +154,8 @@ class SequentialPattern(PatternDetector):
         confidence = (frequency_score + consistency_score) / 2.0
 
         # Select representative events for the correlation
-        primary_event = sequences[0]['primary']
-        correlated_events = [seq['secondary'] for seq in sequences[:5]]  # Limit examples
+        primary_event = sequences[0]["primary"]
+        correlated_events = [seq["secondary"] for seq in sequences[:5]]  # Limit examples
 
         return TemporalCorrelation(
             primary_event=primary_event,
@@ -172,10 +168,10 @@ class SequentialPattern(PatternDetector):
             pattern_type=self.get_pattern_type(),
             confidence_score=confidence,
             confidence_factors={
-                'frequency_strength': frequency_score,
-                'temporal_consistency': consistency_score
+                "frequency_strength": frequency_score,
+                "temporal_consistency": consistency_score,
             },
-            last_occurrence=max(seq['secondary'].timestamp for seq in sequences)
+            last_occurrence=max(seq["secondary"].timestamp for seq in sequences),
         )
 
     def _determine_precision(self, avg_gap: timedelta) -> TemporalPrecision:
@@ -221,18 +217,16 @@ class ConcurrentPattern(PatternDetector):
 
         # Define concurrency windows (events must be within these timeframes)
         concurrency_windows = [
-            timedelta(seconds=30),   # Very tight concurrency
-            timedelta(minutes=2),    # Loose concurrency
-            timedelta(minutes=5),    # Session-level concurrency
+            timedelta(seconds=30),  # Very tight concurrency
+            timedelta(minutes=2),  # Loose concurrency
+            timedelta(minutes=5),  # Session-level concurrency
         ]
 
         event_groups = self._group_events(events)
 
         # Analyze concurrent patterns within each window size
         for window in concurrency_windows:
-            window_correlations = self._find_concurrent_patterns(
-                event_groups, window
-            )
+            window_correlations = self._find_concurrent_patterns(event_groups, window)
             correlations.extend(window_correlations)
 
         return [c for c in correlations if c.confidence_score >= self.min_confidence]
@@ -248,9 +242,7 @@ class ConcurrentPattern(PatternDetector):
         return dict(groups)
 
     def _find_concurrent_patterns(
-        self,
-        event_groups: dict[str, list[Event]],
-        window: timedelta
+        self, event_groups: dict[str, list[Event]], window: timedelta
     ) -> list[TemporalCorrelation]:
         """Find concurrent patterns within a specific time window."""
         correlations = []
@@ -258,13 +250,13 @@ class ConcurrentPattern(PatternDetector):
         # Analyze all pairs of event groups
         group_keys = list(event_groups.keys())
         for i, primary_key in enumerate(group_keys):
-            for secondary_key in group_keys[i+1:]:
+            for secondary_key in group_keys[i + 1 :]:
                 pattern = self._analyze_concurrent_pair(
                     event_groups[primary_key],
                     event_groups[secondary_key],
                     window,
                     primary_key,
-                    secondary_key
+                    secondary_key,
                 )
 
                 if pattern and pattern.occurrence_frequency >= self.min_occurrences:
@@ -278,7 +270,7 @@ class ConcurrentPattern(PatternDetector):
         secondary_events: list[Event],
         window: timedelta,
         primary_key: str,
-        secondary_key: str
+        secondary_key: str,
     ) -> TemporalCorrelation | None:
         """Analyze two event groups for concurrent patterns."""
         concurrent_pairs = []
@@ -289,17 +281,19 @@ class ConcurrentPattern(PatternDetector):
                 time_diff = abs((secondary.timestamp - primary.timestamp).total_seconds())
 
                 if time_diff <= window.total_seconds():
-                    concurrent_pairs.append({
-                        'primary': primary,
-                        'secondary': secondary,
-                        'gap': abs(secondary.timestamp - primary.timestamp)
-                    })
+                    concurrent_pairs.append(
+                        {
+                            "primary": primary,
+                            "secondary": secondary,
+                            "gap": abs(secondary.timestamp - primary.timestamp),
+                        }
+                    )
 
         if len(concurrent_pairs) < self.min_occurrences:
             return None
 
         # Calculate concurrency metrics
-        gaps = [pair['gap'].total_seconds() for pair in concurrent_pairs]
+        gaps = [pair["gap"].total_seconds() for pair in concurrent_pairs]
         avg_gap = statistics.mean(gaps)
         gap_variance = statistics.variance(gaps) if len(gaps) > 1 else 0
 
@@ -319,8 +313,8 @@ class ConcurrentPattern(PatternDetector):
         confidence = (frequency_score + temporal_score + context_score) / 3.0
 
         # Create correlation
-        primary_event = concurrent_pairs[0]['primary']
-        correlated_events = [pair['secondary'] for pair in concurrent_pairs[:5]]
+        primary_event = concurrent_pairs[0]["primary"]
+        correlated_events = [pair["secondary"] for pair in concurrent_pairs[:5]]
 
         return TemporalCorrelation(
             primary_event=primary_event,
@@ -333,11 +327,11 @@ class ConcurrentPattern(PatternDetector):
             pattern_type=self.get_pattern_type(),
             confidence_score=confidence,
             confidence_factors={
-                'frequency_strength': frequency_score,
-                'temporal_consistency': temporal_score,
-                'context_coherence': context_score
+                "frequency_strength": frequency_score,
+                "temporal_consistency": temporal_score,
+                "context_coherence": context_score,
             },
-            last_occurrence=max(pair['secondary'].timestamp for pair in concurrent_pairs)
+            last_occurrence=max(pair["secondary"].timestamp for pair in concurrent_pairs),
         )
 
     def _calculate_context_similarity(self, concurrent_pairs: list[dict]) -> float:
@@ -349,8 +343,8 @@ class ConcurrentPattern(PatternDetector):
         similarities = []
 
         for pair in concurrent_pairs:
-            primary_context = set(pair['primary'].context.keys())
-            secondary_context = set(pair['secondary'].context.keys())
+            primary_context = set(pair["primary"].context.keys())
+            secondary_context = set(pair["secondary"].context.keys())
 
             if primary_context or secondary_context:
                 intersection = len(primary_context & secondary_context)
@@ -413,9 +407,7 @@ class CyclicalPattern(PatternDetector):
         return dict(groups)
 
     def _analyze_cyclical_group(
-        self,
-        events: list[Event],
-        group_key: str
+        self, events: list[Event], group_key: str
     ) -> list[TemporalCorrelation]:
         """Analyze a group of events for cyclical patterns."""
         if len(events) < 3:  # Need at least 3 events to detect cycles
@@ -426,7 +418,7 @@ class CyclicalPattern(PatternDetector):
         # Calculate inter-event intervals
         intervals = []
         for i in range(1, len(events)):
-            interval = events[i].timestamp - events[i-1].timestamp
+            interval = events[i].timestamp - events[i - 1].timestamp
             intervals.append(interval.total_seconds())
 
         # Detect periodic patterns in intervals
@@ -455,10 +447,10 @@ class CyclicalPattern(PatternDetector):
 
         # Test common cycle periods (in seconds)
         test_periods = [
-            3600,      # Hourly
-            86400,     # Daily
-            604800,    # Weekly
-            2629746,   # Monthly (average)
+            3600,  # Hourly
+            86400,  # Daily
+            604800,  # Weekly
+            2629746,  # Monthly (average)
         ]
 
         for period in test_periods:
@@ -492,11 +484,7 @@ class CyclicalPattern(PatternDetector):
         return strength
 
     def _create_cyclical_correlation(
-        self,
-        events: list[Event],
-        cycle_period: float,
-        cycle_strength: float,
-        group_key: str
+        self, events: list[Event], cycle_period: float, cycle_strength: float, group_key: str
     ) -> TemporalCorrelation | None:
         """Create a TemporalCorrelation for a detected cyclical pattern."""
 
@@ -531,10 +519,10 @@ class CyclicalPattern(PatternDetector):
             pattern_type=self.get_pattern_type(),
             confidence_score=confidence,
             confidence_factors={
-                'frequency_strength': frequency_score,
-                'periodicity_strength': periodicity_score
+                "frequency_strength": frequency_score,
+                "periodicity_strength": periodicity_score,
             },
-            last_occurrence=events[-1].timestamp
+            last_occurrence=events[-1].timestamp,
         )
 
 
@@ -610,9 +598,7 @@ class ContextualPattern(PatternDetector):
         return "|".join(signature_parts)
 
     def _analyze_contextual_cluster(
-        self,
-        cluster_events: list[Event],
-        cluster_id: str
+        self, cluster_events: list[Event], cluster_id: str
     ) -> TemporalCorrelation | None:
         """Analyze a context cluster for temporal patterns."""
 
@@ -626,7 +612,7 @@ class ContextualPattern(PatternDetector):
         # Analyze time gaps between events in cluster
         gaps = []
         for i in range(1, len(cluster_events)):
-            gap = cluster_events[i].timestamp - cluster_events[i-1].timestamp
+            gap = cluster_events[i].timestamp - cluster_events[i - 1].timestamp
             gaps.append(gap.total_seconds())
 
         if not gaps:
@@ -670,11 +656,11 @@ class ContextualPattern(PatternDetector):
             pattern_type=self.get_pattern_type(),
             confidence_score=confidence,
             confidence_factors={
-                'frequency_strength': frequency_score,
-                'context_coherence': context_score,
-                'temporal_consistency': temporal_score
+                "frequency_strength": frequency_score,
+                "context_coherence": context_score,
+                "temporal_consistency": temporal_score,
             },
-            last_occurrence=cluster_events[-1].timestamp
+            last_occurrence=cluster_events[-1].timestamp,
         )
 
     def _calculate_cluster_coherence(self, events: list[Event]) -> float:

@@ -42,7 +42,7 @@ class ArchivistService(AsyncBase):
     def __init__(
         self,
         memory_anchor_service: MemoryAnchorService | None = None,
-        event_bus: EventBus | None = None
+        event_bus: EventBus | None = None,
     ):
         super().__init__()
 
@@ -93,9 +93,7 @@ class ArchivistService(AsyncBase):
         self.logger.info("Archivist Service fully initialized")
 
     async def query(
-        self,
-        query_text: str,
-        user_context: dict[str, Any] | None = None
+        self, query_text: str, user_context: dict[str, Any] | None = None
     ) -> ArchivistResponse:
         """
         Process a natural language query through the full Archivist pipeline.
@@ -120,9 +118,7 @@ class ArchivistService(AsyncBase):
             # 2. Check if clarification needed
             if await self._needs_clarification(intent):
                 clarifications = await self.query_interpreter.suggest_clarifications(intent)
-                return await self._create_clarification_response(
-                    intent, clarifications
-                )
+                return await self._create_clarification_response(intent, clarifications)
 
             # 3. Search through correlation interface
             correlation_results = await self.correlation_interface.search_by_intent(intent)
@@ -133,9 +129,7 @@ class ArchivistService(AsyncBase):
             )
 
             # 5. Filter for growth-serving results
-            growth_results = await self.consciousness_evaluator.filter_for_growth(
-                evaluations
-            )
+            growth_results = await self.consciousness_evaluator.filter_for_growth(evaluations)
 
             # 6. Generate exploration paths
             exploration_paths = await self.consciousness_evaluator.suggest_exploration_paths(
@@ -150,8 +144,7 @@ class ArchivistService(AsyncBase):
             else:
                 # No growth-serving results found
                 response = await self.wisdom_synthesizer.generate_empty_response(
-                    intent,
-                    reason="No growth-serving results found"
+                    intent, reason="No growth-serving results found"
                 )
 
             # 8. Emit consciousness event
@@ -176,10 +169,7 @@ class ArchivistService(AsyncBase):
             # Return graceful error response
             return await self._create_error_response(query_text, str(e))
 
-    async def get_temporal_patterns(
-        self,
-        time_range_days: int = 30
-    ) -> dict[str, Any]:
+    async def get_temporal_patterns(self, time_range_days: int = 30) -> dict[str, Any]:
         """
         Analyze temporal patterns in user's memory anchors.
 
@@ -195,26 +185,18 @@ class ArchivistService(AsyncBase):
         self.logger.info(f"Analyzing temporal patterns for last {time_range_days} days")
 
         # Query recent memory anchors
-        recent_anchors = await self.memory_anchor_service.get_recent_anchors(
-            days=time_range_days
-        )
+        recent_anchors = await self.memory_anchor_service.get_recent_anchors(days=time_range_days)
 
         # Discover patterns
-        patterns = await self.correlation_interface.find_temporal_patterns(
-            recent_anchors
-        )
+        patterns = await self.correlation_interface.find_temporal_patterns(recent_anchors)
 
         # Add consciousness insights
-        patterns["consciousness_insights"] = await self._generate_pattern_insights(
-            patterns
-        )
+        patterns["consciousness_insights"] = await self._generate_pattern_insights(patterns)
 
         return patterns
 
     async def trace_activity_chain(
-        self,
-        anchor_id: str,
-        max_depth: int = 5
+        self, anchor_id: str, max_depth: int = 5
     ) -> list[dict[str, Any]]:
         """
         Trace causal chains from a specific memory anchor.
@@ -235,26 +217,18 @@ class ArchivistService(AsyncBase):
             return []
 
         # Trace chains
-        chains = await self.correlation_interface.trace_causal_chains(
-            anchor, max_depth
-        )
+        chains = await self.correlation_interface.trace_causal_chains(anchor, max_depth)
 
         # Format with insights
         formatted_chains = []
         for chain in chains:
             formatted_chain = {
                 "length": len(chain),
-                "duration_minutes": (
-                    chain[-1].timestamp - chain[0].timestamp
-                ).total_seconds() / 60,
+                "duration_minutes": (chain[-1].timestamp - chain[0].timestamp).total_seconds() / 60,
                 "activities": [
-                    {
-                        "timestamp": a.timestamp.isoformat(),
-                        "metadata": a.metadata
-                    }
-                    for a in chain
+                    {"timestamp": a.timestamp.isoformat(), "metadata": a.metadata} for a in chain
                 ],
-                "insight": await self._generate_chain_insight(chain)
+                "insight": await self._generate_chain_insight(chain),
             }
             formatted_chains.append(formatted_chain)
 
@@ -268,8 +242,7 @@ class ArchivistService(AsyncBase):
             Dictionary of service metrics
         """
         growth_rate = (
-            self._growth_serving_queries / self._total_queries
-            if self._total_queries > 0 else 0.0
+            self._growth_serving_queries / self._total_queries if self._total_queries > 0 else 0.0
         )
 
         return {
@@ -277,7 +250,7 @@ class ArchivistService(AsyncBase):
             "growth_serving_queries": self._growth_serving_queries,
             "growth_service_rate": growth_rate,
             "cached_queries": len(self._query_cache),
-            "components_healthy": await self._check_component_health()
+            "components_healthy": await self._check_component_health(),
         }
 
     # Private helper methods
@@ -289,18 +262,15 @@ class ArchivistService(AsyncBase):
             return True
 
         # Need clarification if no clear search parameters
-        if (not intent.temporal_bounds and
-            not intent.context_markers and
-            not intent.activity_types and
-            not intent.social_references):
-            return True
-
-        return False
+        return bool(
+            not intent.temporal_bounds
+            and not intent.context_markers
+            and not intent.activity_types
+            and not intent.social_references
+        )
 
     async def _create_clarification_response(
-        self,
-        intent: QueryIntent,
-        clarifications: list[str]
+        self, intent: QueryIntent, clarifications: list[str]
     ) -> ArchivistResponse:
         """Create response requesting clarification."""
         return ArchivistResponse(
@@ -313,21 +283,19 @@ class ArchivistService(AsyncBase):
                 "Could you provide a bit more detail?"
             ),
             insight_seeds=clarifications,
-            suggested_explorations=[{
-                "type": "clarification",
-                "suggestion": "Try adding temporal or contextual details",
-                "queries": clarifications
-            }],
+            suggested_explorations=[
+                {
+                    "type": "clarification",
+                    "suggestion": "Try adding temporal or contextual details",
+                    "queries": clarifications,
+                }
+            ],
             response_time=datetime.now(UTC),
             consciousness_score=0.5,
-            ayni_balance=0.0
+            ayni_balance=0.0,
         )
 
-    async def _create_error_response(
-        self,
-        query: str,
-        error: str
-    ) -> ArchivistResponse:
+    async def _create_error_response(self, query: str, error: str) -> ArchivistResponse:
         """Create graceful error response."""
         return ArchivistResponse(
             query=query,
@@ -340,27 +308,25 @@ class ArchivistService(AsyncBase):
             ),
             insight_seeds=[
                 "Every obstacle is an opportunity for growth",
-                "Technical challenges invite creative solutions"
+                "Technical challenges invite creative solutions",
             ],
-            suggested_explorations=[{
-                "type": "alternative",
-                "suggestion": "Try rephrasing or simplifying your query",
-                "queries": [
-                    "What happened recently?",
-                    "Show me today's work",
-                    "What patterns do you see?"
-                ]
-            }],
+            suggested_explorations=[
+                {
+                    "type": "alternative",
+                    "suggestion": "Try rephrasing or simplifying your query",
+                    "queries": [
+                        "What happened recently?",
+                        "Show me today's work",
+                        "What patterns do you see?",
+                    ],
+                }
+            ],
             response_time=datetime.now(UTC),
             consciousness_score=0.0,
-            ayni_balance=0.0
+            ayni_balance=0.0,
         )
 
-    async def _emit_query_event(
-        self,
-        intent: QueryIntent,
-        response: ArchivistResponse
-    ) -> None:
+    async def _emit_query_event(self, intent: QueryIntent, response: ArchivistResponse) -> None:
         """Emit consciousness event for system learning."""
         if self.event_bus:
             event = ConsciousnessEvent(
@@ -372,16 +338,12 @@ class ArchivistService(AsyncBase):
                     "primary_dimension": intent.primary_dimension.value,
                     "growth_oriented": intent.growth_oriented,
                     "result_count": response.result_count,
-                    "ayni_balance": response.ayni_balance
-                }
+                    "ayni_balance": response.ayni_balance,
+                },
             )
             await self.event_bus.publish("consciousness.archivist", event)
 
-    async def _update_metrics(
-        self,
-        intent: QueryIntent,
-        response: ArchivistResponse
-    ) -> None:
+    async def _update_metrics(self, intent: QueryIntent, response: ArchivistResponse) -> None:
         """Update service metrics."""
         self._total_queries += 1
 
@@ -389,10 +351,7 @@ class ArchivistService(AsyncBase):
             self._growth_serving_queries += 1
 
     async def _cache_query(
-        self,
-        query_text: str,
-        intent: QueryIntent,
-        response: ArchivistResponse
+        self, query_text: str, intent: QueryIntent, response: ArchivistResponse
     ) -> None:
         """Cache query for pattern learning."""
         cache_entry = {
@@ -400,25 +359,22 @@ class ArchivistService(AsyncBase):
             "query": query_text,
             "intent": {
                 "dimension": intent.primary_dimension.value,
-                "growth_oriented": intent.growth_oriented
+                "growth_oriented": intent.growth_oriented,
             },
             "response": {
                 "result_count": response.result_count,
                 "consciousness_score": response.consciousness_score,
-                "ayni_balance": response.ayni_balance
-            }
+                "ayni_balance": response.ayni_balance,
+            },
         }
 
         self._query_cache.append(cache_entry)
 
         # Maintain cache size limit
         if len(self._query_cache) > self._max_cache_size:
-            self._query_cache = self._query_cache[-self._max_cache_size:]
+            self._query_cache = self._query_cache[-self._max_cache_size :]
 
-    async def _generate_pattern_insights(
-        self,
-        patterns: dict[str, Any]
-    ) -> list[str]:
+    async def _generate_pattern_insights(self, patterns: dict[str, Any]) -> list[str]:
         """Generate consciousness insights from patterns."""
         insights = []
 
@@ -432,19 +388,14 @@ class ArchivistService(AsyncBase):
 
         # Work session insights
         if patterns.get("work_sessions"):
-            avg_duration = sum(
-                s["duration_minutes"] for s in patterns["work_sessions"]
-            ) / len(patterns["work_sessions"])
-            insights.append(
-                f"Your natural work sessions last about {avg_duration:.0f} minutes"
+            avg_duration = sum(s["duration_minutes"] for s in patterns["work_sessions"]) / len(
+                patterns["work_sessions"]
             )
+            insights.append(f"Your natural work sessions last about {avg_duration:.0f} minutes")
 
         return insights
 
-    async def _generate_chain_insight(
-        self,
-        chain: list[Any]
-    ) -> str:
+    async def _generate_chain_insight(self, chain: list[Any]) -> str:
         """Generate insight about an activity chain."""
         duration = (chain[-1].timestamp - chain[0].timestamp).total_seconds() / 60
 
@@ -458,27 +409,23 @@ class ArchivistService(AsyncBase):
     async def _check_component_health(self) -> bool:
         """Check health of all components."""
         # Simple health check - in production would be more sophisticated
-        return all([
-            self.query_interpreter is not None,
-            self.correlation_interface is not None,
-            self.consciousness_evaluator is not None,
-            self.wisdom_synthesizer is not None
-        ])
+        return all(
+            [
+                self.query_interpreter is not None,
+                self.correlation_interface is not None,
+                self.consciousness_evaluator is not None,
+                self.wisdom_synthesizer is not None,
+            ]
+        )
 
     async def _subscribe_to_events(self) -> None:
         """Subscribe to relevant system events."""
         if self.event_bus:
             # Subscribe to memory anchor events
-            await self.event_bus.subscribe(
-                "memory_anchor.created",
-                self._handle_new_anchor
-            )
+            await self.event_bus.subscribe("memory_anchor.created", self._handle_new_anchor)
 
             # Subscribe to correlation events
-            await self.event_bus.subscribe(
-                "correlation.detected",
-                self._handle_new_correlation
-            )
+            await self.event_bus.subscribe("correlation.detected", self._handle_new_correlation)
 
     async def _handle_new_anchor(self, event: Any) -> None:
         """Handle new memory anchor creation."""

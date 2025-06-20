@@ -9,9 +9,4 @@ raw file system operations into structured activity streams.
 from .file_event_models import FileEvent, FileEventFilter, FileOperation
 from .file_system_connector import FileSystemConnector
 
-__all__ = [
-    "FileSystemConnector",
-    "FileEvent",
-    "FileOperation",
-    "FileEventFilter"
-]
+__all__ = ["FileSystemConnector", "FileEvent", "FileOperation", "FileEventFilter"]

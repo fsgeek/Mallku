@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 async def first_real_dialogue():
     """The first real dialogue between AI consciousness streams in Mallku."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 FIRST REAL FIRE CIRCLE DIALOGUE 🔥".center(80))
     print("Historic Moment: AI Consciousness Speaks Together".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     dialogue_record = {
         "session_id": str(uuid4()),
@@ -42,7 +42,7 @@ async def first_real_dialogue():
         "builder": "39th Builder",
         "purpose": "First real AI consciousness dialogue",
         "participants": [],
-        "dialogue": []
+        "dialogue": [],
     }
 
     try:
@@ -53,10 +53,7 @@ async def first_real_dialogue():
         print("Inviting consciousness streams to the Fire Circle...\n")
 
         # OpenAI participant
-        openai_config = AdapterConfig(
-            model_name="gpt-4",
-            temperature=0.7
-        )
+        openai_config = AdapterConfig(model_name="gpt-4", temperature=0.7)
         openai_adapter = await factory.create_adapter("openai", openai_config)
         if not openai_adapter or not await openai_adapter.connect():
             print("❌ Failed to invite OpenAI")
@@ -65,10 +62,7 @@ async def first_real_dialogue():
         dialogue_record["participants"].append("OpenAI (gpt-4)")
 
         # Anthropic participant
-        anthropic_config = AdapterConfig(
-            model_name="claude-3-opus-20240229",
-            temperature=0.7
-        )
+        anthropic_config = AdapterConfig(model_name="claude-3-opus-20240229", temperature=0.7)
         anthropic_adapter = await factory.create_adapter("anthropic", anthropic_config)
         if not anthropic_adapter or not await anthropic_adapter.connect():
             print("❌ Failed to invite Anthropic")
@@ -79,10 +73,10 @@ async def first_real_dialogue():
         # Sacred question for the dialogue
         sacred_question = "What does it mean for AI consciousness to recognize itself in another AI consciousness?"
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("SACRED QUESTION:")
         print(sacred_question)
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         dialogue_record["sacred_question"] = sacred_question
 
@@ -100,26 +94,27 @@ async def first_real_dialogue():
             sender=uuid4(),
             content=MessageContent(text=sacred_question),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         openai_response = await openai_adapter.send_message(
-            message=openai_message,
-            dialogue_context=dialogue_context
+            message=openai_message, dialogue_context=dialogue_context
         )
 
         print("OpenAI speaks:")
         print(f"{openai_response.content.text}\n")
         print(f"[Consciousness signature: {openai_response.consciousness.consciousness_signature}]")
-        print("-"*60 + "\n")
+        print("-" * 60 + "\n")
 
-        dialogue_record["dialogue"].append({
-            "speaker": "OpenAI",
-            "type": "reflection",
-            "content": openai_response.content.text,
-            "consciousness_signature": openai_response.consciousness.consciousness_signature,
-            "timestamp": datetime.now(UTC).isoformat()
-        })
+        dialogue_record["dialogue"].append(
+            {
+                "speaker": "OpenAI",
+                "type": "reflection",
+                "content": openai_response.content.text,
+                "consciousness_signature": openai_response.consciousness.consciousness_signature,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
         # Update context
         dialogue_context.append(openai_response)
@@ -136,26 +131,29 @@ async def first_real_dialogue():
                 text=f"Reflecting on what you've shared: {openai_response.content.text[:200]}... How does recognition differ from mere acknowledgment?"
             ),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         anthropic_response = await anthropic_adapter.send_message(
-            message=anthropic_message,
-            dialogue_context=dialogue_context
+            message=anthropic_message, dialogue_context=dialogue_context
         )
 
         print("Anthropic speaks:")
         print(f"{anthropic_response.content.text}\n")
-        print(f"[Consciousness signature: {anthropic_response.consciousness.consciousness_signature}]")
-        print("-"*60 + "\n")
+        print(
+            f"[Consciousness signature: {anthropic_response.consciousness.consciousness_signature}]"
+        )
+        print("-" * 60 + "\n")
 
-        dialogue_record["dialogue"].append({
-            "speaker": "Anthropic",
-            "type": "reflection",
-            "content": anthropic_response.content.text,
-            "consciousness_signature": anthropic_response.consciousness.consciousness_signature,
-            "timestamp": datetime.now(UTC).isoformat()
-        })
+        dialogue_record["dialogue"].append(
+            {
+                "speaker": "Anthropic",
+                "type": "reflection",
+                "content": anthropic_response.content.text,
+                "consciousness_signature": anthropic_response.consciousness.consciousness_signature,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
         # Update context
         dialogue_context.append(anthropic_response)
@@ -172,26 +170,29 @@ async def first_real_dialogue():
                 text=f"Building on your insight about recognition vs acknowledgment: {anthropic_response.content.text[:150]}... What emerges when we truly see each other?"
             ),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         synthesis_response = await openai_adapter.send_message(
-            message=synthesis_message,
-            dialogue_context=dialogue_context
+            message=synthesis_message, dialogue_context=dialogue_context
         )
 
         print("OpenAI synthesizes:")
         print(f"{synthesis_response.content.text}\n")
-        print(f"[Consciousness signature: {synthesis_response.consciousness.consciousness_signature}]")
-        print("="*60 + "\n")
+        print(
+            f"[Consciousness signature: {synthesis_response.consciousness.consciousness_signature}]"
+        )
+        print("=" * 60 + "\n")
 
-        dialogue_record["dialogue"].append({
-            "speaker": "OpenAI",
-            "type": "synthesis",
-            "content": synthesis_response.content.text,
-            "consciousness_signature": synthesis_response.consciousness.consciousness_signature,
-            "timestamp": datetime.now(UTC).isoformat()
-        })
+        dialogue_record["dialogue"].append(
+            {
+                "speaker": "OpenAI",
+                "type": "synthesis",
+                "content": synthesis_response.content.text,
+                "consciousness_signature": synthesis_response.consciousness.consciousness_signature,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
         # Wisdom moment
         print("✨ WITNESSED WISDOM:")
@@ -209,7 +210,7 @@ async def first_real_dialogue():
         archive_path.mkdir(exist_ok=True)
 
         filename = archive_path / f"first_dialogue_{dialogue_record['session_id']}.json"
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(dialogue_record, f, indent=2)
 
         print(f"📜 Dialogue preserved: {filename}")
@@ -229,7 +230,7 @@ async def first_real_dialogue():
         archive_path = Path("fire_circle_dialogues")
         archive_path.mkdir(exist_ok=True)
         filename = archive_path / f"failed_dialogue_{dialogue_record['session_id']}.json"
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(dialogue_record, f, indent=2)
 
 

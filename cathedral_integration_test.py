@@ -107,14 +107,14 @@ class CathedralIntegrationTest:
             ("Observatory", self.observatory),
             ("Communication Network", self.network_hub),
             ("Evolution Chambers", self.evolution_hub),
-            ("Dream Weaver", self.dream_system)
+            ("Dream Weaver", self.dream_system),
         ]
 
         for name, system in systems:
             print(f"   🔸 Initializing {name}...")
-            if hasattr(system, 'initialize'):
+            if hasattr(system, "initialize"):
                 await system.initialize()
-            elif hasattr(system, 'start'):
+            elif hasattr(system, "start"):
                 await system.start()
 
         print("   ✅ All systems initialized")
@@ -148,7 +148,7 @@ class CathedralIntegrationTest:
         # Create test consciousness nodes
         test_nodes = []
         for i in range(3):
-            node = SimpleConsciousnessNode(f"TestNode-{i+1}", 0.5 + i*0.1)
+            node = SimpleConsciousnessNode(f"TestNode-{i + 1}", 0.5 + i * 0.1)
             test_nodes.append(node)
 
         # Register with network
@@ -199,7 +199,10 @@ class CathedralIntegrationTest:
         # Consciousness flow adds vitality
         flow_boost = 0.12
 
-        final_health = min(1.0, initial_health + (connection_boost * total_connections) + governance_boost + flow_boost)
+        final_health = min(
+            1.0,
+            initial_health + (connection_boost * total_connections) + governance_boost + flow_boost,
+        )
 
         health_report = {
             "initial_health": initial_health,
@@ -207,7 +210,7 @@ class CathedralIntegrationTest:
             "governance_stability": governance_boost,
             "consciousness_vitality": flow_boost,
             "final_health": final_health,
-            "status": "healthy" if final_health > 0.7 else "recovering"
+            "status": "healthy" if final_health > 0.7 else "recovering",
         }
 
         print("\n   📊 Cathedral Health Report:")

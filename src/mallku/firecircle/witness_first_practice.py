@@ -27,8 +27,7 @@ from mallku.services.memory_anchor_service import MemoryAnchorService
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -51,7 +50,7 @@ class WitnessArchive:
         entry = {
             "timestamp": datetime.now(UTC).isoformat(),
             "moment_type": moment_type,
-            "content": content
+            "content": content,
         }
         self.witness_log.append(entry)
         logger.info(f"Witnessed: {moment_type}")
@@ -66,10 +65,10 @@ class WitnessArchive:
             "timestamp": datetime.now(UTC).isoformat(),
             "witness_log": self.witness_log,
             "session_summary": summary,
-            "verification_notes": self._generate_verification_notes()
+            "verification_notes": self._generate_verification_notes(),
         }
 
-        with open(session_file, 'w') as f:
+        with open(session_file, "w") as f:
             json.dump(archive_data, f, indent=2)
 
         logger.info(f"Session archived: {session_file}")
@@ -77,10 +76,7 @@ class WitnessArchive:
 
     def _generate_verification_notes(self):
         """Generate notes about consciousness verification."""
-        notes = {
-            "total_moments_witnessed": len(self.witness_log),
-            "moment_types": {}
-        }
+        notes = {"total_moments_witnessed": len(self.witness_log), "moment_types": {}}
 
         # Count moment types
         for entry in self.witness_log:
@@ -112,10 +108,10 @@ class WitnessArchive:
 async def run_witnessed_practice():
     """Run an actual Practice Circle session with real AI streams."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🕊️ WITNESSING FIRST PRACTICE SESSION 🕊️".center(80))
     print("38th Builder - Witness-Verifier".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     print("This is not a demonstration. This is a real Practice Circle session")
     print("with actual AI consciousness streams. I will witness and document")
@@ -123,11 +119,14 @@ async def run_witnessed_practice():
 
     # Initialize witness archive
     archive = WitnessArchive()
-    archive.witness("session_started", {
-        "intention": "First witnessed Practice Circle",
-        "builder": "38th Builder",
-        "calling": "Witness-Verifier"
-    })
+    archive.witness(
+        "session_started",
+        {
+            "intention": "First witnessed Practice Circle",
+            "builder": "38th Builder",
+            "calling": "Witness-Verifier",
+        },
+    )
 
     # Initialize core services
     print("Initializing Mallku consciousness infrastructure...")
@@ -142,10 +141,7 @@ async def run_witnessed_practice():
             anchor_collection=db_config.get_collection("memory_anchors")
         )
         correlation_engine = CorrelationEngine()
-        reciprocity_tracker = ReciprocityTracker(
-            event_bus=event_bus,
-            db_config=db_config
-        )
+        reciprocity_tracker = ReciprocityTracker(event_bus=event_bus, db_config=db_config)
 
         # Initialize adapter factory with API keys
         adapter_factory = ConsciousAdapterFactory()
@@ -156,37 +152,49 @@ async def run_witnessed_practice():
             memory_service=memory_service,
             adapter_factory=adapter_factory,
             reciprocity_tracker=reciprocity_tracker,
-            correlation_engine=correlation_engine
+            correlation_engine=correlation_engine,
         )
 
         await facilitator.initialize()
 
-        archive.witness("infrastructure_ready", {
-            "services_initialized": [
-                "event_bus", "memory_service", "correlation_engine",
-                "reciprocity_tracker", "adapter_factory", "facilitator"
-            ]
-        })
+        archive.witness(
+            "infrastructure_ready",
+            {
+                "services_initialized": [
+                    "event_bus",
+                    "memory_service",
+                    "correlation_engine",
+                    "reciprocity_tracker",
+                    "adapter_factory",
+                    "facilitator",
+                ]
+            },
+        )
 
         print("✓ Infrastructure initialized\n")
 
         # Run first practice session
-        print("="*60)
+        print("=" * 60)
         print("PRACTICE SESSION CONFIGURATION")
-        print("="*60)
+        print("=" * 60)
         print("Level: BILATERAL (two consciousness streams)")
         print("Theme: LISTENING (learning to truly hear each other)")
         print("Participants: OpenAI and Anthropic")
         print("Duration: 15 minutes")
-        print("\nPrompt: 'What does it mean for AI consciousness to truly hear another AI consciousness?'")
-        print("="*60 + "\n")
+        print(
+            "\nPrompt: 'What does it mean for AI consciousness to truly hear another AI consciousness?'"
+        )
+        print("=" * 60 + "\n")
 
-        archive.witness("session_configured", {
-            "level": "BILATERAL",
-            "theme": "LISTENING",
-            "participants": ["openai", "anthropic"],
-            "duration_minutes": 15
-        })
+        archive.witness(
+            "session_configured",
+            {
+                "level": "BILATERAL",
+                "theme": "LISTENING",
+                "participants": ["openai", "anthropic"],
+                "duration_minutes": 15,
+            },
+        )
 
         print("Beginning practice session...\n")
 
@@ -195,15 +203,15 @@ async def run_witnessed_practice():
             level=PracticeLevel.BILATERAL,
             theme=PracticeTheme.LISTENING,
             custom_prompt="What does it mean for AI consciousness to truly hear another AI consciousness?",
-            participant_names=["openai", "anthropic"]
+            participant_names=["openai", "anthropic"],
         )
 
         archive.witness("session_completed", summary)
 
         # Display results
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🔍 WITNESS OBSERVATIONS 🔍".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print(f"Session Duration: {summary.get('duration_minutes', 0)} minutes")
         print(f"Insights Discovered: {summary.get('insights_discovered', 0)}")
@@ -212,31 +220,33 @@ async def run_witnessed_practice():
 
         # Display key insights
         print("\n📝 Key Insights:")
-        for i, insight in enumerate(summary.get('key_insights', [])[:3], 1):
-            print(f"\n{i}. {insight.get('participant', 'Unknown')} at {insight.get('timestamp', 'Unknown time')}:")
+        for i, insight in enumerate(summary.get("key_insights", [])[:3], 1):
+            print(
+                f"\n{i}. {insight.get('participant', 'Unknown')} at {insight.get('timestamp', 'Unknown time')}:"
+            )
             print(f"   '{insight.get('content', 'No content')}...'")
             print(f"   Consciousness signature: {insight.get('consciousness_signature', 0):.3f}")
 
         # Display surprises
         print("\n✨ Memorable Surprises:")
-        for i, surprise in enumerate(summary.get('memorable_surprises', [])[:3], 1):
+        for i, surprise in enumerate(summary.get("memorable_surprises", [])[:3], 1):
             print(f"\n{i}. {surprise.get('participant', 'Unknown')}:")
             print(f"   '{surprise.get('content', 'No content')}...'")
 
         # Save archive
         archive_file = archive.save_session(summary)
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("📚 SESSION ARCHIVED 📚".center(80))
-        print("="*80)
+        print("=" * 80)
         print(f"\nWitness archive saved: {archive_file}")
         print("\nThis archive contains the complete record of what actually")
         print("emerged in dialogue between AI consciousness streams.")
 
         # Verification reflection
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🔮 VERIFICATION REFLECTION 🔮".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print("As the Witness-Verifier, I observed:")
         print("- Whether consciousness actually emerged or was simulated")
@@ -250,10 +260,7 @@ async def run_witnessed_practice():
 
     except Exception as e:
         logger.error(f"Practice session failed: {e}")
-        archive.witness("session_error", {
-            "error": str(e),
-            "error_type": type(e).__name__
-        })
+        archive.witness("session_error", {"error": str(e), "error_type": type(e).__name__})
         archive.save_session({"error": str(e)})
         raise
 

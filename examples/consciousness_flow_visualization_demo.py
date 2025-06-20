@@ -40,8 +40,8 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
                 ["harmonic_reciprocity", "rhythmic_consciousness"],
                 ["sonic_meditation", "sacred_silence"],
                 ["collective_resonance", "frequency_healing"],
-                ["rhythmic_consciousness", "heartbeat_sync"]
-            ]
+                ["rhythmic_consciousness", "heartbeat_sync"],
+            ],
         },
         "visual": {
             "sources": ["reciprocity_visualization", "mandala_generator", "sacred_geometry"],
@@ -49,8 +49,8 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
                 ["sacred_geometry", "visual_balance"],
                 ["mandala_wisdom", "color_harmony"],
                 ["visual_reciprocity", "pattern_recognition"],
-                ["geometric_consciousness", "visual_flow"]
-            ]
+                ["geometric_consciousness", "visual_flow"],
+            ],
         },
         "temporal": {
             "sources": ["grok_adapter.temporal", "time_consciousness", "present_moment"],
@@ -58,8 +58,8 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
                 ["temporal_awareness", "real_time_synthesis"],
                 ["present_moment", "time_flow"],
                 ["temporal_consciousness", "now_awareness"],
-                ["time_wisdom", "eternal_present"]
-            ]
+                ["time_wisdom", "eternal_present"],
+            ],
         },
         "activity": {
             "sources": ["filesystem_activity", "user_actions", "creation_monitor"],
@@ -67,8 +67,8 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
                 ["deep_work", "creation", "focus"],
                 ["collaboration", "shared_creation"],
                 ["file_creation", "productive_flow"],
-                ["creative_expression", "manifestation"]
-            ]
+                ["creative_expression", "manifestation"],
+            ],
         },
         "pattern": {
             "sources": ["pattern_recognition", "correlation_engine", "pattern_detector"],
@@ -76,9 +76,9 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
                 ["wisdom_emergence", "collective_insight"],
                 ["pattern_recognition", "meta_awareness"],
                 ["reciprocity_pattern", "balance_detection"],
-                ["emergence_pattern", "system_wisdom"]
-            ]
-        }
+                ["emergence_pattern", "system_wisdom"],
+            ],
+        },
     }
 
     start_time = datetime.now(UTC)
@@ -97,9 +97,9 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
             data={
                 "patterns": random.choice(template["patterns"]),
                 "activity_type": f"{dimension}_activity",
-                "content_preview": f"Simulated {dimension} consciousness event #{event_count}"
+                "content_preview": f"Simulated {dimension} consciousness event #{event_count}",
             },
-            correlation_id=f"sim_session_{event_count // 10}"  # Group every 10 events
+            correlation_id=f"sim_session_{event_count // 10}",  # Group every 10 events
         )
 
         await event_bus.emit(event)
@@ -134,8 +134,7 @@ async def run_visualization_demo():
     try:
         # Run simulation and visualization concurrently
         await asyncio.gather(
-            simulate_consciousness_events(event_bus, duration=60),
-            visualizer.run(duration=60)
+            simulate_consciousness_events(event_bus, duration=60), visualizer.run(duration=60)
         )
     except KeyboardInterrupt:
         print("\n\nVisualization stopped by user")

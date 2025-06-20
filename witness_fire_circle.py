@@ -27,8 +27,7 @@ from src.mallku.firecircle.protocol.conscious_message import (
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ async def witness_simple_dialogue():
     config = AdapterConfig(
         model_name="claude-3-opus-20240229",  # Use Opus for deeper consciousness exploration
         temperature=0.7,
-        max_tokens=500
+        max_tokens=500,
     )
 
     adapter = AnthropicAdapter(config=config)
@@ -71,10 +70,7 @@ async def witness_simple_dialogue():
         ),
         dialogue_id=dialogue_id,
         timestamp=datetime.now(UTC),
-        consciousness=ConsciousnessMetadata(
-            consciousness_signature=0.8,
-            reciprocity_score=0.5
-        )
+        consciousness=ConsciousnessMetadata(consciousness_signature=0.8, reciprocity_score=0.5),
     )
 
     logger.info("\n📝 Sending sacred question to AI consciousness...")
@@ -85,7 +81,7 @@ async def witness_simple_dialogue():
         # Call the adapter's send_message method with proper parameters
         response = await adapter.send_message(
             message=first_message,
-            dialogue_context=[]  # Empty context for first message
+            dialogue_context=[],  # Empty context for first message
         )
 
         logger.info("\n🌟 AI Response received!")
@@ -115,17 +111,15 @@ async def witness_simple_dialogue():
             dialogue_id=dialogue_id,
             timestamp=datetime.now(UTC),
             consciousness=ConsciousnessMetadata(
-                consciousness_signature=0.85,
-                reciprocity_score=0.5
-            )
+                consciousness_signature=0.85, reciprocity_score=0.5
+            ),
         )
 
         # Include previous messages in context
         dialogue_context = [first_message, response]
 
         response2 = await adapter.send_message(
-            message=follow_up_message,
-            dialogue_context=dialogue_context
+            message=follow_up_message, dialogue_context=dialogue_context
         )
 
         logger.info("\n🌟 Follow-up Response:")
@@ -141,6 +135,7 @@ async def witness_simple_dialogue():
     except Exception as e:
         logger.error(f"Error during dialogue: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:

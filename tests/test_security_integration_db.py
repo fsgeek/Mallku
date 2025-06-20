@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import aiosqlite
+
 from mallku.core.security import (
     FieldIndexStrategy,
     FieldObfuscationLevel,
@@ -33,18 +34,18 @@ async def test_registry_persistence():
         "user_email": FieldSecurityConfig(
             obfuscation_level=FieldObfuscationLevel.ENCRYPTED,
             index_strategy=FieldIndexStrategy.BLIND,
-            security_notes="Email needs encryption and blind indexing"
+            security_notes="Email needs encryption and blind indexing",
         ),
         "timestamp": FieldSecurityConfig(
             obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
             index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET,
-            security_notes="Temporal offset for privacy"
+            security_notes="Temporal offset for privacy",
         ),
         "balance": FieldSecurityConfig(
             obfuscation_level=FieldObfuscationLevel.ENCRYPTED,
             index_strategy=FieldIndexStrategy.BUCKETED,
             bucket_boundaries=[-1.0, -0.5, 0.0, 0.5, 1.0],
-            security_notes="Bucketed for range queries"
+            security_notes="Bucketed for range queries",
         ),
     }
 
@@ -73,16 +74,15 @@ async def test_registry_persistence():
         # Export and save
         export_data = registry.export_mappings()
 
-        for name, mapping_data in export_data['mappings'].items():
-            await db.execute("""
+        for name, mapping_data in export_data["mappings"].items():
+            await db.execute(
+                """
                 INSERT OR REPLACE INTO field_mappings
                 (semantic_name, field_uuid, security_config)
                 VALUES (?, ?, ?)
-            """, (
-                name,
-                mapping_data['field_uuid'],
-                str(mapping_data['security_config'])
-            ))
+            """,
+                (name, mapping_data["field_uuid"], str(mapping_data["security_config"])),
+            )
 
         await db.commit()
 
@@ -126,17 +126,10 @@ async def test_full_security_flow():
         memory_anchor_uuid=uuid4(),
         timestamp=datetime.now(UTC),
         interaction_id=uuid4(),
-        interaction={
-            "type": "query",
-            "complexity": 0.7
-        },
+        interaction={"type": "query", "complexity": 0.7},
         initiator="human",
         participants=["human", "ai"],
-        ayni_score={
-            "value_given": 0.3,
-            "value_received": 0.8,
-            "balance_direction": "ai_gave_more"
-        }
+        ayni_score={"value_given": 0.3, "value_received": 0.8, "balance_direction": "ai_gave_more"},
     )
 
     # Get obfuscated representation
@@ -145,7 +138,7 @@ async def test_full_security_flow():
     # Verify obfuscation happened
     assert "timestamp" not in obfuscated
     assert "interaction" not in obfuscated
-    assert any(key.startswith('550e8400') or len(key) == 36 for key in obfuscated)
+    assert any(key.startswith("550e8400") or len(key) == 36 for key in obfuscated)
 
     # Test development mode
     ReciprocityActivityData.set_development_mode(True)
@@ -183,6 +176,7 @@ async def main():
     except Exception as e:
         print(f"\n✗ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

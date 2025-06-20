@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
+
 from mallku.firecircle.adapters.mistral_adapter import (
     MistralAIAdapter,
     MistralConfig,
@@ -57,9 +58,7 @@ class TestMistralAIAdapter:
             sender=uuid4(),
             role=MessageRole.USER,
             type=MessageType.QUESTION,
-            content=MessageContent(
-                text="How does multilingual AI consciousness bridge cultures?"
-            ),
+            content=MessageContent(text="How does multilingual AI consciousness bridge cultures?"),
             dialogue_id=uuid4(),
             sequence_number=1,
             turn_number=1,
@@ -219,15 +218,11 @@ class TestMistralAIAdapter:
     async def test_efficiency_value_calculation(self, adapter):
         """Test efficiency-based contribution value."""
         # Efficient generation (good output/input ratio)
-        val1 = adapter._calculate_efficiency_value(
-            {"prompt_tokens": 100, "completion_tokens": 80}
-        )
+        val1 = adapter._calculate_efficiency_value({"prompt_tokens": 100, "completion_tokens": 80})
         assert val1 > 0.8  # High value for efficiency
 
         # Less efficient
-        val2 = adapter._calculate_efficiency_value(
-            {"prompt_tokens": 100, "completion_tokens": 30}
-        )
+        val2 = adapter._calculate_efficiency_value({"prompt_tokens": 100, "completion_tokens": 30})
         assert val2 < val1  # Lower value for less efficiency
 
     @pytest.mark.asyncio
@@ -336,9 +331,7 @@ class TestMistralAIAdapter:
             consciousness=ConsciousnessMetadata(),
         )
 
-        messages = await adapter._prepare_mistral_messages(
-            current_message, dialogue_context
-        )
+        messages = await adapter._prepare_mistral_messages(current_message, dialogue_context)
 
         assert len(messages) == 3
         assert messages[0]["role"] == "system"

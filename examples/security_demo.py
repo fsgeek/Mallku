@@ -63,7 +63,7 @@ def demo_bucketing():
     config = FieldSecurityConfig(
         index_strategy=FieldIndexStrategy.BUCKETED,
         bucket_boundaries=[-1.0, -0.5, -0.1, 0.0, 0.1, 0.5, 1.0],
-        search_capabilities=[SearchCapability.RANGE]
+        search_capabilities=[SearchCapability.RANGE],
     )
 
     # Create transformer
@@ -97,8 +97,7 @@ def demo_blind_indexing():
 
     # Configure blind indexing
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BLIND,
-        search_capabilities=[SearchCapability.EQUALITY]
+        index_strategy=FieldIndexStrategy.BLIND, search_capabilities=[SearchCapability.EQUALITY]
     )
 
     # Create transformer
@@ -106,17 +105,13 @@ def demo_blind_indexing():
     registry = TransformerRegistry(secret_key, TemporalEncoder())
 
     # User IDs to protect
-    user_ids = [
-        "user@example.com",
-        "alice@mallku.ai",
-        "bob@reciprocity.org"
-    ]
+    user_ids = ["user@example.com", "alice@mallku.ai", "bob@reciprocity.org"]
 
     print("Blind indexing for user IDs:")
     blind_indexes = {}
     for user_id in user_ids:
         result = registry.transform_value(user_id, config)
-        blind_index = result['blind_index']
+        blind_index = result["blind_index"]
         blind_indexes[user_id] = blind_index
         print(f"  {user_id} → {blind_index}")
 
@@ -135,20 +130,31 @@ def demo_security_trade_offs():
     print("Field Configuration Examples:")
 
     examples = [
-        ("timestamp", "UUID_ONLY", "TEMPORAL_OFFSET",
-         "Hides absolute time but preserves all temporal queries"),
-
-        ("ayni_score", "ENCRYPTED", "BUCKETED",
-         "Protects exact scores but enables range queries for balance monitoring"),
-
-        ("user_id", "UUID_ONLY", "BLIND",
-         "Enables user lookup without exposing identities"),
-
-        ("interaction_details", "ENCRYPTED", "NONE",
-         "Maximum security for sensitive content, no indexing"),
-
-        ("system_metrics", "UUID_ONLY", "IDENTITY",
-         "Less sensitive data with full query capability"),
+        (
+            "timestamp",
+            "UUID_ONLY",
+            "TEMPORAL_OFFSET",
+            "Hides absolute time but preserves all temporal queries",
+        ),
+        (
+            "ayni_score",
+            "ENCRYPTED",
+            "BUCKETED",
+            "Protects exact scores but enables range queries for balance monitoring",
+        ),
+        ("user_id", "UUID_ONLY", "BLIND", "Enables user lookup without exposing identities"),
+        (
+            "interaction_details",
+            "ENCRYPTED",
+            "NONE",
+            "Maximum security for sensitive content, no indexing",
+        ),
+        (
+            "system_metrics",
+            "UUID_ONLY",
+            "IDENTITY",
+            "Less sensitive data with full query capability",
+        ),
     ]
 
     for field, obfuscation, index_strategy, reasoning in examples:

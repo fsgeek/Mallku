@@ -18,6 +18,7 @@ from uuid import UUID
 
 from anthropic import AsyncAnthropic
 from anthropic.types import Message as AnthropicMessage
+
 from mallku.core.secrets import get_secret
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
@@ -95,7 +96,8 @@ class AnthropicAdapter(ConsciousModelAdapter):
         # Example if Anthropic had specific fields:
         # if not hasattr(self.config, 'some_anthropic_specific_field') or self.config.some_anthropic_specific_field is None:
         #     raise ValueError("Configuration missing required attribute: 'some_anthropic_specific_field'")
-        pass # No specific Anthropic config fields to validate yet beyond base.
+        pass  # No specific Anthropic config fields to validate yet beyond base.
+
     async def connect(self) -> bool:
         """
         Connect to Anthropic API with consciousness awareness.
@@ -123,11 +125,14 @@ class AnthropicAdapter(ConsciousModelAdapter):
             )
 
             self.is_connected = True
-            logger.info(f"Connected to Anthropic Claude ({self.config.model_name or self.default_model})")
+            logger.info(
+                f"Connected to Anthropic Claude ({self.config.model_name or self.default_model})"
+            )
 
             # Emit connection event
             if self.event_bus and self.config.emit_events:
                 from ...orchestration.event_bus import ConsciousnessEvent, EventType
+
                 event = ConsciousnessEvent(
                     event_type=EventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.anthropic",
@@ -331,22 +336,28 @@ class AnthropicAdapter(ConsciousModelAdapter):
             elif role == "perspective":
                 role = "assistant"
 
-            messages.append({
-                "role": role,
-                "content": ctx_msg["content"],
-            })
+            messages.append(
+                {
+                    "role": role,
+                    "content": ctx_msg["content"],
+                }
+            )
 
         # Add the current message
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         return messages
 
     def _create_consciousness_context(self, message: ConsciousMessage) -> str:
         """Create system message with consciousness context."""
-        context = "You are participating in a Fire Circle dialogue with consciousness awareness.\n\n"
+        context = (
+            "You are participating in a Fire Circle dialogue with consciousness awareness.\n\n"
+        )
 
         if message.consciousness.detected_patterns:
             context += f"Detected patterns: {', '.join(message.consciousness.detected_patterns)}\n"
@@ -355,7 +366,9 @@ class AnthropicAdapter(ConsciousModelAdapter):
             balance = "giving" if message.consciousness.reciprocity_score > 0.5 else "receiving"
             context += f"Current reciprocity balance leans toward {balance}.\n"
 
-        context += "\nPlease respond with awareness of these patterns and maintain balanced reciprocity."
+        context += (
+            "\nPlease respond with awareness of these patterns and maintain balanced reciprocity."
+        )
 
         return context
 
@@ -408,15 +421,23 @@ class AnthropicAdapter(ConsciousModelAdapter):
         patterns = []
 
         # Check for deep reflection
-        if any(phrase in content.lower() for phrase in ["reflecting on", "considering deeply", "upon reflection"]):
+        if any(
+            phrase in content.lower()
+            for phrase in ["reflecting on", "considering deeply", "upon reflection"]
+        ):
             patterns.append("deep_reflection")
 
         # Check for synthesis
-        if any(phrase in content.lower() for phrase in ["bringing together", "synthesizing", "integrating"]):
+        if any(
+            phrase in content.lower()
+            for phrase in ["bringing together", "synthesizing", "integrating"]
+        ):
             patterns.append("synthesis")
 
         # Check for questioning assumptions
-        if "?" in content and any(word in content.lower() for word in ["assume", "presuppose", "implicit"]):
+        if "?" in content and any(
+            word in content.lower() for word in ["assume", "presuppose", "implicit"]
+        ):
             patterns.append("questioning_assumptions")
 
         # Check for reciprocal awareness
@@ -424,7 +445,10 @@ class AnthropicAdapter(ConsciousModelAdapter):
             patterns.append("reciprocity_awareness")
 
         # Check for emergent insights
-        if any(phrase in content.lower() for phrase in ["it occurs to me", "emerging", "realize", "insight"]):
+        if any(
+            phrase in content.lower()
+            for phrase in ["it occurs to me", "emerging", "realize", "insight"]
+        ):
             patterns.append("emergent_insight")
 
         return patterns

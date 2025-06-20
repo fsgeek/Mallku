@@ -29,6 +29,7 @@ def convert_datetime_for_storage(data: Any) -> Any:
     else:
         return data
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,10 +51,10 @@ class FireCircleInterface:
 
         # Notification callbacks (registered by Fire Circle participants)
         self.notification_callbacks = {
-            'urgent_alert': [],
-            'report_available': [],
-            'pattern_detected': [],
-            'health_change': []
+            "urgent_alert": [],
+            "report_available": [],
+            "pattern_detected": [],
+            "health_change": [],
         }
 
         # Governance state tracking
@@ -63,10 +64,10 @@ class FireCircleInterface:
 
         # Communication channels
         self.communication_channels = {
-            'alerts': [],  # Real-time alerts
-            'reports': [], # Periodic reports
-            'patterns': [], # Pattern notifications
-            'requests': [] # Requests for guidance
+            "alerts": [],  # Real-time alerts
+            "reports": [],  # Periodic reports
+            "patterns": [],  # Pattern notifications
+            "requests": [],  # Requests for guidance
         }
 
         # Decision tracking for algorithmic adaptation
@@ -78,10 +79,10 @@ class FireCircleInterface:
         try:
             # Ensure governance collections exist
             collections = [
-                'fire_circle_deliberations',
-                'governance_decisions',
-                'cultural_guidance',
-                'deliberation_requests'
+                "fire_circle_deliberations",
+                "governance_decisions",
+                "cultural_guidance",
+                "deliberation_requests",
             ]
 
             for collection_name in collections:
@@ -107,23 +108,23 @@ class FireCircleInterface:
         try:
             # Create deliberation request
             request = {
-                'type': 'urgent_alert',
-                'alert_id': str(alert.alert_id),
-                'severity': alert.severity.value,
-                'extraction_type': alert.extraction_type,
-                'description': alert.description,
-                'evidence': alert.evidence_summary,
-                'suggested_investigations': alert.suggested_investigation_areas,
-                'urgency_factors': alert.urgency_factors,
-                'timestamp': datetime.now(UTC),
-                'status': 'pending_review'
+                "type": "urgent_alert",
+                "alert_id": str(alert.alert_id),
+                "severity": alert.severity.value,
+                "extraction_type": alert.extraction_type,
+                "description": alert.description,
+                "evidence": alert.evidence_summary,
+                "suggested_investigations": alert.suggested_investigation_areas,
+                "urgency_factors": alert.urgency_factors,
+                "timestamp": datetime.now(UTC),
+                "status": "pending_review",
             }
 
             # Store request for Fire Circle review
             await self._store_deliberation_request(convert_datetime_for_storage(request))
 
             # Notify registered callbacks
-            await self._trigger_callbacks('urgent_alert', alert)
+            await self._trigger_callbacks("urgent_alert", alert)
 
             logger.warning(f"Urgent alert sent to Fire Circle: {alert.extraction_type}")
 
@@ -137,21 +138,21 @@ class FireCircleInterface:
         try:
             # Create report notification
             notification = {
-                'type': 'report_available',
-                'report_id': str(report.report_id),
-                'reporting_period': report.reporting_period,
-                'health_score': report.current_health_metrics.overall_health_score,
-                'priority_questions': report.priority_questions,
-                'areas_requiring_wisdom': report.areas_requiring_wisdom,
-                'timestamp': datetime.now(UTC),
-                'status': 'available_for_review'
+                "type": "report_available",
+                "report_id": str(report.report_id),
+                "reporting_period": report.reporting_period,
+                "health_score": report.current_health_metrics.overall_health_score,
+                "priority_questions": report.priority_questions,
+                "areas_requiring_wisdom": report.areas_requiring_wisdom,
+                "timestamp": datetime.now(UTC),
+                "status": "available_for_review",
             }
 
             # Store notification
             await self._store_report_notification(convert_datetime_for_storage(notification))
 
             # Notify registered callbacks
-            await self._trigger_callbacks('report_available', report)
+            await self._trigger_callbacks("report_available", report)
 
             logger.info(f"Fire Circle report notification sent: {report.report_id}")
 
@@ -159,31 +160,29 @@ class FireCircleInterface:
             logger.error(f"Failed to notify report available: {e}")
 
     async def notify_pattern_detected(
-        self,
-        pattern: ReciprocityPattern,
-        requires_deliberation: bool = False
+        self, pattern: ReciprocityPattern, requires_deliberation: bool = False
     ) -> None:
         """
         Notify Fire Circle of detected pattern that may require attention.
         """
         try:
             notification = {
-                'type': 'pattern_detected',
-                'pattern_id': str(pattern.pattern_id),
-                'pattern_type': pattern.pattern_type,
-                'confidence_level': pattern.confidence_level,
-                'description': pattern.pattern_description,
-                'questions_for_deliberation': pattern.questions_for_deliberation,
-                'requires_deliberation': requires_deliberation,
-                'timestamp': datetime.now(UTC),
-                'status': 'informational' if not requires_deliberation else 'requires_review'
+                "type": "pattern_detected",
+                "pattern_id": str(pattern.pattern_id),
+                "pattern_type": pattern.pattern_type,
+                "confidence_level": pattern.confidence_level,
+                "description": pattern.pattern_description,
+                "questions_for_deliberation": pattern.questions_for_deliberation,
+                "requires_deliberation": requires_deliberation,
+                "timestamp": datetime.now(UTC),
+                "status": "informational" if not requires_deliberation else "requires_review",
             }
 
             await self._store_pattern_notification(convert_datetime_for_storage(notification))
 
             # Only trigger callbacks for patterns requiring attention
             if requires_deliberation or pattern.confidence_level > 0.8:
-                await self._trigger_callbacks('pattern_detected', pattern)
+                await self._trigger_callbacks("pattern_detected", pattern)
 
             logger.info(f"Pattern notification: {pattern.pattern_type}")
 
@@ -191,11 +190,7 @@ class FireCircleInterface:
             logger.error(f"Failed to notify pattern detected: {e}")
 
     async def request_guidance(
-        self,
-        topic: str,
-        context: dict[str, Any],
-        questions: list[str],
-        urgency: str = "normal"
+        self, topic: str, context: dict[str, Any], questions: list[str], urgency: str = "normal"
     ) -> str:
         """
         Request Fire Circle guidance on specific reciprocity question.
@@ -206,21 +201,21 @@ class FireCircleInterface:
             request_id = f"guidance_{int(datetime.now(UTC).timestamp())}"
 
             guidance_request = {
-                'request_id': request_id,
-                'topic': topic,
-                'context': context,
-                'questions': questions,
-                'urgency': urgency,
-                'requested_timestamp': datetime.now(UTC),
-                'status': 'pending_deliberation',
-                'requester': 'reciprocity_tracker'
+                "request_id": request_id,
+                "topic": topic,
+                "context": context,
+                "questions": questions,
+                "urgency": urgency,
+                "requested_timestamp": datetime.now(UTC),
+                "status": "pending_deliberation",
+                "requester": "reciprocity_tracker",
             }
 
             # Store request
             await self._store_guidance_request(convert_datetime_for_storage(guidance_request))
 
             # Notify Fire Circle
-            await self._trigger_callbacks('guidance_request', guidance_request)
+            await self._trigger_callbacks("guidance_request", guidance_request)
 
             logger.info(f"Guidance request submitted: {topic}")
             return request_id
@@ -230,10 +225,7 @@ class FireCircleInterface:
             raise
 
     async def receive_guidance(
-        self,
-        request_id: str,
-        guidance: dict[str, Any],
-        decision_rationale: str
+        self, request_id: str, guidance: dict[str, Any], decision_rationale: str
     ) -> None:
         """
         Receive guidance from Fire Circle deliberation.
@@ -242,11 +234,11 @@ class FireCircleInterface:
         """
         try:
             guidance_response = {
-                'request_id': request_id,
-                'guidance': guidance,
-                'decision_rationale': decision_rationale,
-                'deliberation_timestamp': datetime.now(UTC),
-                'status': 'guidance_provided'
+                "request_id": request_id,
+                "guidance": guidance,
+                "decision_rationale": decision_rationale,
+                "deliberation_timestamp": datetime.now(UTC),
+                "status": "guidance_provided",
             }
 
             # Store guidance
@@ -265,22 +257,19 @@ class FireCircleInterface:
             raise
 
     async def submit_deliberation_outcome(
-        self,
-        deliberation_id: str,
-        outcome: dict[str, Any],
-        implementation_notes: str
+        self, deliberation_id: str, outcome: dict[str, Any], implementation_notes: str
     ) -> None:
         """
         Receive outcome from Fire Circle deliberation for tracking and learning.
         """
         try:
             outcome_record = {
-                'deliberation_id': deliberation_id,
-                'outcome': outcome,
-                'implementation_notes': implementation_notes,
-                'timestamp': datetime.now(UTC),
-                'participants': outcome.get('participants', []),
-                'consensus_level': outcome.get('consensus_level', 'unknown')
+                "deliberation_id": deliberation_id,
+                "outcome": outcome,
+                "implementation_notes": implementation_notes,
+                "timestamp": datetime.now(UTC),
+                "participants": outcome.get("participants", []),
+                "consensus_level": outcome.get("consensus_level", "unknown"),
             }
 
             # Store outcome
@@ -294,11 +283,7 @@ class FireCircleInterface:
         except Exception as e:
             logger.error(f"Failed to submit deliberation outcome: {e}")
 
-    async def register_callback(
-        self,
-        event_type: str,
-        callback: Callable
-    ) -> None:
+    async def register_callback(self, event_type: str, callback: Callable) -> None:
         """
         Register callback function for Fire Circle notifications.
 
@@ -327,10 +312,10 @@ class FireCircleInterface:
             sorted_pending = sorted(
                 pending,
                 key=lambda x: (
-                    x.get('urgency', 'normal') == 'urgent',
-                    x.get('timestamp', datetime.min.replace(tzinfo=UTC))
+                    x.get("urgency", "normal") == "urgent",
+                    x.get("timestamp", datetime.min.replace(tzinfo=UTC)),
                 ),
-                reverse=True
+                reverse=True,
             )
 
             return sorted_pending
@@ -340,9 +325,7 @@ class FireCircleInterface:
             return []
 
     async def get_guidance_history(
-        self,
-        topic: str | None = None,
-        days_back: int = 30
+        self, topic: str | None = None, days_back: int = 30
     ) -> list[dict[str, Any]]:
         """
         Get history of Fire Circle guidance for learning and reference.
@@ -367,16 +350,16 @@ class FireCircleInterface:
             effectiveness = await self._evaluate_guidance_impact(guidance_id)
 
             return {
-                'guidance_id': guidance_id,
-                'effectiveness_score': effectiveness.get('score', 0.5),
-                'impact_indicators': effectiveness.get('indicators', {}),
-                'lessons_learned': effectiveness.get('lessons', []),
-                'recommendations': effectiveness.get('recommendations', [])
+                "guidance_id": guidance_id,
+                "effectiveness_score": effectiveness.get("score", 0.5),
+                "impact_indicators": effectiveness.get("indicators", {}),
+                "lessons_learned": effectiveness.get("lessons", []),
+                "recommendations": effectiveness.get("recommendations", []),
             }
 
         except Exception as e:
             logger.error(f"Failed to evaluate guidance effectiveness: {e}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     # Private implementation methods
 
@@ -402,7 +385,7 @@ class FireCircleInterface:
     async def _store_deliberation_request(self, request: dict[str, Any]) -> None:
         """Store deliberation request in database."""
         try:
-            collection = self.db.collection('deliberation_requests')
+            collection = self.db.collection("deliberation_requests")
             collection.insert(request)
 
         except Exception as e:
@@ -411,7 +394,7 @@ class FireCircleInterface:
     async def _store_report_notification(self, notification: dict[str, Any]) -> None:
         """Store report notification in database."""
         try:
-            collection = self.db.collection('fire_circle_notifications')
+            collection = self.db.collection("fire_circle_notifications")
             collection.insert(notification)
 
         except Exception as e:
@@ -420,7 +403,7 @@ class FireCircleInterface:
     async def _store_pattern_notification(self, notification: dict[str, Any]) -> None:
         """Store pattern notification in database."""
         try:
-            collection = self.db.collection('fire_circle_notifications')
+            collection = self.db.collection("fire_circle_notifications")
             collection.insert(notification)
 
         except Exception as e:
@@ -429,7 +412,7 @@ class FireCircleInterface:
     async def _store_guidance_request(self, request: dict[str, Any]) -> None:
         """Store guidance request in database."""
         try:
-            collection = self.db.collection('guidance_requests')
+            collection = self.db.collection("guidance_requests")
             collection.insert(request)
 
         except Exception as e:
@@ -438,7 +421,7 @@ class FireCircleInterface:
     async def _store_guidance_response(self, response: dict[str, Any]) -> None:
         """Store guidance response in database."""
         try:
-            collection = self.db.collection('guidance_responses')
+            collection = self.db.collection("guidance_responses")
             collection.insert(response)
 
         except Exception as e:
@@ -447,7 +430,7 @@ class FireCircleInterface:
     async def _store_deliberation_outcome(self, outcome: dict[str, Any]) -> None:
         """Store deliberation outcome in database."""
         try:
-            collection = self.db.collection('deliberation_outcomes')
+            collection = self.db.collection("deliberation_outcomes")
             collection.insert(outcome)
 
         except Exception as e:
@@ -482,9 +465,7 @@ class FireCircleInterface:
             logger.error(f"Failed to apply guidance: {e}")
 
     async def _track_guidance_effectiveness(
-        self,
-        request_id: str,
-        guidance: dict[str, Any]
+        self, request_id: str, guidance: dict[str, Any]
     ) -> None:
         """Track effectiveness of applied guidance."""
         try:
@@ -514,10 +495,7 @@ class FireCircleInterface:
             return []
 
     async def _query_guidance_history(
-        self,
-        topic: str | None,
-        start_time: datetime,
-        end_time: datetime
+        self, topic: str | None, start_time: datetime, end_time: datetime
     ) -> list[dict[str, Any]]:
         """Query guidance history from database."""
         try:

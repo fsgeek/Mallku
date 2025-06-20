@@ -71,7 +71,7 @@ class ReciprocityVisualizationService:
         self,
         patterns: list[ReciprocityPattern],
         health_metrics: SystemHealthMetrics | None = None,
-        title: str = "Reciprocity Mandala"
+        title: str = "Reciprocity Mandala",
     ) -> Image.Image:
         """
         Generate a mandala showing reciprocity balance and flow.
@@ -85,7 +85,7 @@ class ReciprocityVisualizationService:
         - Symmetry: Balance representation
         """
         # Create base image
-        img = Image.new('RGB', self.config.image_size, self.config.background_color)
+        img = Image.new("RGB", self.config.image_size, self.config.background_color)
         draw = ImageDraw.Draw(img)
 
         center_x, center_y = self.config.image_size[0] // 2, self.config.image_size[1] // 2
@@ -99,9 +99,13 @@ class ReciprocityVisualizationService:
             health_color = self._health_to_color(health_metrics.overall_health_score)
             center_radius = int(ring_width * 0.8)
             draw.ellipse(
-                [center_x - center_radius, center_y - center_radius,
-                 center_x + center_radius, center_y + center_radius],
-                fill=health_color
+                [
+                    center_x - center_radius,
+                    center_y - center_radius,
+                    center_x + center_radius,
+                    center_y + center_radius,
+                ],
+                fill=health_color,
             )
 
         # 2. Inner rings - need fulfillment
@@ -109,29 +113,36 @@ class ReciprocityVisualizationService:
             ring_num = 1
             for need, rate in health_metrics.need_fulfillment_rates.items():
                 self._draw_mandala_ring(
-                    draw, center_x, center_y,
-                    ring_width * ring_num, ring_width * (ring_num + 0.8),
-                    rate, self._need_to_color(str(need))
+                    draw,
+                    center_x,
+                    center_y,
+                    ring_width * ring_num,
+                    ring_width * (ring_num + 0.8),
+                    rate,
+                    self._need_to_color(str(need)),
                 )
                 ring_num += 1
 
         # 3. Middle rings - pattern intensities
         if patterns:
-            ring_num = max(3, len(health_metrics.need_fulfillment_rates) + 1 if health_metrics else 3)
+            ring_num = max(
+                3, len(health_metrics.need_fulfillment_rates) + 1 if health_metrics else 3
+            )
             for i, pattern in enumerate(patterns[:3]):  # Top 3 patterns
                 self._draw_pattern_ring(
-                    draw, center_x, center_y,
-                    ring_width * ring_num, ring_width * (ring_num + 0.8),
-                    pattern
+                    draw,
+                    center_x,
+                    center_y,
+                    ring_width * ring_num,
+                    ring_width * (ring_num + 0.8),
+                    pattern,
                 )
                 ring_num += 1
 
         # 4. Outer ring - participation flow
         if health_metrics:
             self._draw_participation_ring(
-                draw, center_x, center_y,
-                max_radius - ring_width, max_radius,
-                health_metrics
+                draw, center_x, center_y, max_radius - ring_width, max_radius, health_metrics
             )
 
         # Add symmetry lines for balance visualization
@@ -143,9 +154,7 @@ class ReciprocityVisualizationService:
         return img
 
     async def create_flow_visualization(
-        self,
-        interactions: list[InteractionRecord],
-        time_window: timedelta = timedelta(days=7)
+        self, interactions: list[InteractionRecord], time_window: timedelta = timedelta(days=7)
     ) -> Image.Image:
         """
         Create organic flow diagram of wisdom circulation.
@@ -156,13 +165,12 @@ class ReciprocityVisualizationService:
         - Flow intensity through particle density
         - Natural circulation patterns
         """
-        img = Image.new('RGB', self.config.image_size, self.config.background_color)
+        img = Image.new("RGB", self.config.image_size, self.config.background_color)
         draw = ImageDraw.Draw(img)
 
         # Group interactions by type and time
         recent_interactions = [
-            i for i in interactions
-            if datetime.now(UTC) - i.timestamp <= time_window
+            i for i in interactions if datetime.now(UTC) - i.timestamp <= time_window
         ]
 
         # Create flow field based on interactions
@@ -186,9 +194,7 @@ class ReciprocityVisualizationService:
         return img
 
     async def create_pattern_geometry(
-        self,
-        pattern: ReciprocityPattern,
-        related_patterns: list[ReciprocityPattern] | None = None
+        self, pattern: ReciprocityPattern, related_patterns: list[ReciprocityPattern] | None = None
     ) -> Image.Image:
         """
         Generate sacred geometry revealing pattern structure.
@@ -199,7 +205,7 @@ class ReciprocityVisualizationService:
         - Extraction alerts: Asymmetric breaks
         - Emergence: Fractal growth
         """
-        img = Image.new('RGB', self.config.image_size, self.config.background_color)
+        img = Image.new("RGB", self.config.image_size, self.config.background_color)
         draw = ImageDraw.Draw(img)
 
         center_x, center_y = self.config.image_size[0] // 2, self.config.image_size[1] // 2
@@ -225,10 +231,7 @@ class ReciprocityVisualizationService:
 
         return img
 
-    async def create_fire_circle_summary(
-        self,
-        report: FireCircleReport
-    ) -> Image.Image:
+    async def create_fire_circle_summary(self, report: FireCircleReport) -> Image.Image:
         """
         Create comprehensive visual summary for Fire Circle deliberation.
 
@@ -236,13 +239,11 @@ class ReciprocityVisualizationService:
         """
         # Create larger canvas for multiple visualizations
         width, height = self.config.image_size[0] * 2, self.config.image_size[1] * 2
-        img = Image.new('RGB', (width, height), self.config.background_color)
+        img = Image.new("RGB", (width, height), self.config.background_color)
 
         # Create individual visualizations
         mandala = await self.create_reciprocity_mandala(
-            report.detected_patterns,
-            report.current_health_metrics,
-            "Current State"
+            report.detected_patterns, report.current_health_metrics, "Current State"
         )
 
         # Resize and position sub-images
@@ -288,10 +289,12 @@ class ReciprocityVisualizationService:
     def _draw_mandala_ring(
         self,
         draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        inner_r: float, outer_r: float,
+        cx: int,
+        cy: int,
+        inner_r: float,
+        outer_r: float,
         fill_ratio: float,
-        color: tuple[int, int, int]
+        color: tuple[int, int, int],
     ) -> None:
         """Draw a ring segment of the mandala."""
         # Create segments based on symmetry
@@ -304,19 +307,19 @@ class ReciprocityVisualizationService:
 
             # Draw arc segment
             self._draw_arc_segment(
-                draw, cx, cy,
-                int(inner_r), int(outer_r),
-                start_angle, end_angle,
-                color
+                draw, cx, cy, int(inner_r), int(outer_r), start_angle, end_angle, color
             )
 
     def _draw_arc_segment(
         self,
         draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        inner_r: int, outer_r: int,
-        start_angle: float, end_angle: float,
-        color: tuple[int, int, int]
+        cx: int,
+        cy: int,
+        inner_r: int,
+        outer_r: int,
+        start_angle: float,
+        end_angle: float,
+        color: tuple[int, int, int],
     ) -> None:
         """Draw a filled arc segment."""
         # Convert angles to radians
@@ -345,9 +348,11 @@ class ReciprocityVisualizationService:
     def _draw_pattern_ring(
         self,
         draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        inner_r: float, outer_r: float,
-        pattern: ReciprocityPattern
+        cx: int,
+        cy: int,
+        inner_r: float,
+        outer_r: float,
+        pattern: ReciprocityPattern,
     ) -> None:
         """Draw a ring representing a pattern."""
         # Use pattern intensity for fill ratio
@@ -367,9 +372,11 @@ class ReciprocityVisualizationService:
     def _draw_participation_ring(
         self,
         draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        inner_r: float, outer_r: float,
-        health_metrics: SystemHealthMetrics
+        cx: int,
+        cy: int,
+        inner_r: float,
+        outer_r: float,
+        health_metrics: SystemHealthMetrics,
     ) -> None:
         """Draw outer ring showing participation metrics."""
         # Use voluntary return rate
@@ -378,12 +385,7 @@ class ReciprocityVisualizationService:
 
         self._draw_mandala_ring(draw, cx, cy, inner_r, outer_r, fill_ratio, color)
 
-    def _draw_symmetry_guides(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        max_r: float
-    ) -> None:
+    def _draw_symmetry_guides(self, draw: ImageDraw.Draw, cx: int, cy: int, max_r: float) -> None:
         """Draw symmetry guide lines."""
         # Draw faint radial lines
         for i in range(self.config.mandala_symmetry):
@@ -399,14 +401,10 @@ class ReciprocityVisualizationService:
         """Add title to visualization."""
         # Simple text for now - could enhance with proper font handling
         text_color = (200, 200, 200)
-        draw.text((self.config.image_size[0] // 2, 30), title,
-                 fill=text_color, anchor="mm")
+        draw.text((self.config.image_size[0] // 2, 30), title, fill=text_color, anchor="mm")
 
     def _draw_spiral_geometry(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        pattern: ReciprocityPattern
+        self, draw: ImageDraw.Draw, cx: int, cy: int, pattern: ReciprocityPattern
     ) -> None:
         """Draw spiral geometry for flow patterns."""
         # Draw spiral path
@@ -439,22 +437,13 @@ class ReciprocityVisualizationService:
             return base_color
 
     def _blend_colors(
-        self,
-        color1: tuple[int, int, int],
-        color2: tuple[int, int, int],
-        blend: float
+        self, color1: tuple[int, int, int], color2: tuple[int, int, int], blend: float
     ) -> tuple[int, int, int]:
         """Blend two colors."""
-        return tuple(
-            int(c1 * (1 - blend) + c2 * blend)
-            for c1, c2 in zip(color1, color2)
-        )
+        return tuple(int(c1 * (1 - blend) + c2 * blend) for c1, c2 in zip(color1, color2))
 
     def _draw_radial_geometry(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        pattern: ReciprocityPattern
+        self, draw: ImageDraw.Draw, cx: int, cy: int, pattern: ReciprocityPattern
     ) -> None:
         """Draw radial geometry for participation patterns."""
         # Number of rays based on affected participants
@@ -479,10 +468,7 @@ class ReciprocityVisualizationService:
                 draw.ellipse([px - 2, py - 2, px + 2, py + 2], fill=color[:3])
 
     def _draw_asymmetric_geometry(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        pattern: ReciprocityPattern
+        self, draw: ImageDraw.Draw, cx: int, cy: int, pattern: ReciprocityPattern
     ) -> None:
         """Draw asymmetric geometry for extraction patterns."""
         # Create broken circle to represent imbalance
@@ -501,12 +487,10 @@ class ReciprocityVisualizationService:
             draw.ellipse([x - 3, y - 3, x + 3, y + 3], fill=self.config.color_concern)
 
     def _draw_fractal_geometry(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        pattern: ReciprocityPattern
+        self, draw: ImageDraw.Draw, cx: int, cy: int, pattern: ReciprocityPattern
     ) -> None:
         """Draw fractal geometry for emergence patterns."""
+
         # Simple branching fractal
         def draw_branch(x: float, y: float, angle: float, length: float, depth: int):
             if depth == 0 or length < 2:
@@ -530,10 +514,7 @@ class ReciprocityVisualizationService:
             draw_branch(cx, cy, angle, 100, 5)
 
     def _draw_default_geometry(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        pattern: ReciprocityPattern
+        self, draw: ImageDraw.Draw, cx: int, cy: int, pattern: ReciprocityPattern
     ) -> None:
         """Draw default geometry for unrecognized patterns."""
         # Simple circle with pattern info
@@ -542,14 +523,10 @@ class ReciprocityVisualizationService:
         draw.ellipse(
             [cx - radius, cy - radius, cx + radius, cy + radius],
             outline=self.config.color_balance,
-            width=3
+            width=3,
         )
 
-    def _add_pattern_description(
-        self,
-        draw: ImageDraw.Draw,
-        pattern: ReciprocityPattern
-    ) -> None:
+    def _add_pattern_description(self, draw: ImageDraw.Draw, pattern: ReciprocityPattern) -> None:
         """Add pattern description text."""
         # Position at bottom
         y_pos = self.config.image_size[1] - 100
@@ -559,7 +536,7 @@ class ReciprocityVisualizationService:
             (self.config.image_size[0] // 2, y_pos),
             pattern.pattern_type.replace("_", " ").title(),
             fill=(200, 200, 200),
-            anchor="mm"
+            anchor="mm",
         )
 
         # Confidence level
@@ -568,29 +545,24 @@ class ReciprocityVisualizationService:
             (self.config.image_size[0] // 2, y_pos + 20),
             confidence_text,
             fill=(150, 150, 150),
-            anchor="mm"
+            anchor="mm",
         )
 
-    def _calculate_flow_field(
-        self,
-        interactions: list[InteractionRecord]
-    ) -> np.ndarray:
+    def _calculate_flow_field(self, interactions: list[InteractionRecord]) -> np.ndarray:
         """Calculate flow field from interactions."""
         # Placeholder - would implement actual flow calculation
         field_size = (50, 50)
         return np.random.randn(*field_size, 2) * 0.1
 
-    def _draw_flow_lines(
-        self,
-        draw: ImageDraw.Draw,
-        flow_field: np.ndarray
-    ) -> None:
+    def _draw_flow_lines(self, draw: ImageDraw.Draw, flow_field: np.ndarray) -> None:
         """Draw background flow lines."""
         # Placeholder visualization
         for i in range(20):
             points = []
-            x, y = np.random.randint(0, self.config.image_size[0]), \
-                   np.random.randint(0, self.config.image_size[1])
+            x, y = (
+                np.random.randint(0, self.config.image_size[0]),
+                np.random.randint(0, self.config.image_size[1]),
+            )
 
             for _ in range(50):
                 points.append((x, y))
@@ -605,13 +577,14 @@ class ReciprocityVisualizationService:
             # Draw with low opacity
             for j in range(len(points) - 1):
                 opacity = int(50 * (j / len(points)))
-                draw.line([points[j], points[j + 1]],
-                         fill=(*self.config.color_balance, opacity)[:3], width=1)
+                draw.line(
+                    [points[j], points[j + 1]],
+                    fill=(*self.config.color_balance, opacity)[:3],
+                    width=1,
+                )
 
     def _draw_interaction_particle(
-        self,
-        draw: ImageDraw.Draw,
-        interaction: InteractionRecord
+        self, draw: ImageDraw.Draw, interaction: InteractionRecord
     ) -> None:
         """Draw particle representing an interaction."""
         # Random position for now - would map to actual flow
@@ -619,8 +592,12 @@ class ReciprocityVisualizationService:
         y = np.random.randint(50, self.config.image_size[1] - 50)
 
         # Size based on interaction quality
-        quality_score = sum(interaction.interaction_quality_indicators.values()) / \
-                       len(interaction.interaction_quality_indicators) if interaction.interaction_quality_indicators else 0.5
+        quality_score = (
+            sum(interaction.interaction_quality_indicators.values())
+            / len(interaction.interaction_quality_indicators)
+            if interaction.interaction_quality_indicators
+            else 0.5
+        )
         size = int(5 + quality_score * 10)
 
         # Color based on contribution type
@@ -636,19 +613,12 @@ class ReciprocityVisualizationService:
 
         draw.ellipse([x - size, y - size, x + size, y + size], fill=color)
 
-    def _identify_wisdom_pools(
-        self,
-        interactions: list[InteractionRecord]
-    ) -> list[dict[str, Any]]:
+    def _identify_wisdom_pools(self, interactions: list[InteractionRecord]) -> list[dict[str, Any]]:
         """Identify areas of high reciprocal activity."""
         # Placeholder - would implement clustering
         return []
 
-    def _draw_wisdom_pool(
-        self,
-        draw: ImageDraw.Draw,
-        pool: dict[str, Any]
-    ) -> None:
+    def _draw_wisdom_pool(self, draw: ImageDraw.Draw, pool: dict[str, Any]) -> None:
         """Draw area of concentrated wisdom exchange."""
         # Placeholder visualization
         pass
@@ -671,10 +641,7 @@ class ReciprocityVisualizationService:
             draw.text((legend_x + 10, y), label, fill=(200, 200, 200), anchor="lm")
 
     def _add_satellite_patterns(
-        self,
-        draw: ImageDraw.Draw,
-        cx: int, cy: int,
-        patterns: list[ReciprocityPattern]
+        self, draw: ImageDraw.Draw, cx: int, cy: int, patterns: list[ReciprocityPattern]
     ) -> None:
         """Add related patterns as satellite geometries."""
         # Position patterns in orbit
@@ -692,14 +659,11 @@ class ReciprocityVisualizationService:
             draw.ellipse(
                 [sat_x - size, sat_y - size, sat_x + size, sat_y + size],
                 outline=self._pattern_intensity_color(pattern),
-                width=2
+                width=2,
             )
 
     def _draw_deliberation_questions(
-        self,
-        draw: ImageDraw.Draw,
-        report: FireCircleReport,
-        bounds: tuple[int, int, int, int]
+        self, draw: ImageDraw.Draw, report: FireCircleReport, bounds: tuple[int, int, int, int]
     ) -> None:
         """Draw questions for Fire Circle deliberation."""
         x, y, w, h = bounds
@@ -710,7 +674,7 @@ class ReciprocityVisualizationService:
             (x + w // 2, y + margin),
             "Questions for Collective Wisdom",
             fill=(200, 200, 200),
-            anchor="mm"
+            anchor="mm",
         )
 
         # Priority questions
@@ -720,5 +684,5 @@ class ReciprocityVisualizationService:
                 (x + margin, question_y + i * 30),
                 f"• {question[:80]}...",  # Truncate long questions
                 fill=(150, 150, 150),
-                anchor="lm"
+                anchor="lm",
             )

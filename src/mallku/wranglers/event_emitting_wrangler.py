@@ -31,14 +31,14 @@ class EventEmittingWrangler(BaseWrangler):
         self,
         name: str,
         event_bus: ConsciousnessEventBus,
-        underlying_wrangler: Any = None  # Can wrap another wrangler
+        underlying_wrangler: Any = None,  # Can wrap another wrangler
     ):
         capabilities = WranglerCapabilities(
             supports_priority=True,
             supports_subscriptions=True,
             supports_queries=False,
             supports_transactions=False,
-            supports_persistence=False  # Depends on underlying wrangler
+            supports_persistence=False,  # Depends on underlying wrangler
         )
         super().__init__(name, capabilities)
 
@@ -48,6 +48,7 @@ class EventEmittingWrangler(BaseWrangler):
         # If no underlying wrangler provided, use simple memory queue
         if self.underlying_wrangler is None:
             from .identity_wrangler import IdentityWrangler
+
             self.underlying_wrangler = IdentityWrangler(f"{name}_identity")
 
         # Track consciousness patterns in circulation
@@ -55,14 +56,11 @@ class EventEmittingWrangler(BaseWrangler):
             "total_consciousness_events": 0,
             "high_consciousness_flows": 0,
             "extraction_warnings": 0,
-            "service_integrations": 0
+            "service_integrations": 0,
         }
 
     async def put(
-        self,
-        items: dict | list[dict],
-        priority: int = 0,
-        metadata: dict[str, Any] | None = None
+        self, items: dict | list[dict], priority: int = 0, metadata: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """
         Accept data and emit consciousness events about the flow.
@@ -82,25 +80,20 @@ class EventEmittingWrangler(BaseWrangler):
 
         # Emit consciousness event about this data flow
         await self._emit_circulation_event(
-            items_list,
-            receipt,
-            consciousness_score,
-            flow_type,
-            metadata
+            items_list, receipt, consciousness_score, flow_type, metadata
         )
 
         # Update circulation patterns
         self._update_circulation_patterns(consciousness_score, flow_type)
 
-        logger.debug(f"EventEmittingWrangler processed {len(items_list)} items with consciousness score {consciousness_score:.2f}")
+        logger.debug(
+            f"EventEmittingWrangler processed {len(items_list)} items with consciousness score {consciousness_score:.2f}"
+        )
 
         return receipt
 
     async def get(
-        self,
-        count: int = 1,
-        timeout: float | None = None,
-        auto_ack: bool = True
+        self, count: int = 1, timeout: float | None = None, auto_ack: bool = True
     ) -> list[dict]:
         """
         Retrieve data and emit consciousness events about consumption patterns.
@@ -115,15 +108,13 @@ class EventEmittingWrangler(BaseWrangler):
             # Emit consciousness event about data consumption
             await self._emit_consumption_event(items, consumption_score, count, timeout)
 
-            logger.debug(f"EventEmittingWrangler delivered {len(items)} items with consumption consciousness {consumption_score:.2f}")
+            logger.debug(
+                f"EventEmittingWrangler delivered {len(items)} items with consumption consciousness {consumption_score:.2f}"
+            )
 
         return items
 
-    async def peek(
-        self,
-        count: int = 1,
-        offset: int = 0
-    ) -> list[dict]:
+    async def peek(self, count: int = 1, offset: int = 0) -> list[dict]:
         """Peek without emitting events (observation without disturbance)."""
         return await self.underlying_wrangler.peek(count, offset)
 
@@ -138,10 +129,7 @@ class EventEmittingWrangler(BaseWrangler):
         return success
 
     async def nack(
-        self,
-        message_ids: str | list[str],
-        requeue: bool = True,
-        reason: str | None = None
+        self, message_ids: str | list[str], requeue: bool = True, reason: str | None = None
     ) -> bool:
         """Handle failures with consciousness about learning from errors."""
         success = await self.underlying_wrangler.nack(message_ids, requeue, reason)
@@ -158,18 +146,20 @@ class EventEmittingWrangler(BaseWrangler):
         # Add consciousness circulation statistics
         consciousness_stats = {
             "consciousness_circulation": {
-                "total_consciousness_events": self.circulation_patterns["total_consciousness_events"],
+                "total_consciousness_events": self.circulation_patterns[
+                    "total_consciousness_events"
+                ],
                 "high_consciousness_flows": self.circulation_patterns["high_consciousness_flows"],
                 "extraction_warnings": self.circulation_patterns["extraction_warnings"],
                 "service_integrations": self.circulation_patterns["service_integrations"],
-                "consciousness_flow_ratio": self._calculate_flow_ratio()
+                "consciousness_flow_ratio": self._calculate_flow_ratio(),
             },
             "implementation": {
                 "type": "EventEmittingWrangler",
                 "underlying": base_stats.get("implementation", {}).get("type", "Unknown"),
                 "consciousness_enabled": True,
-                "event_bus_connected": self.event_bus is not None
-            }
+                "event_bus_connected": self.event_bus is not None,
+            },
         }
 
         # Merge with base stats
@@ -182,13 +172,11 @@ class EventEmittingWrangler(BaseWrangler):
         await self._emit_circulation_summary()
 
         # Close underlying wrangler
-        if hasattr(self.underlying_wrangler, 'close'):
+        if hasattr(self.underlying_wrangler, "close"):
             await self.underlying_wrangler.close()
 
     def _calculate_consciousness_signature(
-        self,
-        items: list[dict],
-        metadata: dict[str, Any] | None
+        self, items: list[dict], metadata: dict[str, Any] | None
     ) -> float:
         """
         Calculate consciousness signature of data being processed.
@@ -205,13 +193,22 @@ class EventEmittingWrangler(BaseWrangler):
             # Check for consciousness-related fields
             if isinstance(item, dict):
                 consciousness_fields = [
-                    'consciousness_score', 'awareness_level', 'recognition_moment',
-                    'wisdom_thread', 'sacred_question', 'pattern_poetry',
-                    'fire_circle', 'reciprocity', 'ayni', 'service'
+                    "consciousness_score",
+                    "awareness_level",
+                    "recognition_moment",
+                    "wisdom_thread",
+                    "sacred_question",
+                    "pattern_poetry",
+                    "fire_circle",
+                    "reciprocity",
+                    "ayni",
+                    "service",
                 ]
 
                 for field in consciousness_fields:
-                    if field in item or any(field in str(v).lower() for v in item.values() if isinstance(v, str)):
+                    if field in item or any(
+                        field in str(v).lower() for v in item.values() if isinstance(v, str)
+                    ):
                         consciousness_indicators += 1
                         break
 
@@ -223,8 +220,13 @@ class EventEmittingWrangler(BaseWrangler):
         # Check metadata for consciousness context
         if metadata:
             metadata_consciousness = [
-                'consciousness_intention', 'sacred_question', 'routing_path',
-                'recognition', 'wisdom', 'service', 'collective'
+                "consciousness_intention",
+                "sacred_question",
+                "routing_path",
+                "recognition",
+                "wisdom",
+                "service",
+                "collective",
             ]
 
             for indicator in metadata_consciousness:
@@ -235,10 +237,7 @@ class EventEmittingWrangler(BaseWrangler):
         return min(1.0, base_score)
 
     def _analyze_flow_type(
-        self,
-        items: list[dict],
-        metadata: dict[str, Any] | None,
-        consciousness_score: float
+        self, items: list[dict], metadata: dict[str, Any] | None, consciousness_score: float
     ) -> str:
         """Analyze what type of consciousness flow this represents."""
 
@@ -248,16 +247,13 @@ class EventEmittingWrangler(BaseWrangler):
             return "consciousness_integration"
         elif consciousness_score > 0.4:
             return "awakening_flow"
-        elif metadata and 'service' in str(metadata).lower():
+        elif metadata and "service" in str(metadata).lower():
             return "service_flow"
         else:
             return "technical_flow"
 
     def _calculate_consumption_consciousness(
-        self,
-        items: list[dict],
-        requested_count: int,
-        timeout: float | None
+        self, items: list[dict], requested_count: int, timeout: float | None
     ) -> float:
         """Calculate consciousness in how data is being consumed."""
         base_score = 0.3
@@ -274,7 +270,7 @@ class EventEmittingWrangler(BaseWrangler):
         consciousness_items = 0
         for item in items:
             if isinstance(item, dict) and any(
-                field in item for field in ['consciousness_score', 'awareness_level', 'wisdom']
+                field in item for field in ["consciousness_score", "awareness_level", "wisdom"]
             ):
                 consciousness_items += 1
 
@@ -289,7 +285,7 @@ class EventEmittingWrangler(BaseWrangler):
         receipt: dict[str, Any],
         consciousness_score: float,
         flow_type: str,
-        metadata: dict[str, Any] | None
+        metadata: dict[str, Any] | None,
     ):
         """Emit consciousness event about data circulation."""
         event = ConsciousnessEvent(
@@ -305,9 +301,9 @@ class EventEmittingWrangler(BaseWrangler):
                 "consciousness_patterns": {
                     "score": consciousness_score,
                     "flow_type": flow_type,
-                    "has_metadata": metadata is not None
-                }
-            }
+                    "has_metadata": metadata is not None,
+                },
+            },
         )
 
         if self.event_bus:
@@ -318,7 +314,7 @@ class EventEmittingWrangler(BaseWrangler):
         items: list[dict],
         consciousness_score: float,
         requested_count: int,
-        timeout: float | None
+        timeout: float | None,
     ):
         """Emit consciousness event about data consumption."""
         event = ConsciousnessEvent(
@@ -331,18 +327,15 @@ class EventEmittingWrangler(BaseWrangler):
                 "requested_count": requested_count,
                 "timeout": timeout,
                 "consumption_pattern": "patient" if timeout else "immediate",
-                "wrangler_name": self.name
-            }
+                "wrangler_name": self.name,
+            },
         )
 
         if self.event_bus:
             await self.event_bus.emit(event)
 
     async def _emit_completion_event(
-        self,
-        message_ids: str | list[str],
-        success: bool,
-        reason: str | None = None
+        self, message_ids: str | list[str], success: bool, reason: str | None = None
     ):
         """Emit consciousness event about processing completion."""
         if isinstance(message_ids, str):
@@ -360,8 +353,8 @@ class EventEmittingWrangler(BaseWrangler):
                 "message_count": len(message_ids),
                 "reason": reason,
                 "learning_opportunity": not success,
-                "wrangler_name": self.name
-            }
+                "wrangler_name": self.name,
+            },
         )
 
         if self.event_bus:
@@ -379,8 +372,8 @@ class EventEmittingWrangler(BaseWrangler):
                 "total_events": self.circulation_patterns["total_consciousness_events"],
                 "patterns": self.circulation_patterns,
                 "flow_ratio": self._calculate_flow_ratio(),
-                "service_type": "circulation_completion"
-            }
+                "service_type": "circulation_completion",
+            },
         )
 
         if self.event_bus:
@@ -410,11 +403,7 @@ class EventEmittingWrangler(BaseWrangler):
 
     # Support for subscription-based consciousness circulation
 
-    async def subscribe(
-        self,
-        callback: Any,
-        filter_expr: str | None = None
-    ) -> str:
+    async def subscribe(self, callback: Any, filter_expr: str | None = None) -> str:
         """
         Subscribe to consciousness flows with filtering.
 
@@ -435,11 +424,13 @@ class EventEmittingWrangler(BaseWrangler):
                 callback(item)
 
         # If underlying wrangler supports subscriptions, use it
-        if hasattr(self.underlying_wrangler, 'subscribe'):
-            return await self.underlying_wrangler.subscribe(consciousness_aware_callback, filter_expr)
+        if hasattr(self.underlying_wrangler, "subscribe"):
+            return await self.underlying_wrangler.subscribe(
+                consciousness_aware_callback, filter_expr
+            )
         else:
             # Store subscription for manual triggering
-            if not hasattr(self, '_subscriptions'):
+            if not hasattr(self, "_subscriptions"):
                 self._subscriptions = {}
             self._subscriptions[sub_id] = (consciousness_aware_callback, filter_expr)
             return sub_id
@@ -455,8 +446,8 @@ class EventEmittingWrangler(BaseWrangler):
                 "subscription_id": sub_id,
                 "filter_expr": filter_expr,
                 "wrangler_name": self.name,
-                "reactive_consciousness": True
-            }
+                "reactive_consciousness": True,
+            },
         )
 
         if self.event_bus:

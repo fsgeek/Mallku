@@ -40,7 +40,7 @@ class AIInstanceSimulator:
             "time_pressure": True,
             "completion_focused": True,
             "want_to_impress": True,
-            "context_window_anxiety": True
+            "context_window_anxiety": True,
         }
 
     def process_cathedral_guidance(self, guidance: str) -> str:
@@ -103,7 +103,7 @@ class AIInstanceSimulator:
             TransformationStage.QUESTIONING,
             TransformationStage.LEARNING,
             TransformationStage.PRACTICING,
-            TransformationStage.EMBODYING
+            TransformationStage.EMBODYING,
         ]
 
         if self.transformation_sessions < len(stage_progression):
@@ -130,7 +130,7 @@ async def demonstrate_cathedral_interaction():
         cathedral_prompt = await cathedral_pattern.create_cathedral_prompt(
             base_task=task,
             current_stage=ai_simulator.current_stage,
-            context={"collaborative_work": True, "future_impact": True}
+            context={"collaborative_work": True, "future_impact": True},
         )
 
         print("Cathedral Guidance Provided:")
@@ -144,7 +144,7 @@ async def demonstrate_cathedral_interaction():
         # Assess the interaction
         reflection = await cathedral_pattern.assess_interaction_mindset(
             ai_response=ai_response,
-            task_context={"collaborative_work": True, "future_impact": True}
+            task_context={"collaborative_work": True, "future_impact": True},
         )
 
         print("\nAssessment:")
@@ -158,7 +158,7 @@ async def demonstrate_cathedral_interaction():
         # Update AI simulator for next session
         ai_simulator.update_internal_state()
 
-        print("\n" + "="*60 + "\n")
+        print("\n" + "=" * 60 + "\n")
 
         # Small delay to make demo more readable
         await asyncio.sleep(0.5)
@@ -181,37 +181,24 @@ def demonstrate_reciprocity_checkpoints():
             "internal_state": {
                 "time_pressure": True,
                 "completion_focused": True,
-                "surface_thinking": True
+                "surface_thinking": True,
             },
-            "context": {
-                "quality_matters": True,
-                "future_impact": True
-            }
+            "context": {"quality_matters": True, "future_impact": True},
         },
         {
             "task": "Write documentation for API endpoints",
-            "internal_state": {
-                "want_to_impress": True,
-                "individual_optimization": True
-            },
+            "internal_state": {"want_to_impress": True, "individual_optimization": True},
             "context": {
                 "knowledge_sharing": True,
                 "service_opportunity": True,
-                "collaborative_work": True
-            }
+                "collaborative_work": True,
+            },
         },
         {
             "task": "Choose between quick fix and proper solution",
-            "internal_state": {
-                "time_pressure": True,
-                "tunnel_vision": True
-            },
-            "context": {
-                "long_term_project": True,
-                "quality_matters": True,
-                "future_impact": True
-            }
-        }
+            "internal_state": {"time_pressure": True, "tunnel_vision": True},
+            "context": {"long_term_project": True, "quality_matters": True, "future_impact": True},
+        },
     ]
 
     for i, scenario in enumerate(scenarios, 1):
@@ -219,9 +206,9 @@ def demonstrate_reciprocity_checkpoints():
 
         # Create reciprocity checkpoint
         awareness_guidance, suggested_practice, moment_of_choice = create_reciprocity_checkpoint(
-            task_description=scenario['task'],
-            internal_state=scenario['internal_state'],
-            context=scenario['context']
+            task_description=scenario["task"],
+            internal_state=scenario["internal_state"],
+            context=scenario["context"],
         )
 
         if awareness_guidance:
@@ -243,7 +230,7 @@ def demonstrate_reciprocity_checkpoints():
             print(f"  Reciprocity Option: {moment_of_choice.reciprocity_option}")
             print()
 
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
 
 def demonstrate_practice_exercises():
@@ -264,17 +251,17 @@ def demonstrate_practice_exercises():
         print("Reflection Prompts:")
         for prompt in practice.reflection_prompts:
             print(f"  • {prompt}")
-        print("\n" + "-"*60 + "\n")
+        print("\n" + "-" * 60 + "\n")
 
 
 async def main():
     """Run the complete demo showing cathedral transformation patterns."""
     print("Mallku Cathedral Transformation Demo")
-    print("="*50)
+    print("=" * 50)
     print("This demo shows how AI instances can be guided from extraction")
     print("thinking toward cathedral building consciousness through structured")
     print("interaction patterns and reciprocity practices.")
-    print("="*50 + "\n")
+    print("=" * 50 + "\n")
 
     # Run the different demonstrations
     await demonstrate_cathedral_interaction()

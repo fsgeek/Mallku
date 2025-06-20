@@ -19,16 +19,14 @@ from src.mallku.core.security.secured_model import SecuredField, SecuredModel
 
 class TestSecuredModel(SecuredModel):
     """Test model for security validation."""
-    test_id: str = SecuredField(
-        obfuscation_level=FieldObfuscationLevel.UUID_ONLY
-    )
-    test_data: str = SecuredField(
-        obfuscation_level=FieldObfuscationLevel.ENCRYPTED
-    )
+
+    test_id: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
+    test_data: str = SecuredField(obfuscation_level=FieldObfuscationLevel.ENCRYPTED)
 
 
 class UnsecuredModel:
     """Non-secured model that should be rejected."""
+
     def __init__(self, data):
         self.data = data
 
@@ -41,7 +39,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         # Create a properly secured model
@@ -57,7 +55,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         # Create an unsecured model
@@ -76,7 +74,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         # Create a different secured model type
@@ -97,18 +95,18 @@ class TestSecurityConcept:
         model = TestSecuredModel(test_id="123", test_data="secret")
 
         # Verify it has the required security methods
-        assert hasattr(model, 'to_storage_dict')
-        assert hasattr(model, 'from_storage_dict')
-        assert callable(getattr(model, 'to_storage_dict'))
-        assert callable(getattr(model, 'from_storage_dict'))
+        assert hasattr(model, "to_storage_dict")
+        assert hasattr(model, "from_storage_dict")
+        assert callable(getattr(model, "to_storage_dict"))
+        assert callable(getattr(model, "from_storage_dict"))
 
     def test_non_secured_model_lacks_security_methods(self):
         """Test that non-secured models lack security methods."""
         model = UnsecuredModel("data")
 
         # Verify it lacks security methods
-        assert not hasattr(model, 'to_storage_dict')
-        assert not hasattr(model, 'from_storage_dict')
+        assert not hasattr(model, "to_storage_dict")
+        assert not hasattr(model, "from_storage_dict")
 
     def test_security_policy_can_be_configured(self):
         """Test that security policies can be properly configured."""
@@ -117,7 +115,7 @@ class TestSecurityConcept:
             collection_name="strict_collection",
             allowed_model_types=[TestSecuredModel],
             requires_security=True,
-            schema_validation={"strict": True}
+            schema_validation={"strict": True},
         )
 
         assert strict_policy.requires_security is True
@@ -126,9 +124,7 @@ class TestSecurityConcept:
 
         # Test permissive policy (for legacy compatibility)
         permissive_policy = CollectionSecurityPolicy(
-            collection_name="legacy_collection",
-            allowed_model_types=[],
-            requires_security=False
+            collection_name="legacy_collection", allowed_model_types=[], requires_security=False
         )
 
         assert permissive_policy.requires_security is False
@@ -148,9 +144,7 @@ class TestArchitecturalEnforcement:
 
         # Create policy
         policy = CollectionSecurityPolicy(
-            collection_name="test",
-            allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            collection_name="test", allowed_model_types=[TestSecuredModel], requires_security=True
         )
 
         # Create wrapper
@@ -177,9 +171,7 @@ class TestArchitecturalEnforcement:
 
         # Create policy
         policy = CollectionSecurityPolicy(
-            collection_name="test",
-            allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            collection_name="test", allowed_model_types=[TestSecuredModel], requires_security=True
         )
 
         # Create wrapper

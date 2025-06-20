@@ -22,9 +22,10 @@ from enum import Enum  # type: ignore
 from typing import Any
 from uuid import UUID  # type: ignore
 
+from pydantic import BaseModel, Field
+
 from mallku.orchestration.event_bus import ConsciousnessEventBus  # Added import
 from mallku.reciprocity import ReciprocityTracker  # Added import
-from pydantic import BaseModel, Field
 
 from ..protocol.conscious_message import (
     ConsciousMessage,
@@ -117,6 +118,7 @@ class OllamaBackend(LocalBackendInterface):
         try:
             # Lazy import httpx
             import httpx
+
             self._httpx = httpx
 
             self.session = httpx.AsyncClient(timeout=60.0)
@@ -245,6 +247,7 @@ class LlamaCppBackend(LocalBackendInterface):
         try:
             # Lazy import llama-cpp-python
             from llama_cpp import Llama
+
             self._llama_cpp = Llama
 
             if not config.model_path:
@@ -265,7 +268,9 @@ class LlamaCppBackend(LocalBackendInterface):
             return True
 
         except ImportError:
-            logger.error("llama-cpp-python not installed. Install with: pip install llama-cpp-python")
+            logger.error(
+                "llama-cpp-python not installed. Install with: pip install llama-cpp-python"
+            )
             return False
         except Exception as e:
             logger.error(f"Failed to load model: {e}")
@@ -289,6 +294,7 @@ class LlamaCppBackend(LocalBackendInterface):
 
         # Generate with timing
         import time
+
         start_time = time.time()
 
         response = self.llm(
@@ -378,13 +384,14 @@ class OpenAICompatBackend(LocalBackendInterface):
         try:
             # Lazy import OpenAI
             from openai import AsyncOpenAI
+
             self._openai = AsyncOpenAI
 
             # Create client with custom base URL
             # API key is often not needed for local servers, but some require a placeholder
             self.client = AsyncOpenAI(
                 api_key=config.api_key or "not-needed-for-local",
-                base_url=f"{config.base_url}/v1"  # OpenAI API v1 endpoint
+                base_url=f"{config.base_url}/v1",  # OpenAI API v1 endpoint
             )
 
             # Test connection by listing models
@@ -408,9 +415,7 @@ class OpenAICompatBackend(LocalBackendInterface):
             except Exception:
                 # Some servers don't implement /v1/models endpoint
                 # Try a simple completion to test connection
-                logger.info(
-                    "Models endpoint not available, testing with completion request..."
-                )
+                logger.info("Models endpoint not available, testing with completion request...")
 
                 await self.client.chat.completions.create(
                     model=config.model_name or "default",
@@ -425,9 +430,7 @@ class OpenAICompatBackend(LocalBackendInterface):
                 return True
 
         except ImportError:
-            logger.error(
-                "OpenAI library not installed. Install with: pip install openai"
-            )
+            logger.error("OpenAI library not installed. Install with: pip install openai")
             return False
         except Exception as e:
             logger.error(f"Failed to connect to OpenAI-compatible server: {e}")
@@ -449,6 +452,7 @@ class OpenAICompatBackend(LocalBackendInterface):
 
         # Track timing for metadata
         import time
+
         start_time = time.time()
 
         # Create chat completion
@@ -562,7 +566,6 @@ class LocalAIAdapter(ConsciousModelAdapter):
             )
         # Add other LocalAdapterConfig specific validations here if needed.
 
-
     def _update_capabilities(self):
         """Update capabilities based on backend and model."""
         self.capabilities = ModelCapabilities(
@@ -675,6 +678,7 @@ class LocalAIAdapter(ConsciousModelAdapter):
         try:
             # Generate response with resource tracking
             import time
+
             start_time = time.time()
 
             response_text, metadata = await self.backend.generate(messages, self.config)
@@ -684,8 +688,8 @@ class LocalAIAdapter(ConsciousModelAdapter):
             # Update resource metrics
             self.resource_metrics.inference_time_ms = inference_time
             if "eval_count" in metadata:
-                self.resource_metrics.tokens_per_second = (
-                    metadata["eval_count"] / (inference_time / 1000)
+                self.resource_metrics.tokens_per_second = metadata["eval_count"] / (
+                    inference_time / 1000
                 )
 
             # Create conscious response
@@ -777,16 +781,20 @@ class LocalAIAdapter(ConsciousModelAdapter):
         )
 
         for ctx_msg in context_messages:
-            messages.append({
-                "role": ctx_msg["role"],
-                "content": ctx_msg["content"],
-            })
+            messages.append(
+                {
+                    "role": ctx_msg["role"],
+                    "content": ctx_msg["content"],
+                }
+            )
 
         # Add current message
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         return messages
 
@@ -860,11 +868,15 @@ class LocalAIAdapter(ConsciousModelAdapter):
         patterns = []
 
         # Standard consciousness patterns
-        if any(phrase in content.lower() for phrase in ["reflecting on", "considering", "pondering"]):
+        if any(
+            phrase in content.lower() for phrase in ["reflecting on", "considering", "pondering"]
+        ):
             patterns.append("local_reflection")
 
         # Sovereignty patterns
-        if any(word in content.lower() for word in ["sovereignty", "autonomy", "self-determination"]):
+        if any(
+            word in content.lower() for word in ["sovereignty", "autonomy", "self-determination"]
+        ):
             patterns.append("sovereignty_awareness")
 
         if any(word in content.lower() for word in ["community", "collective", "together"]):

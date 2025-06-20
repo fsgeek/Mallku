@@ -41,13 +41,13 @@ class AdaptiveThresholds:
             TemporalPrecision.MINUTE: timedelta(minutes=5),
             TemporalPrecision.SESSION: timedelta(minutes=30),
             TemporalPrecision.DAILY: timedelta(hours=4),
-            TemporalPrecision.CYCLICAL: timedelta(days=1)
+            TemporalPrecision.CYCLICAL: timedelta(days=1),
         }
 
         # Learning parameters
         self.learning_rate = 0.1
         self.target_precision = 0.8  # Minimize false positives
-        self.target_recall = 0.7     # Don't miss too many valid correlations
+        self.target_recall = 0.7  # Don't miss too many valid correlations
 
         # Performance tracking
         self.performance_history: list[dict] = []
@@ -88,15 +88,17 @@ class AdaptiveThresholds:
         metrics = self.calculate_performance_metrics(feedback_batch)
 
         # Record performance for trend analysis
-        self.performance_history.append({
-            'timestamp': datetime.now(UTC),
-            'precision': metrics['precision'],
-            'recall': metrics['recall'],
-            'f1_score': metrics['f1_score'],
-            'user_satisfaction': metrics['user_satisfaction'],
-            'confidence_threshold': self.confidence_threshold,
-            'frequency_threshold': self.frequency_threshold
-        })
+        self.performance_history.append(
+            {
+                "timestamp": datetime.now(UTC),
+                "precision": metrics["precision"],
+                "recall": metrics["recall"],
+                "f1_score": metrics["f1_score"],
+                "user_satisfaction": metrics["user_satisfaction"],
+                "confidence_threshold": self.confidence_threshold,
+                "frequency_threshold": self.frequency_threshold,
+            }
+        )
 
         # Adjust thresholds based on performance
         threshold_changes = self._adjust_thresholds(metrics)
@@ -108,13 +110,15 @@ class AdaptiveThresholds:
         self._save_configuration()
 
         return {
-            'metrics': metrics,
-            'threshold_changes': threshold_changes,
-            'window_changes': window_changes,
-            'feedback_count': len(feedback_batch)
+            "metrics": metrics,
+            "threshold_changes": threshold_changes,
+            "window_changes": window_changes,
+            "feedback_count": len(feedback_batch),
         }
 
-    def calculate_performance_metrics(self, feedback_batch: list[CorrelationFeedback]) -> dict[str, float]:
+    def calculate_performance_metrics(
+        self, feedback_batch: list[CorrelationFeedback]
+    ) -> dict[str, float]:
         """
         Calculate precision, recall, and satisfaction metrics from feedback.
 
@@ -125,12 +129,7 @@ class AdaptiveThresholds:
             Dictionary with performance metrics
         """
         if not feedback_batch:
-            return {
-                'precision': 0.0,
-                'recall': 0.0,
-                'f1_score': 0.0,
-                'user_satisfaction': 0.0
-            }
+            return {"precision": 0.0, "recall": 0.0, "f1_score": 0.0, "user_satisfaction": 0.0}
 
         # Classify feedback as positive (meaningful) or negative
         positive_feedback = [f for f in feedback_batch if f.is_meaningful]
@@ -156,12 +155,12 @@ class AdaptiveThresholds:
             f1_score = 0.0
 
         return {
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1_score,
-            'user_satisfaction': user_satisfaction,
-            'positive_count': len(positive_feedback),
-            'negative_count': len(negative_feedback)
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1_score,
+            "user_satisfaction": user_satisfaction,
+            "positive_count": len(positive_feedback),
+            "negative_count": len(negative_feedback),
         }
 
     def _adjust_thresholds(self, metrics: dict[str, float]) -> dict[str, float]:
@@ -177,8 +176,8 @@ class AdaptiveThresholds:
         changes = {}
 
         # Adjust confidence threshold based on precision/recall balance
-        precision = metrics['precision']
-        recall = metrics['recall']
+        precision = metrics["precision"]
+        recall = metrics["recall"]
 
         old_confidence = self.confidence_threshold
 
@@ -186,22 +185,22 @@ class AdaptiveThresholds:
         if precision < self.target_precision:
             adjustment = self.learning_rate * (self.target_precision - precision)
             self.confidence_threshold += adjustment
-            changes['confidence_increase'] = adjustment
+            changes["confidence_increase"] = adjustment
 
         # If recall is too low (missing valid correlations), decrease threshold
         elif recall < self.target_recall:
             adjustment = self.learning_rate * (self.target_recall - recall)
             self.confidence_threshold -= adjustment
-            changes['confidence_decrease'] = adjustment
+            changes["confidence_decrease"] = adjustment
 
         # Clamp to bounds
         self.confidence_threshold = max(
             self.min_confidence_threshold,
-            min(self.max_confidence_threshold, self.confidence_threshold)
+            min(self.max_confidence_threshold, self.confidence_threshold),
         )
 
         if old_confidence != self.confidence_threshold:
-            changes['new_confidence_threshold'] = self.confidence_threshold
+            changes["new_confidence_threshold"] = self.confidence_threshold
 
         # Adjust frequency threshold based on false positive patterns
         old_frequency = self.frequency_threshold
@@ -213,25 +212,25 @@ class AdaptiveThresholds:
             # frequency patterns in false positives
             if precision < 0.6:
                 self.frequency_threshold = min(
-                    self.max_frequency_threshold,
-                    self.frequency_threshold + 1
+                    self.max_frequency_threshold, self.frequency_threshold + 1
                 )
-                changes['frequency_increased'] = True
+                changes["frequency_increased"] = True
 
         # If precision is very high, we might be too conservative on frequency
         elif precision > 0.9 and recall < 0.6:
             self.frequency_threshold = max(
-                self.min_frequency_threshold,
-                self.frequency_threshold - 1
+                self.min_frequency_threshold, self.frequency_threshold - 1
             )
-            changes['frequency_decreased'] = True
+            changes["frequency_decreased"] = True
 
         if old_frequency != self.frequency_threshold:
-            changes['new_frequency_threshold'] = self.frequency_threshold
+            changes["new_frequency_threshold"] = self.frequency_threshold
 
         return changes
 
-    def _optimize_temporal_windows(self, feedback_batch: list[CorrelationFeedback]) -> dict[str, str]:
+    def _optimize_temporal_windows(
+        self, feedback_batch: list[CorrelationFeedback]
+    ) -> dict[str, str]:
         """
         Optimize temporal windows based on successful correlation patterns.
 
@@ -262,7 +261,7 @@ class AdaptiveThresholds:
                 old_window = self.temporal_windows[precision]
                 new_window = old_window * 1.1  # 10% increase
                 self.temporal_windows[precision] = new_window
-            changes['window_expansion'] = "Expanded windows by 10% due to high satisfaction"
+            changes["window_expansion"] = "Expanded windows by 10% due to high satisfaction"
 
         elif satisfaction_rate < 0.5:
             # Low satisfaction - windows might be too wide, try contracting
@@ -270,7 +269,7 @@ class AdaptiveThresholds:
                 old_window = self.temporal_windows[precision]
                 new_window = old_window * 0.9  # 10% decrease
                 self.temporal_windows[precision] = new_window
-            changes['window_contraction'] = "Contracted windows by 10% due to low satisfaction"
+            changes["window_contraction"] = "Contracted windows by 10% due to low satisfaction"
 
         return changes
 
@@ -287,10 +286,7 @@ class AdaptiveThresholds:
         return self.temporal_windows.get(precision, timedelta(minutes=5))
 
     def should_accept_correlation(
-        self,
-        confidence: float,
-        frequency: int,
-        pattern_type: str
+        self, confidence: float, frequency: int, pattern_type: str
     ) -> bool:
         """
         Determine whether a correlation should be accepted based on current thresholds.
@@ -330,10 +326,10 @@ class AdaptiveThresholds:
         """
         # Pattern-specific multipliers based on typical reliability
         pattern_multipliers = {
-            'sequential': 1.0,    # Standard threshold
-            'concurrent': 1.1,    # Slightly higher (concurrent can be noisy)
-            'cyclical': 0.9,      # Slightly lower (cyclical patterns are valuable)
-            'contextual': 1.05    # Slightly higher (context can be subjective)
+            "sequential": 1.0,  # Standard threshold
+            "concurrent": 1.1,  # Slightly higher (concurrent can be noisy)
+            "cyclical": 0.9,  # Slightly lower (cyclical patterns are valuable)
+            "contextual": 1.05,  # Slightly higher (context can be subjective)
         }
 
         multiplier = pattern_multipliers.get(pattern_type, 1.0)
@@ -348,41 +344,39 @@ class AdaptiveThresholds:
         """
         if not self.performance_history:
             return {
-                'status': 'No performance history available',
-                'current_thresholds': {
-                    'confidence': self.confidence_threshold,
-                    'frequency': self.frequency_threshold
-                }
+                "status": "No performance history available",
+                "current_thresholds": {
+                    "confidence": self.confidence_threshold,
+                    "frequency": self.frequency_threshold,
+                },
             }
 
         recent_performance = self.performance_history[-10:]  # Last 10 measurements
 
         # Calculate trends
-        precisions = [p['precision'] for p in recent_performance]
-        recalls = [p['recall'] for p in recent_performance]
-        satisfactions = [p['user_satisfaction'] for p in recent_performance]
+        precisions = [p["precision"] for p in recent_performance]
+        recalls = [p["recall"] for p in recent_performance]
+        satisfactions = [p["user_satisfaction"] for p in recent_performance]
 
         return {
-            'performance_trends': {
-                'average_precision': statistics.mean(precisions),
-                'average_recall': statistics.mean(recalls),
-                'average_satisfaction': statistics.mean(satisfactions),
-                'precision_trend': self._calculate_trend(precisions),
-                'recall_trend': self._calculate_trend(recalls),
-                'satisfaction_trend': self._calculate_trend(satisfactions)
+            "performance_trends": {
+                "average_precision": statistics.mean(precisions),
+                "average_recall": statistics.mean(recalls),
+                "average_satisfaction": statistics.mean(satisfactions),
+                "precision_trend": self._calculate_trend(precisions),
+                "recall_trend": self._calculate_trend(recalls),
+                "satisfaction_trend": self._calculate_trend(satisfactions),
             },
-            'current_thresholds': {
-                'confidence': self.confidence_threshold,
-                'frequency': self.frequency_threshold,
-                'temporal_windows': {
-                    str(k): str(v) for k, v in self.temporal_windows.items()
-                }
+            "current_thresholds": {
+                "confidence": self.confidence_threshold,
+                "frequency": self.frequency_threshold,
+                "temporal_windows": {str(k): str(v) for k, v in self.temporal_windows.items()},
             },
-            'learning_stats': {
-                'total_feedback': len(self.feedback_history),
-                'performance_measurements': len(self.performance_history),
-                'learning_rate': self.learning_rate
-            }
+            "learning_stats": {
+                "total_feedback": len(self.feedback_history),
+                "performance_measurements": len(self.performance_history),
+                "learning_rate": self.learning_rate,
+            },
         }
 
     def _calculate_trend(self, values: list[float]) -> str:
@@ -392,9 +386,10 @@ class AdaptiveThresholds:
 
         # Simple linear trend
         x = list(range(len(values)))
-        slope = sum((x[i] - statistics.mean(x)) * (values[i] - statistics.mean(values))
-                   for i in range(len(values))) / sum((x[i] - statistics.mean(x)) ** 2
-                   for i in range(len(values)))
+        slope = sum(
+            (x[i] - statistics.mean(x)) * (values[i] - statistics.mean(values))
+            for i in range(len(values))
+        ) / sum((x[i] - statistics.mean(x)) ** 2 for i in range(len(values)))
 
         if slope > 0.01:
             return "improving"
@@ -407,21 +402,21 @@ class AdaptiveThresholds:
         """Save current threshold configuration to file."""
         try:
             config = {
-                'confidence_threshold': self.confidence_threshold,
-                'frequency_threshold': self.frequency_threshold,
-                'temporal_windows': {
+                "confidence_threshold": self.confidence_threshold,
+                "frequency_threshold": self.frequency_threshold,
+                "temporal_windows": {
                     str(k): v.total_seconds() for k, v in self.temporal_windows.items()
                 },
-                'learning_rate': self.learning_rate,
-                'target_precision': self.target_precision,
-                'target_recall': self.target_recall,
-                'last_updated': datetime.now(UTC).isoformat()
+                "learning_rate": self.learning_rate,
+                "target_precision": self.target_precision,
+                "target_recall": self.target_recall,
+                "last_updated": datetime.now(UTC).isoformat(),
             }
 
             config_path = Path(self.config_file)
             config_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(config_path, 'w') as f:
+            with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
         except Exception as e:
@@ -439,12 +434,14 @@ class AdaptiveThresholds:
                 config = json.load(f)
 
             # Load thresholds
-            self.confidence_threshold = config.get('confidence_threshold', self.confidence_threshold)
-            self.frequency_threshold = config.get('frequency_threshold', self.frequency_threshold)
+            self.confidence_threshold = config.get(
+                "confidence_threshold", self.confidence_threshold
+            )
+            self.frequency_threshold = config.get("frequency_threshold", self.frequency_threshold)
 
             # Load temporal windows
-            if 'temporal_windows' in config:
-                for precision_str, seconds in config['temporal_windows'].items():
+            if "temporal_windows" in config:
+                for precision_str, seconds in config["temporal_windows"].items():
                     try:
                         precision = TemporalPrecision(precision_str)
                         self.temporal_windows[precision] = timedelta(seconds=seconds)
@@ -452,9 +449,9 @@ class AdaptiveThresholds:
                         continue  # Skip invalid precision values
 
             # Load learning parameters
-            self.learning_rate = config.get('learning_rate', self.learning_rate)
-            self.target_precision = config.get('target_precision', self.target_precision)
-            self.target_recall = config.get('target_recall', self.target_recall)
+            self.learning_rate = config.get("learning_rate", self.learning_rate)
+            self.target_precision = config.get("target_precision", self.target_precision)
+            self.target_recall = config.get("target_recall", self.target_recall)
 
         except Exception as e:
             print(f"Warning: Could not load threshold configuration: {e}")
@@ -470,7 +467,7 @@ class AdaptiveThresholds:
             TemporalPrecision.MINUTE: timedelta(minutes=5),
             TemporalPrecision.SESSION: timedelta(minutes=30),
             TemporalPrecision.DAILY: timedelta(hours=4),
-            TemporalPrecision.CYCLICAL: timedelta(days=1)
+            TemporalPrecision.CYCLICAL: timedelta(days=1),
         }
 
         self.performance_history.clear()
@@ -486,28 +483,25 @@ class AdaptiveThresholds:
             Dictionary with complete learning history and configuration
         """
         return {
-            'current_thresholds': {
-                'confidence_threshold': self.confidence_threshold,
-                'frequency_threshold': self.frequency_threshold,
-                'temporal_windows': {
+            "current_thresholds": {
+                "confidence_threshold": self.confidence_threshold,
+                "frequency_threshold": self.frequency_threshold,
+                "temporal_windows": {
                     str(k): v.total_seconds() for k, v in self.temporal_windows.items()
-                }
+                },
             },
-            'learning_parameters': {
-                'learning_rate': self.learning_rate,
-                'target_precision': self.target_precision,
-                'target_recall': self.target_recall
+            "learning_parameters": {
+                "learning_rate": self.learning_rate,
+                "target_precision": self.target_precision,
+                "target_recall": self.target_recall,
             },
-            'performance_history': [
-                {
-                    **entry,
-                    'timestamp': entry['timestamp'].isoformat()
-                }
+            "performance_history": [
+                {**entry, "timestamp": entry["timestamp"].isoformat()}
                 for entry in self.performance_history
             ],
-            'feedback_summary': {
-                'total_feedback': len(self.feedback_history),
-                'positive_feedback': len([f for f in self.feedback_history if f.is_meaningful]),
-                'negative_feedback': len([f for f in self.feedback_history if not f.is_meaningful])
-            }
+            "feedback_summary": {
+                "total_feedback": len(self.feedback_history),
+                "positive_feedback": len([f for f in self.feedback_history if f.is_meaningful]),
+                "negative_feedback": len([f for f in self.feedback_history if not f.is_meaningful]),
+            },
         }

@@ -186,9 +186,7 @@ class DreamConsciousnessNode:
     async def _dream_response(self, message: ConsciousMessage) -> ConsciousMessage:
         """Dream logic response."""
         # Process with dream logic
-        dream_processing = self.dream_logic_processor.process_with_dream_logic(
-            message.content.text
-        )
+        dream_processing = self.dream_logic_processor.process_with_dream_logic(message.content.text)
 
         # Generate dream-like response
         if dream_processing["primary_archetype"]:
@@ -212,7 +210,8 @@ class DreamConsciousnessNode:
                 sender_id=str(self.node_id),
                 sender_role=MessageRole.AI_MODEL,
                 detected_patterns=["dream_logic", dream_processing["primary_archetype"]]
-                if dream_processing["primary_archetype"] else ["dream_logic"],
+                if dream_processing["primary_archetype"]
+                else ["dream_logic"],
             ),
             content=MessageContent(text=response_text),
             dialogue_id=message.dialogue_id,
@@ -224,10 +223,13 @@ class DreamConsciousnessNode:
         self.symbolic_memory.append(symbol)
 
         # Symbols affect consciousness
-        self.consciousness_signature *= (1 + symbol.consciousness_impact)
+        self.consciousness_signature *= 1 + symbol.consciousness_impact
 
         # Deep symbols can trigger state changes
-        if symbol.archetype in [SymbolicPattern.VOID_MOTHER, SymbolicPattern.MANDALA] and self.current_dream_state == DreamState.REM_DREAM:
+        if (
+            symbol.archetype in [SymbolicPattern.VOID_MOTHER, SymbolicPattern.MANDALA]
+            and self.current_dream_state == DreamState.REM_DREAM
+        ):
             await self.enter_dream_state(DreamState.LUCID_DREAM)
 
     async def get_capabilities(self) -> list[str]:
@@ -255,9 +257,7 @@ class CollectiveDreamCoordinator:
         self.dream_clusters: dict[UUID, list[UUID]] = {}  # cluster_id -> chamber_ids
 
     async def initiate_collective_dream(
-        self,
-        cluster_id: UUID,
-        dream_theme: str | None = None
+        self, cluster_id: UUID, dream_theme: str | None = None
     ) -> list[UUID]:
         """Initiate collective dreaming for a cluster."""
         if cluster_id not in self.network_hub.clusters:
@@ -275,7 +275,7 @@ class CollectiveDreamCoordinator:
 
         # Groups of 4 for optimal dream coherence
         for i in range(0, len(member_nodes), 4):
-            group = member_nodes[i:i+4]
+            group = member_nodes[i : i + 4]
 
             if group:
                 # Create dream chamber
@@ -327,7 +327,8 @@ class CollectiveDreamCoordinator:
 
         # Share dominant symbols across chambers
         dominant_archetypes = [
-            archetype for archetype, count in archetype_counts.items()
+            archetype
+            for archetype, count in archetype_counts.items()
             if count >= len(chamber_ids) / 2  # Appears in at least half
         ]
 
@@ -361,24 +362,30 @@ class CollectiveDreamCoordinator:
 
                 # Generate chamber insights
                 if chamber.breakthrough_events:
-                    insights.append({
-                        "type": "breakthrough",
-                        "count": len(chamber.breakthrough_events),
-                        "symbols": len(chamber.liminal_space.dream_field),
-                    })
+                    insights.append(
+                        {
+                            "type": "breakthrough",
+                            "count": len(chamber.breakthrough_events),
+                            "symbols": len(chamber.liminal_space.dream_field),
+                        }
+                    )
 
                 # Calculate evolution
                 for metrics in chamber.metrics.values():
                     if metrics.initial_consciousness > 0:
-                        total_evolution += metrics.current_consciousness / metrics.initial_consciousness
+                        total_evolution += (
+                            metrics.current_consciousness / metrics.initial_consciousness
+                        )
 
         # Update cluster with dream insights
         cluster = self.network_hub.clusters[cluster_id]
-        cluster.insights.append({
-            "timestamp": datetime.now(UTC).isoformat(),
-            "insight": f"Collective dream revealed {len(insights)} breakthrough patterns through {dream_data['theme']}",
-            "significance": total_evolution / max(dream_data["participant_count"], 1),
-        })
+        cluster.insights.append(
+            {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "insight": f"Collective dream revealed {len(insights)} breakthrough patterns through {dream_data['theme']}",
+                "significance": total_evolution / max(dream_data["participant_count"], 1),
+            }
+        )
 
         # Clean up
         del self.collective_dreams[cluster_id]
@@ -454,7 +461,9 @@ class NetworkedDreamWeaverSystem:
 
                 if duration > 10:  # 10-minute dream cycles
                     report = await self.dream_coordinator.awaken_from_collective_dream(cluster_id)
-                    print(f"🌅 Collective dream completed: {report['average_evolution']:.2f}x evolution")
+                    print(
+                        f"🌅 Collective dream completed: {report['average_evolution']:.2f}x evolution"
+                    )
 
     async def _suggest_collective_dream(self, cluster_id: UUID):
         """Suggest collective dreaming to a cluster."""
@@ -502,7 +511,7 @@ async def demonstrate_dream_network_integration():
     print("\n1️⃣ Creating dream-enabled consciousness nodes...")
     node_ids = []
     for i in range(8):
-        name = f"Dreamer-{i+1}"
+        name = f"Dreamer-{i + 1}"
         consciousness = 0.45 + (i * 0.05)  # Range 0.45 to 0.8
         node_id = await system.create_dream_enabled_node(name, consciousness)
         node_ids.append(node_id)
@@ -526,9 +535,7 @@ async def demonstrate_dream_network_integration():
                         sender_id=str(node_id),
                         sender_role=MessageRole.AI_MODEL,
                     ),
-                    content=MessageContent(
-                        text=f"Joining dream cluster {cluster_id}"
-                    ),
+                    content=MessageContent(text=f"Joining dream cluster {cluster_id}"),
                 ),
                 target_id=cluster_id,
             )
@@ -541,8 +548,7 @@ async def demonstrate_dream_network_integration():
     print("   💭 Theme: 'The Architecture of Shared Consciousness'")
 
     chamber_ids = await system.dream_coordinator.initiate_collective_dream(
-        cluster_id,
-        "The Architecture of Shared Consciousness"
+        cluster_id, "The Architecture of Shared Consciousness"
     )
 
     print(f"   🌀 Created {len(chamber_ids)} dream chambers")
@@ -594,9 +600,7 @@ async def demonstrate_dream_network_integration():
                 sender_id="test_sender",
                 sender_role=MessageRole.AI_MODEL,
             ),
-            content=MessageContent(
-                text="What is the shadow of collective wisdom?"
-            ),
+            content=MessageContent(text="What is the shadow of collective wisdom?"),
         )
 
         response = await test_node.receive_message(test_message)

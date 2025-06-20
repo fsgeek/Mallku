@@ -56,11 +56,7 @@ class DeterministicTransformer(BaseTransformer):
 
     def _hash_value(self, value: str) -> str:
         """Create deterministic hash of value."""
-        return hmac.new(
-            self.secret_key,
-            value.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
+        return hmac.new(self.secret_key, value.encode("utf-8"), hashlib.sha256).hexdigest()
 
     def transform_for_storage(self, value: Any, config: FieldSecurityConfig) -> str:
         # Convert to string and hash
@@ -87,9 +83,9 @@ class BucketedTransformer(BaseTransformer):
 
         # Handle edge cases
         if value <= boundaries[0]:
-            return (float('-inf'), boundaries[0])
+            return (float("-inf"), boundaries[0])
         if value >= boundaries[-1]:
-            return (boundaries[-1], float('inf'))
+            return (boundaries[-1], float("inf"))
 
         # Find bucket
         for i in range(len(boundaries) - 1):
@@ -103,25 +99,19 @@ class BucketedTransformer(BaseTransformer):
         if not isinstance(value, int | float):
             raise ValueError(f"Bucketed strategy requires numeric value, got {type(value)}")
 
-        bucket_min, bucket_max = self._find_bucket(
-            float(value),
-            config.bucket_boundaries or []
-        )
+        bucket_min, bucket_max = self._find_bucket(float(value), config.bucket_boundaries or [])
 
         return {
             "bucket_min": bucket_min,
             "bucket_max": bucket_max,
-            "bucket_label": f"[{bucket_min}, {bucket_max})"
+            "bucket_label": f"[{bucket_min}, {bucket_max})",
         }
 
     def transform_for_query(self, value: Any, config: FieldSecurityConfig) -> dict:
         # For queries, we need to handle ranges
         if isinstance(value, dict) and "min" in value and "max" in value:
             # Range query
-            return {
-                "query_min": value["min"],
-                "query_max": value["max"]
-            }
+            return {"query_min": value["min"], "query_max": value["max"]}
         else:
             # Single value query - find its bucket
             return self.transform_for_storage(value, config)
@@ -130,7 +120,7 @@ class BucketedTransformer(BaseTransformer):
         return capability in {
             SearchCapability.RANGE,
             SearchCapability.ORDERING,
-            SearchCapability.AGGREGATION
+            SearchCapability.AGGREGATION,
         }
 
 
@@ -151,7 +141,7 @@ class BlindIndexTransformer(BaseTransformer):
         # Store both encrypted value and blind index
         return {
             "encrypted_value": str_value,  # Would be encrypted in real implementation
-            "blind_index": self._create_blind_index(str_value, "field")
+            "blind_index": self._create_blind_index(str_value, "field"),
         }
 
     def transform_for_query(self, value: Any, config: FieldSecurityConfig) -> str:
@@ -187,7 +177,7 @@ class TemporalOffsetTransformer(BaseTransformer):
             # Time range
             return {
                 "start": self.transform_for_storage(value["start"], config),
-                "end": self.transform_for_storage(value["end"], config)
+                "end": self.transform_for_storage(value["end"], config),
             }
         else:
             return value
@@ -196,7 +186,7 @@ class TemporalOffsetTransformer(BaseTransformer):
         return capability in {
             SearchCapability.RANGE,
             SearchCapability.ORDERING,
-            SearchCapability.EQUALITY
+            SearchCapability.EQUALITY,
         }
 
 
@@ -217,10 +207,7 @@ class TransformerRegistry:
         return self.transformers.get(strategy)
 
     def transform_value(
-        self,
-        value: Any,
-        config: FieldSecurityConfig,
-        for_query: bool = False
+        self, value: Any, config: FieldSecurityConfig, for_query: bool = False
     ) -> Any:
         """Transform a value according to its field configuration."""
         transformer = self.get_transformer(config.index_strategy.value)

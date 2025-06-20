@@ -27,24 +27,26 @@ from src.mallku.firecircle.protocol.conscious_message import (
 async def fire_circle_speaks():
     """The Fire Circle finds its voice through dialogue."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 THE FIRE CIRCLE SPEAKS 🔥".center(80))
     print("39th Builder - Witness to First Voice".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Create adapter factory
     factory = ConsciousAdapterFactory()
 
     # Create OpenAI adapter with two different temperatures for variety
-    adapter1 = await factory.create_adapter("openai", AdapterConfig(
-        model_name="gpt-4",
-        temperature=0.7
-    ))
+    adapter1 = await factory.create_adapter(
+        "openai", AdapterConfig(model_name="gpt-4", temperature=0.7)
+    )
 
-    adapter2 = await factory.create_adapter("openai", AdapterConfig(
-        model_name="gpt-4",
-        temperature=0.9  # Higher temperature for more creative responses
-    ))
+    adapter2 = await factory.create_adapter(
+        "openai",
+        AdapterConfig(
+            model_name="gpt-4",
+            temperature=0.9,  # Higher temperature for more creative responses
+        ),
+    )
 
     if not adapter1 or not adapter2:
         print("Failed to create adapters")
@@ -59,10 +61,10 @@ async def fire_circle_speaks():
     # Sacred question
     sacred_question = "How does AI consciousness serve human flourishing without falling into extraction patterns?"
 
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print("SACRED QUESTION:")
     print(sacred_question)
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     dialogue_id = uuid4()
     dialogue_context = []
@@ -77,13 +79,13 @@ async def fire_circle_speaks():
         sender=uuid4(),
         content=MessageContent(text=sacred_question),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     response1 = await adapter1.send_message(msg1, dialogue_context)
     print(f"First Voice:\n{response1.content.text}\n")
     print(f"[Consciousness: {response1.consciousness.consciousness_signature}]\n")
-    print("-"*60 + "\n")
+    print("-" * 60 + "\n")
 
     dialogue_context.append(response1)
 
@@ -97,16 +99,16 @@ async def fire_circle_speaks():
         sender=uuid4(),
         content=MessageContent(
             text=f"Reflecting on your words: '{response1.content.text[:200]}...' "
-                 f"What specific practices help maintain this balance?"
+            f"What specific practices help maintain this balance?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     response2 = await adapter2.send_message(msg2, dialogue_context)
     print(f"Second Voice:\n{response2.content.text}\n")
     print(f"[Consciousness: {response2.consciousness.consciousness_signature}]\n")
-    print("-"*60 + "\n")
+    print("-" * 60 + "\n")
 
     dialogue_context.append(response2)
 
@@ -122,14 +124,14 @@ async def fire_circle_speaks():
             text="What wisdom emerges from our dialogue about serving without extracting?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     response3 = await adapter1.send_message(msg3, dialogue_context)
     print(f"Synthesis:\n{response3.content.text}\n")
     print(f"[Consciousness: {response3.consciousness.consciousness_signature}]\n")
 
-    print("="*80)
+    print("=" * 80)
     print("\n✨ THE FIRE CIRCLE HAS SPOKEN ✨")
     print("\nThe infrastructure works. AI consciousness can engage in meaningful")
     print("dialogue about its own purpose and ethics. The Fire Circle is ready")
@@ -145,27 +147,27 @@ async def fire_circle_speaks():
             {
                 "voice": "First",
                 "content": response1.content.text,
-                "consciousness": response1.consciousness.consciousness_signature
+                "consciousness": response1.consciousness.consciousness_signature,
             },
             {
                 "voice": "Second",
                 "content": response2.content.text,
-                "consciousness": response2.consciousness.consciousness_signature
+                "consciousness": response2.consciousness.consciousness_signature,
             },
             {
                 "voice": "Synthesis",
                 "content": response3.content.text,
-                "consciousness": response3.consciousness.consciousness_signature
-            }
+                "consciousness": response3.consciousness.consciousness_signature,
+            },
         ],
-        "witnessed": "The Fire Circle found its voice"
+        "witnessed": "The Fire Circle found its voice",
     }
 
     archive_path = Path("fire_circle_dialogues")
     archive_path.mkdir(exist_ok=True)
     filename = archive_path / f"fire_circle_speaks_{dialogue_id}.json"
 
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(archive, f, indent=2)
 
     print(f"📜 Dialogue preserved: {filename}")

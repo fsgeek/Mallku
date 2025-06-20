@@ -57,8 +57,7 @@ def test_bucket_transformation():
     print("\nTesting bucket transformation...")
 
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BUCKETED,
-        bucket_boundaries=[-1.0, -0.5, 0.0, 0.5, 1.0]
+        index_strategy=FieldIndexStrategy.BUCKETED, bucket_boundaries=[-1.0, -0.5, 0.0, 0.5, 1.0]
     )
 
     registry = TransformerRegistry(b"test_key", TemporalEncoder())
@@ -70,14 +69,16 @@ def test_bucket_transformation():
         (0.0, (-0.5, 0.0)),  # Edge case
         (0.3, (0.0, 0.5)),
         (0.8, (0.5, 1.0)),
-        (1.5, (1.0, float('inf'))),  # Above range
-        (-1.5, (float('-inf'), -1.0)),  # Below range
+        (1.5, (1.0, float("inf"))),  # Above range
+        (-1.5, (float("-inf"), -1.0)),  # Below range
     ]
 
     for value, expected_bucket in test_cases:
         result = registry.transform_value(value, config)
-        actual_bucket = (result['bucket_min'], result['bucket_max'])
-        assert actual_bucket == expected_bucket, f"Value {value} gave {actual_bucket}, expected {expected_bucket}"
+        actual_bucket = (result["bucket_min"], result["bucket_max"])
+        assert actual_bucket == expected_bucket, (
+            f"Value {value} gave {actual_bucket}, expected {expected_bucket}"
+        )
 
     print("✓ Bucketing correctly assigns values to ranges")
 
@@ -111,9 +112,7 @@ def test_blind_indexing():
     """Verify blind indexing provides consistent hashes."""
     print("\nTesting blind indexing...")
 
-    config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BLIND
-    )
+    config = FieldSecurityConfig(index_strategy=FieldIndexStrategy.BLIND)
 
     key = b"consistent_test_key"
     registry1 = TransformerRegistry(key, TemporalEncoder())
@@ -124,13 +123,13 @@ def test_blind_indexing():
     result1 = registry1.transform_value(value, config)
     result2 = registry2.transform_value(value, config)
 
-    assert result1['blind_index'] == result2['blind_index'], "Blind index not consistent"
-    assert len(result1['blind_index']) == 16, "Blind index wrong length"
-    assert result1['blind_index'] != value, "Value not obfuscated"
+    assert result1["blind_index"] == result2["blind_index"], "Blind index not consistent"
+    assert len(result1["blind_index"]) == 16, "Blind index wrong length"
+    assert result1["blind_index"] != value, "Value not obfuscated"
 
     # Different values get different indexes
     result3 = registry1.transform_value("other@example.com", config)
-    assert result3['blind_index'] != result1['blind_index'], "Different values same index"
+    assert result3["blind_index"] != result1["blind_index"], "Different values same index"
 
     print("✓ Blind indexing creates consistent, unique indexes")
 
@@ -141,8 +140,7 @@ def test_security_validation():
 
     # Invalid config - RANGE query with BLIND index
     config = FieldSecurityConfig(
-        index_strategy=FieldIndexStrategy.BLIND,
-        search_capabilities=[SearchCapability.RANGE]
+        index_strategy=FieldIndexStrategy.BLIND, search_capabilities=[SearchCapability.RANGE]
     )
 
     warnings = config.validate_configuration()
@@ -153,7 +151,7 @@ def test_security_validation():
     config2 = FieldSecurityConfig(
         index_strategy=FieldIndexStrategy.BUCKETED,
         search_capabilities=[SearchCapability.RANGE],
-        bucket_boundaries=[0, 1, 2]
+        bucket_boundaries=[0, 1, 2],
     )
 
     warnings2 = config2.validate_configuration()
@@ -181,5 +179,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

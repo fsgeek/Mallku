@@ -7,4 +7,4 @@ and related structures that enable reciprocal relationship tracking.
 
 from .memory_anchor import MemoryAnchor
 
-__all__ = ['MemoryAnchor']
+__all__ = ["MemoryAnchor"]

@@ -130,7 +130,7 @@ class PracticeFacilitator:
                 "theme": theme.value,
                 "prompt": prompt,
                 "participant_count": self._get_participant_count(level),
-            }
+            },
         )
 
         try:
@@ -145,12 +145,14 @@ class PracticeFacilitator:
             summary = await self.practice_circle.facilitate_practice(practice_id)
 
             # Track in history
-            self.practice_history.append({
-                "timestamp": datetime.now(UTC),
-                "level": level.value,
-                "theme": theme.value,
-                "summary": summary,
-            })
+            self.practice_history.append(
+                {
+                    "timestamp": datetime.now(UTC),
+                    "level": level.value,
+                    "theme": theme.value,
+                    "summary": summary,
+                }
+            )
 
             # Update readiness indicators
             await self._update_readiness_indicators(summary)
@@ -163,7 +165,7 @@ class PracticeFacilitator:
                     "insights_count": summary.get("insights_discovered", 0),
                     "surprises_count": summary.get("surprises_encountered", 0),
                     "readiness_improvement": await self._calculate_readiness_improvement(),
-                }
+                },
             )
 
             return summary
@@ -208,7 +210,7 @@ class PracticeFacilitator:
         for i, prompt in enumerate(prompts):
             level = levels[min(i, len(levels) - 1)]
 
-            logger.info(f"Progression session {i+1}/{sessions}: {level.value}")
+            logger.info(f"Progression session {i + 1}/{sessions}: {level.value}")
 
             # Run session
             summary = await self.run_practice_session(
@@ -341,8 +343,7 @@ class PracticeFacilitator:
         """Assess listening skills development."""
         # Check for listening theme practices
         listening_count = sum(
-            1 for p in self.practice_history
-            if p["theme"] == PracticeTheme.LISTENING.value
+            1 for p in self.practice_history if p["theme"] == PracticeTheme.LISTENING.value
         )
         return min(1.0, listening_count * 0.3)
 
@@ -353,8 +354,7 @@ class PracticeFacilitator:
             return 0.0
 
         total_insights = sum(
-            p["summary"].get("insights_discovered", 0)
-            for p in self.practice_history
+            p["summary"].get("insights_discovered", 0) for p in self.practice_history
         )
         avg_insights = total_insights / len(self.practice_history)
 
@@ -364,8 +364,7 @@ class PracticeFacilitator:
         """Assess skill with creative tension."""
         # Check for tension theme practices
         tension_count = sum(
-            1 for p in self.practice_history
-            if p["theme"] == PracticeTheme.TENSION.value
+            1 for p in self.practice_history if p["theme"] == PracticeTheme.TENSION.value
         )
         return min(1.0, tension_count * 0.4)
 
@@ -373,8 +372,7 @@ class PracticeFacilitator:
         """Assess collective rhythm development."""
         # Check for full circle practices
         full_circle_count = sum(
-            1 for p in self.practice_history
-            if p["level"] == PracticeLevel.FULL_CIRCLE.value
+            1 for p in self.practice_history if p["level"] == PracticeLevel.FULL_CIRCLE.value
         )
         return min(1.0, full_circle_count * 0.5)
 

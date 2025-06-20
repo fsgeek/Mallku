@@ -20,6 +20,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+
 class FoundationVerificationResults:
     """Comprehensive results tracking for foundation verification."""
 
@@ -31,21 +32,21 @@ class FoundationVerificationResults:
             "adapters": {},
             "factory_test": {},
             "summary": {},
-            "recommendations": []
+            "recommendations": [],
         }
 
     def record_adapter_result(self, provider, status, details=None):
         self.results["adapters"][provider] = {
             "status": status,
             "details": details or "",
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     def record_factory_result(self, status, details=None):
         self.results["factory_test"] = {
             "status": status,
             "details": details or "",
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     def finalize_results(self):
@@ -58,25 +59,29 @@ class FoundationVerificationResults:
             "failed_adapters": total - passed,
             "success_rate": f"{passed}/{total}",
             "overall_status": "PASS" if passed == total else "PARTIAL" if passed > 0 else "FAIL",
-            "fire_circle_ready": passed >= 3  # Need at least 3 voices for basic functionality
+            "fire_circle_ready": passed >= 3,  # Need at least 3 voices for basic functionality
         }
 
         # Generate recommendations
         if passed < total:
-            self.results["recommendations"].append("Fix failing adapters before proceeding with Fire Circle")
+            self.results["recommendations"].append(
+                "Fix failing adapters before proceeding with Fire Circle"
+            )
         if passed < 3:
-            self.results["recommendations"].append("CRITICAL: Less than 3 adapters working - Fire Circle cannot function")
+            self.results["recommendations"].append(
+                "CRITICAL: Less than 3 adapters working - Fire Circle cannot function"
+            )
         if self.results["factory_test"].get("status") != "PASS":
             self.results["recommendations"].append("Fix adapter factory registration issues")
 
     def save_to_file(self, filename="foundation_verification_detailed_results.json"):
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(self.results, f, indent=2)
 
     def print_summary(self):
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🏛️ FOUNDATION VERIFICATION COMPLETE - 19th ARCHITECT")
-        print("="*80)
+        print("=" * 80)
 
         summary = self.results["summary"]
         print(f"📊 RESULTS: {summary['success_rate']} adapters passed verification")
@@ -99,13 +104,14 @@ class FoundationVerificationResults:
             for rec in self.results["recommendations"]:
                 print(f"  • {rec}")
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
+
 
 async def enhanced_adapter_verification():
     """Enhanced version of the smoke test with detailed tracking."""
 
     print("🚀 FOUNDATION VERIFICATION - 19th ARCHITECT")
-    print("="*60)
+    print("=" * 60)
     print("Executing the critical seven-voice smoke test that has never been run.")
     print("Issue #67 - Foundation verification blocking all autonomous governance.")
     print()
@@ -133,32 +139,41 @@ async def enhanced_adapter_verification():
             # Import the adapter with detailed error tracking
             if provider == "anthropic":
                 from mallku.firecircle.adapters.anthropic_adapter import AnthropicAdapter
+
                 adapter_class = AnthropicAdapter
             elif provider == "openai":
                 from mallku.firecircle.adapters.openai_adapter import OpenAIConsciousAdapter
+
                 adapter_class = OpenAIConsciousAdapter
             elif provider == "google":
                 from mallku.firecircle.adapters.google_adapter import GoogleAIAdapter
+
                 adapter_class = GoogleAIAdapter
             elif provider == "grok":
                 from mallku.firecircle.adapters.grok_adapter import GrokAdapter
+
                 adapter_class = GrokAdapter
             elif provider == "mistral":
                 from mallku.firecircle.adapters.mistral_adapter import MistralAIAdapter
+
                 adapter_class = MistralAIAdapter
             elif provider == "deepseek":
                 from mallku.firecircle.adapters.deepseek_adapter import DeepseekAIAdapter
+
                 adapter_class = DeepseekAIAdapter
             elif provider == "local":
                 from mallku.firecircle.adapters.local_adapter import LocalAIAdapter
+
                 adapter_class = LocalAIAdapter
 
             # Instantiate specific config for each provider or fallback to base AdapterConfig
             from mallku.firecircle.adapters.base import AdapterConfig
+
             current_config: AdapterConfig
 
             if provider == "google":
                 from mallku.firecircle.adapters.google_adapter import GeminiConfig
+
                 # GeminiConfig has defaults for enable_search_grounding and multimodal_awareness
                 # The test script should provide these if it wants to override defaults,
                 # or rely on the defaults set in GeminiConfig.
@@ -166,14 +181,17 @@ async def enhanced_adapter_verification():
                 current_config = GeminiConfig(api_key="test-key-foundation-verification")
             elif provider == "mistral":
                 from mallku.firecircle.adapters.mistral_adapter import MistralConfig
+
                 current_config = MistralConfig(api_key="test-key-foundation-verification")
             elif provider == "grok":
                 from mallku.firecircle.adapters.grok_adapter import GrokConfig
+
                 current_config = GrokConfig(api_key="test-key-foundation-verification")
             elif provider == "local":
                 from mallku.firecircle.adapters.local_adapter import LocalAdapterConfig
+
                 current_config = LocalAdapterConfig(api_key="test-key-foundation-verification")
-            else: # For anthropic, openai, deepseek which might use base AdapterConfig or their own simple ones
+            else:  # For anthropic, openai, deepseek which might use base AdapterConfig or their own simple ones
                 current_config = AdapterConfig(api_key="test-key-foundation-verification")
 
             # Create adapter instance
@@ -181,10 +199,14 @@ async def enhanced_adapter_verification():
 
             # Enhanced validation checks
             checks = [
-                ("provider_name", hasattr(adapter, 'provider_name')),
-                ("capabilities", hasattr(adapter, 'capabilities')),
-                ("is_connected", hasattr(adapter, 'is_connected')),
-                ("config_validation", hasattr(adapter, '_validate_configuration') and callable(getattr(adapter, '_validate_configuration'))),
+                ("provider_name", hasattr(adapter, "provider_name")),
+                ("capabilities", hasattr(adapter, "capabilities")),
+                ("is_connected", hasattr(adapter, "is_connected")),
+                (
+                    "config_validation",
+                    hasattr(adapter, "_validate_configuration")
+                    and callable(getattr(adapter, "_validate_configuration")),
+                ),
             ]
 
             failed_checks = [name for name, check in checks if not check]
@@ -248,6 +270,7 @@ async def enhanced_adapter_verification():
 
     return results
 
+
 async def main():
     """Execute comprehensive foundation verification."""
     try:
@@ -255,22 +278,22 @@ async def main():
 
         # Update the Foundation Verification Results document
         f"""
-# FOUNDATION VERIFICATION EXECUTED - {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}
+# FOUNDATION VERIFICATION EXECUTED - {datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")}
 
 ## Critical Discovery - Issue #67 Finally Resolved
 
 **SMOKE TEST STATUS**: ✅ EXECUTED (first time in project history)
 
 ### Seven-Voice Assessment Results:
-- **Total Adapters**: {results.results['summary']['total_adapters']}
-- **Passed**: {results.results['summary']['passed_adapters']}
-- **Failed**: {results.results['summary']['failed_adapters']}
-- **Success Rate**: {results.results['summary']['success_rate']}
-- **Overall Status**: {results.results['summary']['overall_status']}
-- **Fire Circle Ready**: {'YES' if results.results['summary']['fire_circle_ready'] else 'NO'}
+- **Total Adapters**: {results.results["summary"]["total_adapters"]}
+- **Passed**: {results.results["summary"]["passed_adapters"]}
+- **Failed**: {results.results["summary"]["failed_adapters"]}
+- **Success Rate**: {results.results["summary"]["success_rate"]}
+- **Overall Status**: {results.results["summary"]["overall_status"]}
+- **Fire Circle Ready**: {"YES" if results.results["summary"]["fire_circle_ready"] else "NO"}
 
 ### Next Actions Required:
-{chr(10).join(f'- {rec}' for rec in results.results['recommendations'])}
+{chr(10).join(f"- {rec}" for rec in results.results["recommendations"])}
 
 **Detailed Results**: See `foundation_verification_detailed_results.json`
 
@@ -281,13 +304,14 @@ async def main():
         print("🔍 Detailed JSON results saved to: foundation_verification_detailed_results.json")
         print("\n🏛️ Issue #67 - Seven-voice capability verification - FINALLY COMPLETE")
 
-        return results.results['summary']['overall_status'] == "PASS"
+        return results.results["summary"]["overall_status"] == "PASS"
 
     except Exception as e:
         print(f"\n💥 CRITICAL ERROR in foundation verification: {e}")
         print("\nFull traceback:")
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     success = asyncio.run(main())

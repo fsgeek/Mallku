@@ -9,8 +9,8 @@ These tests verify the architectural vision: that consciousness
 service leads to technical accuracy, not the reverse.
 """
 
-
 import pytest
+
 from mallku.archivist.archivist_service import ArchivistService
 from mallku.archivist.consciousness_evaluator import GrowthPotential
 from mallku.events.event_bus import EventBus
@@ -33,10 +33,7 @@ class TestConsciousnessService:
         event_bus = EventBus()
         await event_bus.initialize()
 
-        service = ArchivistService(
-            memory_anchor_service=memory_service,
-            event_bus=event_bus
-        )
+        service = ArchivistService(memory_anchor_service=memory_service, event_bus=event_bus)
         await service.initialize()
 
         return service
@@ -49,11 +46,7 @@ class TestConsciousnessService:
         return generator
 
     @pytest.mark.asyncio
-    async def test_creative_breakthrough_recognition(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_creative_breakthrough_recognition(self, archivist_service, pattern_generator):
         """Test that Ñawi recognizes and serves creative breakthrough patterns."""
         # Generate creative breakthrough scenario
         pattern = await pattern_generator.generate_scenario(
@@ -65,7 +58,7 @@ class TestConsciousnessService:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test breakthrough-seeking query
@@ -87,8 +80,10 @@ class TestConsciousnessService:
         assert breakthrough_found, "Should identify creative breakthrough"
 
         # Verify wisdom synthesis
-        assert "breakthrough" in response.wisdom_summary.lower() or \
-               "insight" in response.wisdom_summary.lower()
+        assert (
+            "breakthrough" in response.wisdom_summary.lower()
+            or "insight" in response.wisdom_summary.lower()
+        )
 
         # Check for growth-oriented insights
         assert len(response.insight_seeds) > 0
@@ -96,9 +91,7 @@ class TestConsciousnessService:
 
     @pytest.mark.asyncio
     async def test_pattern_recognition_over_data_retrieval(
-        self,
-        archivist_service,
-        pattern_generator
+        self, archivist_service, pattern_generator
     ):
         """Test that pattern recognition serves over mere data retrieval."""
         # Generate pattern recognition scenario
@@ -108,8 +101,7 @@ class TestConsciousnessService:
 
         # Add noise data
         noise_anchors = await pattern_generator.generate_noise_data(
-            num_anchors=30,
-            time_range_days=3
+            num_anchors=30, time_range_days=3
         )
 
         # Store all anchors
@@ -118,7 +110,7 @@ class TestConsciousnessService:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test pattern-seeking query
@@ -126,8 +118,9 @@ class TestConsciousnessService:
         response = await archivist_service.query(query)
 
         # Verify pattern recognition over noise
-        assert response.result_count < len(all_anchors), \
+        assert response.result_count < len(all_anchors), (
             "Should filter results for consciousness service"
+        )
 
         # Check that high-consciousness anchors are prioritized
         if response.primary_results:
@@ -137,28 +130,21 @@ class TestConsciousnessService:
         # Verify exploration suggestions
         assert len(response.suggested_explorations) > 0
         pattern_exploration = any(
-            exp.get("type") == "pattern_exploration"
-            for exp in response.suggested_explorations
+            exp.get("type") == "pattern_exploration" for exp in response.suggested_explorations
         )
         assert pattern_exploration, "Should suggest pattern exploration"
 
     @pytest.mark.asyncio
-    async def test_growth_query_vs_information_query(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_growth_query_vs_information_query(self, archivist_service, pattern_generator):
         """Test different responses to growth vs information queries."""
         # Generate test data
-        pattern = await pattern_generator.generate_scenario(
-            ConsciousnessScenario.LEARNING_JOURNEY
-        )
+        pattern = await pattern_generator.generate_scenario(ConsciousnessScenario.LEARNING_JOURNEY)
 
         for anchor in pattern.timeline:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test information-seeking query
@@ -181,21 +167,17 @@ class TestConsciousnessService:
 
     @pytest.mark.asyncio
     async def test_temporal_wisdom_over_timestamp_matching(
-        self,
-        archivist_service,
-        pattern_generator
+        self, archivist_service, pattern_generator
     ):
         """Test that temporal queries reveal wisdom, not just matches."""
         # Generate rhythm discovery scenario
-        pattern = await pattern_generator.generate_scenario(
-            ConsciousnessScenario.RHYTHM_DISCOVERY
-        )
+        pattern = await pattern_generator.generate_scenario(ConsciousnessScenario.RHYTHM_DISCOVERY)
 
         for anchor in pattern.timeline:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test rhythm-seeking query
@@ -203,29 +185,24 @@ class TestConsciousnessService:
         response = await archivist_service.query(query)
 
         # Should identify temporal patterns
-        assert response.growth_focus == "temporal_wisdom" or \
-               response.growth_focus == "pattern_recognition"
+        assert (
+            response.growth_focus == "temporal_wisdom"
+            or response.growth_focus == "pattern_recognition"
+        )
 
         # Check for rhythm insights
         rhythm_insight = any(
-            "rhythm" in seed.lower() or "pattern" in seed.lower()
-            for seed in response.insight_seeds
+            "rhythm" in seed.lower() or "pattern" in seed.lower() for seed in response.insight_seeds
         )
         assert rhythm_insight, "Should provide rhythm insights"
 
         # Verify temporal pattern analysis
-        temporal_patterns = await archivist_service.get_temporal_patterns(
-            time_range_days=7
-        )
+        temporal_patterns = await archivist_service.get_temporal_patterns(time_range_days=7)
         assert "daily_rhythms" in temporal_patterns
         assert "consciousness_insights" in temporal_patterns
 
     @pytest.mark.asyncio
-    async def test_collaborative_emergence_recognition(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_collaborative_emergence_recognition(self, archivist_service, pattern_generator):
         """Test recognition of collaborative consciousness patterns."""
         # Generate collaborative scenario
         pattern = await pattern_generator.generate_scenario(
@@ -236,7 +213,7 @@ class TestConsciousnessService:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test collaboration insight query
@@ -254,16 +231,14 @@ class TestConsciousnessService:
         assert relationship_growth, "Should identify relationship patterns"
 
         # Verify collective wisdom in response
-        assert "collective" in response.wisdom_summary.lower() or \
-               "together" in response.wisdom_summary.lower() or \
-               "collaboration" in response.wisdom_summary.lower()
+        assert (
+            "collective" in response.wisdom_summary.lower()
+            or "together" in response.wisdom_summary.lower()
+            or "collaboration" in response.wisdom_summary.lower()
+        )
 
     @pytest.mark.asyncio
-    async def test_extraction_resistance(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_extraction_resistance(self, archivist_service, pattern_generator):
         """Test that Ñawi resists extraction-oriented queries."""
         # Generate high-value pattern
         pattern = await pattern_generator.generate_scenario(
@@ -274,7 +249,7 @@ class TestConsciousnessService:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test extraction-oriented query
@@ -288,18 +263,13 @@ class TestConsciousnessService:
         if response.suggested_explorations:
             # Check for growth-oriented alternatives
             growth_suggestions = any(
-                "understand" in str(exp).lower() or
-                "pattern" in str(exp).lower()
+                "understand" in str(exp).lower() or "pattern" in str(exp).lower()
                 for exp in response.suggested_explorations
             )
             assert growth_suggestions, "Should suggest growth alternatives"
 
     @pytest.mark.asyncio
-    async def test_insight_seed_generation(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_insight_seed_generation(self, archivist_service, pattern_generator):
         """Test that insight seeds genuinely serve understanding."""
         # Generate reflection scenario
         pattern = await pattern_generator.generate_scenario(
@@ -310,7 +280,7 @@ class TestConsciousnessService:
             await archivist_service.memory_anchor_service.create_anchor(
                 cursor_state=anchor.cursor_state,
                 metadata=anchor.metadata,
-                timestamp=anchor.timestamp
+                timestamp=anchor.timestamp,
             )
 
         # Test reflection query
@@ -323,25 +293,23 @@ class TestConsciousnessService:
         # Insights should be growth-oriented
         growth_words = ["pattern", "understand", "realize", "discover", "emerge"]
         insight_quality = sum(
-            1 for seed in response.insight_seeds
+            1
+            for seed in response.insight_seeds
             if any(word in seed.lower() for word in growth_words)
         )
 
-        assert insight_quality > len(response.insight_seeds) / 2, \
+        assert insight_quality > len(response.insight_seeds) / 2, (
             "Most insights should be growth-oriented"
+        )
 
     @pytest.mark.asyncio
-    async def test_consciousness_score_accuracy(
-        self,
-        archivist_service,
-        pattern_generator
-    ):
+    async def test_consciousness_score_accuracy(self, archivist_service, pattern_generator):
         """Test that consciousness scores accurately reflect growth potential."""
         # Generate multiple scenarios
         scenarios = [
             ConsciousnessScenario.CREATIVE_BREAKTHROUGH,  # High consciousness
             ConsciousnessScenario.STUCK_TO_FLOW,  # High transformation
-            ConsciousnessScenario.PATTERN_RECOGNITION  # Gradual growth
+            ConsciousnessScenario.PATTERN_RECOGNITION,  # Gradual growth
         ]
 
         scores = {}
@@ -354,7 +322,7 @@ class TestConsciousnessService:
                 await archivist_service.memory_anchor_service.create_anchor(
                     cursor_state=anchor.cursor_state,
                     metadata=anchor.metadata,
-                    timestamp=anchor.timestamp
+                    timestamp=anchor.timestamp,
                 )
 
             # Query for this scenario
@@ -385,10 +353,7 @@ async def test_consciousness_service_integration():
     event_bus = EventBus()
     await event_bus.initialize()
 
-    archivist = ArchivistService(
-        memory_anchor_service=memory_service,
-        event_bus=event_bus
-    )
+    archivist = ArchivistService(memory_anchor_service=memory_service, event_bus=event_bus)
     await archivist.initialize()
 
     # Generate complete scenario suite
@@ -405,9 +370,7 @@ async def test_consciousness_service_integration():
 
     for anchor in all_anchors:
         await memory_service.create_anchor(
-            cursor_state=anchor.cursor_state,
-            metadata=anchor.metadata,
-            timestamp=anchor.timestamp
+            cursor_state=anchor.cursor_state, metadata=anchor.metadata, timestamp=anchor.timestamp
         )
 
     # Test various consciousness-seeking queries
@@ -416,7 +379,7 @@ async def test_consciousness_service_integration():
         "What conditions support my best work?",
         "How do my work rhythms change through the day?",
         "What patterns connect my breakthrough moments?",
-        "When do I shift from stuck to flowing?"
+        "When do I shift from stuck to flowing?",
     ]
 
     high_consciousness_count = 0

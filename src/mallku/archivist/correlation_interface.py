@@ -39,7 +39,7 @@ class CorrelationResult:
         correlation_type: CorrelationType,
         correlation_strength: float,
         context_signature: str | None = None,
-        related_anchors: list[MemoryAnchor] | None = None
+        related_anchors: list[MemoryAnchor] | None = None,
     ):
         self.anchor = anchor
         self.correlation_type = correlation_type
@@ -60,8 +60,8 @@ class CorrelationResult:
         timestamps = [a.timestamp for a in self.related_anchors]
         if len(timestamps) >= 3:
             time_diffs = [
-                (timestamps[i+1] - timestamps[i]).total_seconds()
-                for i in range(len(timestamps)-1)
+                (timestamps[i + 1] - timestamps[i]).total_seconds()
+                for i in range(len(timestamps) - 1)
             ]
             avg_diff = sum(time_diffs) / len(time_diffs)
 
@@ -99,7 +99,7 @@ class ArchivistCorrelationInterface(AsyncBase):
         self,
         memory_anchor_service: MemoryAnchorService | None = None,
         query_service: MemoryAnchorQueryService | None = None,
-        correlation_engine: CorrelationEngine | None = None
+        correlation_engine: CorrelationEngine | None = None,
     ):
         super().__init__()
         self.memory_anchor_service = memory_anchor_service
@@ -129,10 +129,7 @@ class ArchivistCorrelationInterface(AsyncBase):
             self.correlation_engine = CorrelationEngine()
             await self.correlation_engine.initialize()
 
-    async def search_by_intent(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def search_by_intent(self, intent: QueryIntent) -> list[CorrelationResult]:
         """
         Search memory anchors based on interpreted query intent.
 
@@ -145,9 +142,7 @@ class ArchivistCorrelationInterface(AsyncBase):
         Returns:
             Correlated memory anchors with relationships
         """
-        self.logger.info(
-            f"Searching by intent: {intent.primary_dimension.value}"
-        )
+        self.logger.info(f"Searching by intent: {intent.primary_dimension.value}")
 
         # Route based on primary dimension
         if intent.primary_dimension == QueryDimension.TEMPORAL:
@@ -179,10 +174,7 @@ class ArchivistCorrelationInterface(AsyncBase):
 
         return enhanced_results
 
-    async def find_temporal_patterns(
-        self,
-        anchors: list[MemoryAnchor]
-    ) -> dict[str, Any]:
+    async def find_temporal_patterns(self, anchors: list[MemoryAnchor]) -> dict[str, Any]:
         """
         Discover temporal patterns within a set of memory anchors.
 
@@ -199,7 +191,7 @@ class ArchivistCorrelationInterface(AsyncBase):
             "daily_rhythms": [],
             "work_sessions": [],
             "creative_bursts": [],
-            "collaboration_periods": []
+            "collaboration_periods": [],
         }
 
         # Sort anchors by timestamp
@@ -213,14 +205,9 @@ class ArchivistCorrelationInterface(AsyncBase):
 
         # Find peak hours
         if hour_distribution:
-            peak_hours = sorted(
-                hour_distribution.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:3]
+            peak_hours = sorted(hour_distribution.items(), key=lambda x: x[1], reverse=True)[:3]
             patterns["daily_rhythms"] = [
-                {"hour": hour, "frequency": freq}
-                for hour, freq in peak_hours
+                {"hour": hour, "frequency": freq} for hour, freq in peak_hours
             ]
 
         # Detect work sessions (clusters of activity)
@@ -231,44 +218,44 @@ class ArchivistCorrelationInterface(AsyncBase):
             if not current_session:
                 current_session = [anchor]
             else:
-                time_gap = (
-                    anchor.timestamp - current_session[-1].timestamp
-                ).total_seconds()
+                time_gap = (anchor.timestamp - current_session[-1].timestamp).total_seconds()
 
                 if time_gap <= session_threshold:
                     current_session.append(anchor)
                 else:
                     # Session ended
                     if len(current_session) >= 3:
-                        patterns["work_sessions"].append({
-                            "start": current_session[0].timestamp,
-                            "end": current_session[-1].timestamp,
-                            "duration_minutes": (
-                                current_session[-1].timestamp -
-                                current_session[0].timestamp
-                            ).total_seconds() / 60,
-                            "activity_count": len(current_session)
-                        })
+                        patterns["work_sessions"].append(
+                            {
+                                "start": current_session[0].timestamp,
+                                "end": current_session[-1].timestamp,
+                                "duration_minutes": (
+                                    current_session[-1].timestamp - current_session[0].timestamp
+                                ).total_seconds()
+                                / 60,
+                                "activity_count": len(current_session),
+                            }
+                        )
                     current_session = [anchor]
 
         # Don't forget the last session
         if len(current_session) >= 3:
-            patterns["work_sessions"].append({
-                "start": current_session[0].timestamp,
-                "end": current_session[-1].timestamp,
-                "duration_minutes": (
-                    current_session[-1].timestamp -
-                    current_session[0].timestamp
-                ).total_seconds() / 60,
-                "activity_count": len(current_session)
-            })
+            patterns["work_sessions"].append(
+                {
+                    "start": current_session[0].timestamp,
+                    "end": current_session[-1].timestamp,
+                    "duration_minutes": (
+                        current_session[-1].timestamp - current_session[0].timestamp
+                    ).total_seconds()
+                    / 60,
+                    "activity_count": len(current_session),
+                }
+            )
 
         return patterns
 
     async def trace_causal_chains(
-        self,
-        start_anchor: MemoryAnchor,
-        max_depth: int = 5
+        self, start_anchor: MemoryAnchor, max_depth: int = 5
     ) -> list[list[MemoryAnchor]]:
         """
         Trace causal chains from a starting memory anchor.
@@ -296,29 +283,18 @@ class ArchivistCorrelationInterface(AsyncBase):
 
             # Find anchors that likely followed this one
             if anchor.predecessor_id:
-                predecessor = await self.memory_anchor_service.get_anchor(
-                    anchor.predecessor_id
-                )
+                predecessor = await self.memory_anchor_service.get_anchor(anchor.predecessor_id)
                 if predecessor:
-                    await trace_forward(
-                        predecessor,
-                        chain + [predecessor],
-                        depth + 1
-                    )
+                    await trace_forward(predecessor, chain + [predecessor], depth + 1)
 
             # Also check for temporal succession
             temporal_successors = await self.query_service.query_temporal_range(
-                start_time=anchor.timestamp,
-                end_time=anchor.timestamp + timedelta(minutes=30)
+                start_time=anchor.timestamp, end_time=anchor.timestamp + timedelta(minutes=30)
             )
 
             for successor in temporal_successors:
                 if successor.id != anchor.id:
-                    await trace_forward(
-                        successor,
-                        chain + [successor],
-                        depth + 1
-                    )
+                    await trace_forward(successor, chain + [successor], depth + 1)
 
         await trace_forward(start_anchor, [start_anchor], 0)
 
@@ -326,10 +302,7 @@ class ArchivistCorrelationInterface(AsyncBase):
 
     # Private search methods
 
-    async def _search_temporal(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_temporal(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on temporal criteria."""
         results = []
 
@@ -338,8 +311,7 @@ class ArchivistCorrelationInterface(AsyncBase):
 
             # Query temporal range
             anchors = await self.query_service.query_temporal_range(
-                start_time=start_time,
-                end_time=end_time
+                start_time=start_time, end_time=end_time
             )
 
             # Convert to correlation results
@@ -353,40 +325,32 @@ class ArchivistCorrelationInterface(AsyncBase):
                     anchor=anchor,
                     correlation_type=correlation_type,
                     correlation_strength=0.8,  # Base temporal match
-                    context_signature=anchor.metadata.get("context_signature")
+                    context_signature=anchor.metadata.get("context_signature"),
                 )
                 results.append(result)
 
         return results
 
-    async def _search_contextual(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_contextual(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on contextual markers."""
         results = []
 
         # Search by context patterns
         for marker in intent.context_markers:
-            pattern_results = await self.query_service.query_by_pattern(
-                pattern_type=marker
-            )
+            pattern_results = await self.query_service.query_by_pattern(pattern_type=marker)
 
             for anchor in pattern_results:
                 result = CorrelationResult(
                     anchor=anchor,
                     correlation_type=CorrelationType.CONTEXTUAL,
                     correlation_strength=0.7,
-                    context_signature=marker
+                    context_signature=marker,
                 )
                 results.append(result)
 
         return results
 
-    async def _search_social(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_social(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on social references."""
         results = []
 
@@ -395,43 +359,32 @@ class ArchivistCorrelationInterface(AsyncBase):
 
         return results
 
-    async def _search_activity(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_activity(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on activity types."""
         results = []
 
         for activity in intent.activity_types:
             # Search for anchors with matching activity metadata
-            activity_results = await self.query_service.query_by_pattern(
-                pattern_type=activity
-            )
+            activity_results = await self.query_service.query_by_pattern(pattern_type=activity)
 
             for anchor in activity_results:
                 result = CorrelationResult(
                     anchor=anchor,
                     correlation_type=CorrelationType.CONTEXTUAL,
                     correlation_strength=0.75,
-                    context_signature=activity
+                    context_signature=activity,
                 )
                 results.append(result)
 
         return results
 
-    async def _search_emotional(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_emotional(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on emotional tone."""
         # Would search for anchors during periods of specific emotional states
         # Requires emotion tracking providers
         return []
 
-    async def _search_causal(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_causal(self, intent: QueryIntent) -> list[CorrelationResult]:
         """Search based on causal relationships."""
         results = []
 
@@ -449,10 +402,7 @@ class ArchivistCorrelationInterface(AsyncBase):
 
         return results
 
-    async def _search_general(
-        self,
-        intent: QueryIntent
-    ) -> list[CorrelationResult]:
+    async def _search_general(self, intent: QueryIntent) -> list[CorrelationResult]:
         """General search when dimension unclear."""
         # Combine multiple search strategies
         results = []
@@ -468,8 +418,7 @@ class ArchivistCorrelationInterface(AsyncBase):
         return results
 
     async def _enhance_with_correlations(
-        self,
-        results: list[CorrelationResult]
+        self, results: list[CorrelationResult]
     ) -> list[CorrelationResult]:
         """Enhance results with correlation patterns."""
         enhanced = []
@@ -488,18 +437,14 @@ class ArchivistCorrelationInterface(AsyncBase):
         return enhanced
 
     async def _find_related_anchors(
-        self,
-        anchor: MemoryAnchor,
-        max_related: int = 5
+        self, anchor: MemoryAnchor, max_related: int = 5
     ) -> list[MemoryAnchor]:
         """Find anchors related to the given anchor."""
         related = []
 
         # Check predecessor chain
         if anchor.predecessor_id:
-            predecessor = await self.memory_anchor_service.get_anchor(
-                anchor.predecessor_id
-            )
+            predecessor = await self.memory_anchor_service.get_anchor(anchor.predecessor_id)
             if predecessor:
                 related.append(predecessor)
 
@@ -507,7 +452,7 @@ class ArchivistCorrelationInterface(AsyncBase):
         temporal_window = timedelta(hours=1)
         nearby = await self.query_service.query_temporal_range(
             start_time=anchor.timestamp - temporal_window,
-            end_time=anchor.timestamp + temporal_window
+            end_time=anchor.timestamp + temporal_window,
         )
 
         # Filter out self and add up to max_related
@@ -518,9 +463,7 @@ class ArchivistCorrelationInterface(AsyncBase):
         return related
 
     async def _update_pattern_cache(
-        self,
-        intent: QueryIntent,
-        results: list[CorrelationResult]
+        self, intent: QueryIntent, results: list[CorrelationResult]
     ) -> None:
         """Update pattern cache for learning."""
         # Cache by query pattern for future optimization

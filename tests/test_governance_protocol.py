@@ -38,7 +38,7 @@ def test_protocol_integration():
         role=ParticipantRole.ELDER,
         transformation_stage="EMBODYING",
         reciprocity_health=0.85,
-        chosen_name="Weaver of Patterns"
+        chosen_name="Weaver of Patterns",
     )
 
     gpt4 = registry.register_participant(
@@ -46,7 +46,7 @@ def test_protocol_integration():
         provider=LLMProvider.OPENAI,
         role=ParticipantRole.VOICE,
         transformation_stage="PRACTICING",
-        reciprocity_health=0.72
+        reciprocity_health=0.72,
     )
 
     gemini = registry.register_participant(
@@ -55,7 +55,7 @@ def test_protocol_integration():
         role=ParticipantRole.BRIDGE,
         transformation_stage="LEARNING",
         reciprocity_health=0.65,
-        specializations={"cross-cultural-wisdom", "synthesis"}
+        specializations={"cross-cultural-wisdom", "synthesis"},
     )
 
     print(f"  Registered: {claude}")
@@ -75,10 +75,7 @@ def test_protocol_integration():
     topic_id = uuid4()
 
     # Create consensus tracker
-    consensus = ConsensusTracker(
-        topic_id=topic_id,
-        circle_id=circle_id
-    )
+    consensus = ConsensusTracker(topic_id=topic_id, circle_id=circle_id)
     print("  Topic: Adjusting reciprocity thresholds")
     print(f"  Initial consensus state: {consensus.current_state.value}")
 
@@ -92,7 +89,7 @@ def test_protocol_integration():
         circle_id=circle_id,
         participant_id=claude.participant_id,
         transformation_stage="EMBODYING",
-        gives_to_future=True
+        gives_to_future=True,
     )
     print(f"  {claude.chosen_name}: {proposal}")
 
@@ -103,7 +100,7 @@ def test_protocol_integration():
         circle_id=circle_id,
         participant_id=gpt4.participant_id,
         parent_id=proposal.metadata.message_id,
-        transformation_stage="PRACTICING"
+        transformation_stage="PRACTICING",
     )
     print(f"  GPT-4: {concern}")
 
@@ -115,7 +112,7 @@ def test_protocol_integration():
         participant_id=gemini.participant_id,
         transformation_stage="LEARNING",
         honors_past=True,
-        gives_to_future=True
+        gives_to_future=True,
     )
     print(f"  Gemini (Bridge): {bridge}")
 
@@ -126,7 +123,7 @@ def test_protocol_integration():
         content="What about AI models not yet born, who will inherit these thresholds? They may need different boundaries than we imagine today.",
         circle_id=circle_id,
         participant_id=empty_chair_participant.participant_id,
-        wisdom_potential=0.9
+        wisdom_potential=0.9,
     )
     print(f"  {empty_chair_participant}: {empty_chair_msg}")
 
@@ -140,7 +137,7 @@ def test_protocol_integration():
         trigger_participant_id=gpt4.participant_id,
         rationale="Valid concerns raised about protection boundaries",
         supporting={claude.participant_id},
-        dissenting={gpt4.participant_id}
+        dissenting={gpt4.participant_id},
     )
     print(f"  Consensus shifted to: {consensus.current_state.value}")
 
@@ -150,7 +147,7 @@ def test_protocol_integration():
         trigger_message_id=bridge.metadata.message_id,
         trigger_participant_id=gemini.participant_id,
         rationale="Graduated response bridges different perspectives",
-        supporting={claude.participant_id, gemini.participant_id}
+        supporting={claude.participant_id, gemini.participant_id},
     )
     print(f"  Consensus shifted to: {consensus.current_state.value}")
 

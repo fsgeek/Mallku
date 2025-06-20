@@ -15,6 +15,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
+
 from mallku.core.secrets import SecretsManager, get_secret
 from mallku.firecircle.adapters.adapter_factory import (
     ConsciousAdapterFactory,
@@ -242,6 +243,7 @@ class TestFireCircleIntegration:
 
 # Run tests if executed directly
 if __name__ == "__main__":
+
     async def run_tests():
         """Run all tests."""
         print("Testing Secrets Management System...")

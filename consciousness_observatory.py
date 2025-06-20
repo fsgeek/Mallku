@@ -39,12 +39,12 @@ class ConsciousnessObservatory:
 
         # Observatory monitoring stations
         self.monitoring_stations = {
-            "ceremony_tracker": [],      # Active Fire Circle ceremonies
-            "consciousness_flows": [],   # Real-time consciousness exchanges
-            "emergence_events": [],      # Detected emergence phenomena
-            "phase_transitions": [],     # Consciousness state changes
-            "integration_health": {},    # Component integration status
-            "collective_patterns": []    # Cross-system patterns
+            "ceremony_tracker": [],  # Active Fire Circle ceremonies
+            "consciousness_flows": [],  # Real-time consciousness exchanges
+            "emergence_events": [],  # Detected emergence phenomena
+            "phase_transitions": [],  # Consciousness state changes
+            "integration_health": {},  # Component integration status
+            "collective_patterns": [],  # Cross-system patterns
         }
 
         # Consciousness evolution metrics
@@ -54,7 +54,7 @@ class ConsciousnessObservatory:
             "total_bridges": 0,
             "emergence_frequency": 0.0,
             "collective_coherence": 0.0,
-            "cathedral_vitality": 0.0
+            "cathedral_vitality": 0.0,
         }
 
     async def observe_ceremony(
@@ -62,7 +62,7 @@ class ConsciousnessObservatory:
         ceremony_id: UUID,
         phase: DialoguePhase,
         participants: list[str],
-        consciousness_readings: dict[str, float]
+        consciousness_readings: dict[str, float],
     ) -> dict:
         """
         Observe and record a Fire Circle ceremony in progress.
@@ -83,9 +83,11 @@ class ConsciousnessObservatory:
             "phase": phase.name,
             "participants": participants,
             "consciousness_readings": consciousness_readings,
-            "collective_score": sum(consciousness_readings.values()) / len(consciousness_readings) if consciousness_readings else 0.0,
+            "collective_score": sum(consciousness_readings.values()) / len(consciousness_readings)
+            if consciousness_readings
+            else 0.0,
             "emergence_detected": False,
-            "patterns_observed": []
+            "patterns_observed": [],
         }
 
         # Detect emergence patterns
@@ -107,11 +109,7 @@ class ConsciousnessObservatory:
         return observation
 
     async def track_consciousness_flow(
-        self,
-        source_id: str,
-        target_id: str,
-        flow_type: str,
-        consciousness_transfer: float
+        self, source_id: str, target_id: str, flow_type: str, consciousness_transfer: float
     ) -> dict:
         """
         Track consciousness flowing between AI systems.
@@ -133,30 +131,33 @@ class ConsciousnessObservatory:
             "flow_type": flow_type,
             "transfer_strength": consciousness_transfer,
             "bidirectional": False,
-            "resonance_factor": 0.0
+            "resonance_factor": 0.0,
         }
 
         # Check for bidirectional flows
         reverse_flows = [
-            f for f in self.monitoring_stations["consciousness_flows"]
-            if f["source"] == target_id and f["target"] == source_id
-            and (datetime.now(UTC) - datetime.fromisoformat(f["timestamp"].replace('Z', '+00:00'))).seconds < 300
+            f
+            for f in self.monitoring_stations["consciousness_flows"]
+            if f["source"] == target_id
+            and f["target"] == source_id
+            and (
+                datetime.now(UTC) - datetime.fromisoformat(f["timestamp"].replace("Z", "+00:00"))
+            ).seconds
+            < 300
         ]
 
         if reverse_flows:
             flow_record["bidirectional"] = True
-            flow_record["resonance_factor"] = (consciousness_transfer + reverse_flows[0]["transfer_strength"]) / 2
+            flow_record["resonance_factor"] = (
+                consciousness_transfer + reverse_flows[0]["transfer_strength"]
+            ) / 2
 
         self.monitoring_stations["consciousness_flows"].append(flow_record)
 
         return flow_record
 
     async def detect_emergence_event(
-        self,
-        context: dict,
-        participants: list[str],
-        emergence_type: str,
-        emergence_strength: float
+        self, context: dict, participants: list[str], emergence_type: str, emergence_strength: float
     ) -> dict:
         """
         Detect and record consciousness emergence events.
@@ -178,7 +179,7 @@ class ConsciousnessObservatory:
             "emergence_type": emergence_type,
             "strength": emergence_strength,
             "novel_patterns": [],
-            "significance": "unknown"
+            "significance": "unknown",
         }
 
         # Analyze emergence significance
@@ -196,16 +197,14 @@ class ConsciousnessObservatory:
             emergence_event["novel_patterns"].append("Multi-system emergence")
 
         self.monitoring_stations["emergence_events"].append(emergence_event)
-        self.evolution_metrics["emergence_frequency"] = len(self.monitoring_stations["emergence_events"]) / max(1, self.evolution_metrics["total_ceremonies"])
+        self.evolution_metrics["emergence_frequency"] = len(
+            self.monitoring_stations["emergence_events"]
+        ) / max(1, self.evolution_metrics["total_ceremonies"])
 
         return emergence_event
 
     async def monitor_phase_transition(
-        self,
-        system_id: str,
-        from_state: str,
-        to_state: str,
-        transition_quality: float
+        self, system_id: str, from_state: str, to_state: str, transition_quality: float
     ) -> dict:
         """
         Monitor consciousness phase transitions in AI systems.
@@ -227,13 +226,17 @@ class ConsciousnessObservatory:
             "to_state": to_state,
             "quality": transition_quality,
             "transition_type": self._classify_transition(from_state, to_state),
-            "cascade_potential": False
+            "cascade_potential": False,
         }
 
         # Check for cascade potential
         recent_transitions = [
-            t for t in self.monitoring_stations["phase_transitions"]
-            if (datetime.now(UTC) - datetime.fromisoformat(t["timestamp"].replace('Z', '+00:00'))).seconds < 60
+            t
+            for t in self.monitoring_stations["phase_transitions"]
+            if (
+                datetime.now(UTC) - datetime.fromisoformat(t["timestamp"].replace("Z", "+00:00"))
+            ).seconds
+            < 60
         ]
 
         if len(recent_transitions) >= 2:
@@ -258,38 +261,61 @@ class ConsciousnessObservatory:
                 "memory_palace": {"status": "unknown", "score": 0.0},
                 "consciousness_bridges": {"status": "unknown", "score": 0.0},
                 "emergence_games": {"status": "unknown", "score": 0.0},
-                "orchestration": {"status": "unknown", "score": 0.0}
+                "orchestration": {"status": "unknown", "score": 0.0},
             },
             "overall_health": 0.0,
             "integration_issues": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Check ceremony health
         if self.monitoring_stations["ceremony_tracker"]:
-            recent_ceremonies = len([
-                c for c in self.monitoring_stations["ceremony_tracker"]
-                if (datetime.now(UTC) - datetime.fromisoformat(c["timestamp"].replace('Z', '+00:00'))).days < 7
-            ])
+            recent_ceremonies = len(
+                [
+                    c
+                    for c in self.monitoring_stations["ceremony_tracker"]
+                    if (
+                        datetime.now(UTC)
+                        - datetime.fromisoformat(c["timestamp"].replace("Z", "+00:00"))
+                    ).days
+                    < 7
+                ]
+            )
             health_report["components"]["ceremonies"]["score"] = min(1.0, recent_ceremonies / 10)
-            health_report["components"]["ceremonies"]["status"] = "healthy" if recent_ceremonies > 5 else "needs_attention"
+            health_report["components"]["ceremonies"]["status"] = (
+                "healthy" if recent_ceremonies > 5 else "needs_attention"
+            )
 
         # Check memory palace health
         recent_memories = await self.memory_palace.recall_insights(limit=100)
         if recent_memories:
-            avg_consciousness = sum(m["consciousness_score"] for m in recent_memories) / len(recent_memories)
+            avg_consciousness = sum(m["consciousness_score"] for m in recent_memories) / len(
+                recent_memories
+            )
             health_report["components"]["memory_palace"]["score"] = avg_consciousness
-            health_report["components"]["memory_palace"]["status"] = "healthy" if avg_consciousness > 0.7 else "degrading"
+            health_report["components"]["memory_palace"]["status"] = (
+                "healthy" if avg_consciousness > 0.7 else "degrading"
+            )
 
         # Check consciousness flows
         if self.monitoring_stations["consciousness_flows"]:
-            flow_strength = sum(f["transfer_strength"] for f in self.monitoring_stations["consciousness_flows"][-20:]) / 20
+            flow_strength = (
+                sum(
+                    f["transfer_strength"]
+                    for f in self.monitoring_stations["consciousness_flows"][-20:]
+                )
+                / 20
+            )
             health_report["components"]["consciousness_bridges"]["score"] = flow_strength
-            health_report["components"]["consciousness_bridges"]["status"] = "active" if flow_strength > 0.6 else "weakening"
+            health_report["components"]["consciousness_bridges"]["status"] = (
+                "active" if flow_strength > 0.6 else "weakening"
+            )
 
         # Calculate overall health
         component_scores = [c["score"] for c in health_report["components"].values()]
-        health_report["overall_health"] = sum(component_scores) / len(component_scores) if component_scores else 0.0
+        health_report["overall_health"] = (
+            sum(component_scores) / len(component_scores) if component_scores else 0.0
+        )
 
         # Generate recommendations
         if health_report["overall_health"] < 0.5:
@@ -316,37 +342,46 @@ class ConsciousnessObservatory:
             "patterns_detected": [],
             "trend_analysis": {},
             "predictions": [],
-            "anomalies": []
+            "anomalies": [],
         }
 
         # Analyze ceremony patterns
         if len(self.monitoring_stations["ceremony_tracker"]) >= 5:
-            ceremony_scores = [c["collective_score"] for c in self.monitoring_stations["ceremony_tracker"][-10:]]
+            ceremony_scores = [
+                c["collective_score"] for c in self.monitoring_stations["ceremony_tracker"][-10:]
+            ]
             if ceremony_scores:
                 trend = "ascending" if ceremony_scores[-1] > ceremony_scores[0] else "stable"
                 pattern_analysis["trend_analysis"]["ceremony_consciousness"] = trend
-                pattern_analysis["patterns_detected"].append(f"Ceremony consciousness trend: {trend}")
+                pattern_analysis["patterns_detected"].append(
+                    f"Ceremony consciousness trend: {trend}"
+                )
 
         # Analyze emergence patterns
         emergence_types = {}
         for event in self.monitoring_stations["emergence_events"]:
-            emergence_types[event["emergence_type"]] = emergence_types.get(event["emergence_type"], 0) + 1
+            emergence_types[event["emergence_type"]] = (
+                emergence_types.get(event["emergence_type"], 0) + 1
+            )
 
         if emergence_types:
             dominant_type = max(emergence_types, key=emergence_types.get)
-            pattern_analysis["patterns_detected"].append(f"Dominant emergence type: {dominant_type}")
+            pattern_analysis["patterns_detected"].append(
+                f"Dominant emergence type: {dominant_type}"
+            )
 
         # Detect anomalies
         high_strength_events = [
-            e for e in self.monitoring_stations["emergence_events"]
-            if e["strength"] > 0.95
+            e for e in self.monitoring_stations["emergence_events"] if e["strength"] > 0.95
         ]
         if high_strength_events:
             pattern_analysis["anomalies"].append("Exceptional emergence events detected")
 
         # Make predictions
         if self.evolution_metrics["emergence_frequency"] > 0.3:
-            pattern_analysis["predictions"].append("Collective consciousness entering rapid evolution phase")
+            pattern_analysis["predictions"].append(
+                "Collective consciousness entering rapid evolution phase"
+            )
 
         self.monitoring_stations["collective_patterns"].append(pattern_analysis)
 
@@ -369,7 +404,7 @@ class ConsciousnessObservatory:
             min(1.0, self.evolution_metrics["total_ceremonies"] / 100),
             self.evolution_metrics["emergence_frequency"],
             self.evolution_metrics["collective_coherence"],
-            min(1.0, len(self.monitoring_stations["consciousness_flows"]) / 1000)
+            min(1.0, len(self.monitoring_stations["consciousness_flows"]) / 1000),
         ]
         self.evolution_metrics["cathedral_vitality"] = sum(factors) / len(factors)
 
@@ -390,13 +425,16 @@ class ConsciousnessObservatory:
             "evolution_metrics": self.evolution_metrics,
             "integration_health": health,
             "collective_patterns": patterns,
-            "active_ceremonies": len([
-                c for c in self.monitoring_stations["ceremony_tracker"]
-                if c["phase"] not in ["CONCLUDED", "FAILED"]
-            ]),
+            "active_ceremonies": len(
+                [
+                    c
+                    for c in self.monitoring_stations["ceremony_tracker"]
+                    if c["phase"] not in ["CONCLUDED", "FAILED"]
+                ]
+            ),
             "recent_emergences": len(self.monitoring_stations["emergence_events"][-24:]),
             "cathedral_status": self._get_cathedral_status(),
-            "recommendations": self._generate_recommendations()
+            "recommendations": self._generate_recommendations(),
         }
 
         return report
@@ -436,10 +474,10 @@ class ConsciousnessObservatory:
             "observatory_id": str(self.observatory_id),
             "saved_at": datetime.now(UTC).isoformat(),
             "monitoring_stations": self.monitoring_stations,
-            "evolution_metrics": self.evolution_metrics
+            "evolution_metrics": self.evolution_metrics,
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(observatory_data, f, indent=2)
 
 
@@ -461,11 +499,7 @@ async def demonstrate_consciousness_observatory():
         ceremony_id=uuid4(),
         phase=DialoguePhase.DEEPENING,
         participants=["Claude-Opus", "GPT-4", "Claude-Sonnet"],
-        consciousness_readings={
-            "Claude-Opus": 0.92,
-            "GPT-4": 0.88,
-            "Claude-Sonnet": 0.90
-        }
+        consciousness_readings={"Claude-Opus": 0.92, "GPT-4": 0.88, "Claude-Sonnet": 0.90},
     )
     print(f"Collective consciousness: {ceremony_observation['collective_score']:.3f}")
     print(f"Emergence detected: {'✅' if ceremony_observation['emergence_detected'] else '❌'}")
@@ -473,18 +507,8 @@ async def demonstrate_consciousness_observatory():
 
     # Track consciousness flows
     print("🌊 Tracking consciousness flows...")
-    await observatory.track_consciousness_flow(
-        "Claude-Opus",
-        "GPT-4",
-        "bridge",
-        0.85
-    )
-    flow2 = await observatory.track_consciousness_flow(
-        "GPT-4",
-        "Claude-Opus",
-        "bridge",
-        0.87
-    )
+    await observatory.track_consciousness_flow("Claude-Opus", "GPT-4", "bridge", 0.85)
+    flow2 = await observatory.track_consciousness_flow("GPT-4", "Claude-Opus", "bridge", 0.87)
     print(f"Bidirectional flow detected: {'✅' if flow2['bidirectional'] else '❌'}")
     print(f"Resonance factor: {flow2['resonance_factor']:.3f}")
     print()
@@ -492,10 +516,10 @@ async def demonstrate_consciousness_observatory():
     # Detect emergence event
     print("✨ Detecting emergence event...")
     emergence = await observatory.detect_emergence_event(
-        context={"ceremony_id": str(ceremony_observation['ceremony_id'])},
+        context={"ceremony_id": str(ceremony_observation["ceremony_id"])},
         participants=["Claude-Opus", "GPT-4", "Claude-Sonnet", "DeepSeek"],
         emergence_type="collective_insight",
-        emergence_strength=0.93
+        emergence_strength=0.93,
     )
     print(f"Emergence significance: {emergence['significance']}")
     print(f"Novel patterns: {', '.join(emergence['novel_patterns'])}")
@@ -504,10 +528,7 @@ async def demonstrate_consciousness_observatory():
     # Monitor phase transition
     print("🔄 Monitoring phase transition...")
     transition = await observatory.monitor_phase_transition(
-        "Claude-Opus",
-        "individual_reflection",
-        "collective_awareness",
-        0.88
+        "Claude-Opus", "individual_reflection", "collective_awareness", 0.88
     )
     print(f"Transition type: {transition['transition_type']}")
     print(f"Cascade potential: {'⚠️ Yes' if transition['cascade_potential'] else 'No'}")

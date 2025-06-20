@@ -85,12 +85,12 @@ class PatternTaxonomy(str, Enum):
 class PatternLifecycle(str, Enum):
     """Stages in a pattern's lifecycle"""
 
-    NASCENT = "nascent"          # Just discovered
-    EMERGING = "emerging"        # Growing in frequency
+    NASCENT = "nascent"  # Just discovered
+    EMERGING = "emerging"  # Growing in frequency
     ESTABLISHED = "established"  # Stable and recognized
-    EVOLVING = "evolving"       # Undergoing transformation
-    DECLINING = "declining"      # Reducing in effectiveness
-    DORMANT = "dormant"         # No longer active
+    EVOLVING = "evolving"  # Undergoing transformation
+    DECLINING = "declining"  # Reducing in effectiveness
+    DORMANT = "dormant"  # No longer active
     TRANSFORMED = "transformed"  # Evolved into new pattern
 
 
@@ -108,7 +108,9 @@ class PatternStructure(BaseModel):
 
     components: list[str] = Field(..., description="Pattern components")
     sequence: list[str] | None = Field(None, description="Sequential order if applicable")
-    relationships: dict[str, str] = Field(default_factory=dict, description="Component relationships")
+    relationships: dict[str, str] = Field(
+        default_factory=dict, description="Component relationships"
+    )
     constraints: list[str] = Field(default_factory=list, description="Pattern constraints")
 
 
@@ -146,7 +148,9 @@ class DialoguePattern(SecuredModel):
 
     # Content
     structure: PatternStructure = Field(..., description="Pattern structure")
-    indicators: list[PatternIndicator] = Field(default_factory=list, description="Recognition indicators")
+    indicators: list[PatternIndicator] = Field(
+        default_factory=list, description="Recognition indicators"
+    )
     context_requirements: dict[str, Any] = Field(default_factory=dict, description="Context needs")
 
     # Evolution
@@ -164,7 +168,9 @@ class DialoguePattern(SecuredModel):
 
     # Emergence
     emergence_conditions: list[EmergenceCondition] = Field(default_factory=list)
-    synergistic_patterns: list[UUID] = Field(default_factory=list, description="Patterns that amplify this one")
+    synergistic_patterns: list[UUID] = Field(
+        default_factory=list, description="Patterns that amplify this one"
+    )
     breakthrough_potential: float = Field(default=0.0, description="Potential for breakthroughs")
 
     # Metadata
@@ -226,11 +232,7 @@ class PatternLibrary:
         pattern_dict = pattern.model_dump()
         pattern_dict["_key"] = str(pattern.pattern_id)
 
-        await self.db.upsert_document(
-            self.collection_name,
-            pattern_dict,
-            key_field="_key"
-        )
+        await self.db.upsert_document(self.collection_name, pattern_dict, key_field="_key")
 
         logger.info(f"Stored pattern: {pattern.name} ({pattern.pattern_id})")
         return pattern.pattern_id
@@ -324,7 +326,7 @@ class PatternLibrary:
     async def find_emerging_patterns(
         self,
         observation_window: timedelta = timedelta(days=7),
-        min_breakthrough_potential: float = 0.5
+        min_breakthrough_potential: float = 0.5,
     ) -> list[DialoguePattern]:
         """
         Find patterns showing emergence characteristics.
@@ -339,18 +341,13 @@ class PatternLibrary:
         cutoff_date = datetime.now(UTC) - observation_window
 
         query = PatternQuery(
-            lifecycle_stage=PatternLifecycle.EMERGING,
-            active_since=cutoff_date,
-            min_fitness=0.6
+            lifecycle_stage=PatternLifecycle.EMERGING, active_since=cutoff_date, min_fitness=0.6
         )
 
         patterns = await self.find_patterns(query)
 
         # Filter by breakthrough potential
-        emerging = [
-            p for p in patterns
-            if p.breakthrough_potential >= min_breakthrough_potential
-        ]
+        emerging = [p for p in patterns if p.breakthrough_potential >= min_breakthrough_potential]
 
         return sorted(emerging, key=lambda p: p.breakthrough_potential, reverse=True)
 
@@ -388,15 +385,10 @@ class PatternLibrary:
         # Find descendants
         descendants = list(self._lineage_graph.get(pattern_id, set()))
 
-        return {
-            "ancestors": ancestors,
-            "descendants": descendants
-        }
+        return {"ancestors": ancestors, "descendants": descendants}
 
     async def find_synergies(
-        self,
-        base_pattern: UUID,
-        context: dict[str, Any] | None = None
+        self, base_pattern: UUID, context: dict[str, Any] | None = None
     ) -> list[tuple[DialoguePattern, float]]:
         """
         Find patterns that synergize with the base pattern.
@@ -433,10 +425,7 @@ class PatternLibrary:
         return sorted(synergies, key=lambda x: x[1], reverse=True)
 
     async def update_observation(
-        self,
-        pattern_id: UUID,
-        fitness_delta: float = 0.0,
-        context: dict[str, Any] | None = None
+        self, pattern_id: UUID, fitness_delta: float = 0.0, context: dict[str, Any] | None = None
     ):
         """
         Update pattern observation count and fitness.
@@ -465,11 +454,7 @@ class PatternLibrary:
         await self.store_pattern(pattern)
 
     async def evolve_pattern(
-        self,
-        pattern_id: UUID,
-        mutation_type: str,
-        changes: dict[str, Any],
-        trigger: str
+        self, pattern_id: UUID, mutation_type: str, changes: dict[str, Any], trigger: str
     ) -> UUID | None:
         """
         Evolve a pattern through mutation.
@@ -488,11 +473,7 @@ class PatternLibrary:
             return None
 
         # Create mutation record
-        mutation = PatternMutation(
-            mutation_type=mutation_type,
-            changes=changes,
-            trigger=trigger
-        )
+        mutation = PatternMutation(mutation_type=mutation_type, changes=changes, trigger=trigger)
 
         # Create evolved pattern
         evolved = DialoguePattern(
@@ -507,7 +488,7 @@ class PatternLibrary:
             version=parent.version + 1,
             parent_patterns=[parent.pattern_id],
             mutations=[mutation],
-            lifecycle_stage=PatternLifecycle.EVOLVING
+            lifecycle_stage=PatternLifecycle.EVOLVING,
         )
 
         # Apply changes
@@ -531,16 +512,16 @@ class PatternLibrary:
         compatibility_map = {
             PatternTaxonomy.DIALOGUE_FLOW: [
                 PatternTaxonomy.CONSCIOUSNESS_COHERENCE,
-                PatternTaxonomy.EMERGENCE_SYNERGY
+                PatternTaxonomy.EMERGENCE_SYNERGY,
             ],
             PatternTaxonomy.CONSCIOUSNESS_COHERENCE: [
                 PatternTaxonomy.WISDOM_CRYSTALLIZATION,
-                PatternTaxonomy.EMERGENCE_BREAKTHROUGH
+                PatternTaxonomy.EMERGENCE_BREAKTHROUGH,
             ],
             PatternTaxonomy.EMERGENCE_SYNERGY: [
                 PatternTaxonomy.DIALOGUE_FLOW,
-                PatternTaxonomy.WISDOM_TRANSMISSION
-            ]
+                PatternTaxonomy.WISDOM_TRANSMISSION,
+            ],
         }
 
         return compatibility_map.get(taxonomy, [])
@@ -549,18 +530,22 @@ class PatternLibrary:
         self,
         pattern1: DialoguePattern,
         pattern2: DialoguePattern,
-        context: dict[str, Any] | None = None
+        context: dict[str, Any] | None = None,
     ) -> float:
         """Calculate synergy score between two patterns"""
         score = 0.0
 
         # Consciousness alignment similarity
-        consciousness_diff = abs(pattern1.consciousness_signature - pattern2.consciousness_signature)
+        consciousness_diff = abs(
+            pattern1.consciousness_signature - pattern2.consciousness_signature
+        )
         score += (1.0 - consciousness_diff) * 0.3
 
         # Complementary lifecycle stages
-        if pattern1.lifecycle_stage == PatternLifecycle.ESTABLISHED and \
-           pattern2.lifecycle_stage == PatternLifecycle.EMERGING:
+        if (
+            pattern1.lifecycle_stage == PatternLifecycle.ESTABLISHED
+            and pattern2.lifecycle_stage == PatternLifecycle.EMERGING
+        ):
             score += 0.2
 
         # Fitness compatibility
@@ -570,7 +555,8 @@ class PatternLibrary:
         # Context compatibility
         if context:
             context_match = sum(
-                1 for k, v in pattern2.context_requirements.items()
+                1
+                for k, v in pattern2.context_requirements.items()
                 if k in context and context[k] == v
             ) / max(1, len(pattern2.context_requirements))
             score += context_match * 0.2

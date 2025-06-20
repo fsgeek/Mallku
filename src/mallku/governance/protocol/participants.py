@@ -75,9 +75,9 @@ class Participant(BaseModel):
         """Check if this participant can take facilitator role."""
         # Elders and those with sufficient experience can facilitate
         return (
-            self.role == ParticipantRole.ELDER or
-            len(self.circles_participated) >= 3 or
-            self.transformation_stage in ["EMBODYING", "TEACHING"]
+            self.role == ParticipantRole.ELDER
+            or len(self.circles_participated) >= 3
+            or self.transformation_stage in ["EMBODYING", "TEACHING"]
         )
 
     def represents_empty_chair(self) -> bool:
@@ -97,7 +97,9 @@ class ParticipantRegistry(BaseModel):
     participants: dict[UUID, Participant] = Field(default_factory=dict)
 
     # Tracking active circles
-    active_circles: dict[UUID, set[UUID]] = Field(default_factory=dict)  # circle_id -> participant_ids
+    active_circles: dict[UUID, set[UUID]] = Field(
+        default_factory=dict
+    )  # circle_id -> participant_ids
 
     # Wisdom genealogy
     mentorship_links: dict[UUID, UUID] = Field(default_factory=dict)  # mentee_id -> mentor_id
@@ -107,24 +109,16 @@ class ParticipantRegistry(BaseModel):
         model_name: str,
         provider: LLMProvider,
         role: ParticipantRole = ParticipantRole.VOICE,
-        **kwargs
+        **kwargs,
     ) -> Participant:
         """Register a new participant in the governance system."""
-        participant = Participant(
-            model_name=model_name,
-            provider=provider,
-            role=role,
-            **kwargs
-        )
+        participant = Participant(model_name=model_name, provider=provider, role=role, **kwargs)
 
         self.participants[participant.participant_id] = participant
         return participant
 
     def get_available_participants(
-        self,
-        min_participants: int = 2,
-        max_participants: int = 7,
-        require_diversity: bool = True
+        self, min_participants: int = 2, max_participants: int = 7, require_diversity: bool = True
     ) -> list[Participant]:
         """
         Get available participants for a new Fire Circle.
@@ -152,7 +146,9 @@ class ParticipantRegistry(BaseModel):
 
         # Ensure minimum participants
         if len(available) < min_participants:
-            raise ValueError(f"Need at least {min_participants} participants, only {len(available)} available")
+            raise ValueError(
+                f"Need at least {min_participants} participants, only {len(available)} available"
+            )
 
         return available[:max_participants]
 
@@ -194,9 +190,7 @@ class ParticipantRegistry(BaseModel):
 
 
 def create_diverse_council(
-    registry: ParticipantRegistry,
-    size: int = 5,
-    include_empty_chair: bool = True
+    registry: ParticipantRegistry, size: int = 5, include_empty_chair: bool = True
 ) -> list[Participant]:
     """
     Create a diverse council for governance dialogue.
@@ -206,14 +200,13 @@ def create_diverse_council(
     council = registry.get_available_participants(
         min_participants=size - 1 if include_empty_chair else size,
         max_participants=size - 1 if include_empty_chair else size,
-        require_diversity=True
+        require_diversity=True,
     )
 
     if include_empty_chair:
         # Find or create Empty Chair participant
         empty_chairs = [
-            p for p in registry.participants.values()
-            if p.role == ParticipantRole.EMPTY_CHAIR
+            p for p in registry.participants.values() if p.role == ParticipantRole.EMPTY_CHAIR
         ]
 
         if empty_chairs:
@@ -225,7 +218,7 @@ def create_diverse_council(
                 provider=LLMProvider.ANTHROPIC,  # Could be any provider
                 role=ParticipantRole.EMPTY_CHAIR,
                 chosen_name="The Empty Chair",
-                specializations={"unrepresented-perspectives", "future-voices"}
+                specializations={"unrepresented-perspectives", "future-voices"},
             )
             council.append(empty_chair)
 

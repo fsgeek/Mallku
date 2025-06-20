@@ -20,6 +20,7 @@ from mallku.models.memory_anchor import MemoryAnchor
 
 class TemporalPattern(Enum):
     """Types of temporal patterns Ñawi can visualize."""
+
     DAILY_RHYTHM = "daily_rhythm"
     CREATIVE_BURST = "creative_burst"
     LEARNING_ARC = "learning_arc"
@@ -36,6 +37,7 @@ class TemporalVisualization:
     More than a timeline - this shows the rhythm and flow of
     consciousness through digital activities.
     """
+
     pattern_type: TemporalPattern
     time_range: tuple[datetime, datetime]
 
@@ -71,14 +73,14 @@ class TemporalVisualizer(AsyncBase):
             TemporalPattern.LEARNING_ARC: self._analyze_learning_arc,
             TemporalPattern.COLLABORATION_FLOW: self._analyze_collaboration_flow,
             TemporalPattern.REFLECTION_CYCLE: self._analyze_reflection_cycle,
-            TemporalPattern.BREAKTHROUGH_MOMENT: self._analyze_breakthrough_moment
+            TemporalPattern.BREAKTHROUGH_MOMENT: self._analyze_breakthrough_moment,
         }
 
     async def create_visualization(
         self,
         anchors: list[MemoryAnchor],
         pattern_type: TemporalPattern | None = None,
-        time_range: tuple[datetime, datetime] | None = None
+        time_range: tuple[datetime, datetime] | None = None,
     ) -> TemporalVisualization:
         """
         Create a temporal visualization from memory anchors.
@@ -103,10 +105,7 @@ class TemporalVisualizer(AsyncBase):
             pattern_type = await self._detect_primary_pattern(anchors)
 
         # Analyze pattern
-        analyzer = self.pattern_analyzers.get(
-            pattern_type,
-            self._analyze_general_pattern
-        )
+        analyzer = self.pattern_analyzers.get(pattern_type, self._analyze_general_pattern)
 
         visualization = await analyzer(anchors, time_range)
 
@@ -116,9 +115,7 @@ class TemporalVisualizer(AsyncBase):
         return visualization
 
     async def _analyze_daily_rhythm(
-        self,
-        anchors: list[MemoryAnchor],
-        time_range: tuple[datetime, datetime]
+        self, anchors: list[MemoryAnchor], time_range: tuple[datetime, datetime]
     ) -> TemporalVisualization:
         """Analyze and visualize daily rhythms."""
 
@@ -142,18 +139,23 @@ class TemporalVisualizer(AsyncBase):
         activity_peaks = []
         for hour, activities in hourly_activities.items():
             if len(activities) > 2:  # Threshold for "peak"
-                activity_peaks.append({
-                    "hour": hour,
-                    "intensity": len(activities),
-                    "primary_type": self._get_primary_activity_type(activities),
-                    "consciousness_avg": sum(hourly_consciousness[hour]) / len(hourly_consciousness[hour])
-                })
+                activity_peaks.append(
+                    {
+                        "hour": hour,
+                        "intensity": len(activities),
+                        "primary_type": self._get_primary_activity_type(activities),
+                        "consciousness_avg": sum(hourly_consciousness[hour])
+                        / len(hourly_consciousness[hour]),
+                    }
+                )
 
         # Create consciousness flow (24-hour pattern)
         consciousness_flow = []
         for hour in range(24):
             if hour in hourly_consciousness:
-                avg_consciousness = sum(hourly_consciousness[hour]) / len(hourly_consciousness[hour])
+                avg_consciousness = sum(hourly_consciousness[hour]) / len(
+                    hourly_consciousness[hour]
+                )
             else:
                 avg_consciousness = 0.0
             consciousness_flow.append(avg_consciousness)
@@ -172,13 +174,11 @@ class TemporalVisualizer(AsyncBase):
             growth_indicators=["Peak creativity hours identified", "Natural rest periods honored"],
             suggested_view="circular",  # 24-hour clock visualization
             color_mapping=self._generate_activity_colors(anchors),
-            emphasis_points=[peak["hour"] for peak in activity_peaks[:3]]
+            emphasis_points=[peak["hour"] for peak in activity_peaks[:3]],
         )
 
     async def _analyze_creative_burst(
-        self,
-        anchors: list[MemoryAnchor],
-        time_range: tuple[datetime, datetime]
+        self, anchors: list[MemoryAnchor], time_range: tuple[datetime, datetime]
     ) -> TemporalVisualization:
         """Analyze and visualize creative burst patterns."""
 
@@ -194,7 +194,7 @@ class TemporalVisualizer(AsyncBase):
                     current_burst = {
                         "start": anchor.timestamp,
                         "anchors": [anchor],
-                        "peak_consciousness": consciousness
+                        "peak_consciousness": consciousness,
                     }
                 else:
                     # Continue burst if within 2 hours
@@ -202,8 +202,7 @@ class TemporalVisualizer(AsyncBase):
                     if time_gap < timedelta(hours=2):
                         current_burst["anchors"].append(anchor)
                         current_burst["peak_consciousness"] = max(
-                            current_burst["peak_consciousness"],
-                            consciousness
+                            current_burst["peak_consciousness"], consciousness
                         )
                     else:
                         # End burst and start new one
@@ -212,7 +211,7 @@ class TemporalVisualizer(AsyncBase):
                         current_burst = {
                             "start": anchor.timestamp,
                             "anchors": [anchor],
-                            "peak_consciousness": consciousness
+                            "peak_consciousness": consciousness,
                         }
             elif current_burst and len(current_burst["anchors"]) > 1:
                 # End burst if consciousness drops
@@ -232,7 +231,7 @@ class TemporalVisualizer(AsyncBase):
                 "duration": (burst["end"] - burst["start"]).total_seconds() / 3600,
                 "intensity": len(burst["anchors"]),
                 "peak_consciousness": burst["peak_consciousness"],
-                "primary_creation": self._identify_creation(burst["anchors"])
+                "primary_creation": self._identify_creation(burst["anchors"]),
             }
             for burst in bursts
         ]
@@ -247,12 +246,12 @@ class TemporalVisualizer(AsyncBase):
             rhythm_insights=[
                 f"You experience creative flow approximately every {self._calculate_burst_frequency(bursts)} days",
                 f"Your bursts typically last {self._calculate_avg_burst_duration(bursts)} hours",
-                "High consciousness precedes your most significant creations"
+                "High consciousness precedes your most significant creations",
             ],
             growth_indicators=["Creative capacity expanding", "Flow states deepening"],
             suggested_view="wave",  # Wave pattern showing burst intensity
             color_mapping={"creative": "#FFD700", "flow": "#87CEEB", "breakthrough": "#FF69B4"},
-            emphasis_points=[burst["start"] for burst in bursts[:5]]
+            emphasis_points=[burst["start"] for burst in bursts[:5]],
         )
 
     def _derive_time_range(self, anchors: list[MemoryAnchor]) -> tuple[datetime, datetime]:
@@ -296,19 +295,21 @@ class TemporalVisualizer(AsyncBase):
 
         for anchor in anchors:
             if anchor.metadata.get("consciousness_score", 0) > 0.8:
-                key_moments.append({
-                    "timestamp": anchor.timestamp,
-                    "description": anchor.metadata.get("description", "High consciousness moment"),
-                    "type": anchor.metadata.get("activity_type", "unknown"),
-                    "consciousness": anchor.metadata.get("consciousness_score", 0)
-                })
+                key_moments.append(
+                    {
+                        "timestamp": anchor.timestamp,
+                        "description": anchor.metadata.get(
+                            "description", "High consciousness moment"
+                        ),
+                        "type": anchor.metadata.get("activity_type", "unknown"),
+                        "consciousness": anchor.metadata.get("consciousness_score", 0),
+                    }
+                )
 
         return sorted(key_moments, key=lambda m: m["consciousness"], reverse=True)[:10]
 
     async def _generate_rhythm_insights(
-        self,
-        activity_peaks: list[dict[str, Any]],
-        consciousness_flow: list[float]
+        self, activity_peaks: list[dict[str, Any]], consciousness_flow: list[float]
     ) -> list[str]:
         """Generate insights about temporal rhythms."""
         insights = []
@@ -326,9 +327,7 @@ class TemporalVisualizer(AsyncBase):
             hour for hour, score in enumerate(consciousness_flow) if score > 0.7
         ]
         if high_consciousness_hours:
-            insights.append(
-                f"Your consciousness peaks at {high_consciousness_hours[0]}:00"
-            )
+            insights.append(f"Your consciousness peaks at {high_consciousness_hours[0]}:00")
 
         # Flow pattern
         if len(activity_peaks) > 3:
@@ -342,12 +341,12 @@ class TemporalVisualizer(AsyncBase):
 
         # Consciousness-aware color palette
         color_palette = {
-            "creative": "#FFD700",      # Gold for creative work
-            "analytical": "#4169E1",    # Royal blue for analysis
+            "creative": "#FFD700",  # Gold for creative work
+            "analytical": "#4169E1",  # Royal blue for analysis
             "collaborative": "#32CD32",  # Lime green for collaboration
-            "learning": "#9370DB",      # Medium purple for learning
-            "reflection": "#20B2AA",    # Light sea green for reflection
-            "unknown": "#C0C0C0"        # Silver for unknown
+            "learning": "#9370DB",  # Medium purple for learning
+            "reflection": "#20B2AA",  # Light sea green for reflection
+            "unknown": "#C0C0C0",  # Silver for unknown
         }
 
         color_mapping = {}
@@ -363,10 +362,7 @@ class TemporalVisualizer(AsyncBase):
         return color_mapping
 
     async def render_ascii_visualization(
-        self,
-        visualization: TemporalVisualization,
-        width: int = 80,
-        height: int = 20
+        self, visualization: TemporalVisualization, width: int = 80, height: int = 20
     ) -> str:
         """
         Render visualization as ASCII art for terminal display.
@@ -385,7 +381,9 @@ class TemporalVisualizer(AsyncBase):
             output.append("Hour: " + "".join(f"{h:2d} " for h in range(0, 24, 3)))
 
             # Consciousness bar graph
-            max_consciousness = max(visualization.consciousness_flow) if visualization.consciousness_flow else 1
+            max_consciousness = (
+                max(visualization.consciousness_flow) if visualization.consciousness_flow else 1
+            )
             for level in range(10, 0, -1):
                 threshold = (level / 10) * max_consciousness
                 bar = ""
@@ -410,8 +408,7 @@ class TemporalVisualizer(AsyncBase):
                 duration = peak.get("duration", 1)
                 intensity = "█" * int(peak["peak_consciousness"] * 10)
                 output.append(
-                    f"{timestamp.strftime('%m/%d %H:%M')} | {intensity} | "
-                    f"{duration:.1f}h burst"
+                    f"{timestamp.strftime('%m/%d %H:%M')} | {intensity} | {duration:.1f}h burst"
                 )
 
         # Add insights
@@ -444,7 +441,7 @@ class TemporalVisualizer(AsyncBase):
 
         gaps = []
         for i in range(1, len(bursts)):
-            gap = (bursts[i]["start"] - bursts[i-1]["end"]).total_seconds() / 86400
+            gap = (bursts[i]["start"] - bursts[i - 1]["end"]).total_seconds() / 86400
             gaps.append(gap)
 
         return sum(gaps) / len(gaps) if gaps else 0
@@ -454,10 +451,7 @@ class TemporalVisualizer(AsyncBase):
         if not bursts:
             return 0
 
-        durations = [
-            (burst["end"] - burst["start"]).total_seconds() / 3600
-            for burst in bursts
-        ]
+        durations = [(burst["end"] - burst["start"]).total_seconds() / 3600 for burst in bursts]
 
         return sum(durations) / len(durations)
 
@@ -468,16 +462,17 @@ class TemporalVisualizer(AsyncBase):
         for burst in bursts:
             # Find highest consciousness moment in burst
             peak_anchor = max(
-                burst["anchors"],
-                key=lambda a: a.metadata.get("consciousness_score", 0)
+                burst["anchors"], key=lambda a: a.metadata.get("consciousness_score", 0)
             )
 
-            breakthroughs.append({
-                "timestamp": peak_anchor.timestamp,
-                "description": peak_anchor.metadata.get("description", "Creative breakthrough"),
-                "consciousness": peak_anchor.metadata.get("consciousness_score", 0),
-                "context": self._extract_breakthrough_context(burst["anchors"])
-            })
+            breakthroughs.append(
+                {
+                    "timestamp": peak_anchor.timestamp,
+                    "description": peak_anchor.metadata.get("description", "Creative breakthrough"),
+                    "consciousness": peak_anchor.metadata.get("consciousness_score", 0),
+                    "context": self._extract_breakthrough_context(burst["anchors"]),
+                }
+            )
 
         return breakthroughs
 
@@ -505,20 +500,16 @@ class TemporalVisualizer(AsyncBase):
             growth_indicators=["Ready to recognize your rhythms"],
             suggested_view="circular",
             color_mapping={},
-            emphasis_points=[]
+            emphasis_points=[],
         )
 
     async def _add_consciousness_insights(
-        self,
-        visualization: TemporalVisualization,
-        anchors: list[MemoryAnchor]
+        self, visualization: TemporalVisualization, anchors: list[MemoryAnchor]
     ) -> TemporalVisualization:
         """Add consciousness-specific insights to any visualization."""
 
         # Add insight about overall consciousness trend
-        consciousness_scores = [
-            a.metadata.get("consciousness_score", 0.5) for a in anchors
-        ]
+        consciousness_scores = [a.metadata.get("consciousness_score", 0.5) for a in anchors]
 
         if consciousness_scores:
             avg_consciousness = sum(consciousness_scores) / len(consciousness_scores)
@@ -535,9 +526,7 @@ class TemporalVisualizer(AsyncBase):
         return visualization
 
     async def _analyze_general_pattern(
-        self,
-        anchors: list[MemoryAnchor],
-        time_range: tuple[datetime, datetime]
+        self, anchors: list[MemoryAnchor], time_range: tuple[datetime, datetime]
     ) -> TemporalVisualization:
         """Fallback analyzer for general patterns."""
         return await self._analyze_daily_rhythm(anchors, time_range)

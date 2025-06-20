@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from datetime import timedelta
 
 import pytest
+
 from mallku.firecircle.pattern_library import (
     DialoguePattern,
     PatternIndicator,
@@ -46,18 +47,18 @@ def sample_pattern():
         consciousness_signature=0.8,
         structure=PatternStructure(
             components=["proposal", "agreements"],
-            relationships={"proposal": "supported_by_agreements"}
+            relationships={"proposal": "supported_by_agreements"},
         ),
         indicators=[
             PatternIndicator(
                 indicator_type="agreement_count",
                 threshold=3.0,
                 weight=1.0,
-                description="Number of agreements"
+                description="Number of agreements",
             )
         ],
         fitness_score=0.7,
-        observation_count=5
+        observation_count=5,
     )
 
 
@@ -85,10 +86,12 @@ async def test_pattern_query(pattern_library):
         pattern = DialoguePattern(
             name=f"Pattern {i}",
             description=f"Test pattern {i}",
-            taxonomy=PatternTaxonomy.DIALOGUE_FORMATION if i < 2 else PatternTaxonomy.EMERGENCE_BREAKTHROUGH,
+            taxonomy=PatternTaxonomy.DIALOGUE_FORMATION
+            if i < 2
+            else PatternTaxonomy.EMERGENCE_BREAKTHROUGH,
             pattern_type=PatternType.CONSENSUS if i == 0 else PatternType.CREATIVE_TENSION,
             consciousness_signature=0.6 + i * 0.1,
-            fitness_score=0.5 + i * 0.2
+            fitness_score=0.5 + i * 0.2,
         )
         await pattern_library.store_pattern(pattern)
         patterns.append(pattern)
@@ -106,9 +109,7 @@ async def test_pattern_query(pattern_library):
     assert len(consensus_patterns) >= 1
 
     # Query by fitness
-    high_fitness = await pattern_library.find_patterns(
-        PatternQuery(min_fitness=0.7)
-    )
+    high_fitness = await pattern_library.find_patterns(PatternQuery(min_fitness=0.7))
     assert all(p.fitness_score >= 0.7 for p in high_fitness)
 
 
@@ -119,11 +120,7 @@ async def test_pattern_observation_update(pattern_library, sample_pattern):
     pattern_id = await pattern_library.store_pattern(sample_pattern)
 
     # Update observation
-    await pattern_library.update_observation(
-        pattern_id,
-        fitness_delta=0.1,
-        context={"test": True}
-    )
+    await pattern_library.update_observation(pattern_id, fitness_delta=0.1, context={"test": True})
 
     # Retrieve updated pattern
     updated = await pattern_library.retrieve_pattern(pattern_id)
@@ -143,7 +140,7 @@ async def test_pattern_evolution(pattern_library, sample_pattern):
         pattern_id,
         mutation_type="test_mutation",
         changes={"consciousness_signature": 0.9},
-        trigger="test_trigger"
+        trigger="test_trigger",
     )
 
     assert evolved_id is not None
@@ -170,7 +167,7 @@ async def test_pattern_lineage(pattern_library, sample_pattern):
             parent_id,
             mutation_type=f"evolution_{i}",
             changes={"name": f"Child {i}"},
-            trigger="test"
+            trigger="test",
         )
         if evolved_id:
             child_ids.append(evolved_id)
@@ -194,7 +191,7 @@ async def test_pattern_synergies(pattern_library):
         description="Pattern to find synergies for",
         taxonomy=PatternTaxonomy.DIALOGUE_FLOW,
         pattern_type=PatternType.CONVERGENCE,
-        consciousness_signature=0.7
+        consciousness_signature=0.7,
     )
     base_id = await pattern_library.store_pattern(base_pattern)
 
@@ -205,7 +202,7 @@ async def test_pattern_synergies(pattern_library):
         taxonomy=PatternTaxonomy.CONSCIOUSNESS_COHERENCE,
         pattern_type=PatternType.FLOW_STATE,
         consciousness_signature=0.75,
-        synergistic_patterns=[base_id]
+        synergistic_patterns=[base_id],
     )
     syn_id = await pattern_library.store_pattern(synergistic)
 
@@ -231,14 +228,13 @@ async def test_emerging_patterns(pattern_library):
         lifecycle_stage=PatternLifecycle.EMERGING,
         breakthrough_potential=0.9,
         fitness_score=0.7,
-        observation_count=10
+        observation_count=10,
     )
     await pattern_library.store_pattern(emerging)
 
     # Find emerging patterns
     emerging_patterns = await pattern_library.find_emerging_patterns(
-        observation_window=timedelta(days=7),
-        min_breakthrough_potential=0.8
+        observation_window=timedelta(days=7), min_breakthrough_potential=0.8
     )
 
     assert len(emerging_patterns) > 0
@@ -250,7 +246,7 @@ def test_pattern_lifecycle_progression():
     pattern = DialoguePattern(
         name="Lifecycle Test",
         description="Testing lifecycle progression",
-        lifecycle_stage=PatternLifecycle.NASCENT
+        lifecycle_stage=PatternLifecycle.NASCENT,
     )
 
     # Test lifecycle stages
@@ -269,7 +265,7 @@ def test_pattern_lifecycle_progression():
         PatternLifecycle.EVOLVING,
         PatternLifecycle.DECLINING,
         PatternLifecycle.DORMANT,
-        PatternLifecycle.TRANSFORMED
+        PatternLifecycle.TRANSFORMED,
     ]
 
     for stage in all_stages:

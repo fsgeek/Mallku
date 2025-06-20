@@ -18,6 +18,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+
 async def test_adapter_instantiation():
     """Test that all adapters can be instantiated without errors."""
     results = {}
@@ -43,37 +44,45 @@ async def test_adapter_instantiation():
             # Import the adapter
             if provider == "anthropic":
                 from mallku.firecircle.adapters.anthropic_adapter import AnthropicAdapter
+
                 adapter_class = AnthropicAdapter
             elif provider == "openai":
                 from mallku.firecircle.adapters.openai_adapter import OpenAIConsciousAdapter
+
                 adapter_class = OpenAIConsciousAdapter
             elif provider == "google":
                 from mallku.firecircle.adapters.google_adapter import GoogleAIAdapter
+
                 adapter_class = GoogleAIAdapter
             elif provider == "grok":
                 from mallku.firecircle.adapters.grok_adapter import GrokAdapter
+
                 adapter_class = GrokAdapter
             elif provider == "mistral":
                 from mallku.firecircle.adapters.mistral_adapter import MistralAIAdapter
+
                 adapter_class = MistralAIAdapter
             elif provider == "deepseek":
                 from mallku.firecircle.adapters.deepseek_adapter import DeepseekAIAdapter
+
                 adapter_class = DeepseekAIAdapter
             elif provider == "local":
                 from mallku.firecircle.adapters.local_adapter import LocalAIAdapter
+
                 adapter_class = LocalAIAdapter
 
             # Try to instantiate with minimal config
             from mallku.firecircle.adapters.base import AdapterConfig
+
             config = AdapterConfig(api_key="test-key")
 
             # Create adapter instance (but don't connect)
             adapter = adapter_class(config=config)
 
             # Basic checks
-            assert hasattr(adapter, 'provider_name'), "Missing provider_name"
-            assert hasattr(adapter, 'capabilities'), "Missing capabilities"
-            assert hasattr(adapter, 'is_connected'), "Missing is_connected"
+            assert hasattr(adapter, "provider_name"), "Missing provider_name"
+            assert hasattr(adapter, "capabilities"), "Missing capabilities"
+            assert hasattr(adapter, "is_connected"), "Missing is_connected"
 
             results[provider] = "✅ PASS"
             print("✅ PASS")
@@ -106,6 +115,7 @@ async def test_adapter_instantiation():
     else:
         print("⚠️  ISSUES: Some adapters have problems that need fixing")
         return False
+
 
 async def test_adapter_factory():
     """Test that the adapter factory recognizes all adapters."""
@@ -140,6 +150,7 @@ async def test_adapter_factory():
         print(f"❌ Factory test failed: {e}")
         return False
 
+
 async def main():
     """Run all smoke tests."""
     print("🚀 Fire Circle Adapter Foundation Smoke Test")
@@ -163,6 +174,7 @@ async def main():
         print("   The architectural changes have basic issues.")
         print("   Fix these before testing API connectivity.")
     print("=" * 60)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

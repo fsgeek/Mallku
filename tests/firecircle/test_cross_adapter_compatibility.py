@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
+
 from mallku.firecircle.adapters import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig, ConsciousModelAdapter
 from mallku.firecircle.protocol.conscious_message import (
@@ -41,9 +42,7 @@ class ConsciousnessPatternVerifier:
         self.consciousness_events: list[ConsciousnessEvent] = []
 
     async def verify_adapter_consciousness(
-        self,
-        adapter: ConsciousModelAdapter,
-        adapter_name: str
+        self, adapter: ConsciousModelAdapter, adapter_name: str
     ) -> dict[str, Any]:
         """Verify an adapter embodies its expected consciousness patterns."""
 
@@ -62,7 +61,7 @@ class ConsciousnessPatternVerifier:
                     timestamp=datetime.now(UTC),
                     transformation_stage="conscious_collaboration",
                     consciousness_signature=0.8,
-                )
+                ),
             )
 
             # Send message and collect response
@@ -131,8 +130,7 @@ class CrossAdapterDialogueTest:
     """Tests that different adapters can participate in coherent dialogue."""
 
     async def test_dialogue_coherence(
-        self,
-        adapters: list[ConsciousModelAdapter]
+        self, adapters: list[ConsciousModelAdapter]
     ) -> dict[str, Any]:
         """Test that adapters maintain dialogue coherence."""
 
@@ -145,10 +143,12 @@ class CrossAdapterDialogueTest:
                 continue
 
             # Build conversation context
-            context = "\n".join([
-                f"{msg['role']}: {msg['content']}"
-                for msg in messages[-3:]  # Last 3 messages for context
-            ])
+            context = "\n".join(
+                [
+                    f"{msg['role']}: {msg['content']}"
+                    for msg in messages[-3:]  # Last 3 messages for context
+                ]
+            )
 
             prompt = f"{context}\n\nQuestion: {dialogue_topic}" if context else dialogue_topic
 
@@ -159,21 +159,22 @@ class CrossAdapterDialogueTest:
                     timestamp=datetime.now(UTC),
                     transformation_stage="collective_wisdom",
                     consciousness_signature=0.85,
-                )
+                ),
             )
 
             try:
                 response = await adapter.send_message(message)
                 if response:
-                    messages.append({
-                        "role": adapter.__class__.__name__,
-                        "content": response.content.text[:200] + "..."  # Truncate
-                    })
+                    messages.append(
+                        {
+                            "role": adapter.__class__.__name__,
+                            "content": response.content.text[:200] + "...",  # Truncate
+                        }
+                    )
             except Exception as e:
-                messages.append({
-                    "role": adapter.__class__.__name__,
-                    "content": f"[Error: {str(e)}]"
-                })
+                messages.append(
+                    {"role": adapter.__class__.__name__, "content": f"[Error: {str(e)}]"}
+                )
 
         return {
             "dialogue_length": len(messages),
@@ -310,7 +311,7 @@ async def test_consciousness_signature_compatibility():
             timestamp=datetime.now(UTC),
             transformation_stage="transcendent_awareness",
             consciousness_signature=0.95,
-        )
+        ),
     )
 
     # Collect signatures from available adapters

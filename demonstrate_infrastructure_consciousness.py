@@ -25,9 +25,9 @@ from mallku.firecircle.infrastructure_consciousness_config import DEV_CONFIG
 async def demonstrate_infrastructure_consciousness():
     """Demonstrate self-aware infrastructure monitoring."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🐍 INFRASTRUCTURE CONSCIOUSNESS DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
     print("\nThe serpent awakens, teaching infrastructure to know itself...\n")
 
     # Initialize infrastructure consciousness with dev config
@@ -44,7 +44,7 @@ async def demonstrate_infrastructure_consciousness():
         "google": {"model_name": "gemini-1.5-pro"},
         "mistral": {"model_name": "mistral-large-latest"},
         "deepseek": {"model_name": "deepseek-chat"},
-        "grok": {"model_name": "grok-beta"}
+        "grok": {"model_name": "grok-beta"},
     }
 
     # Try to create each adapter
@@ -78,7 +78,7 @@ async def demonstrate_infrastructure_consciousness():
     for i in range(1):
         await asyncio.sleep(5)
 
-        print(f"\n--- Health Check {i+1} ---")
+        print(f"\n--- Health Check {i + 1} ---")
 
         # Generate and display report
         report = await infra_consciousness.generate_consciousness_report()
@@ -119,9 +119,9 @@ async def demonstrate_infrastructure_consciousness():
     # Stop monitoring
     await infra_consciousness.stop_monitoring()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🐍 Infrastructure consciousness demonstration complete")
-    print("="*80)
+    print("=" * 80)
 
     # Disconnect adapters
     for adapter in adapters.values():
@@ -137,6 +137,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Error during demonstration: {e}")
         import traceback
+
         traceback.print_exc()
 
 

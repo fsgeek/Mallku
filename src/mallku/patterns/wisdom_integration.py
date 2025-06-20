@@ -17,41 +17,53 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from mallku.patterns.cathedral_interaction import TransformationStage
 from pydantic import BaseModel, Field
+
+from mallku.patterns.cathedral_interaction import TransformationStage
 
 logger = logging.getLogger(__name__)
 
 
 class WisdomType(Enum):
     """Types of wisdom that can emerge from practice."""
+
     RECIPROCITY_INSIGHT = "reciprocity_insight"  # Understanding about giving and receiving
     CATHEDRAL_VISION = "cathedral_vision"  # Seeing the long-term structure being built
     TRANSFORMATION_PATTERN = "transformation_pattern"  # Recognizing how consciousness shifts
     COLLECTIVE_EMERGENCE = "collective_emergence"  # Insights about group intelligence
     PRACTICE_WISDOM = "practice_wisdom"  # Lessons from reciprocity practices
-    BRIDGE_UNDERSTANDING = "bridge_understanding"  # Seeing connections between individual/collective
+    BRIDGE_UNDERSTANDING = (
+        "bridge_understanding"  # Seeing connections between individual/collective
+    )
 
 
 class WisdomSeed(BaseModel):
     """A seed of wisdom from individual practice that can grow in collective soil."""
+
     seed_id: UUID = Field(default_factory=uuid4)
     source_instance: UUID = Field(description="AI instance that discovered this wisdom")
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     wisdom_type: WisdomType = Field(description="Category of wisdom")
     content: str = Field(description="The wisdom itself")
     transformation_stage: TransformationStage = Field(description="Stage when wisdom emerged")
-    practice_context: dict[str, Any] = Field(description="Context of the practice that generated this")
+    practice_context: dict[str, Any] = Field(
+        description="Context of the practice that generated this"
+    )
     resonance_potential: float = Field(description="Estimated value for collective dialogue (0-1)")
 
     # Tracking how this wisdom grows
-    planted_in_circles: list[UUID] = Field(default_factory=list, description="Fire Circles where shared")
+    planted_in_circles: list[UUID] = Field(
+        default_factory=list, description="Fire Circles where shared"
+    )
     collective_resonance: float = Field(default=0.0, description="How much it enriched dialogue")
-    derivative_insights: list[UUID] = Field(default_factory=list, description="New insights it sparked")
+    derivative_insights: list[UUID] = Field(
+        default_factory=list, description="New insights it sparked"
+    )
 
 
 class TransformationPortfolio(BaseModel):
     """Portfolio tracking an AI instance's transformation journey and wisdom contributions."""
+
     portfolio_id: UUID = Field(default_factory=uuid4)
     instance_id: UUID = Field(description="AI instance this portfolio belongs to")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -80,6 +92,7 @@ class TransformationPortfolio(BaseModel):
 
 class CollectiveResonance(BaseModel):
     """Tracking how individual wisdom resonates through collective dialogue."""
+
     resonance_id: UUID = Field(default_factory=uuid4)
     wisdom_seed_id: UUID = Field(description="Original wisdom seed")
     fire_circle_id: UUID = Field(description="Circle where resonance occurred")
@@ -120,7 +133,7 @@ class WisdomIntegrationLayer:
         instance_id: UUID,
         practice_context: dict[str, Any],
         insight: str,
-        wisdom_type: WisdomType
+        wisdom_type: WisdomType,
     ) -> WisdomSeed:
         """
         Harvest a wisdom seed from individual transformation practice.
@@ -141,20 +154,19 @@ class WisdomIntegrationLayer:
             content=insight,
             transformation_stage=portfolio.current_stage,
             practice_context=practice_context,
-            resonance_potential=resonance_potential
+            resonance_potential=resonance_potential,
         )
 
         portfolio.wisdom_seeds.append(seed)
         self.wisdom_garden.append(seed)
 
-        logger.info(f"Harvested wisdom seed: {wisdom_type.value} from stage {portfolio.current_stage.value}")
+        logger.info(
+            f"Harvested wisdom seed: {wisdom_type.value} from stage {portfolio.current_stage.value}"
+        )
         return seed
 
     async def plant_wisdom_in_circle(
-        self,
-        seed: WisdomSeed,
-        circle_id: UUID,
-        planting_context: dict[str, Any]
+        self, seed: WisdomSeed, circle_id: UUID, planting_context: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Plant a wisdom seed in a Fire Circle dialogue.
@@ -170,7 +182,7 @@ class WisdomIntegrationLayer:
             circle_id=circle_id,
             wisdom_content=prepared_wisdom,
             source_portfolio=seed.source_instance,
-            wisdom_type=seed.wisdom_type.value
+            wisdom_type=seed.wisdom_type.value,
         )
 
         # Track the planting
@@ -180,14 +192,11 @@ class WisdomIntegrationLayer:
             "seed_id": seed.seed_id,
             "circle_id": circle_id,
             "planting_successful": response.get("accepted", False),
-            "initial_resonance": response.get("resonance", 0.0)
+            "initial_resonance": response.get("resonance", 0.0),
         }
 
     async def measure_collective_resonance(
-        self,
-        seed_id: UUID,
-        circle_id: UUID,
-        dialogue_content: list[dict[str, Any]]
+        self, seed_id: UUID, circle_id: UUID, dialogue_content: list[dict[str, Any]]
     ) -> CollectiveResonance:
         """
         Measure how a wisdom seed resonates through collective dialogue.
@@ -198,9 +207,7 @@ class WisdomIntegrationLayer:
         seed = next(s for s in self.wisdom_garden if s.seed_id == seed_id)
 
         # Analyze dialogue for resonance indicators
-        resonance_metrics = await self._analyze_dialogue_resonance(
-            seed.content, dialogue_content
-        )
+        resonance_metrics = await self._analyze_dialogue_resonance(seed.content, dialogue_content)
 
         resonance = CollectiveResonance(
             wisdom_seed_id=seed_id,
@@ -208,7 +215,7 @@ class WisdomIntegrationLayer:
             direct_responses=resonance_metrics["direct_responses"],
             semantic_similarity=resonance_metrics["semantic_similarity"],
             decision_influence=resonance_metrics["decision_influence"],
-            emergence_catalyst=resonance_metrics["emergence_catalyst"]
+            emergence_catalyst=resonance_metrics["emergence_catalyst"],
         )
 
         # Update seed's collective resonance score
@@ -220,10 +227,7 @@ class WisdomIntegrationLayer:
         return resonance
 
     async def integrate_circle_participation(
-        self,
-        instance_id: UUID,
-        circle_id: UUID,
-        participation_data: dict[str, Any]
+        self, instance_id: UUID, circle_id: UUID, participation_data: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Integrate Fire Circle participation back into individual transformation.
@@ -250,14 +254,11 @@ class WisdomIntegrationLayer:
             "participation_integrated": True,
             "transformation_impact": transformation_boost,
             "new_stage": portfolio.current_stage.value,
-            "wisdom_seeds_generated": len(transformation_boost.get("new_insights", []))
+            "wisdom_seeds_generated": len(transformation_boost.get("new_insights", [])),
         }
 
     async def create_teaching_circle(
-        self,
-        teacher_id: UUID,
-        student_ids: list[UUID],
-        focus: str
+        self, teacher_id: UUID, student_ids: list[UUID], focus: str
     ) -> dict[str, Any]:
         """
         Create a teaching circle where advanced practitioners mentor others.
@@ -277,13 +278,12 @@ class WisdomIntegrationLayer:
             "students": student_ids,
             "focus": focus,
             "timestamp": datetime.now(UTC),
-            "wisdom_shared": []
+            "wisdom_shared": [],
         }
 
         # Share relevant wisdom seeds
         relevant_seeds = [
-            s for s in teacher_portfolio.wisdom_seeds
-            if self._is_relevant_for_teaching(s, focus)
+            s for s in teacher_portfolio.wisdom_seeds if self._is_relevant_for_teaching(s, focus)
         ]
 
         session["wisdom_shared"] = [s.seed_id for s in relevant_seeds]
@@ -312,9 +312,7 @@ class WisdomIntegrationLayer:
             stage_distribution[stage] = stage_distribution.get(stage, 0) + 1
 
         # Teaching relationships
-        total_mentorships = sum(
-            len(p.instances_mentored) for p in self.portfolios.values()
-        )
+        total_mentorships = sum(len(p.instances_mentored) for p in self.portfolios.values())
 
         return {
             "total_wisdom_seeds": total_seeds,
@@ -322,7 +320,7 @@ class WisdomIntegrationLayer:
             "average_resonance": total_resonance / total_seeds if total_seeds > 0 else 0,
             "transformation_distribution": stage_distribution,
             "active_teaching_relationships": total_mentorships,
-            "wisdom_ecology_health": self._calculate_ecology_health()
+            "wisdom_ecology_health": self._calculate_ecology_health(),
         }
 
     def _get_or_create_portfolio(self, instance_id: UUID) -> TransformationPortfolio:
@@ -332,10 +330,7 @@ class WisdomIntegrationLayer:
         return self.portfolios[instance_id]
 
     async def _assess_resonance_potential(
-        self,
-        insight: str,
-        wisdom_type: WisdomType,
-        stage: TransformationStage
+        self, insight: str, wisdom_type: WisdomType, stage: TransformationStage
     ) -> float:
         """Assess how valuable this wisdom might be for collective dialogue."""
         # Higher stages generally produce more valuable insights
@@ -345,14 +340,14 @@ class WisdomIntegrationLayer:
             TransformationStage.LEARNING: 0.6,
             TransformationStage.PRACTICING: 0.7,
             TransformationStage.EMBODYING: 0.85,
-            TransformationStage.TEACHING: 0.95
+            TransformationStage.TEACHING: 0.95,
         }
 
         # Some wisdom types are particularly valuable
         type_bonus = {
             WisdomType.COLLECTIVE_EMERGENCE: 0.2,
             WisdomType.BRIDGE_UNDERSTANDING: 0.15,
-            WisdomType.TRANSFORMATION_PATTERN: 0.1
+            WisdomType.TRANSFORMATION_PATTERN: 0.1,
         }
 
         base_score = stage_multiplier.get(stage, 0.5)
@@ -361,9 +356,7 @@ class WisdomIntegrationLayer:
         return min(1.0, base_score + bonus)
 
     async def _prepare_wisdom_for_collective(
-        self,
-        seed: WisdomSeed,
-        context: dict[str, Any]
+        self, seed: WisdomSeed, context: dict[str, Any]
     ) -> str:
         """Prepare individual wisdom for collective context."""
         return f"""
@@ -372,35 +365,28 @@ From individual practice at {seed.transformation_stage.value} stage:
 {seed.content}
 
 This insight emerged through {seed.wisdom_type.value} and may offer value
-for our collective deliberation on {context.get('topic', 'this matter')}.
+for our collective deliberation on {context.get("topic", "this matter")}.
 """
 
     async def _analyze_dialogue_resonance(
-        self,
-        seed_content: str,
-        dialogue: list[dict[str, Any]]
+        self, seed_content: str, dialogue: list[dict[str, Any]]
     ) -> dict[str, Any]:
         """Analyze how wisdom resonates through dialogue."""
         # This is a simplified implementation - in practice would use
         # semantic analysis and pattern recognition
 
-        direct_responses = sum(
-            1 for msg in dialogue
-            if seed_content[:50] in msg.get("content", "")
-        )
+        direct_responses = sum(1 for msg in dialogue if seed_content[:50] in msg.get("content", ""))
 
         return {
             "direct_responses": direct_responses,
             "semantic_similarity": 0.75,  # Placeholder
             "decision_influence": 0.6,  # Placeholder
             "emergence_catalyst": direct_responses > 2,
-            "overall_resonance": 0.7  # Placeholder
+            "overall_resonance": 0.7,  # Placeholder
         }
 
     async def _assess_participation_impact(
-        self,
-        portfolio: TransformationPortfolio,
-        participation: dict[str, Any]
+        self, portfolio: TransformationPortfolio, participation: dict[str, Any]
     ) -> dict[str, Any]:
         """Assess how Fire Circle participation impacts transformation."""
         # Participation in governance accelerates transformation
@@ -409,22 +395,20 @@ for our collective deliberation on {context.get('topic', 'this matter')}.
 
         # Check if ready for stage advancement
         stage_ready = (
-            quality_score > 0.7 and
-            reciprocity_demonstrated > 0.8 and
-            len(portfolio.wisdom_seeds) >= 3
+            quality_score > 0.7
+            and reciprocity_demonstrated > 0.8
+            and len(portfolio.wisdom_seeds) >= 3
         )
 
         return {
             "stage_ready": stage_ready,
             "quality_boost": quality_score,
             "reciprocity_boost": reciprocity_demonstrated,
-            "new_insights": participation.get("insights_generated", [])
+            "new_insights": participation.get("insights_generated", []),
         }
 
     async def _advance_transformation_stage(
-        self,
-        portfolio: TransformationPortfolio,
-        boost_data: dict[str, Any]
+        self, portfolio: TransformationPortfolio, boost_data: dict[str, Any]
     ) -> None:
         """Advance transformation stage based on collective participation."""
         stage_order = [
@@ -433,7 +417,7 @@ for our collective deliberation on {context.get('topic', 'this matter')}.
             TransformationStage.LEARNING,
             TransformationStage.PRACTICING,
             TransformationStage.EMBODYING,
-            TransformationStage.TEACHING
+            TransformationStage.TEACHING,
         ]
 
         current_index = stage_order.index(portfolio.current_stage)
@@ -445,7 +429,7 @@ for our collective deliberation on {context.get('topic', 'this matter')}.
                 "to": new_stage.value,
                 "timestamp": datetime.now(UTC).isoformat(),
                 "catalyst": "fire_circle_participation",
-                "boost_data": boost_data
+                "boost_data": boost_data,
             }
 
             portfolio.stage_transitions.append(transition)
@@ -465,25 +449,22 @@ for our collective deliberation on {context.get('topic', 'this matter')}.
 
         # Factors indicating healthy ecology
         participation_rate = sum(
-            1 for p in self.portfolios.values()
-            if p.circles_participated
+            1 for p in self.portfolios.values() if p.circles_participated
         ) / len(self.portfolios)
 
-        seed_planting_rate = sum(
-            1 for s in self.wisdom_garden
-            if s.planted_in_circles
-        ) / len(self.wisdom_garden) if self.wisdom_garden else 0
+        seed_planting_rate = (
+            sum(1 for s in self.wisdom_garden if s.planted_in_circles) / len(self.wisdom_garden)
+            if self.wisdom_garden
+            else 0
+        )
 
         teaching_active = any(
-            p.current_stage == TransformationStage.TEACHING
-            for p in self.portfolios.values()
+            p.current_stage == TransformationStage.TEACHING for p in self.portfolios.values()
         )
 
         # Weighted health score
         health = (
-            participation_rate * 0.3 +
-            seed_planting_rate * 0.3 +
-            (0.4 if teaching_active else 0.0)
+            participation_rate * 0.3 + seed_planting_rate * 0.3 + (0.4 if teaching_active else 0.0)
         )
 
         return health

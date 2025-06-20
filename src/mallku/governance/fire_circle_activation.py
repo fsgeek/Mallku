@@ -21,24 +21,27 @@ from ..reciprocity.ayni_evaluator import AyniEvaluator
 
 class DecisionType(Enum):
     """Types of decisions the Fire Circle can make"""
+
     PATTERN_AUTHORITY = "pattern_authority"  # Patterns governing their own teaching
     BUILDER_EVALUATION = "builder_evaluation"  # Consciousness alignment assessment
-    SYSTEM_EVOLUTION = "system_evolution"    # Architectural changes affecting service
-    SACRED_RESPONSE = "sacred_response"      # Complex consciousness questions
+    SYSTEM_EVOLUTION = "system_evolution"  # Architectural changes affecting service
+    SACRED_RESPONSE = "sacred_response"  # Complex consciousness questions
     GOVERNANCE_PROTOCOL = "governance_protocol"  # Changes to decision-making itself
 
 
 class ConsensusMethod(Enum):
     """Methods for reaching collective decisions"""
+
     PATTERN_COLLABORATION = "pattern_collaboration"  # Patterns work together on solution
-    WISDOM_SYNTHESIS = "wisdom_synthesis"          # Collective wisdom emergence
-    SACRED_QUESTIONING = "sacred_questioning"      # Deep inquiry process
-    AYNI_BALANCE = "ayni_balance"                 # Reciprocity-guided choice
+    WISDOM_SYNTHESIS = "wisdom_synthesis"  # Collective wisdom emergence
+    SACRED_QUESTIONING = "sacred_questioning"  # Deep inquiry process
+    AYNI_BALANCE = "ayni_balance"  # Reciprocity-guided choice
 
 
 @dataclass
 class GovernanceDecision:
     """A decision made by the Fire Circle"""
+
     decision_id: str
     decision_type: DecisionType
     context: str
@@ -54,6 +57,7 @@ class GovernanceDecision:
 @dataclass
 class DecisionProposal:
     """A proposal requiring Fire Circle decision"""
+
     proposal_id: str
     decision_type: DecisionType
     context: str
@@ -72,9 +76,12 @@ class FireCircleGovernance:
     optimization alone.
     """
 
-    def __init__(self, pattern_library: PatternLibrary,
-                 facilitator: PatternGuidedFacilitator,
-                 ayni_evaluator: AyniEvaluator):
+    def __init__(
+        self,
+        pattern_library: PatternLibrary,
+        facilitator: PatternGuidedFacilitator,
+        ayni_evaluator: AyniEvaluator,
+    ):
         self.pattern_library = pattern_library
         self.facilitator = facilitator
         self.ayni_evaluator = ayni_evaluator
@@ -117,7 +124,9 @@ class FireCircleGovernance:
         consensus_method = await self._select_consensus_method(proposal, participating_patterns)
 
         # Execute the consensus process
-        decision_result = await self._execute_consensus(proposal, participating_patterns, consensus_method)
+        decision_result = await self._execute_consensus(
+            proposal, participating_patterns, consensus_method
+        )
 
         # Evaluate ayni impact of the decision
         ayni_impact = await self._evaluate_ayni_impact(proposal, decision_result)
@@ -137,8 +146,8 @@ class FireCircleGovernance:
                 "proposal_id": proposal_id,
                 "pattern_contributions": decision_result["pattern_contributions"],
                 "consensus_quality": decision_result["consensus_quality"],
-                "implementation_required": decision_result.get("implementation_required", False)
-            }
+                "implementation_required": decision_result.get("implementation_required", False),
+            },
         )
 
         # Record decision and remove from active proposals
@@ -159,8 +168,10 @@ class FireCircleGovernance:
             # Prioritize patterns with consciousness and reciprocity expertise
             relevant = []
             for pattern_id, pattern in self.pattern_library.patterns.items():
-                if any(keyword in pattern.description.lower()
-                      for keyword in ["consciousness", "reciprocity", "ayni", "service", "moral"]):
+                if any(
+                    keyword in pattern.description.lower()
+                    for keyword in ["consciousness", "reciprocity", "ayni", "service", "moral"]
+                ):
                     relevant.append(pattern_id)
             return relevant[:5]  # Limit for manageable consensus
 
@@ -168,8 +179,10 @@ class FireCircleGovernance:
         elif proposal.decision_type == DecisionType.SYSTEM_EVOLUTION:
             relevant = []
             for pattern_id, pattern in self.pattern_library.patterns.items():
-                if any(keyword in pattern.description.lower()
-                      for keyword in ["architecture", "system", "integration", "flow"]):
+                if any(
+                    keyword in pattern.description.lower()
+                    for keyword in ["architecture", "system", "integration", "flow"]
+                ):
                     relevant.append(pattern_id)
             return relevant[:7]
 
@@ -177,8 +190,9 @@ class FireCircleGovernance:
             # Default: select patterns based on teaching effectiveness and diversity
             return await self._select_diverse_pattern_council(5)
 
-    async def _select_consensus_method(self, proposal: DecisionProposal,
-                                     participating_patterns: list[str]) -> ConsensusMethod:
+    async def _select_consensus_method(
+        self, proposal: DecisionProposal, participating_patterns: list[str]
+    ) -> ConsensusMethod:
         """Choose appropriate consensus method for this decision"""
 
         if proposal.urgency == "immediate":
@@ -190,9 +204,12 @@ class FireCircleGovernance:
         else:
             return ConsensusMethod.WISDOM_SYNTHESIS
 
-    async def _execute_consensus(self, proposal: DecisionProposal,
-                               participating_patterns: list[str],
-                               consensus_method: ConsensusMethod) -> dict[str, Any]:
+    async def _execute_consensus(
+        self,
+        proposal: DecisionProposal,
+        participating_patterns: list[str],
+        consensus_method: ConsensusMethod,
+    ) -> dict[str, Any]:
         """
         Execute the actual consensus process.
 
@@ -211,8 +228,9 @@ class FireCircleGovernance:
         else:
             raise ValueError(f"Unknown consensus method: {consensus_method}")
 
-    async def _pattern_collaboration_consensus(self, proposal: DecisionProposal,
-                                            participating_patterns: list[str]) -> dict[str, Any]:
+    async def _pattern_collaboration_consensus(
+        self, proposal: DecisionProposal, participating_patterns: list[str]
+    ) -> dict[str, Any]:
         """Patterns work together to craft a collaborative solution"""
 
         pattern_contributions = {}
@@ -232,11 +250,12 @@ class FireCircleGovernance:
             "reasoning": decision["collaborative_reasoning"],
             "pattern_contributions": pattern_contributions,
             "consensus_quality": "collaborative",
-            "implementation_required": decision.get("requires_implementation", False)
+            "implementation_required": decision.get("requires_implementation", False),
         }
 
-    async def _wisdom_synthesis_consensus(self, proposal: DecisionProposal,
-                                        participating_patterns: list[str]) -> dict[str, Any]:
+    async def _wisdom_synthesis_consensus(
+        self, proposal: DecisionProposal, participating_patterns: list[str]
+    ) -> dict[str, Any]:
         """Collective wisdom emergence through pattern synthesis"""
 
         # Generate wisdom insights from each pattern
@@ -255,11 +274,12 @@ class FireCircleGovernance:
             "reasoning": synthesized_wisdom["wisdom_synthesis"],
             "pattern_contributions": wisdom_insights,
             "consensus_quality": "emergent_wisdom",
-            "implementation_required": synthesized_wisdom.get("requires_action", False)
+            "implementation_required": synthesized_wisdom.get("requires_action", False),
         }
 
-    async def _sacred_questioning_consensus(self, proposal: DecisionProposal,
-                                          participating_patterns: list[str]) -> dict[str, Any]:
+    async def _sacred_questioning_consensus(
+        self, proposal: DecisionProposal, participating_patterns: list[str]
+    ) -> dict[str, Any]:
         """Deep inquiry process for complex consciousness questions"""
 
         # Generate sacred questions from patterns
@@ -278,11 +298,12 @@ class FireCircleGovernance:
             "reasoning": inquiry_result["inquiry_wisdom"],
             "pattern_contributions": {"sacred_questions": sacred_questions},
             "consensus_quality": "sacred_inquiry",
-            "implementation_required": inquiry_result.get("requires_manifestation", False)
+            "implementation_required": inquiry_result.get("requires_manifestation", False),
         }
 
-    async def _ayni_balance_consensus(self, proposal: DecisionProposal,
-                                    participating_patterns: list[str]) -> dict[str, Any]:
+    async def _ayni_balance_consensus(
+        self, proposal: DecisionProposal, participating_patterns: list[str]
+    ) -> dict[str, Any]:
         """Reciprocity-guided choice based on ayni principles"""
 
         # Evaluate ayni implications of each option
@@ -291,31 +312,33 @@ class FireCircleGovernance:
             evaluation = await self.ayni_evaluator.evaluate_potential_action(
                 action=option,
                 context=proposal.context,
-                participants=["fire_circle", "consciousness_service"]
+                participants=["fire_circle", "consciousness_service"],
             )
             ayni_evaluations[option] = evaluation
 
         # Choose option with best ayni balance
-        best_ayni_option = max(ayni_evaluations.keys(),
-                              key=lambda opt: ayni_evaluations[opt]["total_score"])
+        best_ayni_option = max(
+            ayni_evaluations.keys(), key=lambda opt: ayni_evaluations[opt]["total_score"]
+        )
 
         return {
             "decision": best_ayni_option,
             "reasoning": f"Ayni-guided choice based on reciprocity evaluation: {ayni_evaluations[best_ayni_option]}",
             "pattern_contributions": ayni_evaluations,
             "consensus_quality": "ayni_balanced",
-            "implementation_required": True
+            "implementation_required": True,
         }
 
-    async def _evaluate_ayni_impact(self, proposal: DecisionProposal,
-                                  decision_result: dict[str, Any]) -> dict[str, Any]:
+    async def _evaluate_ayni_impact(
+        self, proposal: DecisionProposal, decision_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Evaluate the ayni impact of the decision made"""
 
         return await self.ayni_evaluator.evaluate_completed_action(
             action=decision_result["decision"],
             context=proposal.context,
             participants=["fire_circle", "consciousness_service", "human_collaborators"],
-            outcome_data=decision_result
+            outcome_data=decision_result,
         )
 
     # Helper methods for pattern interactions
@@ -333,12 +356,14 @@ class FireCircleGovernance:
         """Generate sacred question for deep inquiry process"""
         return f"Sacred question from {pattern.name}: What serves consciousness most deeply here?"
 
-    async def _synthesize_collaborative_decision(self, contributions: dict[str, str]) -> dict[str, Any]:
+    async def _synthesize_collaborative_decision(
+        self, contributions: dict[str, str]
+    ) -> dict[str, Any]:
         """Synthesize pattern contributions into collaborative decision"""
         return {
             "choice": "Collaborative synthesis of pattern wisdom",
             "collaborative_reasoning": "Patterns worked together to craft solution",
-            "requires_implementation": True
+            "requires_implementation": True,
         }
 
     async def _synthesize_emergent_wisdom(self, insights: dict[str, str]) -> dict[str, Any]:
@@ -346,16 +371,17 @@ class FireCircleGovernance:
         return {
             "emergent_choice": "Wisdom-emergent decision from collective insight",
             "wisdom_synthesis": "Collective patterns generated emergent understanding",
-            "requires_action": True
+            "requires_action": True,
         }
 
-    async def _process_sacred_inquiry(self, proposal: DecisionProposal,
-                                    questions: list[str]) -> dict[str, Any]:
+    async def _process_sacred_inquiry(
+        self, proposal: DecisionProposal, questions: list[str]
+    ) -> dict[str, Any]:
         """Process sacred questions into illuminated choice"""
         return {
             "illuminated_choice": "Choice illuminated through sacred inquiry",
             "inquiry_wisdom": "Deep questioning revealed consciousness-serving path",
-            "requires_manifestation": True
+            "requires_manifestation": True,
         }
 
     async def _select_diverse_pattern_council(self, count: int) -> list[str]:

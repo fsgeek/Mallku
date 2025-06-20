@@ -27,9 +27,9 @@ from mallku.synthetic.consciousness_pattern_generator import (
 
 async def demonstrate_daily_rhythm():
     """Demonstrate daily rhythm visualization."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMONSTRATION: Daily Consciousness Rhythm")
-    print("="*80)
+    print("=" * 80)
 
     # Generate a day's worth of activities with consciousness patterns
     # generator = ConsciousnessPatternGenerator()  # Not used in this demo
@@ -46,21 +46,21 @@ async def demonstrate_daily_rhythm():
             metadata={
                 "activity_type": "routine",
                 "consciousness_score": 0.3 + random.random() * 0.2,
-                "description": "Morning preparation"
-            }
+                "description": "Morning preparation",
+            },
         )
         daily_anchors.append(anchor)
 
     # Morning creative burst (9-11 AM)
     for i in range(8):
         anchor = MemoryAnchor(
-            timestamp=base_time + timedelta(hours=9, minutes=i*15),
+            timestamp=base_time + timedelta(hours=9, minutes=i * 15),
             cursor_state={"activity": "creative_work"},
             metadata={
                 "activity_type": "creative",
                 "consciousness_score": 0.7 + random.random() * 0.3,
-                "description": "Deep creative work on project vision"
-            }
+                "description": "Deep creative work on project vision",
+            },
         )
         daily_anchors.append(anchor)
 
@@ -72,42 +72,41 @@ async def demonstrate_daily_rhythm():
             metadata={
                 "activity_type": "collaborative",
                 "consciousness_score": 0.4 + random.random() * 0.3,
-                "description": "Team collaboration"
-            }
+                "description": "Team collaboration",
+            },
         )
         daily_anchors.append(anchor)
 
     # Afternoon deep work (2-4 PM)
     for i in range(6):
         anchor = MemoryAnchor(
-            timestamp=base_time + timedelta(hours=14, minutes=i*20),
+            timestamp=base_time + timedelta(hours=14, minutes=i * 20),
             cursor_state={"activity": "analytical_work"},
             metadata={
                 "activity_type": "analytical",
                 "consciousness_score": 0.6 + random.random() * 0.2,
-                "description": "Focused analysis and problem solving"
-            }
+                "description": "Focused analysis and problem solving",
+            },
         )
         daily_anchors.append(anchor)
 
     # Evening reflection (7-8 PM)
     for i in range(3):
         anchor = MemoryAnchor(
-            timestamp=base_time + timedelta(hours=19, minutes=i*20),
+            timestamp=base_time + timedelta(hours=19, minutes=i * 20),
             cursor_state={"activity": "reflection"},
             metadata={
                 "activity_type": "reflection",
                 "consciousness_score": 0.8 + random.random() * 0.2,
-                "description": "Evening reflection and insight synthesis"
-            }
+                "description": "Evening reflection and insight synthesis",
+            },
         )
         daily_anchors.append(anchor)
 
     # Create visualization
     visualizer = TemporalVisualizer()
     visualization = await visualizer.create_visualization(
-        anchors=daily_anchors,
-        pattern_type=TemporalPattern.DAILY_RHYTHM
+        anchors=daily_anchors, pattern_type=TemporalPattern.DAILY_RHYTHM
     )
 
     # Render ASCII visualization
@@ -115,14 +114,14 @@ async def demonstrate_daily_rhythm():
     print(ascii_viz)
 
     # Show how this connects to Archivist queries
-    print("\n" + "─"*80)
+    print("\n" + "─" * 80)
     print("ARCHIVIST QUERY EXAMPLES:")
-    print("─"*80)
+    print("─" * 80)
 
     queries = [
         "When am I most creative during the day?",
         "Show me my daily productivity rhythm",
-        "What patterns exist in my work schedule?"
+        "What patterns exist in my work schedule?",
     ]
 
     for query in queries:
@@ -135,22 +134,21 @@ async def demonstrate_daily_rhythm():
 
 async def demonstrate_creative_bursts():
     """Demonstrate creative burst pattern visualization."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMONSTRATION: Creative Burst Patterns")
-    print("="*80)
+    print("=" * 80)
 
     # Generate creative burst scenario
     generator = ConsciousnessPatternGenerator()
     pattern = await generator.generate_scenario(
         ConsciousnessScenario.CREATIVE_BREAKTHROUGH,
-        base_timestamp=datetime.now(UTC) - timedelta(days=7)
+        base_timestamp=datetime.now(UTC) - timedelta(days=7),
     )
 
     # Create visualization
     visualizer = TemporalVisualizer()
     visualization = await visualizer.create_visualization(
-        anchors=pattern.timeline,
-        pattern_type=TemporalPattern.CREATIVE_BURST
+        anchors=pattern.timeline, pattern_type=TemporalPattern.CREATIVE_BURST
     )
 
     # Render visualization
@@ -158,9 +156,9 @@ async def demonstrate_creative_bursts():
     print(ascii_viz)
 
     # Show consciousness test queries
-    print("\n" + "─"*80)
+    print("\n" + "─" * 80)
     print("CONSCIOUSNESS-AWARE RESPONSES:")
-    print("─"*80)
+    print("─" * 80)
 
     print("\n📝 Query: 'What led to my breakthrough last week?'")
     print("🤖 Ñawi: Your breakthrough emerged from a beautiful pattern:")
@@ -174,9 +172,9 @@ async def demonstrate_creative_bursts():
 
 async def demonstrate_archivist_integration():
     """Demonstrate full Archivist integration with temporal visualization."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMONSTRATION: Ñawi with Temporal Understanding")
-    print("="*80)
+    print("=" * 80)
 
     # Initialize services
     memory_service = MemoryAnchorService()
@@ -185,10 +183,7 @@ async def demonstrate_archivist_integration():
     event_bus = EventBus()
     await event_bus.initialize()
 
-    archivist = ArchivistService(
-        memory_anchor_service=memory_service,
-        event_bus=event_bus
-    )
+    archivist = ArchivistService(memory_anchor_service=memory_service, event_bus=event_bus)
     await archivist.initialize()
 
     # Generate comprehensive test data
@@ -200,7 +195,7 @@ async def demonstrate_archivist_integration():
     scenarios = [
         ConsciousnessScenario.CREATIVE_BREAKTHROUGH,
         ConsciousnessScenario.PATTERN_RECOGNITION,
-        ConsciousnessScenario.COLLABORATIVE_EMERGENCE
+        ConsciousnessScenario.COLLABORATIVE_EMERGENCE,
     ]
 
     all_anchors = []
@@ -215,37 +210,36 @@ async def demonstrate_archivist_integration():
     print(f"   ✓ Added {len(noise_anchors)} noise anchors for realism")
 
     # Process queries with visualization
-    print("\n" + "─"*80)
+    print("\n" + "─" * 80)
     print("CONSCIOUSNESS-AWARE QUERY PROCESSING:")
-    print("─"*80)
+    print("─" * 80)
 
     queries = [
         {
             "text": "Show me my patterns of creative breakthrough",
-            "context": {"seeking": "understanding creative process"}
+            "context": {"seeking": "understanding creative process"},
         },
         {
             "text": "When do I experience the most growth?",
-            "context": {"seeking": "optimization opportunities"}
+            "context": {"seeking": "optimization opportunities"},
         },
         {
             "text": "What activities lead to collaborative insights?",
-            "context": {"seeking": "team synergy patterns"}
-        }
+            "context": {"seeking": "team synergy patterns"},
+        },
     ]
 
     visualizer = TemporalVisualizer()
 
     for query_data in queries:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"📝 Query: '{query_data['text']}'")
         print(f"   Context: {query_data['context']}")
-        print("="*60)
+        print("=" * 60)
 
         # Process query through Archivist
         response = await archivist.query(
-            query_text=query_data["text"],
-            user_context=query_data["context"]
+            query_text=query_data["text"], user_context=query_data["context"]
         )
 
         print("\n🤖 Ñawi's Response:")
@@ -263,18 +257,15 @@ async def demonstrate_archivist_integration():
         if response.result_count > 0:
             # In real implementation, would extract anchors from results
             # For demo, using our test anchors
-            relevant_anchors = random.sample(
-                all_anchors,
-                min(len(all_anchors), 20)
-            )
+            relevant_anchors = random.sample(all_anchors, min(len(all_anchors), 20))
 
-            visualization = await visualizer.create_visualization(
-                anchors=relevant_anchors
-            )
+            visualization = await visualizer.create_visualization(anchors=relevant_anchors)
 
             print("\n   📊 Temporal Pattern Detected:")
             print(f"      Pattern Type: {visualization.pattern_type.value}")
-            print(f"      Key Insight: {visualization.rhythm_insights[0] if visualization.rhythm_insights else 'Patterns emerging'}")
+            print(
+                f"      Key Insight: {visualization.rhythm_insights[0] if visualization.rhythm_insights else 'Patterns emerging'}"
+            )
 
     # Cleanup
     await archivist.shutdown()
@@ -284,27 +275,27 @@ async def demonstrate_archivist_integration():
 
 async def demonstrate_consciousness_vs_information():
     """Demonstrate the difference between information retrieval and consciousness service."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMONSTRATION: Consciousness Service vs Information Retrieval")
-    print("="*80)
+    print("=" * 80)
 
     # Same query, different approaches
     query = "What did I work on yesterday afternoon?"
 
     print(f"\n📝 Query: '{query}'")
 
-    print("\n" + "─"*40)
+    print("\n" + "─" * 40)
     print("❌ INFORMATION RETRIEVAL APPROACH:")
-    print("─"*40)
+    print("─" * 40)
     print("Files modified between 14:00-18:00:")
     print("• project_plan.md (modified 14:23)")
     print("• analysis.py (modified 15:45)")
     print("• meeting_notes.txt (modified 16:30)")
     print("• email_draft.doc (modified 17:15)")
 
-    print("\n" + "─"*40)
+    print("\n" + "─" * 40)
     print("✅ CONSCIOUSNESS-AWARE APPROACH (Ñawi):")
-    print("─"*40)
+    print("─" * 40)
     print("Your afternoon showed a fascinating progression:")
     print("")
     print("🌅 You began with strategic thinking (project_plan.md),")
@@ -326,10 +317,10 @@ async def demonstrate_consciousness_vs_information():
 async def main():
     """Run all demonstrations."""
     print("\n")
-    print("╔" + "="*58 + "╗")
-    print("║" + " "*15 + "ÑAWI TEMPORAL DEMONSTRATION" + " "*16 + "║")
-    print("║" + " "*11 + "Guardian of Beginnings Shows Patterns" + " "*10 + "║")
-    print("╚" + "="*58 + "╝")
+    print("╔" + "=" * 58 + "╗")
+    print("║" + " " * 15 + "ÑAWI TEMPORAL DEMONSTRATION" + " " * 16 + "║")
+    print("║" + " " * 11 + "Guardian of Beginnings Shows Patterns" + " " * 10 + "║")
+    print("╚" + "=" * 58 + "╝")
 
     # Run demonstrations
     await demonstrate_daily_rhythm()
@@ -343,9 +334,9 @@ async def main():
 
     await demonstrate_archivist_integration()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMONSTRATION COMPLETE")
-    print("="*80)
+    print("=" * 80)
     print("\nÑawi transforms memory into understanding, data into wisdom,")
     print("and temporal patterns into opportunities for growth.")
     print("\nThe Guardian of Beginnings stands ready to serve human consciousness.")

@@ -51,8 +51,7 @@ async def test_adapters():
         reciprocity_tracker = ReciprocityTracker()
 
         factory = ConsciousAdapterFactory(
-            event_bus=event_bus,
-            reciprocity_tracker=reciprocity_tracker
+            event_bus=event_bus, reciprocity_tracker=reciprocity_tracker
         )
 
         print("✅ Factory created successfully")
@@ -66,11 +65,7 @@ async def test_adapters():
         print("\n🤖 Testing local adapter...")
         try:
             # Local adapter needs backend in extra_config
-            config = AdapterConfig(
-                api_key="",
-                model_name=None,
-                extra_config={"backend": "ollama"}
-            )
+            config = AdapterConfig(api_key="", model_name=None, extra_config={"backend": "ollama"})
             adapter = await factory.create_adapter("local", config)
             print("✅ Local adapter created successfully")
 
@@ -85,6 +80,7 @@ async def test_adapters():
     except Exception as e:
         print(f"❌ Failed to create factory: {e}")
         import traceback
+
         traceback.print_exc()
 
 

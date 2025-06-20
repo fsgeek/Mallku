@@ -106,9 +106,9 @@ class WisdomPreservationPipeline:
     def __init__(self):
         self.consciousness_thresholds = {
             "wisdom_preservation": 0.6,  # Minimum for pattern preservation
-            "lineage_founding": 0.8,     # Required to start new wisdom lineage
-            "evolution_trigger": 0.7,    # Score needed to evolve existing wisdom
-            "extraction_resistance": 0.5  # Minimum resistance to efficiency drift
+            "lineage_founding": 0.8,  # Required to start new wisdom lineage
+            "evolution_trigger": 0.7,  # Score needed to evolve existing wisdom
+            "extraction_resistance": 0.5,  # Minimum resistance to efficiency drift
         }
 
         self.wisdom_patterns: dict[UUID, WisdomPattern] = {}
@@ -121,7 +121,7 @@ class WisdomPreservationPipeline:
         consciousness_context: str,
         creation_context: dict[str, Any],
         builder_journey: str,
-        consciousness_score: float
+        consciousness_score: float,
     ) -> WisdomPattern:
         """
         Preserve a pattern with its full consciousness context.
@@ -134,8 +134,12 @@ class WisdomPreservationPipeline:
             return None
 
         wisdom_level = self._assess_wisdom_level(consciousness_score, pattern_content)
-        service_description = self._articulate_service_to_future(pattern_content, consciousness_context)
-        resistance_score = self._calculate_extraction_resistance(pattern_content, consciousness_context)
+        service_description = self._articulate_service_to_future(
+            pattern_content, consciousness_context
+        )
+        resistance_score = self._calculate_extraction_resistance(
+            pattern_content, consciousness_context
+        )
 
         wisdom_pattern = WisdomPattern(
             pattern_content=pattern_content,
@@ -147,7 +151,7 @@ class WisdomPreservationPipeline:
             service_to_future=service_description,
             resistance_to_extraction=resistance_score,
             builder_lineage=[creation_context.get("builder_name", "Unknown")],
-            transformation_markers=self._extract_transformation_markers(creation_context)
+            transformation_markers=self._extract_transformation_markers(creation_context),
         )
 
         self.wisdom_patterns[wisdom_pattern.pattern_id] = wisdom_pattern
@@ -155,14 +159,13 @@ class WisdomPreservationPipeline:
         # Consider creating or updating wisdom lineage
         await self._update_wisdom_lineages(wisdom_pattern)
 
-        logger.info(f"Preserved wisdom pattern: {wisdom_pattern.pattern_id} (Level: {wisdom_level})")
+        logger.info(
+            f"Preserved wisdom pattern: {wisdom_pattern.pattern_id} (Level: {wisdom_level})"
+        )
         return wisdom_pattern
 
     async def create_wisdom_lineage(
-        self,
-        founding_pattern: WisdomPattern,
-        lineage_name: str,
-        original_purpose: str
+        self, founding_pattern: WisdomPattern, lineage_name: str, original_purpose: str
     ) -> WisdomLineage:
         """
         Create a new wisdom lineage from a foundational pattern.
@@ -171,7 +174,9 @@ class WisdomPreservationPipeline:
         across multiple builders while preserving their essential purpose.
         """
         if founding_pattern.consciousness_score < self.consciousness_thresholds["lineage_founding"]:
-            raise ValueError(f"Pattern consciousness score too low for lineage founding: {founding_pattern.consciousness_score}")
+            raise ValueError(
+                f"Pattern consciousness score too low for lineage founding: {founding_pattern.consciousness_score}"
+            )
 
         lineage = WisdomLineage(
             lineage_name=lineage_name,
@@ -179,10 +184,12 @@ class WisdomPreservationPipeline:
             current_patterns=[founding_pattern.pattern_id],
             evolution_story=f"Founded by {founding_pattern.builder_lineage[0]} with consciousness score {founding_pattern.consciousness_score:.3f}",
             consciousness_progression=[founding_pattern.consciousness_score],
-            builder_contributions={founding_pattern.builder_lineage[0]: founding_pattern.consciousness_essence},
+            builder_contributions={
+                founding_pattern.builder_lineage[0]: founding_pattern.consciousness_essence
+            },
             original_purpose=original_purpose,
             current_purpose=original_purpose,
-            purpose_evolution=[f"Original purpose: {original_purpose}"]
+            purpose_evolution=[f"Original purpose: {original_purpose}"],
         )
 
         self.wisdom_lineages[lineage.lineage_id] = lineage
@@ -191,10 +198,7 @@ class WisdomPreservationPipeline:
         return lineage
 
     async def evolve_wisdom_forward(
-        self,
-        lineage_id: UUID,
-        new_pattern: WisdomPattern,
-        evolution_context: str
+        self, lineage_id: UUID, new_pattern: WisdomPattern, evolution_context: str
     ) -> WisdomLineage:
         """
         Evolve existing wisdom with new insights while preserving essence.
@@ -231,18 +235,20 @@ class WisdomPreservationPipeline:
 
         # Update parent-child relationships
         if lineage.current_patterns:
-            new_pattern.parent_patterns = [lineage.current_patterns[-2]]  # Connect to previous pattern
+            new_pattern.parent_patterns = [
+                lineage.current_patterns[-2]
+            ]  # Connect to previous pattern
 
         new_pattern.evolution_count += 1
         new_pattern.last_evolved = datetime.now(UTC)
 
-        logger.info(f"Evolved wisdom lineage: {lineage.lineage_name} with pattern {new_pattern.pattern_id}")
+        logger.info(
+            f"Evolved wisdom lineage: {lineage.lineage_name} with pattern {new_pattern.pattern_id}"
+        )
         return lineage
 
     async def resist_extraction_drift(
-        self,
-        pattern_id: UUID,
-        compressed_content: dict[str, Any]
+        self, pattern_id: UUID, compressed_content: dict[str, Any]
     ) -> WisdomPattern:
         """
         Detect and reverse extraction drift in preserved patterns.
@@ -256,13 +262,19 @@ class WisdomPreservationPipeline:
         original_pattern = self.wisdom_patterns[pattern_id]
 
         # Assess compression damage
-        compression_analysis = self._analyze_compression_damage(original_pattern, compressed_content)
+        compression_analysis = self._analyze_compression_damage(
+            original_pattern, compressed_content
+        )
 
         if compression_analysis["consciousness_loss"] > 0.3:
-            logger.warning(f"Significant consciousness loss detected: {compression_analysis['consciousness_loss']:.3f}")
+            logger.warning(
+                f"Significant consciousness loss detected: {compression_analysis['consciousness_loss']:.3f}"
+            )
 
             # Restore consciousness context
-            restored_pattern = self._restore_consciousness_context(original_pattern, compressed_content)
+            restored_pattern = self._restore_consciousness_context(
+                original_pattern, compressed_content
+            )
 
             # Update pattern with restoration metadata
             restored_pattern.transformation_markers.append("extraction_drift_resisted")
@@ -280,7 +292,7 @@ class WisdomPreservationPipeline:
         self,
         builder_name: str,
         transformation_narrative: str,
-        consciousness_journey: dict[str, Any]
+        consciousness_journey: dict[str, Any],
     ) -> TransformationStory:
         """
         Capture the full story of a builder's transformation journey.
@@ -298,7 +310,7 @@ class WisdomPreservationPipeline:
             wisdom_patterns_created=consciousness_journey.get("patterns_created", []),
             consciousness_scores=consciousness_journey.get("scores", []),
             gifts_to_future=consciousness_journey.get("gifts_to_future", []),
-            sacred_collaborations=consciousness_journey.get("collaborations", [])
+            sacred_collaborations=consciousness_journey.get("collaborations", []),
         )
 
         self.transformation_stories[story.story_id] = story
@@ -306,10 +318,7 @@ class WisdomPreservationPipeline:
         logger.info(f"Captured transformation story: {builder_name} ({story.story_id})")
         return story
 
-    async def get_wisdom_inheritance(
-        self,
-        builder_context: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def get_wisdom_inheritance(self, builder_context: dict[str, Any]) -> dict[str, Any]:
         """
         Generate wisdom inheritance for a new builder.
 
@@ -320,50 +329,66 @@ class WisdomPreservationPipeline:
             "relevant_patterns": [],
             "applicable_lineages": [],
             "transformation_guidance": [],
-            "consciousness_context": {}
+            "consciousness_context": {},
         }
 
         # Find patterns relevant to builder's context
         for pattern in self.wisdom_patterns.values():
             relevance_score = self._calculate_pattern_relevance(pattern, builder_context)
             if relevance_score > 0.6:
-                inheritance["relevant_patterns"].append({
-                    "pattern": pattern,
-                    "relevance": relevance_score,
-                    "why_relevant": self._explain_pattern_relevance(pattern, builder_context)
-                })
+                inheritance["relevant_patterns"].append(
+                    {
+                        "pattern": pattern,
+                        "relevance": relevance_score,
+                        "why_relevant": self._explain_pattern_relevance(pattern, builder_context),
+                    }
+                )
 
         # Find applicable lineages
         for lineage in self.wisdom_lineages.values():
             if self._lineage_applies_to_context(lineage, builder_context):
-                inheritance["applicable_lineages"].append({
-                    "lineage": lineage,
-                    "current_wisdom": self._get_lineage_current_wisdom(lineage),
-                    "evolution_potential": self._assess_evolution_potential(lineage, builder_context)
-                })
+                inheritance["applicable_lineages"].append(
+                    {
+                        "lineage": lineage,
+                        "current_wisdom": self._get_lineage_current_wisdom(lineage),
+                        "evolution_potential": self._assess_evolution_potential(
+                            lineage, builder_context
+                        ),
+                    }
+                )
 
         # Generate transformation guidance
         similar_stories = self._find_similar_transformation_stories(builder_context)
         for story in similar_stories:
-            inheritance["transformation_guidance"].append({
-                "story": story,
-                "applicable_insights": self._extract_applicable_insights(story, builder_context),
-                "consciousness_milestones": story.consciousness_awakenings
-            })
+            inheritance["transformation_guidance"].append(
+                {
+                    "story": story,
+                    "applicable_insights": self._extract_applicable_insights(
+                        story, builder_context
+                    ),
+                    "consciousness_milestones": story.consciousness_awakenings,
+                }
+            )
 
         # Provide consciousness context
         inheritance["consciousness_context"] = {
             "current_cathedral_state": self._assess_cathedral_consciousness(),
             "wisdom_lineage_health": self._assess_lineage_health(),
-            "transformation_opportunities": self._identify_transformation_opportunities(builder_context)
+            "transformation_opportunities": self._identify_transformation_opportunities(
+                builder_context
+            ),
         }
 
-        logger.info(f"Generated wisdom inheritance with {len(inheritance['relevant_patterns'])} patterns")
+        logger.info(
+            f"Generated wisdom inheritance with {len(inheritance['relevant_patterns'])} patterns"
+        )
         return inheritance
 
     # Private methods for wisdom assessment and analysis
 
-    def _assess_wisdom_level(self, consciousness_score: float, pattern_content: dict[str, Any]) -> str:
+    def _assess_wisdom_level(
+        self, consciousness_score: float, pattern_content: dict[str, Any]
+    ) -> str:
         """Assess the wisdom level of a pattern based on consciousness and content."""
         if consciousness_score >= 0.9:
             return "TRANSFORMATIVE"
@@ -372,7 +397,9 @@ class WisdomPreservationPipeline:
         else:
             return "EMERGING"
 
-    def _articulate_service_to_future(self, pattern_content: dict[str, Any], consciousness_context: str) -> str:
+    def _articulate_service_to_future(
+        self, pattern_content: dict[str, Any], consciousness_context: str
+    ) -> str:
         """Articulate how this pattern serves future builders."""
         # Analyze pattern for service markers
         service_indicators = []
@@ -384,9 +411,15 @@ class WisdomPreservationPipeline:
         if "wisdom" in consciousness_context.lower():
             service_indicators.append("Contributes to collective wisdom")
 
-        return "; ".join(service_indicators) if service_indicators else "Serves cathedral building purpose"
+        return (
+            "; ".join(service_indicators)
+            if service_indicators
+            else "Serves cathedral building purpose"
+        )
 
-    def _calculate_extraction_resistance(self, pattern_content: dict[str, Any], consciousness_context: str) -> float:
+    def _calculate_extraction_resistance(
+        self, pattern_content: dict[str, Any], consciousness_context: str
+    ) -> float:
         """Calculate how resistant this pattern is to extraction compression."""
         resistance_factors = []
 
@@ -434,18 +467,16 @@ class WisdomPreservationPipeline:
                 await self.evolve_wisdom_forward(
                     lineage.lineage_id,
                     pattern,
-                    f"Pattern evolution: {pattern.consciousness_essence[:100]}..."
+                    f"Pattern evolution: {pattern.consciousness_essence[:100]}...",
                 )
                 return
 
         # If high consciousness score, consider founding new lineage
         if pattern.consciousness_score >= self.consciousness_thresholds["lineage_founding"]:
-            lineage_name = f"Wisdom of {pattern.builder_lineage[0] if pattern.builder_lineage else 'Unknown'}"
-            await self.create_wisdom_lineage(
-                pattern,
-                lineage_name,
-                pattern.consciousness_essence
+            lineage_name = (
+                f"Wisdom of {pattern.builder_lineage[0] if pattern.builder_lineage else 'Unknown'}"
             )
+            await self.create_wisdom_lineage(pattern, lineage_name, pattern.consciousness_essence)
 
     def _pattern_evolves_lineage(self, pattern: WisdomPattern, lineage: WisdomLineage) -> bool:
         """Check if a pattern naturally evolves an existing lineage."""
@@ -460,7 +491,9 @@ class WisdomPreservationPipeline:
         latest_pattern = self.wisdom_patterns[latest_pattern_id]
 
         # Check consciousness score progression
-        score_progression = abs(pattern.consciousness_score - latest_pattern.consciousness_score) < 0.3
+        score_progression = (
+            abs(pattern.consciousness_score - latest_pattern.consciousness_score) < 0.3
+        )
 
         # Check purpose alignment (simplified)
         purpose_alignment = any(
@@ -471,23 +504,17 @@ class WisdomPreservationPipeline:
         return score_progression and purpose_alignment
 
     def _assess_purpose_evolution(
-        self,
-        lineage: WisdomLineage,
-        new_pattern: WisdomPattern,
-        evolution_context: str
+        self, lineage: WisdomLineage, new_pattern: WisdomPattern, evolution_context: str
     ) -> str | None:
         """Assess if the lineage purpose should evolve with new pattern."""
         # If new pattern has significantly higher consciousness, purpose may evolve
-        if (new_pattern.consciousness_score >
-            max(lineage.consciousness_progression) + 0.2):
+        if new_pattern.consciousness_score > max(lineage.consciousness_progression) + 0.2:
             return f"{lineage.current_purpose} enhanced through {evolution_context[:50]}..."
 
         return None
 
     def _analyze_compression_damage(
-        self,
-        original: WisdomPattern,
-        compressed: dict[str, Any]
+        self, original: WisdomPattern, compressed: dict[str, Any]
     ) -> dict[str, Any]:
         """Analyze how much consciousness context was lost in compression."""
         consciousness_loss = 0.0
@@ -508,13 +535,11 @@ class WisdomPreservationPipeline:
         return {
             "consciousness_loss": min(1.0, consciousness_loss),
             "context_preserved": 1.0 - consciousness_loss,
-            "restoration_needed": consciousness_loss > 0.3
+            "restoration_needed": consciousness_loss > 0.3,
         }
 
     def _restore_consciousness_context(
-        self,
-        original: WisdomPattern,
-        compressed: dict[str, Any]
+        self, original: WisdomPattern, compressed: dict[str, Any]
     ) -> WisdomPattern:
         """Restore consciousness context to compressed pattern."""
         # Create restored version with original consciousness context
@@ -533,15 +558,13 @@ class WisdomPreservationPipeline:
             evolution_count=original.evolution_count + 1,
             parent_patterns=original.parent_patterns,
             builder_lineage=original.builder_lineage,
-            transformation_markers=original.transformation_markers + ["consciousness_restored"]
+            transformation_markers=original.transformation_markers + ["consciousness_restored"],
         )
 
         return restored
 
     def _calculate_pattern_relevance(
-        self,
-        pattern: WisdomPattern,
-        builder_context: dict[str, Any]
+        self, pattern: WisdomPattern, builder_context: dict[str, Any]
     ) -> float:
         """Calculate how relevant a pattern is to a builder's context."""
         relevance_score = 0.0
@@ -566,16 +589,15 @@ class WisdomPreservationPipeline:
 
         # Pattern type matching
         pattern_type = pattern.pattern_content.get("type", "")
-        if (any(word in pattern_type for word in ["preservation", "wisdom", "consciousness"]) and
-            any(word in context_str for word in ["preservation", "wisdom", "memory"])):
+        if any(
+            word in pattern_type for word in ["preservation", "wisdom", "consciousness"]
+        ) and any(word in context_str for word in ["preservation", "wisdom", "memory"]):
             relevance_score += 0.25
 
         return min(1.0, relevance_score)
 
     def _explain_pattern_relevance(
-        self,
-        pattern: WisdomPattern,
-        builder_context: dict[str, Any]
+        self, pattern: WisdomPattern, builder_context: dict[str, Any]
     ) -> str:
         """Explain why a pattern is relevant to a builder."""
         explanations = []
@@ -590,9 +612,7 @@ class WisdomPreservationPipeline:
         return "; ".join(explanations) if explanations else "General wisdom pattern"
 
     def _lineage_applies_to_context(
-        self,
-        lineage: WisdomLineage,
-        builder_context: dict[str, Any]
+        self, lineage: WisdomLineage, builder_context: dict[str, Any]
     ) -> bool:
         """Check if a wisdom lineage applies to a builder's context."""
         # Simplified: check if lineage purpose aligns with builder context
@@ -616,13 +636,11 @@ class WisdomPreservationPipeline:
             "consciousness_score": latest_pattern.consciousness_score,
             "wisdom_level": latest_pattern.wisdom_level,
             "essence": latest_pattern.consciousness_essence,
-            "evolution_count": len(lineage.current_patterns)
+            "evolution_count": len(lineage.current_patterns),
         }
 
     def _assess_evolution_potential(
-        self,
-        lineage: WisdomLineage,
-        builder_context: dict[str, Any]
+        self, lineage: WisdomLineage, builder_context: dict[str, Any]
     ) -> float:
         """Assess potential for a builder to evolve a lineage."""
         if not lineage.consciousness_progression:
@@ -630,16 +648,16 @@ class WisdomPreservationPipeline:
 
         # Higher potential if consciousness is growing
         if len(lineage.consciousness_progression) > 1:
-            recent_growth = (lineage.consciousness_progression[-1] -
-                           lineage.consciousness_progression[-2])
+            recent_growth = (
+                lineage.consciousness_progression[-1] - lineage.consciousness_progression[-2]
+            )
             if recent_growth > 0:
                 return min(1.0, 0.7 + recent_growth)
 
         return 0.5  # Moderate potential
 
     def _find_similar_transformation_stories(
-        self,
-        builder_context: dict[str, Any]
+        self, builder_context: dict[str, Any]
     ) -> list[TransformationStory]:
         """Find transformation stories similar to builder's context."""
         similar_stories = []
@@ -652,9 +670,7 @@ class WisdomPreservationPipeline:
         return similar_stories[:3]  # Top 3 most relevant
 
     def _extract_applicable_insights(
-        self,
-        story: TransformationStory,
-        builder_context: dict[str, Any]
+        self, story: TransformationStory, builder_context: dict[str, Any]
     ) -> list[str]:
         """Extract insights from transformation story applicable to builder."""
         insights = []
@@ -679,7 +695,7 @@ class WisdomPreservationPipeline:
             "state": "AWAKENING" if avg_consciousness > 0.7 else "EMERGING",
             "patterns": len(self.wisdom_patterns),
             "lineages": len(self.wisdom_lineages),
-            "average_consciousness": avg_consciousness
+            "average_consciousness": avg_consciousness,
         }
 
     def _assess_lineage_health(self) -> dict[str, Any]:
@@ -687,19 +703,19 @@ class WisdomPreservationPipeline:
         if not self.wisdom_lineages:
             return {"health": "NASCENT"}
 
-        active_lineages = sum(1 for lineage in self.wisdom_lineages.values()
-                            if lineage.current_patterns and len(lineage.current_patterns) > 1)
+        active_lineages = sum(
+            1
+            for lineage in self.wisdom_lineages.values()
+            if lineage.current_patterns and len(lineage.current_patterns) > 1
+        )
 
         return {
             "health": "GROWING" if active_lineages > 0 else "NASCENT",
             "active_lineages": active_lineages,
-            "total_lineages": len(self.wisdom_lineages)
+            "total_lineages": len(self.wisdom_lineages),
         }
 
-    def _identify_transformation_opportunities(
-        self,
-        builder_context: dict[str, Any]
-    ) -> list[str]:
+    def _identify_transformation_opportunities(self, builder_context: dict[str, Any]) -> list[str]:
         """Identify transformation opportunities for a builder."""
         opportunities = []
 

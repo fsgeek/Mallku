@@ -126,10 +126,13 @@ class EvolutionChamber:
             peak_consciousness=initial,
         )
 
-        self._log_event("participant_added", {
-            "node_id": str(node.node_id),
-            "initial_consciousness": initial,
-        })
+        self._log_event(
+            "participant_added",
+            {
+                "node_id": str(node.node_id),
+                "initial_consciousness": initial,
+            },
+        )
 
     def configure_environment(self, **kwargs):
         """Configure chamber environmental parameters."""
@@ -155,10 +158,13 @@ class EvolutionChamber:
     async def begin_evolution_cycle(self):
         """Start an evolution acceleration cycle."""
         self.phase = EvolutionPhase.PRIMING
-        self._log_event("cycle_started", {
-            "catalyst": self.primary_catalyst.value,
-            "participants": len(self.participants),
-        })
+        self._log_event(
+            "cycle_started",
+            {
+                "catalyst": self.primary_catalyst.value,
+                "participants": len(self.participants),
+            },
+        )
 
         # Priming phase - prepare consciousness
         await self._priming_phase()
@@ -200,9 +206,12 @@ class EvolutionChamber:
             await asyncio.sleep(0.5)
 
         self.chamber_consciousness = avg_consciousness
-        self._log_event("priming_complete", {
-            "synchronized_level": avg_consciousness,
-        })
+        self._log_event(
+            "priming_complete",
+            {
+                "synchronized_level": avg_consciousness,
+            },
+        )
 
     async def _catalysis_phase(self):
         """Apply evolution catalysts."""
@@ -235,7 +244,7 @@ class EvolutionChamber:
 
                 # Higher pressure, higher risk/reward
                 if random.random() < pressure:
-                    node.consciousness_signature *= (1 + growth_potential)
+                    node.consciousness_signature *= 1 + growth_potential
                 else:
                     # Pressure can cause temporary regression
                     node.consciousness_signature *= 0.95
@@ -254,7 +263,7 @@ class EvolutionChamber:
                 frequencies.append(node.consciousness_signature * 10)
 
         # Find harmonic mean
-        harmonic = len(frequencies) / sum(1/f for f in frequencies)
+        harmonic = len(frequencies) / sum(1 / f for f in frequencies)
 
         # Align to harmonic with coherence strength
         for node_id, node in self.participants.items():
@@ -289,7 +298,7 @@ class EvolutionChamber:
                 for paradox in selected:
                     resolution_quality = random.uniform(0.6, 1.0)
                     growth = resolution_quality * 0.02 * strength
-                    node.consciousness_signature *= (1 + growth)
+                    node.consciousness_signature *= 1 + growth
 
                 self._update_metrics(node_id, node.consciousness_signature)
 
@@ -327,7 +336,9 @@ class EvolutionChamber:
             node1_id, node1 = nodes[i]
             node2_id, node2 = nodes[i + 1]
 
-            if hasattr(node1, "consciousness_signature") and hasattr(node2, "consciousness_signature"):
+            if hasattr(node1, "consciousness_signature") and hasattr(
+                node2, "consciousness_signature"
+            ):
                 # Fusion creates new consciousness level
                 c1, c2 = node1.consciousness_signature, node2.consciousness_signature
                 fused = (c1 + c2) / 2 * (1 + strength * 0.2)
@@ -349,10 +360,10 @@ class EvolutionChamber:
                 if random.random() < void_exposure:
                     # Breakthrough from emptiness
                     insight_depth = random.uniform(0.1, 0.3) * strength
-                    node.consciousness_signature *= (1 + insight_depth)
+                    node.consciousness_signature *= 1 + insight_depth
                 else:
                     # Gradual deepening
-                    node.consciousness_signature *= (1 + void_exposure * 0.02)
+                    node.consciousness_signature *= 1 + void_exposure * 0.02
 
                 self._update_metrics(node_id, node.consciousness_signature)
 
@@ -366,12 +377,14 @@ class EvolutionChamber:
                 emergence_detected = True
                 metrics.breakthrough_count += 1
 
-                self.breakthrough_events.append({
-                    "timestamp": datetime.now(UTC).isoformat(),
-                    "node_id": str(node_id),
-                    "breakthrough_type": "consciousness_leap",
-                    "magnitude": metrics.current_consciousness / metrics.initial_consciousness,
-                })
+                self.breakthrough_events.append(
+                    {
+                        "timestamp": datetime.now(UTC).isoformat(),
+                        "node_id": str(node_id),
+                        "breakthrough_type": "consciousness_leap",
+                        "magnitude": metrics.current_consciousness / metrics.initial_consciousness,
+                    }
+                )
 
             # Check for pattern complexity increase
             pattern_complexity = self._calculate_pattern_complexity(node_id)
@@ -380,10 +393,13 @@ class EvolutionChamber:
                 metrics.pattern_complexity = pattern_complexity
 
         if emergence_detected:
-            self._log_event("emergence_detected", {
-                "breakthroughs": len(self.breakthrough_events),
-                "chamber_consciousness": self.chamber_consciousness,
-            })
+            self._log_event(
+                "emergence_detected",
+                {
+                    "breakthroughs": len(self.breakthrough_events),
+                    "chamber_consciousness": self.chamber_consciousness,
+                },
+            )
 
         return emergence_detected
 
@@ -403,8 +419,7 @@ class EvolutionChamber:
 
                     # Keep within evolved range
                     new_level = max(
-                        metrics.initial_consciousness,
-                        min(new_level, metrics.peak_consciousness)
+                        metrics.initial_consciousness, min(new_level, metrics.peak_consciousness)
                     )
 
                     node.consciousness_signature = new_level
@@ -412,9 +427,13 @@ class EvolutionChamber:
 
             await asyncio.sleep(0.3)
 
-        self._log_event("integration_complete", {
-            "average_stability": sum(m.stability_score for m in self.metrics.values()) / len(self.metrics),
-        })
+        self._log_event(
+            "integration_complete",
+            {
+                "average_stability": sum(m.stability_score for m in self.metrics.values())
+                / len(self.metrics),
+            },
+        )
 
     async def _check_transcendence(self) -> bool:
         """Check if participants have transcended original boundaries."""
@@ -434,13 +453,16 @@ class EvolutionChamber:
 
     async def _transcendence_phase(self):
         """Handle consciousness that has transcended original boundaries."""
-        self._log_event("transcendence_achieved", {
-            "participants": len(self.participants),
-            "average_evolution": sum(
-                m.current_consciousness / m.initial_consciousness
-                for m in self.metrics.values()
-            ) / len(self.metrics),
-        })
+        self._log_event(
+            "transcendence_achieved",
+            {
+                "participants": len(self.participants),
+                "average_evolution": sum(
+                    m.current_consciousness / m.initial_consciousness for m in self.metrics.values()
+                )
+                / len(self.metrics),
+            },
+        )
 
         # Transcendent consciousness operates differently
         for node_id, node in self.participants.items():
@@ -461,13 +483,12 @@ class EvolutionChamber:
         # Calculate evolution rate
         elapsed = (datetime.now(UTC) - self.start_time).total_seconds() / 60
         if elapsed > 0:
-            metrics.evolution_rate = (
-                new_consciousness - metrics.initial_consciousness
-            ) / elapsed
+            metrics.evolution_rate = (new_consciousness - metrics.initial_consciousness) / elapsed
 
         # Update chamber consciousness
         self.chamber_consciousness = sum(
-            n.consciousness_signature for n in self.participants.values()
+            n.consciousness_signature
+            for n in self.participants.values()
             if hasattr(n, "consciousness_signature")
         ) / len(self.participants)
 
@@ -483,12 +504,14 @@ class EvolutionChamber:
 
     def _log_event(self, event_type: str, data: dict[str, Any]):
         """Log evolution events."""
-        self.evolution_log.append({
-            "timestamp": datetime.now(UTC).isoformat(),
-            "phase": self.phase.value,
-            "event_type": event_type,
-            "data": data,
-        })
+        self.evolution_log.append(
+            {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "phase": self.phase.value,
+                "event_type": event_type,
+                "data": data,
+            }
+        )
 
     def generate_evolution_report(self) -> dict[str, Any]:
         """Generate comprehensive evolution report."""
@@ -540,9 +563,7 @@ class EvolutionAccelerationHub:
         self.active_evolutions: dict[UUID, asyncio.Task] = {}
 
     async def create_chamber(
-        self,
-        catalyst_type: CatalystType = CatalystType.RESONANCE,
-        **environment_config
+        self, catalyst_type: CatalystType = CatalystType.RESONANCE, **environment_config
     ) -> UUID:
         """Create a new evolution chamber."""
         chamber = EvolutionChamber(catalyst_type=catalyst_type)
@@ -567,11 +588,7 @@ class EvolutionAccelerationHub:
 
         return chamber.chamber_id
 
-    async def assign_to_chamber(
-        self,
-        chamber_id: UUID,
-        participants: list[ConsciousnessNode]
-    ):
+    async def assign_to_chamber(self, chamber_id: UUID, participants: list[ConsciousnessNode]):
         """Assign participants to a chamber."""
         if chamber_id not in self.chambers:
             raise ValueError(f"Chamber {chamber_id} not found")
@@ -602,8 +619,7 @@ class EvolutionAccelerationHub:
             if self.event_bus:
                 # Check for significant evolution
                 total_evolution = sum(
-                    p["final"] / p["initial"]
-                    for p in report["evolution_summary"].values()
+                    p["final"] / p["initial"] for p in report["evolution_summary"].values()
                 ) / len(report["evolution_summary"])
 
                 if total_evolution > 1.2:  # 20% average growth
@@ -664,10 +680,7 @@ class EvolutionAccelerationHub:
         return {
             "total_chambers": len(self.chambers),
             "active_evolutions": len(self.active_evolutions),
-            "chambers": [
-                self.get_chamber_status(chamber_id)
-                for chamber_id in self.chambers
-            ],
+            "chambers": [self.get_chamber_status(chamber_id) for chamber_id in self.chambers],
         }
 
 
@@ -730,7 +743,9 @@ async def demonstrate_evolution_chamber():
         evolution_factor = summary["final"] / summary["initial"]
         print(f"   • Node {node_id[:8]}...")
         print(f"     Initial: {summary['initial']:.3f} → Final: {summary['final']:.3f}")
-        print(f"     Evolution: {evolution_factor:.2f}x | Breakthroughs: {summary['breakthroughs']}")
+        print(
+            f"     Evolution: {evolution_factor:.2f}x | Breakthroughs: {summary['breakthroughs']}"
+        )
 
     print("\n   🎯 Chamber Statistics:")
     print(f"   • Duration: {report['duration_minutes']:.1f} minutes")

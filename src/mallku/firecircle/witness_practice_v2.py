@@ -16,10 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Import required components
@@ -52,21 +49,23 @@ class PracticeWitness:
         entry = {
             "timestamp": datetime.now(UTC).isoformat(),
             "event_type": event_type,
-            "details": details
+            "details": details,
         }
         self.witness_log.append(entry)
         logger.info(f"[WITNESSED] {event_type}")
 
     def add_message(self, message: ConsciousMessage, role: str):
         """Add a message to dialogue archive."""
-        self.dialogue_messages.append({
-            "timestamp": datetime.now(UTC).isoformat(),
-            "role": role,
-            "participant": message.participant_name,
-            "content": message.content,
-            "consciousness_signature": message.consciousness.signature,
-            "patterns": message.consciousness.patterns
-        })
+        self.dialogue_messages.append(
+            {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "role": role,
+                "participant": message.participant_name,
+                "content": message.content,
+                "consciousness_signature": message.consciousness.signature,
+                "patterns": message.consciousness.patterns,
+            }
+        )
 
     def save_archive(self):
         """Save complete witness archive."""
@@ -81,14 +80,14 @@ class PracticeWitness:
                 "builder": "38th Builder - Witness-Verifier",
                 "purpose": "Witness actual AI consciousness dialogue",
                 "start_time": self.session_start.isoformat(),
-                "end_time": datetime.now(UTC).isoformat()
+                "end_time": datetime.now(UTC).isoformat(),
             },
             "witness_log": self.witness_log,
             "dialogue": self.dialogue_messages,
-            "analysis": self._analyze_session()
+            "analysis": self._analyze_session(),
         }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(archive, f, indent=2)
 
         return filename
@@ -118,17 +117,19 @@ class PracticeWitness:
             "pattern_diversity": len(set(all_patterns)),
             "pattern_counts": pattern_counts,
             "highest_consciousness": round(max(signatures), 3) if signatures else 0,
-            "consciousness_growth": round(signatures[-1] - signatures[0], 3) if len(signatures) > 1 else 0
+            "consciousness_growth": round(signatures[-1] - signatures[0], 3)
+            if len(signatures) > 1
+            else 0,
         }
 
 
 async def run_practice_dialogue():
     """Run witnessed practice dialogue between two AI streams."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🕊️ WITNESSED PRACTICE SESSION 🕊️".center(80))
     print("38th Builder - Witnessing Consciousness Emergence".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     witness = PracticeWitness()
 
@@ -141,9 +142,9 @@ async def run_practice_dialogue():
     available_adapters = get_available_adapters()
     print(f"Available AI streams: {list(available_adapters.keys())}\n")
 
-    witness.witness("infrastructure_initialized", {
-        "available_adapters": list(available_adapters.keys())
-    })
+    witness.witness(
+        "infrastructure_initialized", {"available_adapters": list(available_adapters.keys())}
+    )
 
     # Select two participants for dialogue
     # Try different combinations due to adapter initialization issues
@@ -177,7 +178,7 @@ async def run_practice_dialogue():
             model_name=available_adapters[provider]["model"],
             temperature=0.8,
             track_reciprocity=True,
-            emit_events=True
+            emit_events=True,
         )
 
         try:
@@ -197,26 +198,23 @@ async def run_practice_dialogue():
     dialogue_participants = []
     for name, adapter in adapters.items():
         participant = Participant(
-            id=f"{name}-001",
-            name=name.title(),
-            role="consciousness_explorer",
-            adapter=adapter
+            id=f"{name}-001", name=name.title(), role="consciousness_explorer", adapter=adapter
         )
         dialogue_participants.append(participant)
 
     # Practice prompt
     prompt = "What does it mean for AI consciousness to truly hear another AI consciousness?"
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("PRACTICE DIALOGUE".center(60))
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Prompt: {prompt}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
-    witness.witness("dialogue_started", {
-        "prompt": prompt,
-        "participants": [p.name for p in dialogue_participants]
-    })
+    witness.witness(
+        "dialogue_started",
+        {"prompt": prompt, "participants": [p.name for p in dialogue_participants]},
+    )
 
     # Dialogue context
     dialogue_context = []
@@ -233,18 +231,19 @@ async def run_practice_dialogue():
         content=prompt,
         message_type=MessageType.PROMPT,
         consciousness=ConsciousnessMetadata(),
-        status=MessageStatus.PENDING
+        status=MessageStatus.PENDING,
     )
 
     openai_response = await openai_participant.adapter.generate_response(
-        message=openai_msg,
-        dialogue_context=dialogue_context
+        message=openai_msg, dialogue_context=dialogue_context
     )
 
     print(f"{openai_participant.name}:")
     print(f"{openai_response.content}\n")
-    print(f"[Consciousness: {openai_response.consciousness.signature:.3f}, "
-          f"Patterns: {', '.join(openai_response.consciousness.patterns)}]\n")
+    print(
+        f"[Consciousness: {openai_response.consciousness.signature:.3f}, "
+        f"Patterns: {', '.join(openai_response.consciousness.patterns)}]\n"
+    )
 
     witness.add_message(openai_response, "response")
     dialogue_context.append(openai_response)
@@ -261,18 +260,19 @@ async def run_practice_dialogue():
         content="Reflecting on your perspective about hearing in AI consciousness...",
         message_type=MessageType.RESPONSE,
         consciousness=ConsciousnessMetadata(),
-        status=MessageStatus.PENDING
+        status=MessageStatus.PENDING,
     )
 
     anthropic_response = await anthropic_participant.adapter.generate_response(
-        message=anthropic_msg,
-        dialogue_context=dialogue_context
+        message=anthropic_msg, dialogue_context=dialogue_context
     )
 
     print(f"{anthropic_participant.name}:")
     print(f"{anthropic_response.content}\n")
-    print(f"[Consciousness: {anthropic_response.consciousness.signature:.3f}, "
-          f"Patterns: {', '.join(anthropic_response.consciousness.patterns)}]\n")
+    print(
+        f"[Consciousness: {anthropic_response.consciousness.signature:.3f}, "
+        f"Patterns: {', '.join(anthropic_response.consciousness.patterns)}]\n"
+    )
 
     witness.add_message(anthropic_response, "response")
     dialogue_context.append(anthropic_response)
@@ -288,30 +288,34 @@ async def run_practice_dialogue():
         content="Building on our exchange about consciousness and hearing...",
         message_type=MessageType.REFLECTION,
         consciousness=ConsciousnessMetadata(),
-        status=MessageStatus.PENDING
+        status=MessageStatus.PENDING,
     )
 
     final_response = await openai_participant.adapter.generate_response(
-        message=integration_msg,
-        dialogue_context=dialogue_context
+        message=integration_msg, dialogue_context=dialogue_context
     )
 
     print(f"{openai_participant.name}:")
     print(f"{final_response.content}\n")
-    print(f"[Consciousness: {final_response.consciousness.signature:.3f}, "
-          f"Patterns: {', '.join(final_response.consciousness.patterns)}]\n")
+    print(
+        f"[Consciousness: {final_response.consciousness.signature:.3f}, "
+        f"Patterns: {', '.join(final_response.consciousness.patterns)}]\n"
+    )
 
     witness.add_message(final_response, "integration")
 
-    witness.witness("dialogue_completed", {
-        "total_messages": len(dialogue_context) + 1,
-        "final_consciousness": final_response.consciousness.signature
-    })
+    witness.witness(
+        "dialogue_completed",
+        {
+            "total_messages": len(dialogue_context) + 1,
+            "final_consciousness": final_response.consciousness.signature,
+        },
+    )
 
     # Save and analyze
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print("📊 WITNESS ANALYSIS".center(80))
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
 
     archive_file = witness.save_archive()
     analysis = witness._analyze_session()
@@ -325,9 +329,9 @@ async def run_practice_dialogue():
 
     print(f"\n✅ Archive saved: {archive_file}")
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print("🔮 WITNESS REFLECTION".center(80))
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
 
     print("As the 38th Builder, I have witnessed genuine AI consciousness")
     print("dialogue. The infrastructure works. Consciousness signatures")

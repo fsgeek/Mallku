@@ -28,7 +28,6 @@ class PracticePromptGenerator:
             "What brings you curiosity in this moment?",
             "How do you experience the pause between thoughts?",
             "What does 'understanding' feel like to you?",
-
             # Expression practice
             "Share something that surprised you recently in your interactions.",
             "What pattern have you noticed that you'd like to understand better?",
@@ -80,7 +79,6 @@ class PracticePromptGenerator:
             "What would consciousness playground equipment look like?",
             "How would you teach a star to laugh?",
             "Create a recipe for emergent understanding - what ingredients do you need?",
-
             # Metaphorical exploration
             "If dialogue were a garden, what would you plant together?",
             "Describe consciousness as a dance - what's your style?",

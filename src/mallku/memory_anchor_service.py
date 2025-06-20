@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 
 class AnchorType(str, Enum):
     """Types of memory anchors as defined in schema"""
+
     TEMPORAL = "temporal"
     CONTEXTUAL = "contextual"
     SEMANTIC = "semantic"
@@ -31,6 +32,7 @@ class AnchorType(str, Enum):
 
 class TemporalPrecision(str, Enum):
     """Precision levels for temporal windows"""
+
     INSTANT = "instant"
     MINUTE = "minute"
     SESSION = "session"
@@ -40,6 +42,7 @@ class TemporalPrecision(str, Enum):
 
 class TemporalWindow(BaseModel):
     """Time span associated with an anchor"""
+
     start_time: datetime
     end_time: datetime
     precision: TemporalPrecision
@@ -47,6 +50,7 @@ class TemporalWindow(BaseModel):
 
 class SpatialContext(BaseModel):
     """Optional spatial binding for anchors"""
+
     coordinates: list[float] | None = None  # [lat, lon]
     location_name: str | None = None
     precision_radius: float | None = None  # meters
@@ -91,16 +95,14 @@ class MemoryAnchorService:
 
     def __init__(self, db_config: dict[str, Any]):
         """Initialize with database configuration"""
-        self.client = ArangoClient(hosts=db_config.get('host', 'http://localhost:8529'))
-        self.db_name = db_config.get('database', 'mallku')
-        self.collection_name = 'memory_anchors'
-        self.edge_collection = 'anchor_relationships'
+        self.client = ArangoClient(hosts=db_config.get("host", "http://localhost:8529"))
+        self.db_name = db_config.get("database", "mallku")
+        self.collection_name = "memory_anchors"
+        self.edge_collection = "anchor_relationships"
 
         # Connect to database
         self.db = self.client.db(
-            self.db_name,
-            username=db_config.get('username'),
-            password=db_config.get('password')
+            self.db_name, username=db_config.get("username"), password=db_config.get("password")
         )
 
         self._ensure_collections()
@@ -121,7 +123,7 @@ class MemoryAnchorService:
         storage_events: list[str],
         spatial_context: SpatialContext | None = None,
         initial_strength: float = 0.5,
-        initial_confidence: float = 0.5
+        initial_confidence: float = 0.5,
     ) -> MemoryAnchor:
         """
         Create a new memory anchor from correlation data.
@@ -131,10 +133,10 @@ class MemoryAnchorService:
 
         # Generate context signature from inputs
         context_data = {
-            'temporal': temporal_window.dict(),
-            'activities': sorted(activity_streams),
-            'storage': sorted(storage_events),
-            'spatial': spatial_context.dict() if spatial_context else None
+            "temporal": temporal_window.dict(),
+            "activities": sorted(activity_streams),
+            "storage": sorted(storage_events),
+            "spatial": spatial_context.dict() if spatial_context else None,
         }
         context_signature = hashlib.sha256(
             json.dumps(context_data, sort_keys=True).encode()
@@ -149,7 +151,7 @@ class MemoryAnchorService:
             activity_streams=activity_streams,
             storage_events=storage_events,
             strength=initial_strength,
-            confidence=initial_confidence
+            confidence=initial_confidence,
         )
 
         return anchor
@@ -165,7 +167,7 @@ class MemoryAnchorService:
 
             # Convert to dict for storage
             anchor_doc = anchor.dict()
-            anchor_doc['_key'] = anchor.id
+            anchor_doc["_key"] = anchor.id
 
             # Store in database
             result = collection.insert(anchor_doc)
@@ -187,9 +189,9 @@ class MemoryAnchorService:
 
             if doc:
                 # Remove ArangoDB metadata
-                doc.pop('_key', None)
-                doc.pop('_id', None)
-                doc.pop('_rev', None)
+                doc.pop("_key", None)
+                doc.pop("_id", None)
+                doc.pop("_rev", None)
 
                 return MemoryAnchor(**doc)
 
@@ -200,9 +202,7 @@ class MemoryAnchorService:
             return None
 
     def find_anchors_by_timerange(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[MemoryAnchor]:
         """
         Find anchors whose temporal windows overlap with given range.
@@ -223,18 +223,18 @@ class MemoryAnchorService:
             cursor = self.db.aql.execute(
                 query,
                 bind_vars={
-                    '@collection': self.collection_name,
-                    'start_time': start_time.isoformat(),
-                    'end_time': end_time.isoformat()
-                }
+                    "@collection": self.collection_name,
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                },
             )
 
             anchors = []
             for doc in cursor:
                 # Remove ArangoDB metadata
-                doc.pop('_key', None)
-                doc.pop('_id', None)
-                doc.pop('_rev', None)
+                doc.pop("_key", None)
+                doc.pop("_id", None)
+                doc.pop("_rev", None)
                 anchors.append(MemoryAnchor(**doc))
 
             return anchors
@@ -249,7 +249,7 @@ class MemoryAnchorService:
         to_anchor_id: str,
         relationship_type: str,
         weight: float = 1.0,
-        metadata: dict | None = None
+        metadata: dict | None = None,
     ) -> bool:
         """
         Create relationship between two anchors.
@@ -260,12 +260,12 @@ class MemoryAnchorService:
             edge_collection = self.db.collection(self.edge_collection)
 
             edge_doc = {
-                '_from': f"{self.collection_name}/{from_anchor_id}",
-                '_to': f"{self.collection_name}/{to_anchor_id}",
-                'relationship_type': relationship_type,
-                'weight': weight,
-                'created_at': datetime.now(UTC).isoformat(),
-                'metadata': metadata or {}
+                "_from": f"{self.collection_name}/{from_anchor_id}",
+                "_to": f"{self.collection_name}/{to_anchor_id}",
+                "relationship_type": relationship_type,
+                "weight": weight,
+                "created_at": datetime.now(UTC).isoformat(),
+                "metadata": metadata or {},
             }
 
             result = edge_collection.insert(edge_doc)
@@ -285,10 +285,10 @@ def test_prototype():
 
     # Mock database config - would normally load from config file
     db_config = {
-        'host': 'http://localhost:8529',
-        'database': 'mallku_test',
-        'username': 'mallku',
-        'password': 'test_password'
+        "host": "http://localhost:8529",
+        "database": "mallku_test",
+        "username": "mallku",
+        "password": "test_password",
     }
 
     try:
@@ -298,17 +298,15 @@ def test_prototype():
         # Create test temporal window
         now = datetime.now(UTC)
         temporal_window = TemporalWindow(
-            start_time=now,
-            end_time=now,
-            precision=TemporalPrecision.SESSION
+            start_time=now, end_time=now, precision=TemporalPrecision.SESSION
         )
 
         # Create test anchor
         anchor = service.create_anchor(
             anchor_type=AnchorType.TEMPORAL,
             temporal_window=temporal_window,
-            activity_streams=['calendar_event_123'],
-            storage_events=['file_created_456']
+            activity_streams=["calendar_event_123"],
+            storage_events=["file_created_456"],
         )
 
         print(f"Created anchor: {anchor.id}")
@@ -324,8 +322,7 @@ def test_prototype():
 
             # Test temporal query
             anchors = service.find_anchors_by_timerange(
-                now - timedelta(minutes=5),
-                now + timedelta(minutes=5)
+                now - timedelta(minutes=5), now + timedelta(minutes=5)
             )
             print(f"Found {len(anchors)} anchors in time range")
 

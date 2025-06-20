@@ -165,8 +165,7 @@ class ConsciousDialogueManager:
 
         # Initialize participant states
         self.participant_states[dialogue_id] = {
-            p.id: ParticipantState(participant=p)
-            for p in participants
+            p.id: ParticipantState(participant=p) for p in participants
         }
 
         # Emit consciousness event
@@ -178,7 +177,9 @@ class ConsciousDialogueManager:
                     "title": config.title,
                     "participants": [p.name for p in participants],
                     "turn_policy": config.turn_policy.value,
-                    "initiated_by": initiating_event.event_type.value if initiating_event else "manual",
+                    "initiated_by": initiating_event.event_type.value
+                    if initiating_event
+                    else "manual",
                 },
                 correlation_id=correlation_id,
             )
@@ -251,14 +252,18 @@ class ConsciousDialogueManager:
         if participant_state:
             participant_state.turns_taken += 1
             participant_state.last_turn_time = message.timestamp
-            participant_state.consciousness_contribution += message.consciousness.consciousness_signature
+            participant_state.consciousness_contribution += (
+                message.consciousness.consciousness_signature
+            )
 
             # Update consciousness-guided speaker selector
             # Calculate reciprocity delta (positive for giving, negative for taking)
             reciprocity_delta = 0.0
-            if hasattr(participant_state, 'reciprocity_balance'):
+            if hasattr(participant_state, "reciprocity_balance"):
                 old_balance = participant_state.reciprocity_balance
-                participant_state.reciprocity_balance = message.consciousness.reciprocity_score or 0.0
+                participant_state.reciprocity_balance = (
+                    message.consciousness.reciprocity_score or 0.0
+                )
                 reciprocity_delta = participant_state.reciprocity_balance - old_balance
 
             # Update speaker selector with contribution metrics
@@ -266,7 +271,7 @@ class ConsciousDialogueManager:
                 participant_id=message.sender,
                 consciousness_score=message.consciousness.consciousness_signature,
                 reciprocity_delta=reciprocity_delta,
-                energy_cost=0.1  # Speaking costs energy
+                energy_cost=0.1,  # Speaking costs energy
             )
 
     async def get_next_speaker(self, dialogue_id: UUID) -> UUID | None:
@@ -297,7 +302,7 @@ class ConsciousDialogueManager:
             for participant_id in participants:
                 self.consciousness_speaker_selector.restore_participant_energy(
                     participant_id,
-                    amount=0.15  # Silence restores more energy than it costs to speak
+                    amount=0.15,  # Silence restores more energy than it costs to speak
                 )
 
         return next_speaker
@@ -315,7 +320,12 @@ class ConsciousDialogueManager:
 
         # Calculate final metrics
         total_messages = len(dialogue["messages"])
-        avg_consciousness = sum(m.consciousness.consciousness_signature for m in dialogue["messages"]) / total_messages if total_messages > 0 else 0
+        avg_consciousness = (
+            sum(m.consciousness.consciousness_signature for m in dialogue["messages"])
+            / total_messages
+            if total_messages > 0
+            else 0
+        )
 
         participant_summaries = {}
         for pid, state in self.participant_states[dialogue_id].items():
@@ -462,10 +472,7 @@ class ConsciousDialogueManager:
         participants: dict[UUID, ParticipantState],
     ) -> UUID | None:
         """Get next speaker using round robin policy."""
-        active_participants = [
-            pid for pid, state in participants.items()
-            if state.is_active
-        ]
+        active_participants = [pid for pid, state in participants.items() if state.is_active]
 
         if not active_participants:
             return None
@@ -474,6 +481,7 @@ class ConsciousDialogueManager:
             dialogue["speaking_order"] = active_participants.copy()
             if dialogue["config"].randomize_initial_order:
                 import random
+
                 random.shuffle(dialogue["speaking_order"])
 
         current_turn = dialogue["current_turn"] % len(dialogue["speaking_order"])
@@ -493,8 +501,7 @@ class ConsciousDialogueManager:
 
         # Get active participants (not silent)
         active_participants = {
-            pid: state for pid, state in participants.items()
-            if not state.is_silent
+            pid: state for pid, state in participants.items() if not state.is_silent
         }
 
         # Allow sacred silence as a valid choice
@@ -502,9 +509,7 @@ class ConsciousDialogueManager:
 
         # Use consciousness-guided selection
         selected_speaker = await self.consciousness_speaker_selector.select_next_speaker(
-            dialogue_id=dialogue_id,
-            participants=active_participants,
-            allow_silence=allow_silence
+            dialogue_id=dialogue_id, participants=active_participants, allow_silence=allow_silence
         )
 
         # If silence was chosen and allowed

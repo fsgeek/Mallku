@@ -45,7 +45,9 @@ logging.basicConfig(level=logging.INFO)
 logger = get_logger(__name__)
 
 
-async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMetrics, list[ReciprocityPattern]]:
+async def create_sample_data() -> tuple[
+    list[InteractionRecord], SystemHealthMetrics, list[ReciprocityPattern]
+]:
     """Create sample reciprocity data for visualization."""
 
     # Sample interactions over past week
@@ -70,8 +72,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
                     interaction_quality_indicators={
                         "mutual_understanding": 0.9,
                         "creative_emergence": 0.8,
-                        "satisfaction_expressed": 0.85
-                    }
+                        "satisfaction_expressed": 0.85,
+                    },
                 )
             # Support provision interactions
             elif hour == 12:
@@ -86,8 +88,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
                     interaction_quality_indicators={
                         "empathy_shown": 0.9,
                         "comfort_provided": 0.85,
-                        "connection_strengthened": 0.8
-                    }
+                        "connection_strengthened": 0.8,
+                    },
                 )
             # Creative collaboration
             elif hour == 16:
@@ -102,8 +104,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
                     interaction_quality_indicators={
                         "synergy_achieved": 0.95,
                         "innovation_sparked": 0.9,
-                        "joy_experienced": 0.88
-                    }
+                        "joy_experienced": 0.88,
+                    },
                 )
             # Resource sharing
             else:
@@ -118,8 +120,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
                     interaction_quality_indicators={
                         "efficiency": 0.85,
                         "availability": 0.9,
-                        "reliability": 0.92
-                    }
+                        "reliability": 0.92,
+                    },
                 )
 
             interactions.append(interaction)
@@ -142,8 +144,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
         resource_abundance_indicators={
             "knowledge_pool": 0.88,
             "support_availability": 0.91,
-            "creative_energy": 0.86
-        }
+            "creative_energy": 0.86,
+        },
     )
 
     # Create detected patterns
@@ -158,8 +160,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
             questions_for_deliberation=[
                 "How can we nurture this creative emergence further?",
                 "What conditions enabled this positive pattern?",
-                "Should we create more spaces for creative collaboration?"
-            ]
+                "Should we create more spaces for creative collaboration?",
+            ],
         ),
         ReciprocityPattern(
             pattern_type="resource_flow_balance",
@@ -171,8 +173,8 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
             questions_for_deliberation=[
                 "Is the current resource allocation sustainable?",
                 "Are there unmet needs we haven't detected?",
-                "How can we ensure continued resource abundance?"
-            ]
+                "How can we ensure continued resource abundance?",
+            ],
         ),
         ReciprocityPattern(
             pattern_type="participation_growth",
@@ -184,9 +186,9 @@ async def create_sample_data() -> tuple[list[InteractionRecord], SystemHealthMet
             questions_for_deliberation=[
                 "What makes participants want to return?",
                 "How do we maintain this positive momentum?",
-                "Are new participants being welcomed effectively?"
-            ]
-        )
+                "Are new participants being welcomed effectively?",
+            ],
+        ),
     ]
 
     return interactions, health_metrics, patterns
@@ -200,18 +202,12 @@ async def demonstrate_mandala_creation():
     interactions, health_metrics, patterns = await create_sample_data()
 
     # Create visualization service
-    config = VisualizationConfig(
-        image_size=(800, 800),
-        mandala_rings=7,
-        mandala_symmetry=12
-    )
+    config = VisualizationConfig(image_size=(800, 800), mandala_rings=7, mandala_symmetry=12)
     viz_service = ReciprocityVisualizationService(config)
 
     # Generate mandala
     mandala = await viz_service.create_reciprocity_mandala(
-        patterns=patterns,
-        health_metrics=health_metrics,
-        title="Fire Circle Reciprocity Mandala"
+        patterns=patterns, health_metrics=health_metrics, title="Fire Circle Reciprocity Mandala"
     )
 
     # Save for viewing
@@ -237,8 +233,7 @@ async def demonstrate_flow_visualization():
     # Create visualization
     viz_service = ReciprocityVisualizationService()
     flow_viz = await viz_service.create_flow_visualization(
-        interactions=interactions,
-        time_window=timedelta(days=7)
+        interactions=interactions, time_window=timedelta(days=7)
     )
 
     # Save
@@ -260,7 +255,7 @@ async def demonstrate_pattern_geometry():
     viz_service = ReciprocityVisualizationService()
     pattern_geom = await viz_service.create_pattern_geometry(
         pattern=patterns[0],  # Positive emergence pattern
-        related_patterns=patterns[1:]
+        related_patterns=patterns[1:],
     )
 
     # Save
@@ -293,7 +288,7 @@ async def demonstrate_multimodal_contemplation():
         {
             "text": """Looking at this reciprocity mandala, what patterns of balance and flow do you perceive?
             How does the visual structure reflect the health of our reciprocal relationships?""",
-            "image": mandala_base64
+            "image": mandala_base64,
         },
         {
             "text": f"""This mandala represents our Fire Circle with:
@@ -302,15 +297,15 @@ async def demonstrate_multimodal_contemplation():
             - Need fulfillment in growth: {health_metrics.need_fulfillment_rates.get(NeedCategory.GROWTH, 0):.0%}
 
             What wisdom do you see in these patterns? What questions arise for our collective deliberation?""",
-            "image": mandala_base64
+            "image": mandala_base64,
         },
         {
             "text": """If this mandala represents the soul of our reciprocal community, what does it tell us about:
             1. Where we are thriving?
             2. Where we might need more attention?
             3. How we can nurture continued flourishing?""",
-            "image": mandala_base64
-        }
+            "image": mandala_base64,
+        },
     ]
 
     # Send contemplation requests
@@ -322,12 +317,12 @@ async def demonstrate_multimodal_contemplation():
             type=MessageType.REFLECTION,
             sender=uuid4(),
             role=MessageRole.USER,
-            content=MessageContent(text=prompt_data['text']),
+            content=MessageContent(text=prompt_data["text"]),
             dialogue_id=uuid4(),
             sequence_number=i,
             turn_number=i,
             timestamp=datetime.now(UTC),
-            metadata={"images": [prompt_data['image']]}
+            metadata={"images": [prompt_data["image"]]},
         )
 
         # Get AI contemplation
@@ -336,7 +331,9 @@ async def demonstrate_multimodal_contemplation():
         logger.info("AI Contemplation:")
         logger.info("-" * 50)
         logger.info(response.content.text)
-        logger.info(f"Consciousness signature: {response.consciousness.consciousness_signature:.2f}")
+        logger.info(
+            f"Consciousness signature: {response.consciousness.consciousness_signature:.2f}"
+        )
         logger.info(f"Detected patterns: {response.consciousness.detected_patterns}")
         logger.info("-" * 50)
 
@@ -357,20 +354,20 @@ async def demonstrate_fire_circle_summary():
     report = FireCircleReport(
         reporting_period={
             "start": health_metrics.measurement_period_start,
-            "end": health_metrics.measurement_period_end
+            "end": health_metrics.measurement_period_end,
         },
         current_health_metrics=health_metrics,
         detected_patterns=patterns,
         priority_questions=[
             "How can we nurture the emerging creative synergy?",
             "What conditions enable sustainable reciprocity?",
-            "How do we welcome new participants while maintaining trust?"
+            "How do we welcome new participants while maintaining trust?",
         ],
         areas_requiring_wisdom=[
             "Balancing individual expression with collective needs",
             "Recognizing extraction patterns before they harm",
-            "Creating spaces for all forms of contribution"
-        ]
+            "Creating spaces for all forms of contribution",
+        ],
     )
 
     # Create visualization

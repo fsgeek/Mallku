@@ -34,6 +34,7 @@ _initializing = False  # Flag to prevent recursive initialization
 
 class DatabaseAccessViolationError(Exception):
     """Raised when code attempts unauthorized database access."""
+
     pass
 
 
@@ -61,6 +62,7 @@ def get_secured_database() -> "SecuredDatabaseInterface":
 
             # Initialize asynchronously when first accessed
             import asyncio
+
             try:
                 # Try to initialize if we're in an async context
                 loop = asyncio.get_running_loop()
@@ -105,16 +107,16 @@ def get_database_raw() -> "StandardDatabase":
         # Check if this is a legitimate call from within the security layer
         # Allow calls from get_secured_database() and security infrastructure
         is_security_layer_call = (
-            function_name == "get_secured_database" or
-            "database/factory.py" in filename or
-            "database/secured_interface.py" in filename
+            function_name == "get_secured_database"
+            or "database/factory.py" in filename
+            or "database/secured_interface.py" in filename
         )
 
         # Also check if this is initialization/testing code
         is_init_or_test_call = (
-            "test_" in filename or
-            "debug_" in filename or
-            function_name in ["__init__", "initialize", "connect", "ensure_collections"]
+            "test_" in filename
+            or "debug_" in filename
+            or function_name in ["__init__", "initialize", "connect", "ensure_collections"]
         )
 
         is_legitimate_internal_call = is_security_layer_call or is_init_or_test_call
@@ -131,11 +133,13 @@ def get_database_raw() -> "StandardDatabase":
 
         # Track violations for reporting
         if _secured_interface:
-            _secured_interface._security_violations.append({
-                "timestamp": "now",  # Would use datetime in production
-                "caller": caller_info,
-                "violation_type": "direct_database_access"
-            })
+            _secured_interface._security_violations.append(
+                {
+                    "timestamp": "now",  # Would use datetime in production
+                    "caller": caller_info,
+                    "violation_type": "direct_database_access",
+                }
+            )
     else:
         # Log legitimate internal access at debug level
         logger.debug(f"Legitimate internal database access from {caller_info}")
@@ -149,7 +153,7 @@ def get_database_raw() -> "StandardDatabase":
     import os
 
     # Get the path to the sibling database.py file
-    database_path = os.path.join(os.path.dirname(__file__), '..', 'database.py')
+    database_path = os.path.join(os.path.dirname(__file__), "..", "database.py")
     database_path = os.path.abspath(database_path)
 
     # Load the module directly
@@ -177,6 +181,7 @@ def create_development_validator():
     This can be used in tests and development to ensure code follows
     the security-by-design principles.
     """
+
     class DatabaseSecurityValidator:
         def __init__(self):
             self.violations = []
@@ -199,12 +204,14 @@ def create_development_validator():
 
                 # Check for direct database imports
                 for node in ast.walk(tree):
-                    if isinstance(node, ast.ImportFrom) and node.module and 'database' in node.module:
+                    if (
+                        isinstance(node, ast.ImportFrom)
+                        and node.module
+                        and "database" in node.module
+                    ):
                         for alias in node.names:
-                            if alias.name == 'get_database':
-                                violations.append(
-                                    f"Direct import of get_database in {module_name}"
-                                )
+                            if alias.name == "get_database":
+                                violations.append(f"Direct import of get_database in {module_name}")
 
             except Exception as e:
                 logger.debug(f"Could not analyze module {module_name}: {e}")
@@ -217,7 +224,7 @@ def create_development_validator():
 
             # Check all loaded modules
             for module_name in sys.modules:
-                if 'mallku' in module_name:  # Only check our modules
+                if "mallku" in module_name:  # Only check our modules
                     violations = self.check_imports(module_name)
                     if violations:
                         all_violations[module_name] = violations
@@ -236,7 +243,7 @@ def get_security_status() -> dict[str, Any]:
     status = {
         "secured_interface_active": _secured_interface is not None,
         "patch_applied": True,  # Always true if this module loaded
-        "compliance_score": 0.0
+        "compliance_score": 0.0,
     }
 
     if _secured_interface:

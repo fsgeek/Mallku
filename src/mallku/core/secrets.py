@@ -38,24 +38,15 @@ class SecretMetadata(SecuredModel):
     """Metadata about a stored secret for tracking and auditing."""
 
     key: str = SecuredField(
-        obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
-        security_notes="Secret identifier"
+        obfuscation_level=FieldObfuscationLevel.UUID_ONLY, security_notes="Secret identifier"
     )
-    source: str = SecuredField(
-        default="unknown",
-        security_notes="Where this secret came from"
-    )
+    source: str = SecuredField(default="unknown", security_notes="Where this secret came from")
     last_accessed: datetime | None = SecuredField(
-        default=None,
-        security_notes="Track access patterns"
+        default=None, security_notes="Track access patterns"
     )
-    access_count: int = SecuredField(
-        default=0,
-        security_notes="How often this secret is used"
-    )
+    access_count: int = SecuredField(default=0, security_notes="How often this secret is used")
     created_at: datetime = SecuredField(
-        default_factory=lambda: datetime.now(UTC),
-        security_notes="When secret was first stored"
+        default_factory=lambda: datetime.now(UTC), security_notes="When secret was first stored"
     )
 
 
@@ -104,7 +95,9 @@ class SecretsManager:
 
         if encryption_key:
             # Use provided key
-            self._fernet = Fernet(encryption_key.encode() if isinstance(encryption_key, str) else encryption_key)
+            self._fernet = Fernet(
+                encryption_key.encode() if isinstance(encryption_key, str) else encryption_key
+            )
         elif key_file.exists():
             # Load existing key
             with open(key_file, "rb") as f:
@@ -339,7 +332,9 @@ class SecretsManager:
             report[key] = {
                 "source": metadata.source,
                 "access_count": metadata.access_count,
-                "last_accessed": metadata.last_accessed.isoformat() if metadata.last_accessed else None,
+                "last_accessed": metadata.last_accessed.isoformat()
+                if metadata.last_accessed
+                else None,
                 "created_at": metadata.created_at.isoformat(),
             }
 
@@ -374,7 +369,9 @@ async def get_secret(key: str, default: Any = None, required: bool = False) -> A
     return await manager.get_secret(key, default, required)
 
 
-async def inject_adapter_secrets(adapter_configs: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+async def inject_adapter_secrets(
+    adapter_configs: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
     """
     Convenience function to inject secrets into adapter configs.
 

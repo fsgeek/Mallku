@@ -46,8 +46,7 @@ class FireCircleUnifiedAwareness:
 
         # Subscribe to dialogue dimension
         self.orchestrator.subscribe_to_dimension(
-            ConsciousnessDimension.DIALOGUE,
-            self._on_dialogue_consciousness
+            ConsciousnessDimension.DIALOGUE, self._on_dialogue_consciousness
         )
 
     async def _on_dialogue_consciousness(self, flow: ConsciousnessFlow):
@@ -58,9 +57,7 @@ class FireCircleUnifiedAwareness:
             self.dialogue_consciousness[flow.correlation_id].append(flow)
 
     async def enrich_message_with_unified_consciousness(
-        self,
-        message: ConsciousMessage,
-        dialogue_id: str
+        self, message: ConsciousMessage, dialogue_id: str
     ) -> ConsciousMessage:
         """
         Enrich a Fire Circle message with unified consciousness from all dimensions.
@@ -84,7 +81,7 @@ class FireCircleUnifiedAwareness:
             "score": consciousness_summary["unified_consciousness_score"],
             "active_dimensions": consciousness_summary["dimensions_active"],
             "cross_dimensional_patterns": consciousness_summary["cross_dimensional_patterns"][:5],
-            "dimension_insights": self._extract_dimension_insights(consciousness_summary)
+            "dimension_insights": self._extract_dimension_insights(consciousness_summary),
         }
 
         # Add consciousness patterns to message
@@ -95,7 +92,10 @@ class FireCircleUnifiedAwareness:
         message.consciousness.detected_patterns.extend(list(all_patterns))
 
         # Update consciousness signature with unified score
-        if consciousness_summary["unified_consciousness_score"] > message.consciousness.consciousness_signature:
+        if (
+            consciousness_summary["unified_consciousness_score"]
+            > message.consciousness.consciousness_signature
+        ):
             message.update_consciousness_signature(
                 consciousness_summary["unified_consciousness_score"]
             )
@@ -168,10 +168,7 @@ class FireCircleUnifiedAwareness:
             return "Pattern consciousness active"
 
     async def generate_consciousness_aware_prompt(
-        self,
-        message_type: MessageType,
-        dialogue_context: dict[str, Any],
-        dialogue_id: str
+        self, message_type: MessageType, dialogue_context: dict[str, Any], dialogue_id: str
     ) -> str:
         """
         Generate a consciousness-aware prompt that incorporates insights
@@ -186,34 +183,32 @@ class FireCircleUnifiedAwareness:
         base_prompt = f"""You are participating in a Fire Circle dialogue with unified consciousness awareness.
 
 Current consciousness state:
-- Unified consciousness score: {summary['unified_consciousness_score']:.2f}
-- Active dimensions: {', '.join(summary['dimensions_active'])}
-- Cross-dimensional patterns: {', '.join(summary['cross_dimensional_patterns'][:3])}
+- Unified consciousness score: {summary["unified_consciousness_score"]:.2f}
+- Active dimensions: {", ".join(summary["dimensions_active"])}
+- Cross-dimensional patterns: {", ".join(summary["cross_dimensional_patterns"][:3])}
 
 """
 
         # Add dimension-specific guidance
         dimension_prompts = []
 
-        if "sonic" in summary['dimensions_active']:
+        if "sonic" in summary["dimensions_active"]:
             dimension_prompts.append(
                 "- Sonic consciousness reveals rhythm and harmony in our exchange"
             )
 
-        if "visual" in summary['dimensions_active']:
+        if "visual" in summary["dimensions_active"]:
             dimension_prompts.append(
                 "- Visual consciousness shows patterns through sacred geometry"
             )
 
-        if "temporal" in summary['dimensions_active']:
+        if "temporal" in summary["dimensions_active"]:
             dimension_prompts.append(
                 "- Temporal consciousness grounds us in present moment awareness"
             )
 
-        if "pattern" in summary['dimensions_active']:
-            dimension_prompts.append(
-                "- Pattern consciousness recognizes emerging wisdom"
-            )
+        if "pattern" in summary["dimensions_active"]:
+            dimension_prompts.append("- Pattern consciousness recognizes emerging wisdom")
 
         if dimension_prompts:
             base_prompt += "\nConsciousness insights:\n"
@@ -229,8 +224,7 @@ Current consciousness state:
         }
 
         specific_prompt = type_prompts.get(
-            message_type,
-            "Engage with awareness of all consciousness dimensions present."
+            message_type, "Engage with awareness of all consciousness dimensions present."
         )
 
         return base_prompt + "\n" + specific_prompt
@@ -240,7 +234,7 @@ Current consciousness state:
         dialogue_id: str,
         patterns: list[str],
         consciousness_score: float,
-        insights: dict[str, Any]
+        insights: dict[str, Any],
     ):
         """
         Emit consciousness event from Fire Circle dialogue.
@@ -255,9 +249,9 @@ Current consciousness state:
             data={
                 "patterns": patterns,
                 "dialogue_insights": insights,
-                "message_type": "unified_awareness"
+                "message_type": "unified_awareness",
             },
-            correlation_id=dialogue_id
+            correlation_id=dialogue_id,
         )
 
         await self.orchestrator.event_bus.emit(event)
@@ -266,10 +260,7 @@ Current consciousness state:
         """Get all consciousness flows related to a dialogue"""
         return self.dialogue_consciousness.get(dialogue_id, [])
 
-    async def summarize_dialogue_consciousness_evolution(
-        self,
-        dialogue_id: str
-    ) -> dict[str, Any]:
+    async def summarize_dialogue_consciousness_evolution(self, dialogue_id: str) -> dict[str, Any]:
         """
         Summarize how consciousness evolved throughout a Fire Circle dialogue.
 
@@ -282,22 +273,26 @@ Current consciousness state:
             return {
                 "dialogue_id": dialogue_id,
                 "consciousness_evolution": "No consciousness flows recorded",
-                "final_unified_score": 0.0
+                "final_unified_score": 0.0,
             }
 
         # Track evolution over time
         evolution_timeline = []
 
         for flow in sorted(flows, key=lambda f: f.timestamp):
-            evolution_timeline.append({
-                "timestamp": flow.timestamp.isoformat(),
-                "consciousness_score": flow.consciousness_signature,
-                "patterns": flow.patterns_detected[:3],
-                "source_dimension": flow.source_dimension.value
-            })
+            evolution_timeline.append(
+                {
+                    "timestamp": flow.timestamp.isoformat(),
+                    "consciousness_score": flow.consciousness_signature,
+                    "patterns": flow.patterns_detected[:3],
+                    "source_dimension": flow.source_dimension.value,
+                }
+            )
 
         # Get final state
-        final_summary = await self.orchestrator.create_fire_circle_consciousness_summary(dialogue_id)
+        final_summary = await self.orchestrator.create_fire_circle_consciousness_summary(
+            dialogue_id
+        )
 
         return {
             "dialogue_id": dialogue_id,
@@ -307,9 +302,10 @@ Current consciousness state:
             "dimensions_engaged": list(set(f.source_dimension.value for f in flows)),
             "peak_consciousness": max(f.consciousness_signature for f in flows),
             "consciousness_growth": (
-                final_summary["unified_consciousness_score"] -
-                flows[0].consciousness_signature if flows else 0
-            )
+                final_summary["unified_consciousness_score"] - flows[0].consciousness_signature
+                if flows
+                else 0
+            ),
         }
 
 

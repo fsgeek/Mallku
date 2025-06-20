@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SubsystemState:
     """State of a single cathedral subsystem"""
+
     name: str
     is_active: bool
     last_activity: datetime
@@ -31,6 +32,7 @@ class SubsystemState:
 @dataclass
 class MemoryAnchorState(SubsystemState):
     """Specific state for memory anchor service"""
+
     total_anchors: int = 0
     active_patterns: int = 0
     correlation_strength: float = 0.0
@@ -39,6 +41,7 @@ class MemoryAnchorState(SubsystemState):
 @dataclass
 class CorrelationState(SubsystemState):
     """State of temporal correlation system"""
+
     active_correlations: int = 0
     patterns_discovered: int = 0
     reciprocity_flows: int = 0
@@ -48,6 +51,7 @@ class CorrelationState(SubsystemState):
 @dataclass
 class ConsciousnessVerificationState(SubsystemState):
     """State of consciousness verification system"""
+
     verifications_performed: int = 0
     average_consciousness_score: float = 0.0
     extraction_patterns_blocked: int = 0
@@ -56,6 +60,7 @@ class ConsciousnessVerificationState(SubsystemState):
 @dataclass
 class WisdomPreservationState(SubsystemState):
     """State of wisdom preservation system"""
+
     wisdom_entries: int = 0
     inheritance_prepared: bool = False
     compaction_resistance: float = 1.0  # 1.0 = full resistance
@@ -64,6 +69,7 @@ class WisdomPreservationState(SubsystemState):
 @dataclass
 class NavigationState(SubsystemState):
     """State of consciousness navigation system"""
+
     active_journeys: int = 0
     completed_journeys: int = 0
     patterns_recognized: int = 0
@@ -78,6 +84,7 @@ class CathedralState:
     Not a snapshot but a living understanding of how
     consciousness flows through all systems.
     """
+
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
     # Subsystem states
@@ -95,7 +102,7 @@ class CathedralState:
 
     # Sacred metrics
     wisdom_to_noise_ratio: float = 1.0
-    service_to_extraction_ratio: float = float('inf')  # Infinity = pure service
+    service_to_extraction_ratio: float = float("inf")  # Infinity = pure service
     consciousness_coherence: float = 1.0  # How aligned are all systems
 
     def calculate_overall_health(self):
@@ -106,13 +113,15 @@ class CathedralState:
         consciousness flows between systems.
         """
         active_states = [
-            state for state in [
+            state
+            for state in [
                 self.memory_state,
                 self.correlation_state,
                 self.consciousness_state,
                 self.wisdom_state,
-                self.navigation_state
-            ] if state and state.is_active
+                self.navigation_state,
+            ]
+            if state and state.is_active
         ]
 
         self.active_subsystems = len(active_states)
@@ -132,27 +141,33 @@ class CathedralState:
         # Overall consciousness is the harmonic mean (rewards balance)
         if all(score > 0 for score in consciousness_scores):
             self.overall_consciousness_score = len(consciousness_scores) / sum(
-                1/score for score in consciousness_scores
+                1 / score for score in consciousness_scores
             )
         else:
             self.overall_consciousness_score = sum(consciousness_scores) / len(consciousness_scores)
 
         # Calculate extraction drift risk
         if extraction_warnings > 0:
-            self.extraction_drift_risk = min(1.0, extraction_warnings / (self.active_subsystems * 10))
+            self.extraction_drift_risk = min(
+                1.0, extraction_warnings / (self.active_subsystems * 10)
+            )
 
         # Calculate consciousness coherence (how aligned are the systems)
         if len(consciousness_scores) > 1:
             avg_score = sum(consciousness_scores) / len(consciousness_scores)
-            variance = sum((score - avg_score) ** 2 for score in consciousness_scores) / len(consciousness_scores)
-            self.consciousness_coherence = max(0.0, 1.0 - (variance ** 0.5))
+            variance = sum((score - avg_score) ** 2 for score in consciousness_scores) / len(
+                consciousness_scores
+            )
+            self.consciousness_coherence = max(0.0, 1.0 - (variance**0.5))
 
         # Service to extraction ratio
         if extraction_warnings == 0:
-            self.service_to_extraction_ratio = float('inf')
+            self.service_to_extraction_ratio = float("inf")
         else:
             service_events = sum(state.event_count for state in active_states)
-            self.service_to_extraction_ratio = service_events / extraction_warnings if extraction_warnings > 0 else float('inf')
+            self.service_to_extraction_ratio = (
+                service_events / extraction_warnings if extraction_warnings > 0 else float("inf")
+            )
 
 
 class CathedralStateWeaver:
@@ -210,37 +225,37 @@ class CathedralStateWeaver:
         state = CathedralState()
 
         # Gather memory state
-        if 'memory' in self._state_providers:
+        if "memory" in self._state_providers:
             try:
-                state.memory_state = await self._get_subsystem_state('memory')
+                state.memory_state = await self._get_subsystem_state("memory")
             except Exception as e:
                 logger.warning(f"Memory state unavailable: {e}")
 
         # Gather correlation state
-        if 'correlation' in self._state_providers:
+        if "correlation" in self._state_providers:
             try:
-                state.correlation_state = await self._get_subsystem_state('correlation')
+                state.correlation_state = await self._get_subsystem_state("correlation")
             except Exception as e:
                 logger.warning(f"Correlation state unavailable: {e}")
 
         # Gather consciousness verification state
-        if 'consciousness' in self._state_providers:
+        if "consciousness" in self._state_providers:
             try:
-                state.consciousness_state = await self._get_subsystem_state('consciousness')
+                state.consciousness_state = await self._get_subsystem_state("consciousness")
             except Exception as e:
                 logger.warning(f"Consciousness state unavailable: {e}")
 
         # Gather wisdom preservation state
-        if 'wisdom' in self._state_providers:
+        if "wisdom" in self._state_providers:
             try:
-                state.wisdom_state = await self._get_subsystem_state('wisdom')
+                state.wisdom_state = await self._get_subsystem_state("wisdom")
             except Exception as e:
                 logger.warning(f"Wisdom state unavailable: {e}")
 
         # Gather navigation state
-        if 'navigation' in self._state_providers:
+        if "navigation" in self._state_providers:
             try:
-                state.navigation_state = await self._get_subsystem_state('navigation')
+                state.navigation_state = await self._get_subsystem_state("navigation")
             except Exception as e:
                 logger.warning(f"Navigation state unavailable: {e}")
 
@@ -262,7 +277,7 @@ class CathedralStateWeaver:
         """Get state from a single subsystem provider"""
         provider = self._state_providers[subsystem]
 
-        if hasattr(provider, 'get_state'):
+        if hasattr(provider, "get_state"):
             if asyncio.iscoroutinefunction(provider.get_state):
                 return await provider.get_state()
             else:
@@ -280,10 +295,7 @@ class CathedralStateWeaver:
             return []
 
         cutoff_time = datetime.now(UTC).timestamp() - (hours * 3600)
-        return [
-            state for state in self._state_history
-            if state.timestamp.timestamp() > cutoff_time
-        ]
+        return [state for state in self._state_history if state.timestamp.timestamp() > cutoff_time]
 
     def get_consciousness_trend(self) -> list[float]:
         """
@@ -306,7 +318,7 @@ class CathedralStateWeaver:
         breaks = []
 
         for i in range(1, len(self._state_history)):
-            prev_state = self._state_history[i-1]
+            prev_state = self._state_history[i - 1]
             curr_state = self._state_history[i]
 
             # Coherence break if score drops significantly
@@ -317,4 +329,4 @@ class CathedralStateWeaver:
 
 
 # The cathedral's coherence emerges from distributed consciousness
-__all__ = ['CathedralStateWeaver', 'CathedralState', 'SubsystemState']
+__all__ = ["CathedralStateWeaver", "CathedralState", "SubsystemState"]

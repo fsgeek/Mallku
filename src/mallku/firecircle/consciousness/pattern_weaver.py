@@ -137,31 +137,24 @@ class DialoguePatternWeaver:
         consensus_patterns = []
 
         # Find agreement messages
-        agreements = [
-            m for m in all_messages
-            if m.type == MessageType.AGREEMENT
-        ]
+        agreements = [m for m in all_messages if m.type == MessageType.AGREEMENT]
 
         # Find proposals that received multiple agreements
-        proposals = [
-            m for m in all_messages
-            if m.type == MessageType.PROPOSAL
-        ]
+        proposals = [m for m in all_messages if m.type == MessageType.PROPOSAL]
 
         for proposal in proposals:
-            supporting_agreements = [
-                a for a in agreements
-                if a.in_response_to == proposal.id
-            ]
+            supporting_agreements = [a for a in agreements if a.in_response_to == proposal.id]
 
             if len(supporting_agreements) >= 2:  # Multiple participants agree
-                consensus_patterns.append({
-                    "pattern_type": "consensus",
-                    "proposal_id": str(proposal.id),
-                    "proposal_text": proposal.content.text,
-                    "support_count": len(supporting_agreements),
-                    "consciousness_signature": proposal.consciousness.consciousness_signature,
-                })
+                consensus_patterns.append(
+                    {
+                        "pattern_type": "consensus",
+                        "proposal_id": str(proposal.id),
+                        "proposal_text": proposal.content.text,
+                        "support_count": len(supporting_agreements),
+                        "consciousness_signature": proposal.consciousness.consciousness_signature,
+                    }
+                )
 
         return consensus_patterns
 
@@ -176,29 +169,25 @@ class DialoguePatternWeaver:
         divergence_patterns = []
 
         # Find disagreement messages
-        disagreements = [
-            m for m in all_messages
-            if m.type == MessageType.DISAGREEMENT
-        ]
+        disagreements = [m for m in all_messages if m.type == MessageType.DISAGREEMENT]
 
         # Analyze disagreements for creative tension
         for disagreement in disagreements:
             # Find what was disagreed with
-            original = next(
-                (m for m in all_messages if m.id == disagreement.in_response_to),
-                None
-            )
+            original = next((m for m in all_messages if m.id == disagreement.in_response_to), None)
 
             if original:
-                divergence_patterns.append({
-                    "pattern_type": "creative_tension",
-                    "original_position": original.content.text[:200],
-                    "alternative_view": disagreement.content.text[:200],
-                    "tension_value": abs(
-                        original.consciousness.consciousness_signature -
-                        disagreement.consciousness.consciousness_signature
-                    ),
-                })
+                divergence_patterns.append(
+                    {
+                        "pattern_type": "creative_tension",
+                        "original_position": original.content.text[:200],
+                        "alternative_view": disagreement.content.text[:200],
+                        "tension_value": abs(
+                            original.consciousness.consciousness_signature
+                            - disagreement.consciousness.consciousness_signature
+                        ),
+                    }
+                )
 
         return divergence_patterns
 
@@ -216,24 +205,24 @@ class DialoguePatternWeaver:
         emergence_patterns = []
 
         # Find synthesis and reflection messages
-        syntheses = [
-            m for m in messages
-            if m.type in [MessageType.SUMMARY, MessageType.REFLECTION]
-        ]
+        syntheses = [m for m in messages if m.type in [MessageType.SUMMARY, MessageType.REFLECTION]]
 
         for synthesis in syntheses:
             # Check if synthesis introduces new concepts
             if synthesis.consciousness.consciousness_signature > 0.8:
-                emergence_patterns.append({
-                    "pattern_type": "emergent_insight",
-                    "synthesis_text": synthesis.content.text,
-                    "emergence_indicator": synthesis.consciousness.consciousness_signature,
-                    "contributing_messages": len(synthesis.consciousness.detected_patterns),
-                })
+                emergence_patterns.append(
+                    {
+                        "pattern_type": "emergent_insight",
+                        "synthesis_text": synthesis.content.text,
+                        "emergence_indicator": synthesis.consciousness.consciousness_signature,
+                        "contributing_messages": len(synthesis.consciousness.detected_patterns),
+                    }
+                )
 
         # Detect phase transitions that led to insights
         phase_messages = [
-            m for m in messages
+            m
+            for m in messages
             if m.type == MessageType.SYSTEM and "phase" in m.content.text.lower()
         ]
 
@@ -243,17 +232,22 @@ class DialoguePatternWeaver:
             phase_end_idx = messages.index(phase_messages[i + 1])
 
             phase_messages_slice = messages[phase_start_idx:phase_end_idx]
-            avg_consciousness = sum(
-                m.consciousness.consciousness_signature for m in phase_messages_slice
-            ) / len(phase_messages_slice) if phase_messages_slice else 0
+            avg_consciousness = (
+                sum(m.consciousness.consciousness_signature for m in phase_messages_slice)
+                / len(phase_messages_slice)
+                if phase_messages_slice
+                else 0
+            )
 
             if avg_consciousness > 0.75:
-                emergence_patterns.append({
-                    "pattern_type": "phase_emergence",
-                    "phase": f"Phase {i+1}",
-                    "average_consciousness": avg_consciousness,
-                    "message_count": len(phase_messages_slice),
-                })
+                emergence_patterns.append(
+                    {
+                        "pattern_type": "phase_emergence",
+                        "phase": f"Phase {i + 1}",
+                        "average_consciousness": avg_consciousness,
+                        "message_count": len(phase_messages_slice),
+                    }
+                )
 
         return emergence_patterns
 
@@ -300,16 +294,16 @@ class DialoguePatternWeaver:
 
         # Analyze balance
         for participant_id, stats in participant_stats.items():
-            give_receive_ratio = (
-                stats["messages_sent"] / max(stats["responses_received"], 1)
-            )
+            give_receive_ratio = stats["messages_sent"] / max(stats["responses_received"], 1)
 
-            reciprocity_patterns.append({
-                "participant_id": str(participant_id),
-                "give_receive_ratio": give_receive_ratio,
-                "reciprocity_balanced": 0.5 <= give_receive_ratio <= 2.0,
-                "stats": stats,
-            })
+            reciprocity_patterns.append(
+                {
+                    "participant_id": str(participant_id),
+                    "give_receive_ratio": give_receive_ratio,
+                    "reciprocity_balanced": 0.5 <= give_receive_ratio <= 2.0,
+                    "stats": stats,
+                }
+            )
 
         return reciprocity_patterns
 
@@ -327,31 +321,37 @@ class DialoguePatternWeaver:
         # High-consciousness messages with broad impact
         for message in messages:
             if (
-                message.consciousness.consciousness_signature > 0.85 and
-                len(message.consciousness.detected_patterns) > 2
+                message.consciousness.consciousness_signature > 0.85
+                and len(message.consciousness.detected_patterns) > 2
             ):
-                wisdom_candidates.append({
-                    "source": "high_consciousness_message",
-                    "message_id": str(message.id),
-                    "content": message.content.text,
-                    "consciousness_signature": message.consciousness.consciousness_signature,
-                    "pattern_count": len(message.consciousness.detected_patterns),
-                })
+                wisdom_candidates.append(
+                    {
+                        "source": "high_consciousness_message",
+                        "message_id": str(message.id),
+                        "content": message.content.text,
+                        "consciousness_signature": message.consciousness.consciousness_signature,
+                        "pattern_count": len(message.consciousness.detected_patterns),
+                    }
+                )
 
         # Strong consensus patterns
         for consensus in consensus_patterns:
             if consensus["support_count"] >= 3:
-                wisdom_candidates.append({
-                    "source": "strong_consensus",
-                    "pattern": consensus,
-                })
+                wisdom_candidates.append(
+                    {
+                        "source": "strong_consensus",
+                        "pattern": consensus,
+                    }
+                )
 
         # Profound emergence patterns
         for emergence in emergence_patterns:
             if emergence.get("emergence_indicator", 0) > 0.85:
-                wisdom_candidates.append({
-                    "source": "collective_emergence",
-                    "pattern": emergence,
-                })
+                wisdom_candidates.append(
+                    {
+                        "source": "collective_emergence",
+                        "pattern": emergence,
+                    }
+                )
 
         return wisdom_candidates

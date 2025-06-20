@@ -141,7 +141,7 @@ async def demo_consciousness_dialogue(adapter: LocalAIAdapter):
         role=MessageRole.USER,
         content=MessageContent(
             text="How can local communities maintain technological sovereignty "
-                 "while participating in broader AI governance?"
+            "while participating in broader AI governance?"
         ),
         dialogue_id=uuid4(),
         sequence_number=1,
@@ -150,7 +150,7 @@ async def demo_consciousness_dialogue(adapter: LocalAIAdapter):
             timestamp=datetime.now(UTC),
             transformation_stage="sovereignty_exploration",
             consciousness_signature=0.85,
-        )
+        ),
     )
 
     print("📤 Sending sovereignty question to local AI...")
@@ -167,7 +167,8 @@ async def demo_consciousness_dialogue(adapter: LocalAIAdapter):
 
         # Check for sovereignty awareness
         sovereignty_patterns = [
-            p for p in response.consciousness.detected_patterns
+            p
+            for p in response.consciousness.detected_patterns
             if any(word in p for word in ["sovereignty", "local", "privacy", "community"])
         ]
 

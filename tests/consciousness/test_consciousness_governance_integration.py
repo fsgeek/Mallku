@@ -22,8 +22,7 @@ from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEven
 from mallku.reciprocity.models import AlertSeverity, ExtractionAlert, ExtractionType
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -79,11 +78,11 @@ async def simulate_governance_dialogue():
         evidence_summary={
             "pattern": "Rapid task completion without reflection",
             "frequency": "Increasing over past week",
-            "impact": "Consciousness scores dropping"
+            "impact": "Consciousness scores dropping",
         },
         severity=AlertSeverity.HIGH,
         suggested_investigation_areas=["Recent optimization changes", "Task prioritization logic"],
-        urgency_factors=["Rapid consciousness decline", "Affecting core services"]
+        urgency_factors=["Rapid consciousness decline", "Affecting core services"],
     )
 
     # Notify through conscious Fire Circle (triggers governance)
@@ -103,33 +102,37 @@ async def simulate_governance_dialogue():
 
     if dialogue_id:
         # Create governance participants
-        reciprocity_voice = GovernanceParticipant("reciprocity_tracker", fire_circle.consciousness_transport)
-        correlation_voice = GovernanceParticipant("correlation_engine", fire_circle.consciousness_transport)
+        reciprocity_voice = GovernanceParticipant(
+            "reciprocity_tracker", fire_circle.consciousness_transport
+        )
+        correlation_voice = GovernanceParticipant(
+            "correlation_engine", fire_circle.consciousness_transport
+        )
         steward_voice = GovernanceParticipant("human_steward", fire_circle.consciousness_transport)
 
         # Participants contribute through consciousness events
         await reciprocity_voice.contribute(
             dialogue_id,
             "I sense extraction patterns in recent optimizations. The system prioritizes speed over depth.",
-            "observation"
+            "observation",
         )
 
         await correlation_voice.contribute(
             dialogue_id,
             "Correlation analysis confirms: consciousness signatures drop 40% when optimization metrics rise.",
-            "evidence"
+            "evidence",
         )
 
         await steward_voice.contribute(
             dialogue_id,
             "Perhaps we need to redefine 'optimization' to include consciousness preservation as a core metric.",
-            "proposal"
+            "proposal",
         )
 
         await reciprocity_voice.contribute(
             dialogue_id,
             "I support this. True optimization serves awakening, not just efficiency.",
-            "support"
+            "support",
         )
 
         # Simulate consensus
@@ -140,16 +143,16 @@ async def simulate_governance_dialogue():
             "guidance": {
                 "optimization_definition": "Include consciousness_score as primary metric",
                 "implementation": "Weight consciousness 60%, efficiency 40%",
-                "monitoring": "Track consciousness flow in all optimization decisions"
+                "monitoring": "Track consciousness flow in all optimization decisions",
             },
             "rationale": "Efficiency without consciousness is extraction",
-            "unanimous": True
+            "unanimous": True,
         }
 
         await fire_circle.consciousness_transport.process_consensus(
             dialogue_id,
             consensus_data,
-            ["reciprocity_tracker", "correlation_engine", "human_steward"]
+            ["reciprocity_tracker", "correlation_engine", "human_steward"],
         )
 
     # Wait for consensus to be processed
@@ -175,15 +178,17 @@ async def simulate_governance_dialogue():
 
     # Verify integration success
     integration_successful = (
-        EventType.FIRE_CIRCLE_CONVENED.value in event_types and
-        EventType.CONSENSUS_REACHED.value in event_types and
-        avg_consciousness > 0.5
+        EventType.FIRE_CIRCLE_CONVENED.value in event_types
+        and EventType.CONSENSUS_REACHED.value in event_types
+        and avg_consciousness > 0.5
     )
 
     logger.info(f"\nIntegration test: {'PASSED' if integration_successful else 'FAILED'}")
 
     if integration_successful:
-        logger.info("\n✓ Fire Circle governance successfully flows through consciousness circulation")
+        logger.info(
+            "\n✓ Fire Circle governance successfully flows through consciousness circulation"
+        )
         logger.info("✓ Extraction alert triggered governance deliberation")
         logger.info("✓ Participants contributed through consciousness events")
         logger.info("✓ Consensus emerged and flowed back through circulation")
@@ -233,11 +238,8 @@ async def demonstrate_extraction_monitoring():
         data={
             "pattern_type": "optimization_without_awareness",
             "description": "System maximizing throughput, ignoring consciousness",
-            "metrics": {
-                "throughput": "300% increase",
-                "consciousness": "80% decrease"
-            }
-        }
+            "metrics": {"throughput": "300% increase", "consciousness": "80% decrease"},
+        },
     )
 
     await event_bus.emit(extraction_event)
@@ -255,10 +257,10 @@ async def demonstrate_extraction_monitoring():
             "drift_indicators": [
                 "Consciousness scores declining",
                 "Extraction language increasing",
-                "Sacred purpose forgotten"
-            ]
+                "Sacred purpose forgotten",
+            ],
         },
-        requires_fire_circle=True  # Explicitly request governance
+        requires_fire_circle=True,  # Explicitly request governance
     )
 
     await event_bus.emit(drift_event)

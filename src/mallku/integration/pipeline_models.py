@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class PipelineStage(str, Enum):
     """Stages in the Memory Anchor Discovery Trail pipeline."""
+
     ACTIVITY_CAPTURE = "activity_capture"
     CORRELATION_DETECTION = "correlation_detection"
     ANCHOR_CREATION = "anchor_creation"
@@ -52,7 +53,9 @@ class PipelineEvent(BaseModel):
     # Processing metadata
     processing_time_ms: dict[str, float] = Field(default_factory=dict)
 
-    def advance_stage(self, new_stage: PipelineStage, processing_time_ms: float | None = None) -> None:
+    def advance_stage(
+        self, new_stage: PipelineStage, processing_time_ms: float | None = None
+    ) -> None:
         """Advance the pipeline event to the next stage."""
         if processing_time_ms is not None:
             self.processing_time_ms[self.current_stage.value] = processing_time_ms
@@ -154,18 +157,19 @@ class PipelineStatistics(BaseModel):
             "success_rate": self.calculate_success_rate(),
             "throughput_eps": self.calculate_throughput(),
             "avg_processing_time_ms": sum(
-                stats.get("avg_time_ms", 0)
-                for stats in self.stage_performance.values()
+                stats.get("avg_time_ms", 0) for stats in self.stage_performance.values()
             ),
             "total_processed": self.total_events_processed,
             "correlations_per_event": (
                 self.correlations_detected / self.total_events_processed
-                if self.total_events_processed > 0 else 0
+                if self.total_events_processed > 0
+                else 0
             ),
             "anchors_per_correlation": (
                 self.anchors_created / self.correlations_detected
-                if self.correlations_detected > 0 else 0
-            )
+                if self.correlations_detected > 0
+                else 0
+            ),
         }
 
 

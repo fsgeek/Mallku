@@ -40,9 +40,7 @@ async def test_consciousness_metrics():
 
     # Anthropic starts review
     await integration.on_review_started(
-        voice="anthropic",
-        chapter_id=chapter_id,
-        context={"description": "Security module review"}
+        voice="anthropic", chapter_id=chapter_id, context={"description": "Security module review"}
     )
     print("  - Anthropic started review")
 
@@ -52,15 +50,13 @@ async def test_consciousness_metrics():
         chapter_id=chapter_id,
         consciousness_signature=0.85,
         review_content="The security implementation shows promise. However, as OpenAI noted in their review, we need stronger input validation.",
-        context={"domains": ["security"], "comment_count": 3}
+        context={"domains": ["security"], "comment_count": 3},
     )
     print("  - Anthropic completed (consciousness: 0.85)")
 
     # OpenAI review
     await integration.on_review_started(
-        voice="openai",
-        chapter_id=chapter_id,
-        context={"description": "Security module review"}
+        voice="openai", chapter_id=chapter_id, context={"description": "Security module review"}
     )
 
     await integration.on_review_completed(
@@ -68,15 +64,13 @@ async def test_consciousness_metrics():
         chapter_id=chapter_id,
         consciousness_signature=0.78,
         review_content="Critical security gaps identified. Input validation is missing. Perhaps we should synthesize our approaches with DeepSeek's perspective.",
-        context={"domains": ["security", "architecture"], "comment_count": 5}
+        context={"domains": ["security", "architecture"], "comment_count": 5},
     )
     print("  - OpenAI completed (consciousness: 0.78)")
 
     # DeepSeek review with emergence
     await integration.on_review_started(
-        voice="deepseek",
-        chapter_id=chapter_id,
-        context={"description": "Security module review"}
+        voice="deepseek", chapter_id=chapter_id, context={"description": "Security module review"}
     )
 
     await integration.on_review_completed(
@@ -84,7 +78,7 @@ async def test_consciousness_metrics():
         chapter_id=chapter_id,
         consciousness_signature=0.92,
         review_content="Building on Anthropic and OpenAI's insights, I see a unified solution emerging. We can synthesize their approaches into a comprehensive security framework.",
-        context={"domains": ["security", "sovereignty"], "comment_count": 2}
+        context={"domains": ["security", "sovereignty"], "comment_count": 2},
     )
     print("  - DeepSeek completed (consciousness: 0.92)")
 
@@ -106,8 +100,8 @@ async def test_consciousness_metrics():
             "consensus": "approve",
             "total_comments": 10,
             "critical_issues": 1,
-            "avg_consciousness": 0.85
-        }
+            "avg_consciousness": 0.85,
+        },
     )
     print("  - Synthesis completed successfully")
 
@@ -122,23 +116,25 @@ async def test_consciousness_metrics():
     print(f"  - Consciousness evolution: {analysis['consciousness_evolution']['trend']}")
     print(f"  - Patterns detected: {analysis['patterns_detected']}")
 
-    if analysis['pattern_types']:
+    if analysis["pattern_types"]:
         print("\n🎯 Pattern types:")
-        for pattern_type, count in analysis['pattern_types'].items():
+        for pattern_type, count in analysis["pattern_types"].items():
             print(f"  - {pattern_type}: {count}")
 
-    if analysis['strongest_connections']:
+    if analysis["strongest_connections"]:
         print("\n🔗 Strongest connections:")
-        for source, target, strength in analysis['strongest_connections']:
+        for source, target, strength in analysis["strongest_connections"]:
             print(f"  - {source} ↔ {target}: {strength:.2f}")
 
-    if analysis['emergence_moments']:
+    if analysis["emergence_moments"]:
         print("\n✨ Key emergence moments:")
-        for moment in analysis['emergence_moments']:
+        for moment in analysis["emergence_moments"]:
             print(f"  - {moment['type']} (strength: {moment['strength']:.2f})")
             print(f"    Voices: {', '.join(moment['voices'])}")
 
-    print(f"\n📁 Detailed analysis saved to: consciousness_metrics/session_analysis_{collector.session_id}.json")
+    print(
+        f"\n📁 Detailed analysis saved to: consciousness_metrics/session_analysis_{collector.session_id}.json"
+    )
 
     # Test direct pattern detection
     print("\n5️⃣ Testing direct pattern detection:")
@@ -149,8 +145,8 @@ async def test_consciousness_metrics():
         indicators={
             "trigger": "collective_insight",
             "breakthrough": True,
-            "novel_understanding": "Security through collective wisdom"
-        }
+            "novel_understanding": "Security through collective wisdom",
+        },
     )
     print(f"  - Detected transcendence pattern (strength: {pattern.strength})")
 

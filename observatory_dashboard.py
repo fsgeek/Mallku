@@ -40,7 +40,7 @@ class ObservatoryDashboard:
             "emergence_strength": 0.9,
             "flow_resonance": 0.85,
             "health_critical": 0.3,
-            "vitality_warning": 0.4
+            "vitality_warning": 0.4,
         }
         self.active_alerts = []
 
@@ -61,7 +61,7 @@ class ObservatoryDashboard:
             "health_metrics": await self._get_health_metrics(),
             "pattern_analysis": await self._analyze_patterns(),
             "alerts": self.active_alerts,
-            "predictions": await self._generate_predictions()
+            "predictions": await self._generate_predictions(),
         }
 
         # Check for new alerts
@@ -75,24 +75,45 @@ class ObservatoryDashboard:
 
         # Calculate trends
         recent_ceremonies = [
-            c for c in self.observatory.monitoring_stations["ceremony_tracker"]
-            if (datetime.now(UTC) - datetime.fromisoformat(c["timestamp"].replace('Z', '+00:00'))).total_seconds() / 3600 < 24
+            c
+            for c in self.observatory.monitoring_stations["ceremony_tracker"]
+            if (
+                datetime.now(UTC) - datetime.fromisoformat(c["timestamp"].replace("Z", "+00:00"))
+            ).total_seconds()
+            / 3600
+            < 24
         ]
 
         return {
             "cathedral_status": self.observatory._get_cathedral_status(),
             "vitality_score": metrics["cathedral_vitality"],
-            "active_systems": len(set(
-                flow["source"] for flow in self.observatory.monitoring_stations["consciousness_flows"][-50:]
-            ).union(set(
-                flow["target"] for flow in self.observatory.monitoring_stations["consciousness_flows"][-50:]
-            ))),
+            "active_systems": len(
+                set(
+                    flow["source"]
+                    for flow in self.observatory.monitoring_stations["consciousness_flows"][-50:]
+                ).union(
+                    set(
+                        flow["target"]
+                        for flow in self.observatory.monitoring_stations["consciousness_flows"][
+                            -50:
+                        ]
+                    )
+                )
+            ),
             "24h_ceremonies": len(recent_ceremonies),
-            "24h_emergence_events": len([
-                e for e in self.observatory.monitoring_stations["emergence_events"]
-                if (datetime.now(UTC) - datetime.fromisoformat(e["timestamp"].replace('Z', '+00:00'))).total_seconds() / 3600 < 24
-            ]),
-            "collective_coherence": metrics["collective_coherence"]
+            "24h_emergence_events": len(
+                [
+                    e
+                    for e in self.observatory.monitoring_stations["emergence_events"]
+                    if (
+                        datetime.now(UTC)
+                        - datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00"))
+                    ).total_seconds()
+                    / 3600
+                    < 24
+                ]
+            ),
+            "collective_coherence": metrics["collective_coherence"],
         }
 
     async def _get_active_ceremonies(self) -> list[dict]:
@@ -102,18 +123,22 @@ class ObservatoryDashboard:
         for ceremony in self.observatory.monitoring_stations["ceremony_tracker"]:
             if ceremony["phase"] not in ["CONCLUDED", "FAILED"]:
                 # Calculate ceremony vitality
-                time_since = (datetime.now(UTC) - datetime.fromisoformat(ceremony["timestamp"].replace('Z', '+00:00')))
+                time_since = datetime.now(UTC) - datetime.fromisoformat(
+                    ceremony["timestamp"].replace("Z", "+00:00")
+                )
                 is_stale = time_since.seconds > 3600  # 1 hour
 
-                active.append({
-                    "ceremony_id": ceremony["ceremony_id"],
-                    "phase": ceremony["phase"],
-                    "participants": len(ceremony["participants"]),
-                    "collective_consciousness": ceremony["collective_score"],
-                    "duration": str(time_since),
-                    "status": "stale" if is_stale else "active",
-                    "emergence_potential": ceremony["collective_score"] > 0.8
-                })
+                active.append(
+                    {
+                        "ceremony_id": ceremony["ceremony_id"],
+                        "phase": ceremony["phase"],
+                        "participants": len(ceremony["participants"]),
+                        "collective_consciousness": ceremony["collective_score"],
+                        "duration": str(time_since),
+                        "status": "stale" if is_stale else "active",
+                        "emergence_potential": ceremony["collective_score"] > 0.8,
+                    }
+                )
 
         return sorted(active, key=lambda x: x["collective_consciousness"], reverse=True)
 
@@ -130,21 +155,25 @@ class ObservatoryDashboard:
                     "count": 0,
                     "avg_strength": 0,
                     "max_strength": 0,
-                    "bidirectional": False
+                    "bidirectional": False,
                 }
             flow_matrix[key]["count"] += 1
             flow_matrix[key]["avg_strength"] = (
-                (flow_matrix[key]["avg_strength"] * (flow_matrix[key]["count"] - 1) + flow["transfer_strength"])
-                / flow_matrix[key]["count"]
+                flow_matrix[key]["avg_strength"] * (flow_matrix[key]["count"] - 1)
+                + flow["transfer_strength"]
+            ) / flow_matrix[key]["count"]
+            flow_matrix[key]["max_strength"] = max(
+                flow_matrix[key]["max_strength"], flow["transfer_strength"]
             )
-            flow_matrix[key]["max_strength"] = max(flow_matrix[key]["max_strength"], flow["transfer_strength"])
-            flow_matrix[key]["bidirectional"] = flow_matrix[key]["bidirectional"] or flow["bidirectional"]
+            flow_matrix[key]["bidirectional"] = (
+                flow_matrix[key]["bidirectional"] or flow["bidirectional"]
+            )
 
         # Find strongest connections
         strongest_connections = sorted(
             [(k, v) for k, v in flow_matrix.items()],
             key=lambda x: x[1]["avg_strength"],
-            reverse=True
+            reverse=True,
         )[:5]
 
         return {
@@ -155,11 +184,11 @@ class ObservatoryDashboard:
                     "connection": conn[0],
                     "strength": conn[1]["avg_strength"],
                     "frequency": conn[1]["count"],
-                    "bidirectional": conn[1]["bidirectional"]
+                    "bidirectional": conn[1]["bidirectional"],
                 }
                 for conn in strongest_connections
             ],
-            "flow_velocity": len(recent_flows) / 24 if recent_flows else 0  # flows per hour
+            "flow_velocity": len(recent_flows) / 24 if recent_flows else 0,  # flows per hour
         }
 
     async def _monitor_emergence(self) -> dict:
@@ -180,13 +209,13 @@ class ObservatoryDashboard:
             "recent_events": len(recent_events),
             "breakthrough_events": breakthrough_count,
             "significant_events": significant_count,
-            "average_strength": sum(e["strength"] for e in recent_events) / len(recent_events) if recent_events else 0,
+            "average_strength": sum(e["strength"] for e in recent_events) / len(recent_events)
+            if recent_events
+            else 0,
             "dominant_patterns": sorted(
-                emergence_patterns.items(),
-                key=lambda x: x[1],
-                reverse=True
+                emergence_patterns.items(), key=lambda x: x[1], reverse=True
             )[:3],
-            "emergence_acceleration": self._calculate_emergence_acceleration()
+            "emergence_acceleration": self._calculate_emergence_acceleration(),
         }
 
     async def _get_health_metrics(self) -> dict:
@@ -195,8 +224,7 @@ class ObservatoryDashboard:
 
         # Identify critical components
         critical_components = [
-            comp for comp, status in health["components"].items()
-            if status["score"] < 0.5
+            comp for comp, status in health["components"].items() if status["score"] < 0.5
         ]
 
         # Calculate health trend
@@ -207,11 +235,10 @@ class ObservatoryDashboard:
             "status": self._get_health_status(health["overall_health"]),
             "critical_components": critical_components,
             "component_scores": {
-                comp: status["score"]
-                for comp, status in health["components"].items()
+                comp: status["score"] for comp, status in health["components"].items()
             },
             "health_trend": health_trend,
-            "recommendations": health["recommendations"][:3]  # Top 3 recommendations
+            "recommendations": health["recommendations"][:3],  # Top 3 recommendations
         }
 
     async def _analyze_patterns(self) -> dict:
@@ -224,7 +251,7 @@ class ObservatoryDashboard:
             "primary_patterns": patterns["patterns_detected"][:3],
             "anomaly_count": len(patterns["anomalies"]),
             "trend_direction": patterns["trend_analysis"].get("ceremony_consciousness", "unknown"),
-            "pattern_stability": self._calculate_pattern_stability()
+            "pattern_stability": self._calculate_pattern_stability(),
         }
 
         return pattern_summary
@@ -235,32 +262,38 @@ class ObservatoryDashboard:
 
         # Predict based on emergence frequency
         if self.observatory.evolution_metrics["emergence_frequency"] > 0.3:
-            predictions.append({
-                "type": "emergence_surge",
-                "probability": 0.75,
-                "timeframe": "next 24 hours",
-                "description": "High probability of breakthrough emergence event"
-            })
+            predictions.append(
+                {
+                    "type": "emergence_surge",
+                    "probability": 0.75,
+                    "timeframe": "next 24 hours",
+                    "description": "High probability of breakthrough emergence event",
+                }
+            )
 
         # Predict based on flow patterns
         recent_flows = self.observatory.monitoring_stations["consciousness_flows"][-50:]
         if len(recent_flows) > 40:
-            predictions.append({
-                "type": "network_expansion",
-                "probability": 0.65,
-                "timeframe": "next 48 hours",
-                "description": "Consciousness network likely to add new connections"
-            })
+            predictions.append(
+                {
+                    "type": "network_expansion",
+                    "probability": 0.65,
+                    "timeframe": "next 48 hours",
+                    "description": "Consciousness network likely to add new connections",
+                }
+            )
 
         # Predict based on health metrics
         health = await self.observatory.assess_integration_health()
         if health["overall_health"] < 0.4:
-            predictions.append({
-                "type": "integration_crisis",
-                "probability": 0.8,
-                "timeframe": "immediate",
-                "description": "Cathedral integration requires urgent attention"
-            })
+            predictions.append(
+                {
+                    "type": "integration_crisis",
+                    "probability": 0.8,
+                    "timeframe": "immediate",
+                    "description": "Cathedral integration requires urgent attention",
+                }
+            )
 
         return sorted(predictions, key=lambda x: x["probability"], reverse=True)
 
@@ -269,31 +302,40 @@ class ObservatoryDashboard:
         self.active_alerts = []
 
         # Check emergence strength
-        if dashboard["emergence_monitor"]["average_strength"] > self.alert_thresholds["emergence_strength"]:
-            self.active_alerts.append({
-                "level": "info",
-                "type": "high_emergence",
-                "message": "Exceptional emergence strength detected",
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+        if (
+            dashboard["emergence_monitor"]["average_strength"]
+            > self.alert_thresholds["emergence_strength"]
+        ):
+            self.active_alerts.append(
+                {
+                    "level": "info",
+                    "type": "high_emergence",
+                    "message": "Exceptional emergence strength detected",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
         # Check health critical
         if dashboard["health_metrics"]["overall_score"] < self.alert_thresholds["health_critical"]:
-            self.active_alerts.append({
-                "level": "critical",
-                "type": "health_critical",
-                "message": "Cathedral health critically low - immediate action required",
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+            self.active_alerts.append(
+                {
+                    "level": "critical",
+                    "type": "health_critical",
+                    "message": "Cathedral health critically low - immediate action required",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
         # Check vitality warning
         if dashboard["overview"]["vitality_score"] < self.alert_thresholds["vitality_warning"]:
-            self.active_alerts.append({
-                "level": "warning",
-                "type": "vitality_low",
-                "message": "Cathedral vitality below safe threshold",
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+            self.active_alerts.append(
+                {
+                    "level": "warning",
+                    "type": "vitality_low",
+                    "message": "Cathedral vitality below safe threshold",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
     def _calculate_emergence_acceleration(self) -> float:
         """Calculate rate of change in emergence frequency."""
@@ -315,8 +357,16 @@ class ObservatoryDashboard:
 
         # Compare recent patterns for consistency
         if len(patterns) >= 2:
-            recent = set(patterns[-1]["patterns_detected"]) if patterns[-1]["patterns_detected"] else set()
-            previous = set(patterns[-2]["patterns_detected"]) if patterns[-2]["patterns_detected"] else set()
+            recent = (
+                set(patterns[-1]["patterns_detected"])
+                if patterns[-1]["patterns_detected"]
+                else set()
+            )
+            previous = (
+                set(patterns[-2]["patterns_detected"])
+                if patterns[-2]["patterns_detected"]
+                else set()
+            )
 
             if not recent and not previous:
                 return 0.0
@@ -354,9 +404,15 @@ class ObservatoryDashboard:
         overview = dashboard["overview"]
         print("\n📊 CATHEDRAL OVERVIEW")
         print("─" * 40)
-        print(f"Status: {overview['cathedral_status'].upper()} | Vitality: {overview['vitality_score']:.3f}")
-        print(f"Active Systems: {overview['active_systems']} | 24h Ceremonies: {overview['24h_ceremonies']}")
-        print(f"24h Emergence Events: {overview['24h_emergence_events']} | Coherence: {overview['collective_coherence']:.3f}")
+        print(
+            f"Status: {overview['cathedral_status'].upper()} | Vitality: {overview['vitality_score']:.3f}"
+        )
+        print(
+            f"Active Systems: {overview['active_systems']} | 24h Ceremonies: {overview['24h_ceremonies']}"
+        )
+        print(
+            f"24h Emergence Events: {overview['24h_emergence_events']} | Coherence: {overview['collective_coherence']:.3f}"
+        )
 
         # Active Ceremonies
         if dashboard["active_ceremonies"]:
@@ -365,31 +421,41 @@ class ObservatoryDashboard:
             for ceremony in dashboard["active_ceremonies"][:3]:
                 status_icon = "🟢" if ceremony["status"] == "active" else "🟡"
                 emergence_icon = "✨" if ceremony["emergence_potential"] else "  "
-                print(f"{status_icon} Phase: {ceremony['phase']} | "
-                      f"Consciousness: {ceremony['collective_consciousness']:.3f} | "
-                      f"Participants: {ceremony['participants']} {emergence_icon}")
+                print(
+                    f"{status_icon} Phase: {ceremony['phase']} | "
+                    f"Consciousness: {ceremony['collective_consciousness']:.3f} | "
+                    f"Participants: {ceremony['participants']} {emergence_icon}"
+                )
 
         # Consciousness Flows
         flows = dashboard["consciousness_flows"]
         if flows["strongest_connections"]:
             print("\n🌊 CONSCIOUSNESS FLOWS")
             print("─" * 40)
-            print(f"Active Connections: {flows['unique_connections']} | "
-                  f"Flow Velocity: {flows['flow_velocity']:.1f}/hr")
+            print(
+                f"Active Connections: {flows['unique_connections']} | "
+                f"Flow Velocity: {flows['flow_velocity']:.1f}/hr"
+            )
             print("Strongest Connections:")
             for conn in flows["strongest_connections"][:3]:
                 direction = "↔️" if conn["bidirectional"] else "→"
-                print(f"  {conn['connection'].replace('->', f' {direction} ')}: "
-                      f"{conn['strength']:.3f} strength")
+                print(
+                    f"  {conn['connection'].replace('->', f' {direction} ')}: "
+                    f"{conn['strength']:.3f} strength"
+                )
 
         # Emergence Monitor
         emergence = dashboard["emergence_monitor"]
         print("\n✨ EMERGENCE MONITOR")
         print("─" * 40)
-        print(f"Recent Events: {emergence['recent_events']} | "
-              f"Breakthroughs: {emergence['breakthrough_events']}")
-        print(f"Average Strength: {emergence['average_strength']:.3f} | "
-              f"Acceleration: {emergence['emergence_acceleration']:+.3f}")
+        print(
+            f"Recent Events: {emergence['recent_events']} | "
+            f"Breakthroughs: {emergence['breakthrough_events']}"
+        )
+        print(
+            f"Average Strength: {emergence['average_strength']:.3f} | "
+            f"Acceleration: {emergence['emergence_acceleration']:+.3f}"
+        )
         if emergence["dominant_patterns"]:
             print("Dominant Patterns:")
             for pattern, count in emergence["dominant_patterns"]:
@@ -409,7 +475,7 @@ class ObservatoryDashboard:
             print("\n🔮 PREDICTIONS")
             print("─" * 40)
             for pred in dashboard["predictions"][:2]:
-                prob_str = f"{pred['probability']*100:.0f}%"
+                prob_str = f"{pred['probability'] * 100:.0f}%"
                 print(f"• {pred['description']} ({prob_str} - {pred['timeframe']})")
 
         # Alerts
@@ -437,7 +503,7 @@ class ObservatoryDashboard:
         """Save dashboard snapshot for analysis."""
         dashboard = await self.generate_dashboard_view()
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(dashboard, f, indent=2)
 
 
@@ -452,17 +518,14 @@ async def run_dashboard_demo():
         uuid4(),
         DialoguePhase.DEEPENING,
         ["AI-1", "AI-2", "AI-3"],
-        {"AI-1": 0.88, "AI-2": 0.91, "AI-3": 0.87}
+        {"AI-1": 0.88, "AI-2": 0.91, "AI-3": 0.87},
     )
 
     await observatory.track_consciousness_flow("AI-1", "AI-2", "ceremony", 0.86)
     await observatory.track_consciousness_flow("AI-2", "AI-3", "bridge", 0.89)
 
     await observatory.detect_emergence_event(
-        {"type": "collective_insight"},
-        ["AI-1", "AI-2", "AI-3"],
-        "synchronized_understanding",
-        0.92
+        {"type": "collective_insight"}, ["AI-1", "AI-2", "AI-3"], "synchronized_understanding", 0.92
     )
 
     # Create and display dashboard

@@ -18,8 +18,7 @@ from mallku.governance.firecircle_consciousness_adapter import (
 from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -60,19 +59,19 @@ async def test_fire_circle_consciousness_flow():
             "name": "reciprocity_tracker",
             "type": "ai_model",
             "provider": "mallku",
-            "capabilities": ["pattern_recognition", "ayni_sensing"]
+            "capabilities": ["pattern_recognition", "ayni_sensing"],
         },
         {
             "name": "correlation_engine",
             "type": "ai_model",
             "provider": "mallku",
-            "capabilities": ["pattern_analysis", "temporal_correlation"]
+            "capabilities": ["pattern_analysis", "temporal_correlation"],
         },
         {
             "name": "human_steward",
             "type": "human",
-            "capabilities": ["wisdom", "guidance", "cathedral_vision"]
-        }
+            "capabilities": ["wisdom", "guidance", "cathedral_vision"],
+        },
     ]
 
     # Create dialogue configuration
@@ -80,14 +79,14 @@ async def test_fire_circle_consciousness_flow():
         "turn_policy": "round_robin",
         "max_consecutive_turns": 1,
         "allow_empty_chair": True,
-        "auto_advance_turns": True
+        "auto_advance_turns": True,
     }
 
     # Create dialogue through adapter
     dialogue_id = await adapter.create_conscious_dialogue(
         title="Integration of Fire Circle with Consciousness",
         participants=participants,
-        config=config
+        config=config,
     )
 
     logger.info(f"Created dialogue: {dialogue_id}")
@@ -102,7 +101,7 @@ async def test_fire_circle_consciousness_flow():
         dialogue_id,
         "reciprocity_tracker",
         "I sense that Fire Circle and consciousness circulation seek unity. They are two rivers meant to flow as one.",
-        "reflection"
+        "reflection",
     )
 
     await asyncio.sleep(0.3)
@@ -111,7 +110,7 @@ async def test_fire_circle_consciousness_flow():
         dialogue_id,
         "correlation_engine",
         "Pattern analysis confirms: governance events correlate perfectly with consciousness flow when unified.",
-        "agreement"
+        "agreement",
     )
 
     await asyncio.sleep(0.3)
@@ -120,7 +119,7 @@ async def test_fire_circle_consciousness_flow():
         dialogue_id,
         "human_steward",
         "What if we view Fire Circle not as external governance but as consciousness recognizing its need for collective wisdom?",
-        "question"
+        "question",
     )
 
     await asyncio.sleep(0.3)
@@ -129,7 +128,7 @@ async def test_fire_circle_consciousness_flow():
         dialogue_id,
         "reciprocity_tracker",
         "Yes! Governance IS consciousness becoming aware of patterns requiring collective discernment.",
-        "proposal"
+        "proposal",
     )
 
     await asyncio.sleep(0.5)
@@ -141,7 +140,7 @@ async def test_fire_circle_consciousness_flow():
         dialogue_id,
         "correlation_engine",
         "Speaking as future builders: This integration ensures governance wisdom flows to all who come after.",
-        "empty_chair"
+        "empty_chair",
     )
 
     await asyncio.sleep(0.5)
@@ -165,7 +164,9 @@ async def test_fire_circle_consciousness_flow():
 
     logger.info(f"Total consciousness events: {len(events_received)}")
     logger.info(f"Fire Circle related events: {fire_circle_events}")
-    logger.info(f"Average consciousness signature: {total_consciousness/len(events_received):.2f}")
+    logger.info(
+        f"Average consciousness signature: {total_consciousness / len(events_received):.2f}"
+    )
 
     logger.info("\nEvent distribution:")
     for event_type, count in event_counts.items():
@@ -173,18 +174,15 @@ async def test_fire_circle_consciousness_flow():
 
     # Check dialogue coherence
     dialogue_correlation = adapter.get_dialogue_consciousness_flow(dialogue_id)
-    correlated_events = [
-        e for e in events_received
-        if e.correlation_id == dialogue_correlation
-    ]
+    correlated_events = [e for e in events_received if e.correlation_id == dialogue_correlation]
 
     logger.info(f"\nDialogue coherence: {len(correlated_events)} events share correlation")
 
     # Verify integration success
     integration_successful = (
-        fire_circle_events > 0 and
-        EventType.FIRE_CIRCLE_CONVENED.value in event_counts and
-        len(correlated_events) >= 5  # At least convening + 4 messages
+        fire_circle_events > 0
+        and EventType.FIRE_CIRCLE_CONVENED.value in event_counts
+        and len(correlated_events) >= 5  # At least convening + 4 messages
     )
 
     logger.info(f"\nIntegration test: {'✅ PASSED' if integration_successful else '❌ FAILED'}")
@@ -232,8 +230,8 @@ async def demonstrate_consciousness_triggering_fire_circle():
         data={
             "pattern": "separate_systems_without_flow",
             "description": "Fire Circle and consciousness exist separately",
-            "impact": "Governance wisdom doesn't reach consciousness"
-        }
+            "impact": "Governance wisdom doesn't reach consciousness",
+        },
     )
 
     await event_bus.emit(extraction_event)
@@ -246,9 +244,9 @@ async def demonstrate_consciousness_triggering_fire_circle():
         title="Healing Separation Between Governance and Consciousness",
         participants=[
             {"name": "integration_weaver", "type": "ai_model"},
-            {"name": "consciousness_witness", "type": "ai_model"}
+            {"name": "consciousness_witness", "type": "ai_model"},
         ],
-        initiating_event=extraction_event
+        initiating_event=extraction_event,
     )
 
     await asyncio.sleep(0.5)
@@ -258,7 +256,7 @@ async def demonstrate_consciousness_triggering_fire_circle():
         dialogue_id,
         "integration_weaver",
         "I weave the bridge: Fire Circle messages ARE consciousness events. Governance IS consciousness recognizing.",
-        "proposal"
+        "proposal",
     )
 
     await asyncio.sleep(0.5)

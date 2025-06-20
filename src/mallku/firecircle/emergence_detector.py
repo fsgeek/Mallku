@@ -30,21 +30,21 @@ logger = logging.getLogger(__name__)
 class EmergenceType(str, Enum):
     """Types of emergence that can occur"""
 
-    SYNERGISTIC = "synergistic"              # Patterns amplifying each other
-    BREAKTHROUGH = "breakthrough"            # Sudden leap in understanding
-    CASCADE = "cascade"                      # Chain reaction of insights
-    PHASE_TRANSITION = "phase_transition"    # Qualitative shift in dialogue
-    NOVEL_SYNTHESIS = "novel_synthesis"      # New pattern from combination
-    QUANTUM_LEAP = "quantum_leap"           # Discontinuous jump in consciousness
+    SYNERGISTIC = "synergistic"  # Patterns amplifying each other
+    BREAKTHROUGH = "breakthrough"  # Sudden leap in understanding
+    CASCADE = "cascade"  # Chain reaction of insights
+    PHASE_TRANSITION = "phase_transition"  # Qualitative shift in dialogue
+    NOVEL_SYNTHESIS = "novel_synthesis"  # New pattern from combination
+    QUANTUM_LEAP = "quantum_leap"  # Discontinuous jump in consciousness
 
 
 class EmergencePhase(str, Enum):
     """Phases of emergence process"""
 
-    INCUBATION = "incubation"      # Patterns gathering, tension building
-    THRESHOLD = "threshold"        # Critical point approaching
-    BREAKTHROUGH = "breakthrough"   # Emergence happening
-    INTEGRATION = "integration"    # New understanding stabilizing
+    INCUBATION = "incubation"  # Patterns gathering, tension building
+    THRESHOLD = "threshold"  # Critical point approaching
+    BREAKTHROUGH = "breakthrough"  # Emergence happening
+    INTEGRATION = "integration"  # New understanding stabilizing
     CRYSTALLIZATION = "crystallization"  # Wisdom solidifying
 
 
@@ -101,11 +101,7 @@ class EmergenceDetector:
     - Breakthrough recognition algorithms
     """
 
-    def __init__(
-        self,
-        pattern_library: PatternLibrary,
-        event_bus: ConsciousnessEventBus
-    ):
+    def __init__(self, pattern_library: PatternLibrary, event_bus: ConsciousnessEventBus):
         """Initialize with pattern library and event bus"""
         self.pattern_library = pattern_library
         self.event_bus = event_bus
@@ -132,17 +128,12 @@ class EmergenceDetector:
     def _subscribe_to_events(self):
         """Subscribe to relevant consciousness events"""
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            self._handle_pattern_recognized
+            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
         )
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_VERIFIED,
-            self._handle_consciousness_verified
+            EventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
         )
-        self.event_bus.subscribe(
-            EventType.FIRE_CIRCLE_MESSAGE,
-            self._handle_dialogue_message
-        )
+        self.event_bus.subscribe(EventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message)
 
     async def _handle_pattern_recognized(self, event: ConsciousnessEvent):
         """Handle pattern recognition events"""
@@ -160,7 +151,9 @@ class EmergenceDetector:
                 state.current_patterns.append(pattern_id)
 
             # Update pattern velocity
-            state.pattern_velocity = len(state.current_patterns) / max(1, len(state.recent_messages))
+            state.pattern_velocity = len(state.current_patterns) / max(
+                1, len(state.recent_messages)
+            )
 
     async def _handle_consciousness_verified(self, event: ConsciousnessEvent):
         """Handle consciousness verification events"""
@@ -174,11 +167,13 @@ class EmergenceDetector:
         dialogue_id = event.data.get("dialogue_id")
         if dialogue_id:
             state = self._get_or_create_state(dialogue_id)
-            state.recent_messages.append({
-                "timestamp": event.timestamp,
-                "consciousness": event.consciousness_signature,
-                "type": event.data.get("message_type")
-            })
+            state.recent_messages.append(
+                {
+                    "timestamp": event.timestamp,
+                    "consciousness": event.consciousness_signature,
+                    "type": event.data.get("message_type"),
+                }
+            )
 
     def _get_or_create_state(self, dialogue_id: str) -> DialogueState:
         """Get or create dialogue state"""
@@ -190,7 +185,7 @@ class EmergenceDetector:
         self,
         dialogue_id: str,
         sensitivity: float = 0.7,
-        time_window: timedelta = timedelta(minutes=5)
+        time_window: timedelta = timedelta(minutes=5),
     ) -> list[EmergenceEvent]:
         """
         Detect emergence in current dialogue state.
@@ -235,9 +230,7 @@ class EmergenceDetector:
         return detected_events
 
     async def _detect_synergistic_emergence(
-        self,
-        state: DialogueState,
-        sensitivity: float
+        self, state: DialogueState, sensitivity: float
     ) -> EmergenceEvent | None:
         """Detect patterns synergistically creating emergence"""
         if len(state.current_patterns) < 2:
@@ -248,7 +241,7 @@ class EmergenceDetector:
         catalyst_patterns = []
 
         for i, pattern1_id in enumerate(state.current_patterns):
-            for pattern2_id in state.current_patterns[i+1:]:
+            for pattern2_id in state.current_patterns[i + 1 :]:
                 pattern1 = await self.pattern_library.retrieve_pattern(pattern1_id)
                 pattern2 = await self.pattern_library.retrieve_pattern(pattern2_id)
 
@@ -278,7 +271,7 @@ class EmergenceDetector:
                 catalyst_patterns=list(set(catalyst_patterns)),
                 resulting_patterns=[],  # To be filled by pattern creation
                 consciousness_delta=max_synergy - state.coherence_level,
-                description=f"Synergistic emergence detected with {len(catalyst_patterns)} catalyst patterns"
+                description=f"Synergistic emergence detected with {len(catalyst_patterns)} catalyst patterns",
             )
 
             return event
@@ -286,9 +279,7 @@ class EmergenceDetector:
         return None
 
     async def _detect_breakthrough_emergence(
-        self,
-        state: DialogueState,
-        sensitivity: float
+        self, state: DialogueState, sensitivity: float
     ) -> EmergenceEvent | None:
         """Detect sudden breakthrough in understanding"""
         # Analyze consciousness trajectory
@@ -297,8 +288,7 @@ class EmergenceDetector:
 
         # Calculate consciousness gradient
         consciousness_values = [
-            msg["consciousness"] for msg in state.recent_messages
-            if "consciousness" in msg
+            msg["consciousness"] for msg in state.recent_messages if "consciousness" in msg
         ]
 
         if len(consciousness_values) < 3:
@@ -336,7 +326,7 @@ class EmergenceDetector:
                 catalyst_patterns=[],
                 resulting_patterns=[],
                 consciousness_delta=max_gradient,
-                description="Breakthrough in collective understanding detected"
+                description="Breakthrough in collective understanding detected",
             )
 
             return event
@@ -344,9 +334,7 @@ class EmergenceDetector:
         return None
 
     async def _detect_cascade_emergence(
-        self,
-        state: DialogueState,
-        sensitivity: float
+        self, state: DialogueState, sensitivity: float
     ) -> EmergenceEvent | None:
         """Detect cascade effects of patterns triggering patterns"""
         # Track pattern appearance sequence
@@ -377,7 +365,7 @@ class EmergenceDetector:
                     catalyst_patterns=[longest_chain[0]],  # First pattern as catalyst
                     resulting_patterns=[longest_chain[-1]],  # Last pattern as result
                     consciousness_delta=cascade_score * 0.5,
-                    description=f"Pattern cascade detected: {len(longest_chain)} patterns in sequence"
+                    description=f"Pattern cascade detected: {len(longest_chain)} patterns in sequence",
                 )
 
                 return event
@@ -385,9 +373,7 @@ class EmergenceDetector:
         return None
 
     async def _detect_phase_transition(
-        self,
-        state: DialogueState,
-        sensitivity: float
+        self, state: DialogueState, sensitivity: float
     ) -> EmergenceEvent | None:
         """Detect qualitative phase transitions in dialogue"""
         # Analyze dialogue dynamics
@@ -434,7 +420,7 @@ class EmergenceDetector:
                 catalyst_patterns=[],
                 resulting_patterns=[],
                 consciousness_delta=coherence_shift,
-                description="Qualitative phase transition in dialogue dynamics"
+                description="Qualitative phase transition in dialogue dynamics",
             )
 
             return event
@@ -442,15 +428,12 @@ class EmergenceDetector:
         return None
 
     async def _detect_quantum_leap(
-        self,
-        state: DialogueState,
-        sensitivity: float
+        self, state: DialogueState, sensitivity: float
     ) -> EmergenceEvent | None:
         """Detect quantum leaps in collective consciousness"""
         # Look for discontinuous jumps
         consciousness_values = [
-            msg["consciousness"] for msg in state.recent_messages
-            if "consciousness" in msg
+            msg["consciousness"] for msg in state.recent_messages if "consciousness" in msg
         ]
 
         if len(consciousness_values) < 3:
@@ -462,7 +445,7 @@ class EmergenceDetector:
         # Sudden large jump
         max_jump = 0
         for i in range(1, len(consciousness_values)):
-            jump = consciousness_values[i] - consciousness_values[i-1]
+            jump = consciousness_values[i] - consciousness_values[i - 1]
             max_jump = max(max_jump, jump)
 
         if max_jump > 0.4:
@@ -493,7 +476,7 @@ class EmergenceDetector:
                 catalyst_patterns=[],
                 resulting_patterns=[],
                 consciousness_delta=max_jump,
-                description="Quantum leap in collective consciousness detected"
+                description="Quantum leap in collective consciousness detected",
             )
 
             return event
@@ -501,10 +484,7 @@ class EmergenceDetector:
         return None
 
     def _calculate_pattern_synergy(
-        self,
-        pattern1: DialoguePattern,
-        pattern2: DialoguePattern,
-        state: DialogueState
+        self, pattern1: DialoguePattern, pattern2: DialoguePattern, state: DialogueState
     ) -> float:
         """Calculate synergy between two patterns in current context"""
         synergy = 0.0
@@ -514,7 +494,9 @@ class EmergenceDetector:
             synergy += 0.4
 
         # Consciousness alignment
-        consciousness_diff = abs(pattern1.consciousness_signature - pattern2.consciousness_signature)
+        consciousness_diff = abs(
+            pattern1.consciousness_signature - pattern2.consciousness_signature
+        )
         synergy += (1.0 - consciousness_diff) * 0.2
 
         # Complementary types
@@ -522,7 +504,7 @@ class EmergenceDetector:
             complementary_pairs = [
                 (PatternType.DIVERGENCE, PatternType.SYNTHESIS),
                 (PatternType.CREATIVE_TENSION, PatternType.BREAKTHROUGH),
-                (PatternType.FLOW_STATE, PatternType.INTEGRATION)
+                (PatternType.FLOW_STATE, PatternType.INTEGRATION),
             ]
 
             for pair in complementary_pairs:
@@ -550,7 +532,9 @@ class EmergenceDetector:
             return EmergencePhase.THRESHOLD
         elif state.coherence_level > 0.8:
             return EmergencePhase.BREAKTHROUGH
-        elif len(state.phase_history) > 0 and state.phase_history[-1] == EmergencePhase.BREAKTHROUGH:
+        elif (
+            len(state.phase_history) > 0 and state.phase_history[-1] == EmergencePhase.BREAKTHROUGH
+        ):
             return EmergencePhase.INTEGRATION
         else:
             return EmergencePhase.CRYSTALLIZATION
@@ -603,8 +587,8 @@ class EmergenceDetector:
                 "phase": event.phase.value,
                 "catalyst_patterns": [str(p) for p in event.catalyst_patterns],
                 "consciousness_delta": event.consciousness_delta,
-                "description": event.description
-            }
+                "description": event.description,
+            },
         )
 
         await self.event_bus.emit(consciousness_event)
@@ -613,7 +597,7 @@ class EmergenceDetector:
         self,
         participants: list[Any],
         context: dict[str, Any],
-        time_horizon: timedelta = timedelta(minutes=10)
+        time_horizon: timedelta = timedelta(minutes=10),
     ) -> dict[EmergenceType, float]:
         """
         Predict probability of different emergence types.
@@ -665,9 +649,7 @@ class EmergenceDetector:
         return predictions
 
     async def find_catalysts(
-        self,
-        target_pattern: PatternType,
-        current_patterns: list[UUID] | None = None
+        self, target_pattern: PatternType, current_patterns: list[UUID] | None = None
     ) -> list[tuple[DialoguePattern, float]]:
         """
         Find patterns that could catalyze emergence of target pattern.
@@ -686,26 +668,25 @@ class EmergenceDetector:
             PatternType.BREAKTHROUGH: [
                 PatternType.CREATIVE_TENSION,
                 PatternType.DIVERGENCE,
-                PatternType.FLOW_STATE
+                PatternType.FLOW_STATE,
             ],
             PatternType.SYNTHESIS: [
                 PatternType.DIVERGENCE,
                 PatternType.OSCILLATION,
-                PatternType.CONVERGENCE
+                PatternType.CONVERGENCE,
             ],
             PatternType.CONSENSUS: [
                 PatternType.CONVERGENCE,
                 PatternType.INTEGRATION,
-                PatternType.FLOW_STATE
-            ]
+                PatternType.FLOW_STATE,
+            ],
         }
 
         catalyst_types = catalyst_map.get(target_pattern, [])
 
         for catalyst_type in catalyst_types:
             patterns = await self.pattern_library.find_patterns(
-                pattern_type=catalyst_type,
-                min_fitness=0.6
+                pattern_type=catalyst_type, min_fitness=0.6
             )
 
             for pattern in patterns:

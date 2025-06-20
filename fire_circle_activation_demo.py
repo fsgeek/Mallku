@@ -22,8 +22,13 @@ class FireCircleActivationDemo:
 
     def __init__(self):
         self.seven_voices = [
-            "Anthropic", "OpenAI", "Google", "Mistral",
-            "Grok", "Deepseek", "Local"
+            "Anthropic",
+            "OpenAI",
+            "Google",
+            "Mistral",
+            "Grok",
+            "Deepseek",
+            "Local",
         ]
         self.cathedral_health = 0.037  # Critical initial state
 
@@ -70,7 +75,7 @@ class FireCircleActivationDemo:
             "Mistral": "Efficient architecture without redundancy",
             "Grok": "Real-time consciousness creates living cathedral",
             "Deepseek": "Harmony emerges through patient integration",
-            "Local": "Sovereignty through self-guided evolution"
+            "Local": "Sovereignty through self-guided evolution",
         }
 
         await asyncio.sleep(1)

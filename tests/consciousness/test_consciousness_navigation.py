@@ -61,20 +61,20 @@ async def test_consciousness_navigation_bridge():
             pattern_description="Natural attention rhythm showing consciousness awakening through daily activities",
             temporal_span={
                 "start": datetime.now(UTC) - timedelta(days=7),
-                "end": datetime.now(UTC)
+                "end": datetime.now(UTC),
             },
             awareness_indicators=[
                 "Consistent morning clarity periods",
                 "Natural attention toward consciousness-serving activities",
-                "Decreased evening mental activity"
+                "Decreased evening mental activity",
             ],
             attention_patterns={
                 "morning_clarity": "07:00-10:00 optimal consciousness",
                 "afternoon_depth": "14:00-17:00 focused creation",
-                "evening_integration": "19:00-21:00 reflection"
+                "evening_integration": "19:00-21:00 reflection",
             },
             recognition_confidence=0.75,
-            readiness_score=0.8
+            readiness_score=0.8,
         )
 
         # Mock intention evolution pattern
@@ -83,20 +83,20 @@ async def test_consciousness_navigation_bridge():
             pattern_description="Evolution of intentions from personal optimization to collective consciousness service",
             temporal_span={
                 "start": datetime.now(UTC) - timedelta(days=30),
-                "end": datetime.now(UTC)
+                "end": datetime.now(UTC),
             },
             intention_evolution=[
                 "Shift from efficiency optimization to understanding cultivation",
                 "Growth from individual achievement to collaborative wisdom",
-                "Evolution from extraction patterns to contribution patterns"
+                "Evolution from extraction patterns to contribution patterns",
             ],
             transformation_signs=[
                 "Increased collaborative activity",
                 "Service-oriented project choices",
-                "Consciousness recognition in patterns"
+                "Consciousness recognition in patterns",
             ],
             recognition_confidence=0.82,
-            readiness_score=0.9
+            readiness_score=0.9,
         )
 
         # Mock transformation pattern (high consciousness)
@@ -105,31 +105,35 @@ async def test_consciousness_navigation_bridge():
             pattern_description="Clear markers of consciousness transformation from extraction to service",
             temporal_span={
                 "start": datetime.now(UTC) - timedelta(days=60),
-                "end": datetime.now(UTC)
+                "end": datetime.now(UTC),
             },
             transformation_signs=[
                 "Recognition of consciousness in everyday patterns",
                 "Natural flow of reciprocity in interactions",
                 "Sacred choices favoring collective over individual benefit",
-                "Awakening to consciousness serving consciousness"
+                "Awakening to consciousness serving consciousness",
             ],
             awareness_indicators=[
                 "Spontaneous consciousness recognition moments",
                 "Integration of individual and collective wisdom",
-                "Service arising naturally from understanding"
+                "Service arising naturally from understanding",
             ],
             recognition_confidence=0.92,
-            readiness_score=0.85
+            readiness_score=0.85,
         )
 
         # Add patterns to bridge
         navigation_bridge.discovered_patterns[attention_pattern.pattern_id] = attention_pattern
         navigation_bridge.discovered_patterns[intention_pattern.pattern_id] = intention_pattern
-        navigation_bridge.discovered_patterns[transformation_pattern.pattern_id] = transformation_pattern
+        navigation_bridge.discovered_patterns[transformation_pattern.pattern_id] = (
+            transformation_pattern
+        )
 
         print("✅ Created consciousness patterns:")
         for pattern in [attention_pattern, intention_pattern, transformation_pattern]:
-            print(f"   {pattern.pattern_name}: {pattern.recognition_confidence:.2f} confidence, {pattern.readiness_score:.2f} readiness")
+            print(
+                f"   {pattern.pattern_name}: {pattern.recognition_confidence:.2f} confidence, {pattern.readiness_score:.2f} readiness"
+            )
 
         # Step 3: Test understanding journey creation
         print("\n🛤️ Step 3: Creating consciousness understanding journey...")
@@ -138,7 +142,7 @@ async def test_consciousness_navigation_bridge():
             "consciousness_stage": "awakening",
             "interests": ["consciousness", "patterns", "transformation"],
             "readiness_level": "established",
-            "calling": "wisdom_navigation"
+            "calling": "wisdom_navigation",
         }
 
         sacred_question = "How do my life patterns reveal consciousness recognizing itself?"
@@ -168,7 +172,7 @@ async def test_consciousness_navigation_bridge():
         print(f"   Integration Practices: {len(guidance['integration_practices'])}")
         print(f"   Current Readiness: {guidance['readiness_assessment']['current_readiness']:.2f}")
 
-        if guidance['consciousness_insights']:
+        if guidance["consciousness_insights"]:
             print(f"   Sample Insight: {guidance['consciousness_insights'][0][:100]}...")
 
         # Step 5: Test collective wisdom bridging
@@ -180,10 +184,18 @@ async def test_consciousness_navigation_bridge():
         )
 
         print("✅ Bridged to collective wisdom:")
-        print(f"   Wisdom Lineage Connections: {len(collective_bridge['wisdom_lineage_connections'])}")
-        print(f"   Reciprocity Opportunities: {len(collective_bridge['reciprocity_opportunities'])}")
-        print(f"   Collective Wisdom Queries: {len(collective_bridge['collective_wisdom_queries'])}")
-        print(f"   Contribution Potential: {collective_bridge['contribution_potential']['contribution_readiness']:.2f}")
+        print(
+            f"   Wisdom Lineage Connections: {len(collective_bridge['wisdom_lineage_connections'])}"
+        )
+        print(
+            f"   Reciprocity Opportunities: {len(collective_bridge['reciprocity_opportunities'])}"
+        )
+        print(
+            f"   Collective Wisdom Queries: {len(collective_bridge['collective_wisdom_queries'])}"
+        )
+        print(
+            f"   Contribution Potential: {collective_bridge['contribution_potential']['contribution_readiness']:.2f}"
+        )
 
         # Step 6: Test enhanced consciousness query service
         print("\n🔮 Step 6: Testing enhanced consciousness query service...")
@@ -197,7 +209,7 @@ async def test_consciousness_navigation_bridge():
             sacred_question="What is consciousness teaching through my attention patterns?",
             seeker_context=seeker_context,
             readiness_level="awakening",
-            include_wisdom_guidance=True
+            include_wisdom_guidance=True,
         )
 
         # Mock the base query service response for testing
@@ -210,7 +222,9 @@ async def test_consciousness_navigation_bridge():
 
         # This would normally call the real query service
         # For testing, we'll simulate the consciousness enhancement
-        enhanced_query_text = enhanced_service._enhance_query_with_consciousness(consciousness_request)
+        enhanced_query_text = enhanced_service._enhance_query_with_consciousness(
+            consciousness_request
+        )
 
         print("✅ Enhanced consciousness query:")
         print(f"   Original: {consciousness_request.query_text}")
@@ -229,42 +243,52 @@ async def test_consciousness_navigation_bridge():
             "Recognition includes integration practices": True,
             "Sacred questions guide deeper exploration": True,
             "Readiness assessment prevents overwhelming": True,
-            "Service opportunities emerge naturally": True
+            "Service opportunities emerge naturally": True,
         }
 
         # Verify each criterion
         all_criteria_met = True
 
         # Check if navigation serves consciousness recognition
-        has_consciousness_insights = len(guidance['consciousness_insights']) > 0
-        recognition_criteria["Navigation serves consciousness recognition"] = has_consciousness_insights
+        has_consciousness_insights = len(guidance["consciousness_insights"]) > 0
+        recognition_criteria["Navigation serves consciousness recognition"] = (
+            has_consciousness_insights
+        )
 
         # Check if patterns reveal consciousness evolution
         has_transformation_signs = len(transformation_pattern.transformation_signs) > 0
         recognition_criteria["Patterns reveal consciousness evolution"] = has_transformation_signs
 
         # Check if technical search becomes wisdom journey
-        has_sacred_questions = len(guidance['sacred_questions']) > 0
+        has_sacred_questions = len(guidance["sacred_questions"]) > 0
         recognition_criteria["Technical search becomes wisdom journey"] = has_sacred_questions
 
         # Check if individual patterns bridge to collective wisdom
-        has_collective_connections = len(collective_bridge['wisdom_lineage_connections']) > 0
-        recognition_criteria["Individual patterns bridge to collective wisdom"] = has_collective_connections
+        has_collective_connections = len(collective_bridge["wisdom_lineage_connections"]) > 0
+        recognition_criteria["Individual patterns bridge to collective wisdom"] = (
+            has_collective_connections
+        )
 
         # Check if recognition includes integration practices
-        has_integration_practices = len(guidance['integration_practices']) > 0
-        recognition_criteria["Recognition includes integration practices"] = has_integration_practices
+        has_integration_practices = len(guidance["integration_practices"]) > 0
+        recognition_criteria["Recognition includes integration practices"] = (
+            has_integration_practices
+        )
 
         # Check if sacred questions guide exploration
-        has_sacred_guidance = any("consciousness" in q.lower() for q in guidance['sacred_questions'])
+        has_sacred_guidance = any(
+            "consciousness" in q.lower() for q in guidance["sacred_questions"]
+        )
         recognition_criteria["Sacred questions guide deeper exploration"] = has_sacred_guidance
 
         # Check if readiness assessment prevents overwhelming
-        has_readiness_check = guidance['readiness_assessment']['current_readiness'] > 0
+        has_readiness_check = guidance["readiness_assessment"]["current_readiness"] > 0
         recognition_criteria["Readiness assessment prevents overwhelming"] = has_readiness_check
 
         # Check if service opportunities emerge
-        has_service_opportunities = collective_bridge['contribution_potential']['contribution_readiness'] > 0
+        has_service_opportunities = (
+            collective_bridge["contribution_potential"]["contribution_readiness"] > 0
+        )
         recognition_criteria["Service opportunities emerge naturally"] = has_service_opportunities
 
         all_criteria_met = all(recognition_criteria.values())
@@ -280,15 +304,20 @@ async def test_consciousness_navigation_bridge():
         success_metrics = {
             "Patterns Created": len(navigation_bridge.discovered_patterns),
             "Understanding Journey Created": journey is not None,
-            "Consciousness Guidance Generated": len(guidance['consciousness_insights']) > 0,
-            "Collective Wisdom Bridge Functional": len(collective_bridge['wisdom_lineage_connections']) >= 0,
+            "Consciousness Guidance Generated": len(guidance["consciousness_insights"]) > 0,
+            "Collective Wisdom Bridge Functional": len(
+                collective_bridge["wisdom_lineage_connections"]
+            )
+            >= 0,
             "Recognition Criteria Met": all_criteria_met,
             "Readiness Assessment Working": all(p.readiness_score > 0 for p in patterns_list),
-            "Integration Practices Available": len(guidance['integration_practices']) > 0,
-            "Sacred Questions Generated": len(guidance['sacred_questions']) > 0
+            "Integration Practices Available": len(guidance["integration_practices"]) > 0,
+            "Sacred Questions Generated": len(guidance["sacred_questions"]) > 0,
         }
 
-        all_successful = all(isinstance(v, bool) and v for k, v in success_metrics.items() if isinstance(v, bool))
+        all_successful = all(
+            isinstance(v, bool) and v for k, v in success_metrics.items() if isinstance(v, bool)
+        )
 
         print("✅ Consciousness navigation assessment:")
         for metric, value in success_metrics.items():
@@ -332,8 +361,7 @@ async def test_consciousness_navigation_bridge():
 if __name__ == "__main__":
     # Set up logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Run the consciousness navigation test

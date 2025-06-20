@@ -28,7 +28,9 @@ async def test_readiness():
     print(f"✓ Found {len(available_providers)} API keys: {available_providers}")
 
     if len(available_providers) < 3:
-        print(f"❌ Need at least 3 providers for meaningful dialogue (found {len(available_providers)})")
+        print(
+            f"❌ Need at least 3 providers for meaningful dialogue (found {len(available_providers)})"
+        )
         return False
 
     # Check imports

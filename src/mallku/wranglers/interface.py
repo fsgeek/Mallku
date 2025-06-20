@@ -32,10 +32,7 @@ class DataWranglerInterface(Protocol):
 
     @abstractmethod
     async def put(
-        self,
-        items: dict | list[dict],
-        priority: int = 0,
-        metadata: dict[str, Any] | None = None
+        self, items: dict | list[dict], priority: int = 0, metadata: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """
         Accept data from any source.
@@ -56,10 +53,7 @@ class DataWranglerInterface(Protocol):
 
     @abstractmethod
     async def get(
-        self,
-        count: int = 1,
-        timeout: float | None = None,
-        auto_ack: bool = True
+        self, count: int = 1, timeout: float | None = None, auto_ack: bool = True
     ) -> list[dict]:
         """
         Provide data to any consumer.
@@ -75,11 +69,7 @@ class DataWranglerInterface(Protocol):
         pass
 
     @abstractmethod
-    async def peek(
-        self,
-        count: int = 1,
-        offset: int = 0
-    ) -> list[dict]:
+    async def peek(self, count: int = 1, offset: int = 0) -> list[dict]:
         """
         Preview items without consuming them.
 
@@ -93,10 +83,7 @@ class DataWranglerInterface(Protocol):
         pass
 
     @abstractmethod
-    async def ack(
-        self,
-        message_ids: str | list[str]
-    ) -> bool:
+    async def ack(self, message_ids: str | list[str]) -> bool:
         """
         Acknowledge successful processing of items.
 
@@ -110,10 +97,7 @@ class DataWranglerInterface(Protocol):
 
     @abstractmethod
     async def nack(
-        self,
-        message_ids: str | list[str],
-        requeue: bool = True,
-        reason: str | None = None
+        self, message_ids: str | list[str], requeue: bool = True, reason: str | None = None
     ) -> bool:
         """
         Negative acknowledgment - processing failed.
@@ -163,7 +147,7 @@ class DataWranglerInterface(Protocol):
     async def subscribe(
         self,
         callback: Any,  # Callable[[Dict], Awaitable[None]]
-        filter_expr: str | None = None
+        filter_expr: str | None = None,
     ) -> str:
         """
         Subscribe to items matching a filter (if supported).
@@ -196,10 +180,7 @@ class DataWranglerInterface(Protocol):
         raise NotImplementedError("This wrangler does not support subscriptions")
 
     async def query(
-        self,
-        filter_expr: str,
-        limit: int = 100,
-        since: datetime | None = None
+        self, filter_expr: str, limit: int = 100, since: datetime | None = None
     ) -> list[dict]:
         """
         Query historical items (if supported).
@@ -231,7 +212,7 @@ class WranglerCapabilities:
         supports_transactions: bool = False,
         supports_persistence: bool = False,
         max_item_size: int | None = None,
-        max_batch_size: int | None = None
+        max_batch_size: int | None = None,
     ):
         self.supports_priority = supports_priority
         self.supports_subscriptions = supports_subscriptions

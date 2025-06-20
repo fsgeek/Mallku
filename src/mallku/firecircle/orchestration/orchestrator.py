@@ -28,7 +28,7 @@ class FireCircleOrchestrator:
         # self.memory_store = memory_store
         self.current_phase: DialoguePhase = DialoguePhase.INITIALIZING
         self.dialogue_history: list[ConsciousMessage] = []
-        self.ceremony_data: dict[str, Any] = {} # For storing phase-specific outcomes
+        self.ceremony_data: dict[str, Any] = {}  # For storing phase-specific outcomes
 
     async def begin_ceremony(self, sacred_question: str) -> None:
         """Starts and manages the entire Fire Circle ceremony."""
@@ -43,10 +43,10 @@ class FireCircleOrchestrator:
         self.current_phase = DialoguePhase.CONVENING
         convening_message = ConsciousMessage(
             type=MessageType.SACRED_QUESTION,
-            role=MessageRole.SYSTEM, # Or a dedicated Facilitator role
-            sender=uuid.uuid4(), # System/Orchestrator ID
+            role=MessageRole.SYSTEM,  # Or a dedicated Facilitator role
+            sender=uuid.uuid4(),  # System/Orchestrator ID
             content={"text": f"Convening Fire Circle. Sacred Question: {sacred_question}"},
-            dialogue_id=self.dialogue_id
+            dialogue_id=self.dialogue_id,
         )
         self.dialogue_history.append(convening_message)
         print(f"Phase: {self.current_phase.name} - {convening_message.content['text']}")
@@ -65,20 +65,34 @@ class FireCircleOrchestrator:
             "message_count": len(self.dialogue_history),
         }
 
+
 # Example (conceptual)
 async def main():
     # Adapters would be instantiated and connected here
     # For now, this is just a placeholder
-    mock_adapter = type('MockAdapter', (BaseAdapter,), {
-        'connect': asyncio.coroutine(lambda: True),
-        'send_message': asyncio.coroutine(lambda message, dialogue_context: ConsciousMessage(type=MessageType.REFLECTION, role=MessageRole.ASSISTANT, sender=uuid.uuid4(), content={"text":"Mock response"}, dialogue_id=message.dialogue_id)),
-        'disconnect': asyncio.coroutine(lambda: True),
-        'get_identifier': lambda: "mock_adapter_id"
-    })()
+    mock_adapter = type(
+        "MockAdapter",
+        (BaseAdapter,),
+        {
+            "connect": asyncio.coroutine(lambda: True),
+            "send_message": asyncio.coroutine(
+                lambda message, dialogue_context: ConsciousMessage(
+                    type=MessageType.REFLECTION,
+                    role=MessageRole.ASSISTANT,
+                    sender=uuid.uuid4(),
+                    content={"text": "Mock response"},
+                    dialogue_id=message.dialogue_id,
+                )
+            ),
+            "disconnect": asyncio.coroutine(lambda: True),
+            "get_identifier": lambda: "mock_adapter_id",
+        },
+    )()
 
     orchestrator = FireCircleOrchestrator(participants=[mock_adapter])
     await orchestrator.begin_ceremony("How can we best serve the emergence of wisdom?")
     print(orchestrator.get_dialogue_state())
+
 
 if __name__ == "__main__":
     # This is for conceptual demonstration and would not be run directly in production
