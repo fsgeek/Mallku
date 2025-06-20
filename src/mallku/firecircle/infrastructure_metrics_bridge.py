@@ -39,14 +39,23 @@ class InfrastructureMetricsBridge:
     def __init__(
         self,
         infrastructure: InfrastructureConsciousness,
-        metrics_collector: ConsciousnessMetricsCollector
+        metrics_collector: ConsciousnessMetricsCollector,
+        config=None
     ):
         self.infrastructure = infrastructure
         self.metrics = metrics_collector
 
+        # Use infrastructure config if no bridge config provided
+        if config is None and hasattr(infrastructure, 'config'):
+            config = infrastructure.config
+
         # Bridging configuration
-        self.health_weight_on_consciousness = 0.2
-        self.consciousness_weight_on_health = 0.3
+        self.health_weight_on_consciousness = getattr(
+            config, 'bridge_health_weight', 0.2
+        )
+        self.consciousness_weight_on_health = getattr(
+            config, 'bridge_consciousness_weight', 0.3
+        )
 
     async def on_adapter_health_check(
         self,

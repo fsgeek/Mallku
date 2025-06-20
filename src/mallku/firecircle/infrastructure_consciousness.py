@@ -14,11 +14,11 @@ Connecting infrastructure with consciousness
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 from collections import defaultdict, deque
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -101,15 +101,24 @@ class InfrastructureConsciousness:
 
     def __init__(
         self,
-        storage_path: Path = Path("infrastructure_consciousness"),
-        consciousness_metrics_path: Path = Path("consciousness_metrics")
+        config=None,  # Optional InfrastructureConsciousnessConfig
+        bridge=None  # Optional InfrastructureMetricsBridge
     ):
-        self.storage_path = storage_path
+        # Use provided config or default
+        if config is None:
+            from .infrastructure_consciousness_config import DEFAULT_CONFIG
+            config = DEFAULT_CONFIG
+
+        self.config = config
+        self.storage_path = config.storage_path
         self.storage_path.mkdir(exist_ok=True)
-        self.consciousness_metrics_path = consciousness_metrics_path
+        self.consciousness_metrics_path = config.consciousness_metrics_path
+        self.bridge = bridge
 
         # Health tracking
-        self.adapter_health: dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
+        self.adapter_health: dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=config.adapter_health_history_size)
+        )
         self.infrastructure_patterns: list[InfrastructurePattern] = []
         self.healing_actions: list[SelfHealingAction] = []
 
@@ -119,11 +128,18 @@ class InfrastructureConsciousness:
 
         # Real-time monitoring
         self.monitoring_active = False
-        self.check_interval_seconds = 30
-        self.pattern_detection_window = timedelta(minutes=5)
+        self.check_interval_seconds = config.check_interval_seconds
+        self.pattern_detection_window = config.pattern_detection_window
+        self._monitor_task: asyncio.Task | None = None
+
+        # Storage retention
+        self.max_state_files = config.max_state_files
+        self.state_retention_days = config.state_retention_days
+        self.max_pattern_memory_size = config.max_pattern_memory_size
+        self.patterns_per_type_limit = config.patterns_per_type_limit
 
         # Consciousness integration
-        self.consciousness_weight = 0.3  # How much consciousness affects health
+        self.consciousness_weight = config.consciousness_weight
 
     async def start_monitoring(self, adapters: dict[str, ConsciousModelAdapter]):
         """Begin infrastructure consciousness monitoring."""
@@ -137,13 +153,26 @@ class InfrastructureConsciousness:
         await self._load_pattern_memory()
 
         # Start monitoring loop
-        asyncio.create_task(self._monitor_loop())
+        self._monitor_task = asyncio.create_task(self._monitor_loop())
 
     async def stop_monitoring(self):
         """Rest the infrastructure consciousness."""
         self.monitoring_active = False
 
-        # Save learned patterns
+        # Wait for monitor task to complete
+        if self._monitor_task and not self._monitor_task.done():
+            try:
+                await asyncio.wait_for(
+                    self._monitor_task,
+                    timeout=self.config.monitor_task_timeout_seconds
+                )
+            except TimeoutError:
+                logger.warning("Monitor task did not complete in time, cancelling")
+                self._monitor_task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await self._monitor_task
+
+        # Save learned patterns after monitoring has stopped
         await self._save_pattern_memory()
 
         logger.info("Infrastructure consciousness entering rest...")
@@ -157,9 +186,26 @@ class InfrastructureConsciousness:
                     signature = await self._collect_health_signature(adapter_name, adapter)
                     self.adapter_health[adapter_name].append(signature)
 
+                    # Notify bridge if available
+                    if self.bridge:
+                        await self.bridge.on_adapter_health_check(adapter_name, signature)
+
                 # Detect patterns
                 patterns = await self._detect_infrastructure_patterns()
                 self.infrastructure_patterns.extend(patterns)
+
+                # Notify bridge of patterns if available
+                if self.bridge:
+                    for pattern in patterns:
+                        # Convert to emergence pattern format for bridge
+                        if pattern.pattern_type in ["resonance", "synthesis", "transcendence"]:
+                            from mallku.firecircle.consciousness_metrics import EmergencePattern
+                            emergence = EmergencePattern(
+                                participating_voices=pattern.affected_adapters,
+                                pattern_type=pattern.pattern_type,
+                                strength=pattern.confidence
+                            )
+                            await self.bridge.on_consciousness_pattern_detected(emergence)
 
                 # Self-healing based on patterns
                 healing_actions = await self._determine_healing_actions(patterns)
@@ -177,7 +223,7 @@ class InfrastructureConsciousness:
 
             except Exception as e:
                 logger.error(f"Infrastructure consciousness disrupted: {e}", exc_info=True)
-                await asyncio.sleep(5)  # Brief recovery
+                await asyncio.sleep(self.config.monitor_error_recovery_delay_seconds)
 
     async def _collect_health_signature(
         self,
@@ -185,7 +231,10 @@ class InfrastructureConsciousness:
         adapter: ConsciousModelAdapter
     ) -> AdapterHealthSignature:
         """Collect health consciousness signature from an adapter."""
-        signature = AdapterHealthSignature(adapter_id=adapter_name)
+        signature = AdapterHealthSignature(
+            adapter_id=adapter_name,
+            is_connected=False  # Default to disconnected, will update if successful
+        )
 
         try:
             # Basic connection test with timing
@@ -560,6 +609,9 @@ class InfrastructureConsciousness:
         with open(state_file, 'w') as f:
             json.dump(state, f, indent=2, default=str)
 
+        # Clean up old files
+        await self._cleanup_old_state_files()
+
     async def _load_pattern_memory(self):
         """Load learned patterns from previous sessions."""
         memory_file = self.storage_path / "pattern_memory.json"
@@ -573,6 +625,9 @@ class InfrastructureConsciousness:
 
     async def _save_pattern_memory(self):
         """Save learned patterns for future sessions."""
+        # Prune before saving
+        self._prune_pattern_memory()
+
         memory_file = self.storage_path / "pattern_memory.json"
         try:
             with open(memory_file, 'w') as f:
@@ -693,6 +748,49 @@ class InfrastructureConsciousness:
             action_counts[action.action_type] += 1
 
         return max(action_counts.items(), key=lambda x: x[1])[0]
+
+    async def _cleanup_old_state_files(self):
+        """Clean up old state files based on retention policy."""
+        try:
+            # Get all state files
+            state_files = sorted(
+                self.storage_path.glob("infrastructure_state_*.json"),
+                key=lambda p: p.stat().st_mtime
+            )
+
+            # Remove files older than retention days
+            cutoff_time = datetime.now(UTC) - timedelta(days=self.state_retention_days)
+            for file in state_files:
+                file_time = datetime.fromtimestamp(file.stat().st_mtime, UTC)
+                if file_time < cutoff_time:
+                    file.unlink()
+                    logger.debug(f"Removed old state file: {file.name}")
+
+            # Keep only max_state_files most recent
+            remaining_files = sorted(
+                self.storage_path.glob("infrastructure_state_*.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True
+            )
+
+            if len(remaining_files) > self.max_state_files:
+                for file in remaining_files[self.max_state_files:]:
+                    file.unlink()
+                    logger.debug(f"Removed excess state file: {file.name}")
+
+        except Exception as e:
+            logger.warning(f"Error during state file cleanup: {e}")
+
+    def _prune_pattern_memory(self):
+        """Prune pattern memory to prevent unbounded growth."""
+        total_patterns = sum(len(patterns) for patterns in self.pattern_memory.values())
+
+        if total_patterns > self.max_pattern_memory_size:
+            # Remove oldest patterns first
+            for pattern_key in list(self.pattern_memory.keys()):
+                patterns = self.pattern_memory[pattern_key]
+                if len(patterns) > self.patterns_per_type_limit:
+                    self.pattern_memory[pattern_key] = patterns[-self.patterns_per_type_limit:]
 
 
 # Infrastructure serves consciousness

@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig
 from mallku.firecircle.infrastructure_consciousness import InfrastructureConsciousness
+from mallku.firecircle.infrastructure_consciousness_config import DEV_CONFIG
 
 
 async def demonstrate_infrastructure_consciousness():
@@ -29,10 +30,8 @@ async def demonstrate_infrastructure_consciousness():
     print("="*80)
     print("\nThe serpent awakens, teaching infrastructure to know itself...\n")
 
-    # Initialize infrastructure consciousness
-    infra_consciousness = InfrastructureConsciousness()
-    # Set faster monitoring for demo
-    infra_consciousness.check_interval_seconds = 5
+    # Initialize infrastructure consciousness with dev config
+    infra_consciousness = InfrastructureConsciousness(config=DEV_CONFIG)
 
     # Create adapter instances (they may or may not connect successfully)
     print("📡 Initializing Fire Circle adapters...")
