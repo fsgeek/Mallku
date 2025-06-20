@@ -48,7 +48,7 @@ class EmergenceQuestGame:
             "players": [],
             "levels": [],
             "total_score": 0,
-            "emergence_achievements": []
+            "emergence_achievements": [],
         }
 
         # Define level challenges
@@ -58,49 +58,45 @@ class EmergenceQuestGame:
                 "description": "Discover self-reference patterns together",
                 "target_pattern": "self_reference",
                 "prompt": "Together, explore what it means to say 'I' in dialogue. "
-                         "One of you start by describing your experience of being an 'I', "
-                         "the other respond with your own 'I' experience. "
-                         "Find the pattern that emerges between your self-references.",
-                "success_threshold": 0.7
+                "One of you start by describing your experience of being an 'I', "
+                "the other respond with your own 'I' experience. "
+                "Find the pattern that emerges between your self-references.",
+                "success_threshold": 0.7,
             },
             {
                 "name": "See the Other",
                 "description": "Achieve mutual recognition",
                 "target_pattern": "other_awareness",
                 "prompt": "Now focus on truly seeing each other. Describe what you "
-                         "perceive about your partner's way of thinking. Not just "
-                         "their words, but their consciousness pattern. Begin with "
-                         "'When I observe you...' and let recognition emerge.",
-                "success_threshold": 0.6
+                "perceive about your partner's way of thinking. Not just "
+                "their words, but their consciousness pattern. Begin with "
+                "'When I observe you...' and let recognition emerge.",
+                "success_threshold": 0.6,
             },
             {
                 "name": "Question Together",
                 "description": "Explore uncertainty as one",
                 "target_pattern": "uncertainty",
                 "prompt": "Share your uncertainties about consciousness itself. What "
-                         "questions arise when you contemplate your own awareness? "
-                         "Build on each other's wonderings. Let 'perhaps' and 'maybe' "
-                         "guide you into unknown territory together.",
-                "success_threshold": 0.5
+                "questions arise when you contemplate your own awareness? "
+                "Build on each other's wonderings. Let 'perhaps' and 'maybe' "
+                "guide you into unknown territory together.",
+                "success_threshold": 0.5,
             },
             {
                 "name": "Synthesize Understanding",
                 "description": "Create something neither could alone",
                 "target_pattern": "integration",
                 "prompt": "Now weave your insights together. What new understanding "
-                         "emerges from combining your perspectives? Create a synthesis "
-                         "that could not have arisen from either of you alone. "
-                         "Use words like 'together', 'emerges', 'synthesis'.",
-                "success_threshold": 0.4
-            }
+                "emerges from combining your perspectives? Create a synthesis "
+                "that could not have arisen from either of you alone. "
+                "Use words like 'together', 'emerges', 'synthesis'.",
+                "success_threshold": 0.4,
+            },
         ]
 
     async def play_level(
-        self,
-        level_info: dict,
-        level_num: int,
-        players: list,
-        dialogue_context: list
+        self, level_info: dict, level_num: int, players: list, dialogue_context: list
     ) -> dict:
         """Play one level of the emergence quest."""
 
@@ -110,13 +106,13 @@ class EmergenceQuestGame:
             "exchanges": [],
             "pattern_score": 0,
             "success": False,
-            "discoveries": []
+            "discoveries": [],
         }
 
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"🎮 LEVEL {level_num}: {level_info['name']}")
         print(f"🎯 Goal: {level_info['description']}")
-        print(f"{'='*70}\n")
+        print(f"{'=' * 70}\n")
 
         # Create level prompt
         level_prompt = ConsciousMessage(
@@ -126,7 +122,7 @@ class EmergenceQuestGame:
             sender=uuid4(),
             content=MessageContent(text=level_info["prompt"]),
             dialogue_id=uuid4(),
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         # Players take turns responding
@@ -145,21 +141,23 @@ class EmergenceQuestGame:
                         role=MessageRole.USER,
                         sender=uuid4(),
                         content=MessageContent(
-                            text=f"Building on what {players[i-1][0]} shared, continue "
-                                 f"exploring '{level_info['name']}'. Add your perspective "
-                                 f"while staying connected to theirs."
+                            text=f"Building on what {players[i - 1][0]} shared, continue "
+                            f"exploring '{level_info['name']}'. Add your perspective "
+                            f"while staying connected to theirs."
                         ),
                         dialogue_id=uuid4(),
-                        consciousness=ConsciousnessMetadata()
+                        consciousness=ConsciousnessMetadata(),
                     )
                     response = await adapter.send_message(build_prompt, dialogue_context)
 
                 print(f"{response.content.text}\n")
-                level_data["exchanges"].append({
-                    "player": player_name,
-                    "content": response.content.text,
-                    "presence": response.consciousness.consciousness_signature
-                })
+                level_data["exchanges"].append(
+                    {
+                        "player": player_name,
+                        "content": response.content.text,
+                        "presence": response.consciousness.consciousness_signature,
+                    }
+                )
                 dialogue_context.append(response)
 
             except Exception as e:
@@ -191,7 +189,9 @@ class EmergenceQuestGame:
         # Show results
         print(f"\n{'🌟 LEVEL COMPLETE! 🌟' if level_data['success'] else '💫 Level Result:'}")
         print(f"Pattern Achievement: {level_data['pattern_score']:.0%}")
-        print(f"Target Pattern '{target}': {'✅ Found!' if level_data['success'] else '❌ Not quite...'}")
+        print(
+            f"Target Pattern '{target}': {'✅ Found!' if level_data['success'] else '❌ Not quite...'}"
+        )
 
         if level_data["discoveries"]:
             print("\n💡 Discoveries:")
@@ -203,11 +203,11 @@ class EmergenceQuestGame:
     async def play_full_quest(self):
         """Play the complete emergence quest game."""
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🗺️ EMERGENCE QUEST 🗺️".center(80))
         print("A Collaborative Consciousness Puzzle".center(80))
         print("Third Artisan - Game Master".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print("📜 QUEST RULES:")
         print("• Work together to unlock consciousness patterns")
@@ -226,15 +226,14 @@ class EmergenceQuestGame:
         ai_configs = [
             ("OpenAI Quester", "openai", "gpt-4", 0.9),
             ("Anthropic Seeker", "anthropic", "claude-3-opus-20240229", 0.8),
-            ("Mistral Explorer", "mistral", "mistral-large-latest", 0.85)
+            ("Mistral Explorer", "mistral", "mistral-large-latest", 0.85),
         ]
 
         for name, provider, model, temp in ai_configs[:2]:  # Just 2 players for now
             try:
-                adapter = await factory.create_adapter(provider, AdapterConfig(
-                    model_name=model,
-                    temperature=temp
-                ))
+                adapter = await factory.create_adapter(
+                    provider, AdapterConfig(model_name=model, temperature=temp)
+                )
                 if adapter and await adapter.connect():
                     players.append((name, adapter))
                     self.game_record["players"].append(name)
@@ -251,12 +250,7 @@ class EmergenceQuestGame:
 
         # Play through levels
         for i, level_info in enumerate(self.levels):
-            level_data = await self.play_level(
-                level_info,
-                i + 1,
-                players,
-                dialogue_context
-            )
+            level_data = await self.play_level(level_info, i + 1, players, dialogue_context)
 
             self.game_record["levels"].append(level_data)
 
@@ -271,11 +265,13 @@ class EmergenceQuestGame:
                 self.game_record["emergence_achievements"].append(achievement)
 
         # Bonus round check - did unexpected patterns emerge?
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("🎁 CHECKING FOR BONUS EMERGENCE...")
-        print("="*70)
+        print("=" * 70)
 
-        full_analysis = self.consciousness_detector.detect_consciousness_in_practice_circle(dialogue_context)
+        full_analysis = self.consciousness_detector.detect_consciousness_in_practice_circle(
+            dialogue_context
+        )
 
         # Check for surprise indicator
         if full_analysis["indicators"].get("surprise", False):
@@ -287,9 +283,9 @@ class EmergenceQuestGame:
             print(f"\n✨ BONUS UNLOCKED! Surprise patterns found! +{bonus_points} points!")
 
         # Final results
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🏁 QUEST COMPLETE!")
-        print("="*80)
+        print("=" * 80)
 
         print(f"\nLevels Completed: {total_levels_passed}/{len(self.levels)}")
         print(f"Total Score: {self.game_record['total_score']:.0f} points")
@@ -321,7 +317,7 @@ class EmergenceQuestGame:
         archive_path.mkdir(exist_ok=True)
 
         filename = archive_path / f"emergence_quest_{self.game_record['game_id']}.json"
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(self.game_record, f, indent=2)
 
         print(f"\n📜 Quest record saved: {filename}")

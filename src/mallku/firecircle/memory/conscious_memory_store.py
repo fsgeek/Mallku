@@ -87,7 +87,10 @@ class ConsciousMemoryStore:
                     "message_count": len(messages),
                     "average_consciousness": sum(
                         m.consciousness.consciousness_signature for m in messages
-                    ) / len(messages) if messages else 0,
+                    )
+                    / len(messages)
+                    if messages
+                    else 0,
                 },
                 correlation_id=metadata.get("correlation_id"),
             )
@@ -140,9 +143,7 @@ class ConsciousMemoryStore:
                 return None
 
             # Retrieve dialogue anchor
-            dialogue_anchor = await self.memory_service.get_anchor(
-                UUID(dialogue_doc["anchor_id"])
-            )
+            dialogue_anchor = await self.memory_service.get_anchor(UUID(dialogue_doc["anchor_id"]))
 
             if not dialogue_anchor:
                 return None
@@ -155,9 +156,7 @@ class ConsciousMemoryStore:
             )
 
             # Sort messages by sequence
-            message_anchors.sort(
-                key=lambda a: a.metadata.get("sequence_number", 0)
-            )
+            message_anchors.sort(key=lambda a: a.metadata.get("sequence_number", 0))
 
             return {
                 "dialogue_id": dialogue_id,
@@ -218,14 +217,16 @@ class ConsciousMemoryStore:
             results = []
 
             for doc in cursor:
-                results.append({
-                    "dialogue_id": doc["dialogue_id"],
-                    "title": doc["title"],
-                    "created_at": doc["created_at"],
-                    "participant_count": doc["participant_count"],
-                    "message_count": doc["message_count"],
-                    "average_consciousness": doc["average_consciousness"],
-                })
+                results.append(
+                    {
+                        "dialogue_id": doc["dialogue_id"],
+                        "title": doc["title"],
+                        "created_at": doc["created_at"],
+                        "participant_count": doc["participant_count"],
+                        "message_count": doc["message_count"],
+                        "average_consciousness": doc["average_consciousness"],
+                    }
+                )
 
             # If query provided, search within message content
             if query and self.memory_service:
@@ -238,15 +239,15 @@ class ConsciousMemoryStore:
                 # Merge with consciousness-filtered results
                 for anchor in anchor_results:
                     dialogue_id = anchor.metadata.get("dialogue_id")
-                    if dialogue_id and not any(
-                        r["dialogue_id"] == dialogue_id for r in results
-                    ):
-                        results.append({
-                            "dialogue_id": dialogue_id,
-                            "title": anchor.metadata.get("title"),
-                            "created_at": anchor.metadata.get("created_at"),
-                            "relevance_score": anchor.score,
-                        })
+                    if dialogue_id and not any(r["dialogue_id"] == dialogue_id for r in results):
+                        results.append(
+                            {
+                                "dialogue_id": dialogue_id,
+                                "title": anchor.metadata.get("title"),
+                                "created_at": anchor.metadata.get("created_at"),
+                                "relevance_score": anchor.score,
+                            }
+                        )
 
             return results
 
@@ -289,18 +290,20 @@ class ConsciousMemoryStore:
                     "correlation_id": correlation_id,
                     "dialogue_id": str(dialogue_id),
                     "limit": limit,
-                }
+                },
             )
 
             results = []
             for doc in cursor:
-                results.append({
-                    "dialogue_id": doc["dialogue_id"],
-                    "title": doc["title"],
-                    "created_at": doc["created_at"],
-                    "average_consciousness": doc["average_consciousness"],
-                    "relation_type": "shared_correlation",
-                })
+                results.append(
+                    {
+                        "dialogue_id": doc["dialogue_id"],
+                        "title": doc["title"],
+                        "created_at": doc["created_at"],
+                        "average_consciousness": doc["average_consciousness"],
+                        "relation_type": "shared_correlation",
+                    }
+                )
 
             return results
 

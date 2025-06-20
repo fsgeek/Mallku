@@ -36,33 +36,33 @@ async def test_consciousness_router_intelligence():
             {
                 "query": "show me files from yesterday",
                 "expected_intention": ConsciousnessIntention.TECHNICAL,
-                "expected_path": "technical_service"
+                "expected_path": "technical_service",
             },
             {
                 "query": "help me see patterns in my attention",
                 "expected_intention": ConsciousnessIntention.RECOGNITION,
-                "expected_path": "consciousness_service"
+                "expected_path": "consciousness_service",
             },
             {
                 "query": "what is my work teaching me about consciousness",
                 "expected_intention": ConsciousnessIntention.UNDERSTANDING,
-                "expected_path": "consciousness_service"
+                "expected_path": "consciousness_service",
             },
             {
                 "query": "how can I integrate these insights into daily practice",
                 "expected_intention": ConsciousnessIntention.INTEGRATION,
-                "expected_path": "hybrid_service"
+                "expected_path": "hybrid_service",
             },
             {
                 "query": "how can my patterns serve collective wisdom",
                 "expected_intention": ConsciousnessIntention.SERVICE,
-                "expected_path": "hybrid_service"
+                "expected_path": "hybrid_service",
             },
             {
                 "query": "explore consciousness through my activities",
                 "expected_intention": ConsciousnessIntention.EXPLORATION,
-                "expected_path": "consciousness_journey"
-            }
+                "expected_path": "consciousness_journey",
+            },
         ]
 
         print("🎯 Testing consciousness intention detection:")
@@ -83,12 +83,16 @@ async def test_consciousness_router_intelligence():
                 passed_tests += 1
 
             print(f"\n   {status} Test {i}: '{scenario['query']}'")
-            print(f"      🎯 Intention: {detected_intention} (expected: {scenario['expected_intention']})")
+            print(
+                f"      🎯 Intention: {detected_intention} (expected: {scenario['expected_intention']})"
+            )
             print(f"      🛤️ Path: {detected_path} (expected: {scenario['expected_path']})")
             print(f"      🧘 Readiness: {routing_decision['consciousness_readiness']['level']}")
             print(f"      ⭐ Sacred: {routing_decision['is_sacred_question']}")
 
-        print(f"\n📊 Router Intelligence Results: {passed_tests}/{len(test_scenarios)} tests passed")
+        print(
+            f"\n📊 Router Intelligence Results: {passed_tests}/{len(test_scenarios)} tests passed"
+        )
         return passed_tests == len(test_scenarios)
 
     except Exception as e:
@@ -124,7 +128,7 @@ async def test_consciousness_enrichment_models():
             confidence_level=ConfidenceLevel.HIGH,
             last_modified=datetime.now(UTC),
             anchor_timestamp=datetime.now(UTC),
-            correlation_tags=["temporal", "filesystem"]
+            correlation_tags=["temporal", "filesystem"],
         )
 
         print("✅ Created mock technical result")
@@ -136,7 +140,7 @@ async def test_consciousness_enrichment_models():
             sacred_question="How does consciousness use your coding to serve collective wisdom?",
             recognition_depth=0.8,
             integration_guidance="Notice consciousness awareness while coding - let this guide your technical choices",
-            service_potential="Your coding insights could help other developers recognize consciousness in their work"
+            service_potential="Your coding insights could help other developers recognize consciousness in their work",
         )
 
         print("✅ Created recognition moment")
@@ -147,7 +151,7 @@ async def test_consciousness_enrichment_models():
             connection_type="consciousness_recognition",
             collective_relevance="Programming patterns that could serve developer community consciousness",
             fire_circle_potential=True,
-            reciprocity_indicator="Individual coding consciousness serving collective technical wisdom"
+            reciprocity_indicator="Individual coding consciousness serving collective technical wisdom",
         )
 
         print("✅ Created wisdom thread")
@@ -159,14 +163,14 @@ async def test_consciousness_enrichment_models():
             wisdom_threads=[wisdom_thread],
             daily_practice_suggestions=[
                 "Notice consciousness while coding",
-                "Ask: How does this code serve others?"
+                "Ask: How does this code serve others?",
             ],
             next_sacred_questions=[
                 "How does my coding serve consciousness awakening?",
-                "What is consciousness creating through my programming?"
+                "What is consciousness creating through my programming?",
             ],
             consciousness_stage="awakening",
-            enrichment_confidence=0.9
+            enrichment_confidence=0.9,
         )
 
         print("✅ Created consciousness-enriched result")
@@ -212,8 +216,12 @@ async def test_query_context_enhancement():
 
         print("✅ Query enhanced with consciousness context")
         print(f"   🎯 Consciousness intention: {enhanced_query.context['consciousness_intention']}")
-        print(f"   🧘 Readiness level: {enhanced_query.context['consciousness_readiness']['level']}")
-        print(f"   ⭐ Sacred question: {enhanced_query.context.get('sacred_question', 'None')[:80]}...")
+        print(
+            f"   🧘 Readiness level: {enhanced_query.context['consciousness_readiness']['level']}"
+        )
+        print(
+            f"   ⭐ Sacred question: {enhanced_query.context.get('sacred_question', 'None')[:80]}..."
+        )
         print(f"   🛤️ Routing path: {enhanced_query.context['routing_path']}")
         print(f"   💫 Needs enrichment: {enhanced_query.context['needs_enrichment']}")
 
@@ -240,11 +248,7 @@ async def test_technical_service_connection():
         print("✅ Technical service initialized")
 
         # Test a simple query
-        test_query = QueryRequest(
-            query_text="recent files",
-            max_results=3,
-            min_confidence=0.3
-        )
+        test_query = QueryRequest(query_text="recent files", max_results=3, min_confidence=0.3)
 
         response = await technical_service.execute_query(test_query)
 
@@ -275,7 +279,7 @@ async def run_simple_integration_tests():
         ("Consciousness Router Intelligence", test_consciousness_router_intelligence),
         ("Consciousness Enrichment Models", test_consciousness_enrichment_models),
         ("Query Context Enhancement", test_query_context_enhancement),
-        ("Technical Service Connection", test_technical_service_connection)
+        ("Technical Service Connection", test_technical_service_connection),
     ]
 
     results = []
@@ -321,8 +325,7 @@ async def run_simple_integration_tests():
 if __name__ == "__main__":
     # Set up logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Run simple integration tests

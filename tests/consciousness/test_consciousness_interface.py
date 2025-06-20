@@ -28,10 +28,12 @@ def test_experience_weaving_imports():
     try:
         print("Testing consciousness interface import...")
         from mallku.experience import consciousness_interface  # noqa: F401
+
         print("✅ Consciousness interface imports successful")
 
         print("Testing pattern poetry import...")
         from mallku.experience import pattern_poetry  # noqa: F401
+
         print("✅ Pattern poetry imports successful")
 
         print("Testing experience module availability...")
@@ -68,7 +70,7 @@ async def test_consciousness_interface_creation():
             "poetry_over_data": True,
             "journey_over_destination": True,
             "mirror_over_window": True,
-            "service_over_extraction": True
+            "service_over_extraction": True,
         }
 
         for setting, expected in expected_settings.items():
@@ -243,8 +245,7 @@ async def run_all_tests():
 if __name__ == "__main__":
     # Set up logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Run tests

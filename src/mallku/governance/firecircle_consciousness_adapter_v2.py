@@ -71,7 +71,9 @@ class FireCircleConsciousnessAdapterV2:
         # Create config with consciousness features enabled
         fc_config = ConsciousDialogueConfig(
             title=title,
-            turn_policy=TurnPolicy(config.get("turn_policy", "round_robin")) if config else TurnPolicy.ROUND_ROBIN,
+            turn_policy=TurnPolicy(config.get("turn_policy", "round_robin"))
+            if config
+            else TurnPolicy.ROUND_ROBIN,
             max_consecutive_turns=config.get("max_consecutive_turns", 1) if config else 1,
             allow_empty_chair=config.get("allow_empty_chair", True) if config else True,
             auto_advance_turns=config.get("auto_advance_turns", True) if config else True,
@@ -110,7 +112,7 @@ class FireCircleConsciousnessAdapterV2:
         The message automatically flows through consciousness circulation.
         """
         # Get current dialogue state
-        if not hasattr(self.dialogue_manager, 'active_dialogues'):
+        if not hasattr(self.dialogue_manager, "active_dialogues"):
             raise ValueError(f"No active dialogue with ID {dialogue_id}")
 
         dialogue_state = self.dialogue_manager.active_dialogues.get(dialogue_id)
@@ -154,7 +156,7 @@ class FireCircleConsciousnessAdapterV2:
 
     def get_dialogue_consciousness_flow(self, dialogue_id: UUID) -> str | None:
         """Get correlation ID for dialogue's consciousness flow."""
-        if hasattr(self.dialogue_manager, 'active_dialogues'):
+        if hasattr(self.dialogue_manager, "active_dialogues"):
             dialogue_state = self.dialogue_manager.active_dialogues.get(dialogue_id)
             if dialogue_state:
                 return dialogue_state.get("correlation_id")

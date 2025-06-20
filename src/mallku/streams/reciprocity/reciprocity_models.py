@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 class InteractionType(str):
     """Types of interactions between human and AI"""
+
     QUERY = "query"
     RESPONSE = "response"
     CLARIFICATION = "clarification"
@@ -23,6 +24,7 @@ class InteractionType(str):
 
 class ValueType(str):
     """Types of value exchanged in interactions"""
+
     KNOWLEDGE = "knowledge"
     COMPUTATION = "computation"
     CREATIVITY = "creativity"
@@ -44,12 +46,9 @@ class ReciprocityActivityData(ObfuscatedModel):
 
     # Interaction metadata
     interaction: dict = Field(default_factory=dict)
-    interaction_id: UUID = Field(
-        description="Unique identifier for this interaction"
-    )
+    interaction_id: UUID = Field(description="Unique identifier for this interaction")
     timestamp: datetime = Field(
-        default_factory=datetime.utcnow,
-        description="When this interaction occurred"
+        default_factory=datetime.utcnow, description="When this interaction occurred"
     )
 
     # Participants
@@ -57,20 +56,17 @@ class ReciprocityActivityData(ObfuscatedModel):
         description="Who initiated this interaction"
     )
     participants: list[str] = Field(
-        default_factory=list,
-        description="All participants in this interaction"
+        default_factory=list, description="All participants in this interaction"
     )
 
     # Ayni scoring
     ayni_score: dict = Field(
-        default_factory=dict,
-        description="Reciprocity measurements for this interaction"
+        default_factory=dict, description="Reciprocity measurements for this interaction"
     )
 
     # System health tracking
     system_health: dict = Field(
-        default_factory=dict,
-        description="Track UPI implementation issues affecting reciprocity"
+        default_factory=dict, description="Track UPI implementation issues affecting reciprocity"
     )
 
     class Config:
@@ -85,7 +81,7 @@ class ReciprocityActivityData(ObfuscatedModel):
                     "type": InteractionType.QUERY,
                     "content_hash": "sha256:abcd1234",  # Not actual content
                     "topic_category": "technical_assistance",
-                    "complexity": 0.7
+                    "complexity": 0.7,
                 },
                 "ayni_score": {
                     "value_given": 0.3,
@@ -93,13 +89,13 @@ class ReciprocityActivityData(ObfuscatedModel):
                     "value_delta": -0.5,
                     "value_type": ValueType.KNOWLEDGE,
                     "quality_score": 0.9,
-                    "balance_direction": "ai_gave_more"
+                    "balance_direction": "ai_gave_more",
                 },
                 "system_health": {
                     "is_system_failure": False,
                     "prompt_quality": 0.95,
-                    "response_coherence": 0.98
-                }
+                    "response_coherence": 0.98,
+                },
             }
         }
 
@@ -116,33 +112,26 @@ class ReciprocityBalance(ObfuscatedModel):
 
     # Balance tracking
     current_balance: float = Field(
-        default=0.0,
-        description="Current reciprocity balance (-1 to 1, 0 is perfect balance)"
+        default=0.0, description="Current reciprocity balance (-1 to 1, 0 is perfect balance)"
     )
 
     # Historical tracking
     total_interactions: int = Field(default=0)
     last_interaction: datetime = Field(default_factory=datetime.utcnow)
     balance_history: list[dict] = Field(
-        default_factory=list,
-        description="Historical balance snapshots"
+        default_factory=list, description="Historical balance snapshots"
     )
 
     # Relationship health
     relationship_health: float = Field(
-        default=1.0,
-        description="Overall health of the reciprocal relationship (0-1)"
+        default=1.0, description="Overall health of the reciprocal relationship (0-1)"
     )
 
     # Strategic forgetting
     last_decay_applied: datetime = Field(
-        default_factory=datetime.utcnow,
-        description="When balance decay was last applied"
+        default_factory=datetime.utcnow, description="When balance decay was last applied"
     )
-    decay_rate: float = Field(
-        default=0.01,
-        description="Rate at which old imbalances decay"
-    )
+    decay_rate: float = Field(default=0.01, description="Rate at which old imbalances decay")
 
 
 class AyniConfiguration(BaseModel):
@@ -156,7 +145,7 @@ class AyniConfiguration(BaseModel):
             ValueType.CREATIVITY: 1.2,
             ValueType.EMOTIONAL_SUPPORT: 1.1,
             ValueType.TASK_COMPLETION: 0.9,
-            ValueType.ERROR_CORRECTION: 1.5
+            ValueType.ERROR_CORRECTION: 1.5,
         }
     )
 
@@ -167,16 +156,13 @@ class AyniConfiguration(BaseModel):
 
     # Balance thresholds
     refusal_threshold: float = Field(
-        default=-0.8,
-        description="Balance below which AI may refuse requests"
+        default=-0.8, description="Balance below which AI may refuse requests"
     )
     rebalancing_suggestion_threshold: float = Field(
-        default=-0.5,
-        description="Balance below which to suggest rebalancing"
+        default=-0.5, description="Balance below which to suggest rebalancing"
     )
 
     # System health settings
     penalize_system_failures: bool = Field(
-        default=False,
-        description="Whether to count system failures against user balance"
+        default=False, description="Whether to count system failures against user balance"
     )

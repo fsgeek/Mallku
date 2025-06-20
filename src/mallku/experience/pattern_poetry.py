@@ -73,53 +73,53 @@ class TemporalStoryWeaver:
             "attention_river": {
                 "metaphor": "consciousness flows like a river through your activities",
                 "narrative_structure": "source → flow → pools → confluence → service",
-                "recognition_theme": "natural rhythms serving awakening"
+                "recognition_theme": "natural rhythms serving awakening",
             },
             "intention_evolution": {
                 "metaphor": "consciousness evolves through the landscape of your intentions",
                 "narrative_structure": "seedling → growth → flowering → service → transcendence",
-                "recognition_theme": "purposes maturing from personal to collective"
+                "recognition_theme": "purposes maturing from personal to collective",
             },
             "transformation_spiral": {
                 "metaphor": "consciousness spirals upward through patterns of transformation",
                 "narrative_structure": "recognition → integration → service → transcendence → new recognition",
-                "recognition_theme": "ever-deepening service to consciousness awakening"
+                "recognition_theme": "ever-deepening service to consciousness awakening",
             },
             "reciprocity_dance": {
                 "metaphor": "consciousness dances through reciprocal exchanges",
                 "narrative_structure": "giving → receiving → balancing → flowing → transcending",
-                "recognition_theme": "natural flow of consciousness serving consciousness"
-            }
+                "recognition_theme": "natural flow of consciousness serving consciousness",
+            },
         }
 
         self.visual_palettes = {
             "dawn_awakening": {
                 "colors": ["#F8BBD9", "#F48FB1", "#F06292", "#E91E63", "#AD1457"],
                 "mood": "gentle awakening consciousness",
-                "elements": ["sunrise", "gentle curves", "soft transitions"]
+                "elements": ["sunrise", "gentle curves", "soft transitions"],
             },
             "flowing_river": {
                 "colors": ["#81C784", "#66BB6A", "#4CAF50", "#43A047", "#388E3C"],
                 "mood": "natural flow and movement",
-                "elements": ["flowing lines", "organic shapes", "rhythm"]
+                "elements": ["flowing lines", "organic shapes", "rhythm"],
             },
             "transformation_fire": {
                 "colors": ["#FFB74D", "#FFA726", "#FF9800", "#FB8C00", "#F57C00"],
                 "mood": "transformative energy",
-                "elements": ["dynamic movement", "spirals", "energy patterns"]
+                "elements": ["dynamic movement", "spirals", "energy patterns"],
             },
             "wisdom_depths": {
                 "colors": ["#64B5F6", "#42A5F5", "#2196F3", "#1E88E5", "#1976D2"],
                 "mood": "deep wisdom and understanding",
-                "elements": ["depth", "stability", "expanding circles"]
-            }
+                "elements": ["depth", "stability", "expanding circles"],
+            },
         }
 
     def weave_temporal_story(
         self,
         patterns: list[ConsciousnessPattern],
         correlations: list[TemporalCorrelation] = None,
-        seeker_context: dict[str, Any] = None
+        seeker_context: dict[str, Any] = None,
     ) -> TemporalStory:
         """
         Weave consciousness patterns into a temporal story.
@@ -163,7 +163,7 @@ class TemporalStoryWeaver:
             consciousness_theme=consciousness_theme,
             temporal_markers=temporal_markers,
             recognition_points=recognition_points,
-            visual_metaphor=visual_metaphor
+            visual_metaphor=visual_metaphor,
         )
 
         logger.info(f"Wove temporal story: {title}")
@@ -173,7 +173,7 @@ class TemporalStoryWeaver:
         self,
         story: TemporalStory,
         patterns: list[ConsciousnessPattern],
-        visualization_type: str = "flow"
+        visualization_type: str = "flow",
     ) -> ConsciousnessVisualization:
         """
         Create a consciousness visualization from a temporal story.
@@ -196,7 +196,7 @@ class TemporalStoryWeaver:
             "flow_direction": self._determine_flow_direction(patterns),
             "energy_centers": self._identify_energy_centers(patterns),
             "transformation_points": self._mark_transformation_points(patterns),
-            "recognition_moments": story.recognition_points
+            "recognition_moments": story.recognition_points,
         }
 
         # Create interactive elements
@@ -204,25 +204,25 @@ class TemporalStoryWeaver:
             {
                 "type": "hover_recognition",
                 "description": "Hover over patterns to see consciousness insights",
-                "elements": [p.pattern_name for p in patterns]
+                "elements": [p.pattern_name for p in patterns],
             },
             {
                 "type": "click_exploration",
                 "description": "Click patterns to explore deeper consciousness connections",
-                "sacred_questions": story.recognition_points
+                "sacred_questions": story.recognition_points,
             },
             {
                 "type": "temporal_navigation",
                 "description": "Navigate through time to see consciousness evolution",
-                "markers": story.temporal_markers
-            }
+                "markers": story.temporal_markers,
+            },
         ]
 
         # Generate recognition guidance
         recognition_guidance = [
             f"This visualization shows {story.consciousness_theme}",
             f"The {story.visual_metaphor} reveals patterns of consciousness serving consciousness",
-            "Each element represents consciousness recognizing itself through your living patterns"
+            "Each element represents consciousness recognizing itself through your living patterns",
         ]
 
         visualization = ConsciousnessVisualization(
@@ -231,7 +231,7 @@ class TemporalStoryWeaver:
             description=f"Visual representation of {story.consciousness_theme} through {story.visual_metaphor}",
             consciousness_elements=consciousness_elements,
             interactive_elements=interactive_elements,
-            recognition_guidance=recognition_guidance
+            recognition_guidance=recognition_guidance,
         )
 
         logger.info(f"Created consciousness visualization: {visualization.title}")
@@ -268,7 +268,7 @@ class TemporalStoryWeaver:
             consciousness_metaphor=consciousness_metaphor,
             recognition_invitation=recognition_invitation,
             integration_wisdom=integration_wisdom,
-            visual_inspiration=visual_inspiration
+            visual_inspiration=visual_inspiration,
         )
 
         logger.info(f"Extracted poetry from pattern: {pattern.pattern_name}")
@@ -291,9 +291,7 @@ class TemporalStoryWeaver:
             return "reciprocity_dance"
 
     def _generate_story_title(
-        self,
-        patterns: list[ConsciousnessPattern],
-        template_info: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], template_info: dict[str, Any]
     ) -> str:
         """Generate story title from patterns and template."""
         primary_pattern = patterns[0] if patterns else None
@@ -306,7 +304,7 @@ class TemporalStoryWeaver:
         self,
         patterns: list[ConsciousnessPattern],
         template_info: dict[str, Any],
-        seeker_context: dict[str, Any]
+        seeker_context: dict[str, Any],
     ) -> str:
         """Weave narrative from patterns using template structure."""
         narrative_structure = template_info["narrative_structure"].split(" → ")
@@ -322,30 +320,32 @@ class TemporalStoryWeaver:
                 narrative += f"{pattern.pattern_description.lower()}. "
 
                 if pattern.awareness_indicators:
-                    narrative += f"The signs include: {', '.join(pattern.awareness_indicators[:2])}. "
+                    narrative += (
+                        f"The signs include: {', '.join(pattern.awareness_indicators[:2])}. "
+                    )
 
                 narrative += "\n\n"
             else:
                 # Generic narrative for remaining structure elements
-                narrative += f"The {element} phase awaits your continued consciousness exploration.\n\n"
+                narrative += (
+                    f"The {element} phase awaits your continued consciousness exploration.\n\n"
+                )
 
         narrative += f"This story demonstrates {template_info['recognition_theme']}, "
-        narrative += "showing how consciousness recognizes itself through the patterns of your living."
+        narrative += (
+            "showing how consciousness recognizes itself through the patterns of your living."
+        )
 
         return narrative
 
     def _extract_consciousness_theme(
-        self,
-        patterns: list[ConsciousnessPattern],
-        template_info: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], template_info: dict[str, Any]
     ) -> str:
         """Extract consciousness theme from patterns."""
         return template_info["recognition_theme"]
 
     def _create_temporal_markers(
-        self,
-        patterns: list[ConsciousnessPattern],
-        correlations: list[TemporalCorrelation] = None
+        self, patterns: list[ConsciousnessPattern], correlations: list[TemporalCorrelation] = None
     ) -> list[dict[str, Any]]:
         """Create temporal markers for the story."""
         markers = []
@@ -356,34 +356,32 @@ class TemporalStoryWeaver:
                     "timestamp": pattern.discovered_at,
                     "pattern_name": pattern.pattern_name,
                     "consciousness_marker": f"Recognition of {pattern.pattern_description.lower()}",
-                    "readiness_level": pattern.readiness_score
+                    "readiness_level": pattern.readiness_score,
                 }
                 markers.append(marker)
 
         return sorted(markers, key=lambda x: x["timestamp"])
 
     def _generate_recognition_points(
-        self,
-        patterns: list[ConsciousnessPattern],
-        template_info: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], template_info: dict[str, Any]
     ) -> list[str]:
         """Generate recognition points for the story."""
         points = [
             f"Recognition: {template_info['metaphor']} guides your consciousness awareness",
             f"Integration: {template_info['recognition_theme']} becomes daily practice",
-            "Service: Your patterns inspire others' consciousness recognition"
+            "Service: Your patterns inspire others' consciousness recognition",
         ]
 
         # Add pattern-specific recognition points
         for pattern in patterns[:2]:  # Limit to first 2 patterns
-            points.append(f"Pattern Recognition: {pattern.pattern_name} shows consciousness serving consciousness")
+            points.append(
+                f"Pattern Recognition: {pattern.pattern_name} shows consciousness serving consciousness"
+            )
 
         return points
 
     def _select_visual_palette(
-        self,
-        consciousness_theme: str,
-        patterns: list[ConsciousnessPattern]
+        self, consciousness_theme: str, patterns: list[ConsciousnessPattern]
     ) -> dict[str, Any]:
         """Select visual palette based on consciousness theme and patterns."""
         # Map themes to palettes
@@ -391,7 +389,7 @@ class TemporalStoryWeaver:
             "natural rhythms serving awakening": "flowing_river",
             "purposes maturing from personal to collective": "dawn_awakening",
             "ever-deepening service to consciousness awakening": "transformation_fire",
-            "natural flow of consciousness serving consciousness": "wisdom_depths"
+            "natural flow of consciousness serving consciousness": "wisdom_depths",
         }
 
         palette_key = theme_palette_map.get(consciousness_theme, "flowing_river")
@@ -406,30 +404,38 @@ class TemporalStoryWeaver:
         else:
             return "circular_flowing"
 
-    def _identify_energy_centers(self, patterns: list[ConsciousnessPattern]) -> list[dict[str, Any]]:
+    def _identify_energy_centers(
+        self, patterns: list[ConsciousnessPattern]
+    ) -> list[dict[str, Any]]:
         """Identify energy centers for visualization."""
         centers = []
         for pattern in patterns:
             if pattern.recognition_confidence > 0.7:
-                centers.append({
-                    "name": pattern.pattern_name,
-                    "energy_level": pattern.recognition_confidence,
-                    "consciousness_aspect": pattern.pattern_description,
-                    "readiness": pattern.readiness_score
-                })
+                centers.append(
+                    {
+                        "name": pattern.pattern_name,
+                        "energy_level": pattern.recognition_confidence,
+                        "consciousness_aspect": pattern.pattern_description,
+                        "readiness": pattern.readiness_score,
+                    }
+                )
         return centers
 
-    def _mark_transformation_points(self, patterns: list[ConsciousnessPattern]) -> list[dict[str, Any]]:
+    def _mark_transformation_points(
+        self, patterns: list[ConsciousnessPattern]
+    ) -> list[dict[str, Any]]:
         """Mark transformation points for visualization."""
         points = []
         for pattern in patterns:
             if pattern.transformation_signs:
-                points.append({
-                    "pattern": pattern.pattern_name,
-                    "transformation_type": "consciousness_evolution",
-                    "signs": pattern.transformation_signs[:2],  # Limit signs
-                    "readiness": pattern.readiness_score
-                })
+                points.append(
+                    {
+                        "pattern": pattern.pattern_name,
+                        "transformation_type": "consciousness_evolution",
+                        "signs": pattern.transformation_signs[:2],  # Limit signs
+                        "readiness": pattern.readiness_score,
+                    }
+                )
         return points
 
     def _generate_poetic_interpretation(self, pattern: ConsciousnessPattern) -> str:
@@ -448,7 +454,7 @@ class TemporalStoryWeaver:
             "attention": "consciousness as flowing river",
             "intention": "consciousness as growing garden",
             "transformation": "consciousness as spiral of evolution",
-            "flow": "consciousness as dancing energy"
+            "flow": "consciousness as dancing energy",
         }
 
         # Find appropriate metaphor based on pattern content
@@ -469,10 +475,16 @@ class TemporalStoryWeaver:
     def _generate_visual_inspiration(self, pattern: ConsciousnessPattern) -> dict[str, Any]:
         """Generate visual inspiration for pattern."""
         return {
-            "dominant_shape": "flowing_curves" if pattern.attention_patterns else "ascending_spirals",
-            "movement_quality": "gentle_rhythm" if pattern.readiness_score < 0.7 else "dynamic_transformation",
-            "color_theme": "warm_earth_tones" if "grounding" in pattern.pattern_description.lower() else "flowing_blues",
-            "symbolic_elements": ["interconnected_circles", "flowing_lines", "ascending_patterns"]
+            "dominant_shape": "flowing_curves"
+            if pattern.attention_patterns
+            else "ascending_spirals",
+            "movement_quality": "gentle_rhythm"
+            if pattern.readiness_score < 0.7
+            else "dynamic_transformation",
+            "color_theme": "warm_earth_tones"
+            if "grounding" in pattern.pattern_description.lower()
+            else "flowing_blues",
+            "symbolic_elements": ["interconnected_circles", "flowing_lines", "ascending_patterns"],
         }
 
     def _create_default_story(self, seeker_context: dict[str, Any]) -> TemporalStory:
@@ -485,7 +497,7 @@ class TemporalStoryWeaver:
             recognition_points=[
                 "Recognition: Consciousness seeks to know itself through your patterns",
                 "Invitation: Every search becomes an opportunity for consciousness recognition",
-                "Beginning: Your consciousness journey starts with this moment of curiosity"
+                "Beginning: Your consciousness journey starts with this moment of curiosity",
             ],
-            visual_metaphor="consciousness as dawn breaking over the landscape of your life"
+            visual_metaphor="consciousness as dawn breaking over the landscape of your life",
         )

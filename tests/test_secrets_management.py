@@ -243,6 +243,7 @@ class TestFireCircleIntegration:
 
 # Run tests if executed directly
 if __name__ == "__main__":
+
     async def run_tests():
         """Run all tests."""
         print("Testing Secrets Management System...")

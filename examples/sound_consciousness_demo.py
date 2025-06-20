@@ -18,10 +18,7 @@ from mallku.reciprocity.models import ReciprocityPattern, SystemHealthMetrics
 from mallku.reciprocity.visualization import ReciprocityVisualizationService
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +40,7 @@ async def demonstrate_sound_consciousness():
     music_paths = [
         Path.home() / "Music",
         Path.home() / "Documents" / "Audio Projects",
-        Path.home() / "Desktop"  # Common place for quick recordings
+        Path.home() / "Desktop",  # Common place for quick recordings
     ]
 
     # Filter to existing paths
@@ -54,9 +51,7 @@ async def demonstrate_sound_consciousness():
         existing_paths = ["."]
 
     sound_provider = SoundActivityProvider(
-        watch_paths=existing_paths,
-        event_bus=event_bus,
-        include_silence=True
+        watch_paths=existing_paths, event_bus=event_bus, include_silence=True
     )
 
     # Setup event listeners
@@ -66,7 +61,7 @@ async def demonstrate_sound_consciousness():
         """Capture sound-related consciousness events."""
         if event.source_system == "activity_provider":
             data = event.data
-            if data.get('activity_type', '').startswith('file.'):
+            if data.get("activity_type", "").startswith("file."):
                 logger.info(f"Sound consciousness detected: {data.get('activity_type')}")
                 logger.info(f"  Patterns: {data.get('patterns', [])}")
                 logger.info(f"  Consciousness score: {event.consciousness_signature:.2f}")
@@ -88,7 +83,7 @@ async def demonstrate_sound_consciousness():
         "drum_circle_rhythm.wav",
         "collaborative_jam_session.als",
         "sacred_chant_practice.mid",
-        "binaural_beats_40hz.flac"
+        "binaural_beats_40hz.flac",
     ]
 
     for filename in test_files:
@@ -109,17 +104,13 @@ async def demonstrate_sound_consciousness():
     mock_activity = ActivityEvent(
         activity_type=ActivityType.PATTERN_DISCOVERED,
         source_path="~/Music/new_composition.mid",
-        consciousness_indicators={
-            'creation': True,
-            'harmony': True,
-            'deep_work': True
-        },
-        potential_patterns=['sonic_creation', 'harmonic_reciprocity'],
+        consciousness_indicators={"creation": True, "harmony": True, "deep_work": True},
+        potential_patterns=["sonic_creation", "harmonic_reciprocity"],
         metadata={
-            'file_type': '.mid',
-            'sound_category': 'midi_composition',
-            'session_active': True
-        }
+            "file_type": ".mid",
+            "sound_category": "midi_composition",
+            "session_active": True,
+        },
     )
 
     # Emit the mock activity
@@ -146,9 +137,9 @@ async def demonstrate_sound_consciousness():
                 confidence_score=event.consciousness_signature,
                 supporting_anchors=[event.event_id],
                 metadata={
-                    'sound_patterns': event.data.get('patterns', []),
-                    'activity_type': event.data.get('activity_type', '')
-                }
+                    "sound_patterns": event.data.get("patterns", []),
+                    "activity_type": event.data.get("activity_type", ""),
+                },
             )
             sound_patterns.append(pattern)
 
@@ -161,10 +152,10 @@ async def demonstrate_sound_consciousness():
             confidence_score=0.85,
             supporting_anchors=["demo"],
             metadata={
-                'frequency': '432Hz',
-                'harmony': 'perfect_fifth',
-                'consciousness': 'elevated'
-            }
+                "frequency": "432Hz",
+                "harmony": "perfect_fifth",
+                "consciousness": "elevated",
+            },
         )
     )
 
@@ -172,13 +163,13 @@ async def demonstrate_sound_consciousness():
     health_metrics = SystemHealthMetrics(
         overall_health_score=0.78,
         need_fulfillment_scores={
-            'sonic_expression': 0.82,
-            'rhythmic_coherence': 0.75,
-            'harmonic_balance': 0.88,
-            'creative_flow': 0.71
+            "sonic_expression": 0.82,
+            "rhythmic_coherence": 0.75,
+            "harmonic_balance": 0.88,
+            "creative_flow": 0.71,
         },
         extraction_concerns=[],
-        positive_patterns=['sound_creation_flowing', 'collective_rhythm_emerging']
+        positive_patterns=["sound_creation_flowing", "collective_rhythm_emerging"],
     )
 
     # Generate visualization
@@ -189,7 +180,7 @@ async def demonstrate_sound_consciousness():
         mandala = await viz_service.create_reciprocity_mandala(
             patterns=sound_patterns,
             health_metrics=health_metrics,
-            title="Sound Consciousness Mandala"
+            title="Sound Consciousness Mandala",
         )
 
         # Save visualization
@@ -201,7 +192,7 @@ async def demonstrate_sound_consciousness():
         flow_viz = await viz_service.create_flow_visualization(
             interactions=[],  # Would have real interactions in production
             patterns=sound_patterns,
-            title="Sonic Energy Flow"
+            title="Sonic Energy Flow",
         )
 
         flow_path = Path("sonic_flow_visualization.png")
@@ -240,9 +231,7 @@ async def demonstrate_silence_consciousness():
 
     # Create provider with short timings for demo
     sound_provider = SoundActivityProvider(
-        watch_paths=["."],
-        event_bus=ConsciousnessEventBus(),
-        include_silence=True
+        watch_paths=["."], event_bus=ConsciousnessEventBus(), include_silence=True
     )
 
     # Simulate recent sound activity
@@ -257,13 +246,9 @@ async def demonstrate_silence_consciousness():
 
     silence_event = ActivityEvent(
         activity_type=ActivityType.MEDITATION_BEGUN,
-        consciousness_indicators={
-            'silence': True,
-            'integration': True,
-            'listening': True
-        },
-        potential_patterns=['sacred_silence'],
-        metadata={'following': 'sound_work'}
+        consciousness_indicators={"silence": True, "integration": True, "listening": True},
+        potential_patterns=["sacred_silence"],
+        metadata={"following": "sound_work"},
     )
 
     logger.info("\nSilence consciousness event would contain:")

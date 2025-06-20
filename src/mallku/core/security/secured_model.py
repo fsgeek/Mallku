@@ -23,7 +23,7 @@ def SecuredField(
     index_strategy: FieldIndexStrategy = FieldIndexStrategy.NONE,
     search_capabilities: list | None = None,
     security_notes: str | None = None,
-    **kwargs
+    **kwargs,
 ) -> Any:
     """
     Enhanced Pydantic Field with security configuration.
@@ -41,14 +41,14 @@ def SecuredField(
         obfuscation_level=obfuscation_level,
         index_strategy=index_strategy,
         search_capabilities=search_capabilities or [],
-        security_notes=security_notes
+        security_notes=security_notes,
     )
 
     # Store security config in field's json_schema_extra
-    if 'json_schema_extra' not in kwargs:
-        kwargs['json_schema_extra'] = {}
+    if "json_schema_extra" not in kwargs:
+        kwargs["json_schema_extra"] = {}
 
-    kwargs['json_schema_extra']['security_config'] = json.loads(security_config.model_dump_json())
+    kwargs["json_schema_extra"]["security_config"] = json.loads(security_config.model_dump_json())
 
     # Create field with metadata
     return PydanticField(default, **kwargs)
@@ -104,15 +104,15 @@ class SecuredModel(BaseModel):
 
         for field_name, field_value in data.items():
             # Skip private fields
-            if field_name.startswith('_'):
+            if field_name.startswith("_"):
                 continue
 
             # Get field info and security config
             field_info = self.__fields__.get(field_name)
             security_config = None
 
-            if field_info and hasattr(field_info, 'json_schema_extra'):
-                config_dict = field_info.json_schema_extra.get('security_config')
+            if field_info and hasattr(field_info, "json_schema_extra"):
+                config_dict = field_info.json_schema_extra.get("security_config")
                 if config_dict:
                     security_config = FieldSecurityConfig(**config_dict)
 
@@ -121,10 +121,7 @@ class SecuredModel(BaseModel):
                 security_config = FieldSecurityConfig()
 
             # Get or create UUID mapping
-            field_uuid = self._registry.get_or_create_mapping(
-                field_name,
-                security_config
-            )
+            field_uuid = self._registry.get_or_create_mapping(field_name, security_config)
 
             # Apply obfuscation based on level
             if security_config.obfuscation_level == FieldObfuscationLevel.NONE:
@@ -136,7 +133,7 @@ class SecuredModel(BaseModel):
                     # Development mode: include both UUID and semantic name
                     obfuscated_data[field_uuid] = {
                         "_semantic_name": field_name,
-                        "value": field_value
+                        "value": field_value,
                     }
                 else:
                     # Production mode: UUID only
@@ -197,8 +194,10 @@ class SecuredModel(BaseModel):
         warnings = {}
 
         for field_name, field_info in self.__class__.model_fields.items():
-            if hasattr(field_info, 'json_schema_extra') and isinstance(field_info.json_schema_extra, dict):
-                config_dict: Any = field_info.json_schema_extra.get('security_config')
+            if hasattr(field_info, "json_schema_extra") and isinstance(
+                field_info.json_schema_extra, dict
+            ):
+                config_dict: Any = field_info.json_schema_extra.get("security_config")
                 if config_dict:
                     security_config = FieldSecurityConfig(**config_dict)
                     field_warnings = security_config.validate_configuration()

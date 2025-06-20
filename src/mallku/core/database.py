@@ -57,8 +57,8 @@ class MallkuDBConfig:
         self.config = configparser.ConfigParser()
         try:
             # Handle potential BOM in config file
-            self.config.read(self.config_file, encoding='utf-8-sig')
-            if 'database' not in self.config:
+            self.config.read(self.config_file, encoding="utf-8-sig")
+            if "database" not in self.config:
                 logging.warning("No database section in config. Using defaults.")
                 self._create_default_config()
         except Exception as e:
@@ -68,20 +68,20 @@ class MallkuDBConfig:
     def _create_default_config(self) -> None:
         """Create default configuration for test database."""
         self.config = configparser.ConfigParser()
-        self.config['database'] = {
-            'host': 'localhost',
-            'port': '8529',
-            'database': 'Mallku',
-            'user_name': 'mallku_user',
-            'user_password': 'test_password',
-            'admin_user': 'root',
-            'admin_passwd': 'test_admin',
-            'ssl': 'false'
+        self.config["database"] = {
+            "host": "localhost",
+            "port": "8529",
+            "database": "Mallku",
+            "user_name": "mallku_user",
+            "user_password": "test_password",
+            "admin_user": "root",
+            "admin_passwd": "test_admin",
+            "ssl": "false",
         }
 
         # Save the default config
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
-        with open(self.config_file, 'w') as f:
+        with open(self.config_file, "w") as f:
             self.config.write(f)
 
         logging.info(f"Created default config at {self.config_file}")
@@ -103,12 +103,12 @@ class MallkuDBConfig:
             logging.error("No configuration available")
             return False
 
-        db_config = self.config['database']
+        db_config = self.config["database"]
 
         # Build connection URL
-        protocol = 'https' if db_config.get('ssl', 'false').lower() == 'true' else 'http'
-        host = db_config['host']
-        port = db_config['port']
+        protocol = "https" if db_config.get("ssl", "false").lower() == "true" else "http"
+        host = db_config["host"]
+        port = db_config["port"]
         url = f"{protocol}://{host}:{port}"
 
         # Wait for database to be ready
@@ -134,15 +134,12 @@ class MallkuDBConfig:
             self.client = ArangoClient(hosts=url)
 
             # Connect to database
-            database_name = db_config['database']
-            username = db_config['user_name']
-            password = db_config['user_password']
+            database_name = db_config["database"]
+            username = db_config["user_name"]
+            password = db_config["user_password"]
 
             self._database = self.client.db(
-                database_name,
-                username=username,
-                password=password,
-                verify=True
+                database_name, username=username, password=password, verify=True
             )
 
             # Test the connection
@@ -198,10 +195,10 @@ class MallkuDBConfig:
     def ensure_collections(self) -> None:
         """Ensure all required Mallku collections exist."""
         required_collections = [
-            'memory_anchors',
-            'reciprocity_records',
-            'activity_streams',
-            'context_relationships'
+            "memory_anchors",
+            "reciprocity_records",
+            "activity_streams",
+            "context_relationships",
         ]
 
         for collection_name in required_collections:

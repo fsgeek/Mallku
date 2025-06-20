@@ -58,7 +58,7 @@ class ReciprocityCollector(BaseCollector):
             record["collection_metadata"] = {
                 "collector_id": self.collection_id,
                 "collected_at": datetime.now(UTC).isoformat(),
-                "collector_version": "0.1.0"
+                "collector_version": "0.1.0",
             }
 
         return collected_data
@@ -99,8 +99,8 @@ class ReciprocityCollector(BaseCollector):
                 # Just metadata about the interaction
                 "prompt_complexity": 0.7,  # From complexity analyzer
                 "response_categories": ["technical", "explanatory"],
-                "interaction_type": "query"
-            }
+                "interaction_type": "query",
+            },
         }
 
         # In production, fetch real interactions
@@ -131,11 +131,8 @@ class ReciprocityCollector(BaseCollector):
                 "success_rate": 0.96,
                 "average_response_time": 1500,
                 "errors": ["timeout", "rate_limit"],
-                "system_health": {
-                    "prompt_quality": 0.85,
-                    "template_effectiveness": 0.92
-                }
-            }
+                "system_health": {"prompt_quality": 0.85, "template_effectiveness": 0.92},
+            },
         }  # noqa: F841 -- this is an example
 
         # In production, fetch from prompt management system
@@ -171,11 +168,8 @@ class ReciprocityCollector(BaseCollector):
                 "includes_feedback": True,
                 "feedback_type": "positive",
                 "interaction_pattern": "iterative_refinement",
-                "estimated_value": {
-                    "human_effort": 0.6,
-                    "ai_computation": 0.8
-                }
-            }
+                "estimated_value": {"human_effort": 0.6, "ai_computation": 0.8},
+            },
         }
 
         # In production, fetch from UI layer
@@ -239,5 +233,5 @@ class ReciprocityCollector(BaseCollector):
             "buffer_size": len(self.interaction_buffer),
             "total_collected": 0,  # Would track this in production
             "last_collection": datetime.now(UTC).isoformat(),
-            "status": "active"
+            "status": "active",
         }

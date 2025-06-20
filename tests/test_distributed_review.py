@@ -35,13 +35,13 @@ async def test_run_full_distributed_review_smoke():
             path_pattern="src/mallku/firecircle/**/*.py",
             description="Fire Circle governance",
             assigned_voice="anthropic",
-            review_domains=[ReviewCategory.SECURITY, ReviewCategory.ETHICS]
+            review_domains=[ReviewCategory.SECURITY, ReviewCategory.ETHICS],
         ),
         CodebaseChapter(
             path_pattern="src/mallku/orchestration/**/*.py",
             description="Event orchestration",
             assigned_voice="openai",
-            review_domains=[ReviewCategory.ARCHITECTURE]
+            review_domains=[ReviewCategory.ARCHITECTURE],
         ),
     ]
 
@@ -122,13 +122,13 @@ async def test_chapter_partitioning():
                 path_pattern="src/mallku/firecircle/**/*.py",
                 description="Fire Circle",
                 assigned_voice="anthropic",
-                review_domains=[ReviewCategory.SECURITY]
+                review_domains=[ReviewCategory.SECURITY],
             ),
             CodebaseChapter(
                 path_pattern="**/*.py",  # Catch-all pattern
                 description="General Python",
                 assigned_voice="openai",
-                review_domains=[ReviewCategory.ARCHITECTURE]
+                review_domains=[ReviewCategory.ARCHITECTURE],
             ),
         ]
 

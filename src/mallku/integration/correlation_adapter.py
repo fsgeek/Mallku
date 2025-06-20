@@ -29,7 +29,7 @@ class CorrelationToAnchorAdapter:
         self,
         memory_service: MemoryAnchorService,
         confidence_threshold: float = 0.7,
-        batch_size: int = 10
+        batch_size: int = 10,
     ):
         """
         Initialize the correlation adapter.
@@ -45,12 +45,12 @@ class CorrelationToAnchorAdapter:
 
         # Statistics
         self.stats = {
-            'correlations_processed': 0,
-            'anchors_created': 0,
-            'anchors_rejected_confidence': 0,
-            'anchors_rejected_error': 0,
-            'processing_times': [],
-            'last_batch_time': None
+            "correlations_processed": 0,
+            "anchors_created": 0,
+            "anchors_rejected_confidence": 0,
+            "anchors_rejected_error": 0,
+            "processing_times": [],
+            "last_batch_time": None,
         }
 
         # Batch processing
@@ -69,11 +69,11 @@ class CorrelationToAnchorAdapter:
         start_time = datetime.now(UTC)
 
         try:
-            self.stats['correlations_processed'] += 1
+            self.stats["correlations_processed"] += 1
 
             # Check confidence threshold
             if correlation.confidence_score < self.confidence_threshold:
-                self.stats['anchors_rejected_confidence'] += 1
+                self.stats["anchors_rejected_confidence"] += 1
                 logger.debug(
                     f"Correlation {correlation.correlation_id} rejected: "
                     f"confidence {correlation.confidence_score:.3f} < {self.confidence_threshold}"
@@ -84,7 +84,7 @@ class CorrelationToAnchorAdapter:
             anchor = await self._create_memory_anchor(correlation)
 
             if anchor:
-                self.stats['anchors_created'] += 1
+                self.stats["anchors_created"] += 1
                 logger.info(
                     f"Created memory anchor {anchor.anchor_id} from correlation "
                     f"with confidence {correlation.confidence_score:.3f}"
@@ -93,19 +93,21 @@ class CorrelationToAnchorAdapter:
             return anchor
 
         except Exception as e:
-            self.stats['anchors_rejected_error'] += 1
+            self.stats["anchors_rejected_error"] += 1
             logger.error(f"Error processing correlation {correlation.correlation_id}: {e}")
             return None
 
         finally:
             processing_time = (datetime.now(UTC) - start_time).total_seconds() * 1000
-            self.stats['processing_times'].append(processing_time)
+            self.stats["processing_times"].append(processing_time)
 
             # Keep only recent processing times for performance metrics
-            if len(self.stats['processing_times']) > 1000:
-                self.stats['processing_times'] = self.stats['processing_times'][-500:]
+            if len(self.stats["processing_times"]) > 1000:
+                self.stats["processing_times"] = self.stats["processing_times"][-500:]
 
-    async def process_correlation_batch(self, correlations: list[TemporalCorrelation]) -> list[MemoryAnchor]:
+    async def process_correlation_batch(
+        self, correlations: list[TemporalCorrelation]
+    ) -> list[MemoryAnchor]:
         """
         Process a batch of correlations for improved efficiency.
 
@@ -126,7 +128,7 @@ class CorrelationToAnchorAdapter:
                 created_anchors.append(anchor)
 
         batch_time = (datetime.now(UTC) - batch_start).total_seconds()
-        self.stats['last_batch_time'] = batch_time
+        self.stats["last_batch_time"] = batch_time
 
         logger.info(
             f"Batch processing complete: {len(created_anchors)} anchors created "
@@ -153,19 +155,19 @@ class CorrelationToAnchorAdapter:
             timestamps = [event.timestamp for event in all_events]
 
             temporal_window = {
-                'start_time': min(timestamps).isoformat(),
-                'end_time': max(timestamps).isoformat(),
-                'precision': correlation.temporal_precision.value,
-                'gap': correlation.temporal_gap.total_seconds()
+                "start_time": min(timestamps).isoformat(),
+                "end_time": max(timestamps).isoformat(),
+                "precision": correlation.temporal_precision.value,
+                "gap": correlation.temporal_gap.total_seconds(),
             }
 
             # Build correlation metadata
             correlation_metadata = {
-                'pattern_type': correlation.pattern_type,
-                'confidence_score': correlation.confidence_score,
-                'occurrence_frequency': correlation.occurrence_frequency,
-                'pattern_stability': correlation.pattern_stability,
-                'confidence_factors': correlation.confidence_factors
+                "pattern_type": correlation.pattern_type,
+                "confidence_score": correlation.confidence_score,
+                "occurrence_frequency": correlation.occurrence_frequency,
+                "pattern_stability": correlation.pattern_stability,
+                "confidence_factors": correlation.confidence_factors,
             }
 
             # Create memory anchor with correct field names
@@ -174,20 +176,20 @@ class CorrelationToAnchorAdapter:
                 timestamp=datetime.now(UTC),  # MemoryAnchor expects 'timestamp'
                 cursors=cursors,  # Dict format, not list
                 metadata={
-                    'correlation_id': str(correlation.correlation_id),
-                    'correlation_metadata': correlation_metadata,
-                    'temporal_window': temporal_window,
-                    'primary_event': {
-                        'event_id': str(primary_event.event_id),
-                        'timestamp': primary_event.timestamp.isoformat(),
-                        'event_type': primary_event.event_type.value,
-                        'stream_id': primary_event.stream_id,
-                        'correlation_tags': primary_event.correlation_tags
+                    "correlation_id": str(correlation.correlation_id),
+                    "correlation_metadata": correlation_metadata,
+                    "temporal_window": temporal_window,
+                    "primary_event": {
+                        "event_id": str(primary_event.event_id),
+                        "timestamp": primary_event.timestamp.isoformat(),
+                        "event_type": primary_event.event_type.value,
+                        "stream_id": primary_event.stream_id,
+                        "correlation_tags": primary_event.correlation_tags,
                     },
-                    'created_by': 'correlation_adapter',
-                    'creation_method': 'temporal_correlation',
-                    'confidence_score': correlation.confidence_score
-                }
+                    "created_by": "correlation_adapter",
+                    "creation_method": "temporal_correlation",
+                    "confidence_score": correlation.confidence_score,
+                },
             )
 
             # Store anchor using memory service
@@ -199,17 +201,19 @@ class CorrelationToAnchorAdapter:
             logger.error(f"Failed to create memory anchor from correlation: {e}")
             return None
 
-    def _build_cursors_from_correlation(self, correlation: TemporalCorrelation) -> list[dict[str, Any]]:
+    def _build_cursors_from_correlation(
+        self, correlation: TemporalCorrelation
+    ) -> list[dict[str, Any]]:
         """Build cursors from correlation events."""
         cursors = []
 
         # Add cursor for primary event
-        primary_cursor = self._create_cursor_from_event(correlation.primary_event, 'primary')
+        primary_cursor = self._create_cursor_from_event(correlation.primary_event, "primary")
         cursors.append(primary_cursor)
 
         # Add cursors for correlated events
         for i, event in enumerate(correlation.correlated_events):
-            cursor = self._create_cursor_from_event(event, f'correlated_{i}')
+            cursor = self._create_cursor_from_event(event, f"correlated_{i}")
             cursors.append(cursor)
 
         return cursors
@@ -218,43 +222,43 @@ class CorrelationToAnchorAdapter:
         """Create a cursor from an event."""
 
         cursor = {
-            'role': role,
-            'event_id': str(event.event_id),
-            'timestamp': event.timestamp.isoformat(),
-            'event_type': event.event_type.value,
-            'stream_id': event.stream_id,
-            'content_summary': self._summarize_event_content(event),
-            'correlation_tags': event.correlation_tags
+            "role": role,
+            "event_id": str(event.event_id),
+            "timestamp": event.timestamp.isoformat(),
+            "event_type": event.event_type.value,
+            "stream_id": event.stream_id,
+            "content_summary": self._summarize_event_content(event),
+            "correlation_tags": event.correlation_tags,
         }
 
         # Add content-specific cursor information
-        if hasattr(event, 'content') and event.content:
-            if 'file_path' in event.content:
-                cursor['file_path'] = event.content['file_path']
-                cursor['cursor_type'] = 'file_reference'
-            elif 'operation' in event.content:
-                cursor['operation'] = event.content['operation']
-                cursor['cursor_type'] = 'activity_reference'
+        if hasattr(event, "content") and event.content:
+            if "file_path" in event.content:
+                cursor["file_path"] = event.content["file_path"]
+                cursor["cursor_type"] = "file_reference"
+            elif "operation" in event.content:
+                cursor["operation"] = event.content["operation"]
+                cursor["cursor_type"] = "activity_reference"
             else:
-                cursor['cursor_type'] = 'event_reference'
+                cursor["cursor_type"] = "event_reference"
 
         return cursor
 
     def _summarize_event_content(self, event: Any) -> str:
         """Create a brief summary of event content for the cursor."""
 
-        if not hasattr(event, 'content') or not event.content:
+        if not hasattr(event, "content") or not event.content:
             return f"{event.event_type.value} event"
 
         content = event.content
 
         # File-related events
-        if 'file_name' in content:
-            operation = content.get('operation', 'unknown')
+        if "file_name" in content:
+            operation = content.get("operation", "unknown")
             return f"{operation} {content['file_name']}"
 
         # Activity events
-        if 'operation' in content:
+        if "operation" in content:
             return f"{content['operation']} operation"
 
         # Generic event
@@ -265,35 +269,39 @@ class CorrelationToAnchorAdapter:
         stats = self.stats.copy()
 
         # Calculate derived metrics
-        if stats['processing_times']:
-            stats['avg_processing_time_ms'] = sum(stats['processing_times']) / len(stats['processing_times'])
-            stats['max_processing_time_ms'] = max(stats['processing_times'])
-            stats['min_processing_time_ms'] = min(stats['processing_times'])
+        if stats["processing_times"]:
+            stats["avg_processing_time_ms"] = sum(stats["processing_times"]) / len(
+                stats["processing_times"]
+            )
+            stats["max_processing_time_ms"] = max(stats["processing_times"])
+            stats["min_processing_time_ms"] = min(stats["processing_times"])
         else:
-            stats['avg_processing_time_ms'] = 0
-            stats['max_processing_time_ms'] = 0
-            stats['min_processing_time_ms'] = 0
+            stats["avg_processing_time_ms"] = 0
+            stats["max_processing_time_ms"] = 0
+            stats["min_processing_time_ms"] = 0
 
         # Calculate success rate
-        total_processed = stats['correlations_processed']
+        total_processed = stats["correlations_processed"]
         if total_processed > 0:
-            stats['anchor_creation_rate'] = stats['anchors_created'] / total_processed
-            stats['confidence_rejection_rate'] = stats['anchors_rejected_confidence'] / total_processed
-            stats['error_rate'] = stats['anchors_rejected_error'] / total_processed
+            stats["anchor_creation_rate"] = stats["anchors_created"] / total_processed
+            stats["confidence_rejection_rate"] = (
+                stats["anchors_rejected_confidence"] / total_processed
+            )
+            stats["error_rate"] = stats["anchors_rejected_error"] / total_processed
         else:
-            stats['anchor_creation_rate'] = 0
-            stats['confidence_rejection_rate'] = 0
-            stats['error_rate'] = 0
+            stats["anchor_creation_rate"] = 0
+            stats["confidence_rejection_rate"] = 0
+            stats["error_rate"] = 0
 
         return stats
 
     def reset_statistics(self) -> None:
         """Reset adapter statistics."""
         self.stats = {
-            'correlations_processed': 0,
-            'anchors_created': 0,
-            'anchors_rejected_confidence': 0,
-            'anchors_rejected_error': 0,
-            'processing_times': [],
-            'last_batch_time': None
+            "correlations_processed": 0,
+            "anchors_created": 0,
+            "anchors_rejected_confidence": 0,
+            "anchors_rejected_error": 0,
+            "processing_times": [],
+            "last_batch_time": None,
         }

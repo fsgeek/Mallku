@@ -21,16 +21,14 @@ from src.mallku.core.security.secured_model import SecuredField, SecuredModel
 
 class TestSecuredModel(SecuredModel):
     """Test model for security validation."""
-    test_id: str = SecuredField(
-        obfuscation_level=FieldObfuscationLevel.UUID_ONLY
-    )
-    test_data: str = SecuredField(
-        obfuscation_level=FieldObfuscationLevel.ENCRYPTED
-    )
+
+    test_id: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
+    test_data: str = SecuredField(obfuscation_level=FieldObfuscationLevel.ENCRYPTED)
 
 
 class UnsecuredModel:
     """Non-secured model that should be rejected."""
+
     def __init__(self, data):
         self.data = data
 
@@ -75,7 +73,7 @@ class TestSecuredDatabaseInterface:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         model = TestSecuredModel(test_id="123", test_data="secret")
@@ -88,7 +86,7 @@ class TestSecuredDatabaseInterface:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         unsecured_model = UnsecuredModel("data")
@@ -103,7 +101,7 @@ class TestSecuredDatabaseInterface:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         # Create a different secured model type
@@ -118,12 +116,14 @@ class TestSecuredDatabaseInterface:
         assert "not allowed in test_collection" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_create_secured_collection_registers_policy(self, secured_interface, mock_database):
+    async def test_create_secured_collection_registers_policy(
+        self, secured_interface, mock_database
+    ):
         """Test that creating secured collection registers its policy."""
         policy = CollectionSecurityPolicy(
             collection_name="test_secured",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         mock_collection = MagicMock()
@@ -176,13 +176,14 @@ class TestSecuredCollectionWrapper:
         return CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
     @pytest.fixture
     def secured_wrapper(self, mock_collection, collection_policy):
         """Secured collection wrapper."""
         from src.mallku.core.security.registry import SecurityRegistry
+
         registry = SecurityRegistry()
         return SecuredCollectionWrapper(mock_collection, collection_policy, registry)
 
@@ -241,7 +242,7 @@ class TestSecurityEnforcement:
         policy = CollectionSecurityPolicy(
             collection_name="secure_test",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         # Create secured collection
@@ -268,9 +269,7 @@ class TestSecurityEnforcement:
         from src.mallku.core.security.registry import SecurityRegistry
 
         policy = CollectionSecurityPolicy(
-            collection_name="test",
-            allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            collection_name="test", allowed_model_types=[TestSecuredModel], requires_security=True
         )
 
         wrapper = SecuredCollectionWrapper(mock_database, policy, SecurityRegistry())

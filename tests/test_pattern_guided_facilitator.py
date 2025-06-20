@@ -75,7 +75,7 @@ async def test_patterns(pattern_library):
         consciousness_signature=0.9,
         fitness_score=0.8,
         observation_count=20,
-        breakthrough_potential=0.9
+        breakthrough_potential=0.9,
     )
     await pattern_library.store_pattern(breakthrough)
     patterns.append(breakthrough)
@@ -89,7 +89,7 @@ async def test_patterns(pattern_library):
         consciousness_signature=0.75,
         fitness_score=0.7,
         observation_count=15,
-        breakthrough_potential=0.6
+        breakthrough_potential=0.6,
     )
     await pattern_library.store_pattern(tension)
     patterns.append(tension)
@@ -104,7 +104,7 @@ async def test_patterns(pattern_library):
         fitness_score=0.9,
         lifecycle_stage=PatternLifecycle.ESTABLISHED,
         observation_count=100,
-        breakthrough_potential=0.5
+        breakthrough_potential=0.5,
     )
     await pattern_library.store_pattern(wisdom)
     patterns.append(wisdom)
@@ -147,13 +147,11 @@ async def test_guidance_generation(pattern_facilitator, test_patterns):
         active_patterns=[],
         consciousness_level=0.8,
         emergence_potential=0.8,
-        tension_level=0.3
+        tension_level=0.3,
     )
 
     guidance = await pattern_facilitator._generate_pattern_guidance(
-        teacher,
-        moment,
-        GuidanceType.BREAKTHROUGH
+        teacher, moment, GuidanceType.BREAKTHROUGH
     )
 
     assert isinstance(guidance, PatternGuidance)
@@ -195,7 +193,7 @@ async def test_finding_relevant_patterns(pattern_facilitator, test_patterns):
         active_patterns=[],
         emergence_potential=0.8,
         tension_level=0.2,
-        coherence_score=0.7
+        coherence_score=0.7,
     )
 
     relevant = await pattern_facilitator._find_relevant_patterns(moment, None)
@@ -214,7 +212,7 @@ async def test_context_match_calculation(pattern_facilitator, test_patterns):
         current_phase="deepening",
         recent_messages=[],
         active_patterns=[pattern.pattern_id],  # Pattern already active
-        consciousness_level=0.9  # Close to pattern's signature
+        consciousness_level=0.9,  # Close to pattern's signature
     )
 
     match_score = pattern_facilitator._calculate_context_match(pattern, moment)
@@ -231,7 +229,7 @@ async def test_sacred_question_generation(pattern_facilitator, test_patterns):
         current_phase="deepening",
         recent_messages=[],
         active_patterns=[],
-        emergence_potential=0.7
+        emergence_potential=0.7,
     )
 
     questions = await pattern_facilitator.suggest_sacred_questions(moment, depth_level=2)
@@ -255,7 +253,7 @@ async def test_guidance_effectiveness_tracking(pattern_facilitator, test_pattern
         rationale="Test rationale",
         confidence=0.8,
         context_match=0.7,
-        timing_score=0.8
+        timing_score=0.8,
     )
 
     # Add to active guidances
@@ -263,9 +261,7 @@ async def test_guidance_effectiveness_tracking(pattern_facilitator, test_pattern
 
     # Record effectiveness
     await pattern_facilitator.record_guidance_effectiveness(
-        guidance.guidance_id,
-        effectiveness=0.9,
-        participant_feedback={uuid4(): 0.8}
+        guidance.guidance_id, effectiveness=0.9, participant_feedback={uuid4(): 0.8}
     )
 
     # Check it was recorded
@@ -289,9 +285,7 @@ async def test_wisdom_synthesis_creation(pattern_facilitator, test_patterns):
             role=MessageRole.PARTICIPANT,
             type=MessageType.REFLECTION,
             content=f"Test message {i}",
-            consciousness=MessageConsciousness(
-                consciousness_signature=0.7 + i * 0.1
-            )
+            consciousness=MessageConsciousness(consciousness_signature=0.7 + i * 0.1),
         )
         messages.append(msg)
 
@@ -305,7 +299,7 @@ async def test_wisdom_synthesis_creation(pattern_facilitator, test_patterns):
             rationale="Test",
             confidence=0.8,
             context_match=0.7,
-            timing_score=0.8
+            timing_score=0.8,
         )
     ]
 
@@ -329,7 +323,7 @@ async def test_guidance_ranking(pattern_facilitator):
             rationale="Test",
             confidence=0.9,
             context_match=0.8,
-            timing_score=0.8
+            timing_score=0.8,
         ),
         PatternGuidance(
             pattern_id=uuid4(),
@@ -339,7 +333,7 @@ async def test_guidance_ranking(pattern_facilitator):
             rationale="Test",
             confidence=0.4,
             context_match=0.5,
-            timing_score=0.5
+            timing_score=0.5,
         ),
         PatternGuidance(
             pattern_id=uuid4(),
@@ -349,8 +343,8 @@ async def test_guidance_ranking(pattern_facilitator):
             rationale="Test",
             confidence=0.7,
             context_match=0.7,
-            timing_score=0.7
-        )
+            timing_score=0.7,
+        ),
     ]
 
     moment = DialogueMoment(
@@ -359,7 +353,7 @@ async def test_guidance_ranking(pattern_facilitator):
         recent_messages=[],
         active_patterns=[],
         emergence_potential=0.8,  # High emergence
-        tension_level=0.3
+        tension_level=0.3,
     )
 
     ranked = pattern_facilitator._rank_guidances(guidances, moment)
@@ -377,7 +371,7 @@ async def test_pattern_lifecycle_impact_on_teaching(pattern_facilitator, pattern
         name="Young Pattern",
         description="Just discovered",
         lifecycle_stage=PatternLifecycle.NASCENT,
-        fitness_score=0.7
+        fitness_score=0.7,
     )
     await pattern_library.store_pattern(nascent_pattern)
 
@@ -385,7 +379,7 @@ async def test_pattern_lifecycle_impact_on_teaching(pattern_facilitator, pattern
         name="Mature Pattern",
         description="Well established",
         lifecycle_stage=PatternLifecycle.ESTABLISHED,
-        fitness_score=0.7
+        fitness_score=0.7,
     )
     await pattern_library.store_pattern(established_pattern)
 
@@ -393,7 +387,7 @@ async def test_pattern_lifecycle_impact_on_teaching(pattern_facilitator, pattern
         name="Old Pattern",
         description="No longer active",
         lifecycle_stage=PatternLifecycle.DORMANT,
-        fitness_score=0.7
+        fitness_score=0.7,
     )
     await pattern_library.store_pattern(dormant_pattern)
 

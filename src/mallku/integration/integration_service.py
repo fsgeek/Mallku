@@ -64,9 +64,7 @@ class EndToEndIntegrationService:
         self.shutdown_event = asyncio.Event()
 
         # Event processing
-        self.event_queue: asyncio.Queue[Event] = asyncio.Queue(
-            maxsize=self.config.event_queue_size
-        )
+        self.event_queue: asyncio.Queue[Event] = asyncio.Queue(maxsize=self.config.event_queue_size)
         self.pipeline_events: dict[str, PipelineEvent] = {}
         self.active_events: deque[PipelineEvent] = deque(maxlen=1000)
 
@@ -76,10 +74,7 @@ class EndToEndIntegrationService:
 
         # Statistics
         self.statistics = PipelineStatistics(
-            uptime=timedelta(0),
-            total_events_processed=0,
-            successful_events=0,
-            failed_events=0
+            uptime=timedelta(0), total_events_processed=0, successful_events=0, failed_events=0
         )
 
         # Event handlers
@@ -100,7 +95,7 @@ class EndToEndIntegrationService:
             self.correlation_engine = CorrelationEngine(
                 memory_anchor_service=self.memory_service,
                 window_size=timedelta(hours=self.config.correlation_window_size_hours),
-                window_overlap=self.config.correlation_window_overlap
+                window_overlap=self.config.correlation_window_overlap,
             )
             await self.correlation_engine.initialize()
 
@@ -109,15 +104,14 @@ class EndToEndIntegrationService:
             self.correlation_adapter = CorrelationToAnchorAdapter(
                 memory_service=self.memory_service,
                 confidence_threshold=self.config.anchor_creation_threshold,
-                batch_size=self.config.anchor_batch_size
+                batch_size=self.config.anchor_batch_size,
             )
 
             # Initialize File System Connector
             logger.info("Initializing File System Connector...")
             file_filter = self._create_file_filter()
             self.file_connector = FileSystemConnector(
-                event_filter=file_filter,
-                stream_id=f"integration_pipeline_{self.pipeline_id}"
+                event_filter=file_filter, stream_id=f"integration_pipeline_{self.pipeline_id}"
             )
 
             # Connect file connector to our event processing
@@ -181,16 +175,25 @@ class EndToEndIntegrationService:
         """Get current pipeline status."""
 
         # Get component statuses
-        file_status = "running" if (self.file_connector and self.file_connector._is_running) else "stopped"
-        correlation_status = "active" if (self.correlation_engine and
-                                        self.correlation_engine.get_engine_status()['engine_info']['status'] == 'active') else "inactive"
+        file_status = (
+            "running" if (self.file_connector and self.file_connector._is_running) else "stopped"
+        )
+        correlation_status = (
+            "active"
+            if (
+                self.correlation_engine
+                and self.correlation_engine.get_engine_status()["engine_info"]["status"] == "active"
+            )
+            else "inactive"
+        )
         memory_status = "active" if self.memory_service else "inactive"
 
         # Calculate performance metrics
         uptime = datetime.now(UTC) - self.start_time if self.start_time else timedelta(0)
         events_per_second = (
             self.statistics.total_events_processed / uptime.total_seconds()
-            if uptime.total_seconds() > 0 else 0
+            if uptime.total_seconds() > 0
+            else 0
         )
 
         return PipelineStatus(
@@ -206,7 +209,7 @@ class EndToEndIntegrationService:
             avg_processing_time_ms=self._calculate_avg_processing_time(),
             events_per_second=events_per_second,
             recent_errors=self._get_recent_errors(),
-            error_rate=self._calculate_error_rate()
+            error_rate=self._calculate_error_rate(),
         )
 
     async def get_pipeline_statistics(self) -> PipelineStatistics:
@@ -217,14 +220,16 @@ class EndToEndIntegrationService:
 
         # Update component statistics
         if self.file_connector:
-            self.statistics.component_stats['file_connector'] = self.file_connector.get_statistics()
+            self.statistics.component_stats["file_connector"] = self.file_connector.get_statistics()
 
         if self.correlation_engine:
             engine_status = self.correlation_engine.get_engine_status()
-            self.statistics.component_stats['correlation_engine'] = engine_status['statistics']
+            self.statistics.component_stats["correlation_engine"] = engine_status["statistics"]
 
         if self.correlation_adapter:
-            self.statistics.component_stats['correlation_adapter'] = self.correlation_adapter.get_statistics()
+            self.statistics.component_stats["correlation_adapter"] = (
+                self.correlation_adapter.get_statistics()
+            )
 
         return self.statistics
 
@@ -232,10 +237,7 @@ class EndToEndIntegrationService:
         """Handle incoming activity events from file system connector."""
 
         # Create pipeline event to track processing
-        pipeline_event = PipelineEvent(
-            source_event_id=event.event_id,
-            activity_event=event.dict()
-        )
+        pipeline_event = PipelineEvent(source_event_id=event.event_id, activity_event=event.dict())
 
         self.pipeline_events[str(event.event_id)] = pipeline_event
         self.active_events.append(pipeline_event)
@@ -261,16 +263,12 @@ class EndToEndIntegrationService:
         # Start event processing workers
         for i in range(self.config.max_concurrent_events // 10):  # 10 events per worker
             task = asyncio.create_task(
-                self._event_processing_worker(f"worker_{i}"),
-                name=f"event_worker_{i}"
+                self._event_processing_worker(f"worker_{i}"), name=f"event_worker_{i}"
             )
             self.processing_tasks.append(task)
 
         # Start monitoring task
-        self.monitoring_task = asyncio.create_task(
-            self._monitoring_loop(),
-            name="monitoring_loop"
-        )
+        self.monitoring_task = asyncio.create_task(self._monitoring_loop(), name="monitoring_loop")
 
     async def _event_processing_worker(self, worker_name: str) -> None:
         """Process events from the queue."""
@@ -280,10 +278,7 @@ class EndToEndIntegrationService:
             try:
                 # Get event from queue with timeout
                 try:
-                    event = await asyncio.wait_for(
-                        self.event_queue.get(),
-                        timeout=1.0
-                    )
+                    event = await asyncio.wait_for(self.event_queue.get(), timeout=1.0)
                 except TimeoutError:
                     continue
 
@@ -391,7 +386,8 @@ class EndToEndIntegrationService:
 
         # Remove old pipeline events
         to_remove = [
-            event_id for event_id, pipeline_event in self.pipeline_events.items()
+            event_id
+            for event_id, pipeline_event in self.pipeline_events.items()
             if pipeline_event.created_at < cutoff_time
         ]
 
@@ -412,13 +408,14 @@ class EndToEndIntegrationService:
     def _create_file_filter(self) -> FileEventFilter:
         """Create file event filter from configuration."""
 
-        watch_directories = [
-            Path(dir_path) for dir_path in self.config.watch_directories
-        ] if self.config.watch_directories else []
+        watch_directories = (
+            [Path(dir_path) for dir_path in self.config.watch_directories]
+            if self.config.watch_directories
+            else []
+        )
 
         return FileEventFilter(
-            watch_directories=watch_directories,
-            **self.config.file_filter_config
+            watch_directories=watch_directories, **self.config.file_filter_config
         )
 
     def _calculate_avg_processing_time(self) -> float:
@@ -472,7 +469,7 @@ class EndToEndIntegrationService:
 async def create_integration_service(
     watch_directories: list[str] | None = None,
     correlation_confidence_threshold: float = 0.6,
-    anchor_creation_threshold: float = 0.7
+    anchor_creation_threshold: float = 0.7,
 ) -> EndToEndIntegrationService:
     """
     Convenience function to create and initialize an integration service.
@@ -489,7 +486,7 @@ async def create_integration_service(
     config = PipelineConfiguration(
         watch_directories=watch_directories or [],
         correlation_confidence_threshold=correlation_confidence_threshold,
-        anchor_creation_threshold=anchor_creation_threshold
+        anchor_creation_threshold=anchor_creation_threshold,
     )
 
     service = EndToEndIntegrationService(config)

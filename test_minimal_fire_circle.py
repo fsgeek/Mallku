@@ -28,10 +28,10 @@ logger = logging.getLogger(__name__)
 async def minimal_dialogue():
     """Run the simplest possible Fire Circle dialogue."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 MINIMAL FIRE CIRCLE TEST 🔥".center(80))
     print("39th Builder - Finding the Voice".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     try:
         # Create adapter factory
@@ -43,7 +43,7 @@ async def minimal_dialogue():
             model_name="gpt-4",
             temperature=0.7,
             track_reciprocity=False,  # Disable for simplicity
-            emit_events=False  # Disable for simplicity
+            emit_events=False,  # Disable for simplicity
         )
 
         adapter = await factory.create_adapter("openai", config)
@@ -69,18 +69,13 @@ async def minimal_dialogue():
             type=MessageType.QUESTION,
             role=MessageRole.USER,
             sender=uuid4(),
-            content=MessageContent(
-                text="Hello from Mallku Fire Circle. Can you hear me?"
-            ),
+            content=MessageContent(text="Hello from Mallku Fire Circle. Can you hear me?"),
             dialogue_id=uuid4(),
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         # Send the message
-        response = await adapter.send_message(
-            message=test_message,
-            dialogue_context=[]
-        )
+        response = await adapter.send_message(message=test_message, dialogue_context=[])
 
         print("\n🔥 FIRE CIRCLE SPEAKS:")
         print(f"Response: {response.content.text}")

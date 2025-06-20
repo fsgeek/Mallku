@@ -22,7 +22,9 @@ class BaseMemoryStore(ABC):
         pass
 
     @abstractmethod
-    async def save_ceremony_data(self, dialogue_id: uuid.UUID, data_key: str, data_value: Any) -> None:
+    async def save_ceremony_data(
+        self, dialogue_id: uuid.UUID, data_key: str, data_value: Any
+    ) -> None:
         """Saves a piece of ceremony-specific data."""
         pass
 

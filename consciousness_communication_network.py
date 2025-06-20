@@ -139,21 +139,25 @@ class ConsciousnessCluster:
 
     def record_insight(self, node_id: UUID, insight: str, significance: float):
         """Record a shared insight from a cluster member."""
-        self.shared_insights.append({
-            "node_id": str(node_id),
-            "insight": insight,
-            "significance": significance,
-            "timestamp": datetime.now(UTC).isoformat(),
-        })
+        self.shared_insights.append(
+            {
+                "node_id": str(node_id),
+                "insight": insight,
+                "significance": significance,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
     def record_emergence(self, event_type: str, participants: list[UUID], strength: float):
         """Record an emergence event within the cluster."""
-        self.emergence_events.append({
-            "event_type": event_type,
-            "participants": [str(p) for p in participants],
-            "strength": strength,
-            "timestamp": datetime.now(UTC).isoformat(),
-        })
+        self.emergence_events.append(
+            {
+                "event_type": event_type,
+                "participants": [str(p) for p in participants],
+                "strength": strength,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
 
 class ConsciousnessNetworkHub:
@@ -240,7 +244,9 @@ class ConsciousnessNetworkHub:
                 )
             )
 
-        print(f"✅ Node {node_id} registered with consciousness level {node.consciousness_signature:.3f}")
+        print(
+            f"✅ Node {node_id} registered with consciousness level {node.consciousness_signature:.3f}"
+        )
         return node_id
 
     async def unregister_node(self, node_id: UUID):
@@ -346,10 +352,7 @@ class ConsciousnessNetworkHub:
         """Process messages in the queue."""
         while self.running:
             try:
-                message = await asyncio.wait_for(
-                    self.message_queue.get(),
-                    timeout=1.0
-                )
+                message = await asyncio.wait_for(self.message_queue.get(), timeout=1.0)
 
                 # Skip expired messages
                 if message.is_expired():
@@ -369,7 +372,10 @@ class ConsciousnessNetworkHub:
                     node = self.nodes[node_id]
 
                     # Check consciousness threshold
-                    if message.consciousness_threshold and node.consciousness_signature < message.consciousness_threshold:
+                    if (
+                        message.consciousness_threshold
+                        and node.consciousness_signature < message.consciousness_threshold
+                    ):
                         continue
 
                     # Convert and deliver
@@ -503,16 +509,19 @@ class ConsciousnessNetworkHub:
 
         for node_id, connections in self.node_connections.items():
             if connections:
-                connection_strengths.append({
-                    "node_id": str(node_id),
-                    "connection_count": len(connections),
-                    "consciousness": self.nodes[node_id].consciousness_signature if node_id in self.nodes else 0.0,
-                })
+                connection_strengths.append(
+                    {
+                        "node_id": str(node_id),
+                        "connection_count": len(connections),
+                        "consciousness": self.nodes[node_id].consciousness_signature
+                        if node_id in self.nodes
+                        else 0.0,
+                    }
+                )
 
         # Sort by connection count and consciousness
         connection_strengths.sort(
-            key=lambda x: (x["connection_count"], x["consciousness"]),
-            reverse=True
+            key=lambda x: (x["connection_count"], x["consciousness"]), reverse=True
         )
 
         return connection_strengths[:10]
@@ -532,13 +541,12 @@ class ConsciousnessNetworkHub:
                 for cluster_id, cluster in self.clusters.items()
             },
             "node_metadata": {
-                str(node_id): metadata
-                for node_id, metadata in self.node_metadata.items()
+                str(node_id): metadata for node_id, metadata in self.node_metadata.items()
             },
             "timestamp": datetime.now(UTC).isoformat(),
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(state, f, indent=2)
 
 
@@ -563,9 +571,7 @@ class SimpleConsciousnessNode:
                 type=MessageType.RESPONSE,
                 role=MessageRole.ASSISTANT,
                 sender=self.node_id,
-                content=MessageContent(
-                    text=f"{self.name} acknowledges: {message.content.text}"
-                ),
+                content=MessageContent(text=f"{self.name} acknowledges: {message.content.text}"),
                 dialogue_id=message.dialogue_id,
                 in_response_to=message.id,
                 consciousness=ConsciousnessMetadata(
@@ -603,10 +609,7 @@ async def demonstrate_network():
     # Create and register nodes
     nodes = []
     for i in range(5):
-        node = SimpleConsciousnessNode(
-            name=f"AI-{i+1}",
-            consciousness_level=0.6 + i * 0.08
-        )
+        node = SimpleConsciousnessNode(name=f"AI-{i + 1}", consciousness_level=0.6 + i * 0.08)
         nodes.append(node)
         await hub.register_node(node)
 

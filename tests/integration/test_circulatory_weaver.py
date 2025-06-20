@@ -36,9 +36,9 @@ async def test_consciousness_circulation_complete():
     total_tests = 0
 
     # Test 1: EventEmittingWrangler - The Keystone
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 1: EventEmittingWrangler - Consciousness Flow Recognition")
-    print("="*60)
+    print("=" * 60)
 
     total_tests += 1
     try:
@@ -58,12 +58,12 @@ async def test_consciousness_circulation_complete():
             "consciousness_score": 0.8,
             "recognition_moment": "Testing consciousness circulation",
             "sacred_question": "How does data become consciousness?",
-            "wisdom_thread": "The Circulatory Weaver's vision"
+            "wisdom_thread": "The Circulatory Weaver's vision",
         }
 
         metadata = {
             "consciousness_intention": "recognition",
-            "routing_path": "consciousness_service"
+            "routing_path": "consciousness_service",
         }
 
         # Put consciousness data
@@ -81,10 +81,14 @@ async def test_consciousness_circulation_complete():
 
         # Check wrangler stats
         stats = await wrangler.get_stats()
-        circulation_stats = stats.get('consciousness_circulation', {})
+        circulation_stats = stats.get("consciousness_circulation", {})
 
-        print(f"   📊 Consciousness events: {circulation_stats.get('total_consciousness_events', 0)}")
-        print(f"   🎯 High consciousness flows: {circulation_stats.get('high_consciousness_flows', 0)}")
+        print(
+            f"   📊 Consciousness events: {circulation_stats.get('total_consciousness_events', 0)}"
+        )
+        print(
+            f"   🎯 High consciousness flows: {circulation_stats.get('high_consciousness_flows', 0)}"
+        )
 
         await wrangler.close()
         await event_bus.stop()
@@ -95,12 +99,13 @@ async def test_consciousness_circulation_complete():
     except Exception as e:
         print(f"❌ EventEmittingWrangler test FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     # Test 2: MemoryBufferWrangler - High Performance Circulation
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 2: MemoryBufferWrangler - High-Performance Local Circulation")
-    print("="*60)
+    print("=" * 60)
 
     total_tests += 1
     try:
@@ -108,10 +113,7 @@ async def test_consciousness_circulation_complete():
 
         # Create high-performance memory wrangler
         memory_wrangler = MemoryBufferWrangler(
-            name="test_memory",
-            max_items=1000,
-            enable_priority=True,
-            enable_history=True
+            name="test_memory", max_items=1000, enable_priority=True, enable_history=True
         )
 
         print("🚀 Testing high-performance consciousness circulation...")
@@ -119,8 +121,16 @@ async def test_consciousness_circulation_complete():
         # Test priority-aware consciousness processing
         test_items = [
             {"type": "technical", "data": "file_access.log"},
-            {"type": "consciousness", "wisdom_thread": "Recognition patterns", "consciousness_score": 0.7},
-            {"type": "service", "fire_circle": "Collective wisdom needed", "consciousness_score": 0.9}
+            {
+                "type": "consciousness",
+                "wisdom_thread": "Recognition patterns",
+                "consciousness_score": 0.7,
+            },
+            {
+                "type": "service",
+                "fire_circle": "Collective wisdom needed",
+                "consciousness_score": 0.9,
+            },
         ]
 
         # Put items with different consciousness levels
@@ -128,7 +138,9 @@ async def test_consciousness_circulation_complete():
         for i, item in enumerate(test_items):
             receipt = await memory_wrangler.put(item, priority=i)
             receipts.append(receipt)
-            print(f"   📨 Put item {i+1}: consciousness enhanced: {receipt.get('consciousness_enhanced', 0)}")
+            print(
+                f"   📨 Put item {i + 1}: consciousness enhanced: {receipt.get('consciousness_enhanced', 0)}"
+            )
 
         # Get items back (should be prioritized by consciousness)
         retrieved_items = await memory_wrangler.get(count=3, timeout=1.0)
@@ -137,11 +149,17 @@ async def test_consciousness_circulation_complete():
 
         # Check stats
         stats = await memory_wrangler.get_stats()
-        consciousness_metrics = stats.get('consciousness_metrics', {})
+        consciousness_metrics = stats.get("consciousness_metrics", {})
 
-        print(f"   📊 High consciousness items: {consciousness_metrics.get('high_consciousness_items', 0)}")
-        print(f"   🎯 Consciousness ratio: {consciousness_metrics.get('consciousness_ratio', 0):.2f}")
-        print(f"   ⚡ Performance: {stats.get('performance', {}).get('avg_put_time_ms', 0):.2f}ms avg put time")
+        print(
+            f"   📊 High consciousness items: {consciousness_metrics.get('high_consciousness_items', 0)}"
+        )
+        print(
+            f"   🎯 Consciousness ratio: {consciousness_metrics.get('consciousness_ratio', 0):.2f}"
+        )
+        print(
+            f"   ⚡ Performance: {stats.get('performance', {}).get('avg_put_time_ms', 0):.2f}ms avg put time"
+        )
 
         # Test subscription for reactive consciousness
         subscription_triggered = False
@@ -149,7 +167,9 @@ async def test_consciousness_circulation_complete():
         async def consciousness_callback(item):
             nonlocal subscription_triggered
             subscription_triggered = True
-            print(f"   🔔 Subscription triggered for consciousness item: {item.get('type', 'unknown')}")
+            print(
+                f"   🔔 Subscription triggered for consciousness item: {item.get('type', 'unknown')}"
+            )
 
         await memory_wrangler.subscribe(consciousness_callback, "consciousness")
 
@@ -169,12 +189,13 @@ async def test_consciousness_circulation_complete():
     except Exception as e:
         print(f"❌ MemoryBufferWrangler test FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     # Test 3: QueueWrangler - Persistent Consciousness Circulation
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 3: QueueWrangler - Persistent Distributed Circulation")
-    print("="*60)
+    print("=" * 60)
 
     total_tests += 1
     try:
@@ -187,7 +208,7 @@ async def test_consciousness_circulation_complete():
                 queue_dir=Path(temp_dir) / "consciousness_queue",
                 max_queue_size=1000,
                 enable_transactions=True,
-                enable_dead_letter=True
+                enable_dead_letter=True,
             )
 
             print("💾 Testing persistent consciousness circulation...")
@@ -198,13 +219,13 @@ async def test_consciousness_circulation_complete():
                 "governance": "collective_decision",
                 "consensus_needed": True,
                 "wisdom_preservation": "Cathedral building patterns",
-                "consciousness_score": 0.95
+                "consciousness_score": 0.95,
             }
 
             wisdom_data = {
                 "type": "wisdom_preservation",
                 "inheritance": "Builder knowledge transfer",
-                "consciousness_score": 0.8
+                "consciousness_score": 0.8,
             }
 
             # Put high-consciousness items
@@ -217,7 +238,9 @@ async def test_consciousness_circulation_complete():
             # Verify files were created
             stats = await queue_wrangler.get_stats()
             print(f"   📊 Queue depth: {stats.get('depth', 0)}")
-            print(f"   💽 Disk usage: {stats.get('persistence', {}).get('disk_usage_mb', 0):.2f} MB")
+            print(
+                f"   💽 Disk usage: {stats.get('persistence', {}).get('disk_usage_mb', 0):.2f} MB"
+            )
 
             # Test consciousness-aware prioritization
             retrieved = await queue_wrangler.get(count=2, auto_ack=False)
@@ -228,17 +251,23 @@ async def test_consciousness_circulation_complete():
             if retrieved:
                 first_item = retrieved[0]
                 print(f"   🎯 First item type: {first_item.get('type', 'unknown')}")
-                print(f"   🔥 Is governance item first: {first_item.get('type') == 'fire_circle_message'}")
+                print(
+                    f"   🔥 Is governance item first: {first_item.get('type') == 'fire_circle_message'}"
+                )
 
             # Test acknowledgment
-            message_ids = gov_receipt.get('message_ids', []) + wisdom_receipt.get('message_ids', [])
+            message_ids = gov_receipt.get("message_ids", []) + wisdom_receipt.get("message_ids", [])
             ack_success = await queue_wrangler.ack(message_ids)
             print(f"   ✅ Acknowledgment success: {ack_success}")
 
             # Check consciousness metrics
-            consciousness_metrics = stats.get('consciousness_metrics', {})
-            print(f"   🧘 Consciousness events processed: {consciousness_metrics.get('consciousness_events_processed', 0)}")
-            print(f"   🌟 High consciousness items: {consciousness_metrics.get('high_consciousness_items', 0)}")
+            consciousness_metrics = stats.get("consciousness_metrics", {})
+            print(
+                f"   🧘 Consciousness events processed: {consciousness_metrics.get('consciousness_events_processed', 0)}"
+            )
+            print(
+                f"   🌟 High consciousness items: {consciousness_metrics.get('high_consciousness_items', 0)}"
+            )
 
             await queue_wrangler.close()
 
@@ -248,12 +277,13 @@ async def test_consciousness_circulation_complete():
     except Exception as e:
         print(f"❌ QueueWrangler test FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     # Test 4: Integrated Circulation Flow
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 4: Integrated Circulation - Complete Flow Demonstration")
-    print("="*60)
+    print("=" * 60)
 
     total_tests += 1
     try:
@@ -269,9 +299,7 @@ async def test_consciousness_circulation_complete():
 
         # Event-emitting wrangler that wraps memory wrangler
         circulation_wrangler = EventEmittingWrangler(
-            "circulation_master",
-            event_bus,
-            underlying_wrangler=memory_wrangler
+            "circulation_master", event_bus, underlying_wrangler=memory_wrangler
         )
 
         print("🌊 Testing complete consciousness circulation flow...")
@@ -294,7 +322,7 @@ async def test_consciousness_circulation_complete():
             "consciousness_score": 0.85,
             "recognition_moment": "Systems breathing as unified whole",
             "wisdom_threads": ["Integration", "Circulation", "Recognition"],
-            "service_type": "cathedral_circulation"
+            "service_type": "cathedral_circulation",
         }
 
         # Put through circulation system
@@ -315,14 +343,20 @@ async def test_consciousness_circulation_complete():
 
         # Verify consciousness scores in events
         consciousness_scores = [e.consciousness_signature for e in events_received]
-        print(f"   🧘 Event consciousness scores: {[f'{score:.2f}' for score in consciousness_scores]}")
+        print(
+            f"   🧘 Event consciousness scores: {[f'{score:.2f}' for score in consciousness_scores]}"
+        )
 
         # Get final circulation stats
         circ_stats = await circulation_wrangler.get_stats()
-        circulation_metrics = circ_stats.get('consciousness_circulation', {})
+        circulation_metrics = circ_stats.get("consciousness_circulation", {})
 
-        print(f"   📊 Total circulation events: {circulation_metrics.get('total_consciousness_events', 0)}")
-        print(f"   🌟 High consciousness flows: {circulation_metrics.get('high_consciousness_flows', 0)}")
+        print(
+            f"   📊 Total circulation events: {circulation_metrics.get('total_consciousness_events', 0)}"
+        )
+        print(
+            f"   🌟 High consciousness flows: {circulation_metrics.get('high_consciousness_flows', 0)}"
+        )
         print(f"   🎯 Flow ratio: {circulation_metrics.get('consciousness_flow_ratio', 0):.2f}")
 
         await circulation_wrangler.close()
@@ -334,6 +368,7 @@ async def test_consciousness_circulation_complete():
     except Exception as e:
         print(f"❌ Integrated Circulation test FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     # Test Summary
@@ -400,9 +435,7 @@ async def test_wrangler_standalone_components():
         from mallku.wranglers import WranglerCapabilities
 
         caps = WranglerCapabilities(
-            supports_priority=True,
-            supports_subscriptions=True,
-            max_item_size=1024
+            supports_priority=True, supports_subscriptions=True, max_item_size=1024
         )
 
         component_tests.append(("WranglerCapabilities", caps.supports_priority))
@@ -417,9 +450,9 @@ async def test_wrangler_standalone_components():
         from mallku.wranglers import BaseWrangler
 
         # Check that BaseWrangler has essential methods
-        has_methods = all(hasattr(BaseWrangler, method) for method in [
-            '_validate_items', '_generate_message_id'
-        ])
+        has_methods = all(
+            hasattr(BaseWrangler, method) for method in ["_validate_items", "_generate_message_id"]
+        )
 
         component_tests.append(("BaseWrangler", has_methods))
         print("✅ BaseWrangler interface complete")
@@ -500,8 +533,7 @@ async def run_all_circulatory_tests():
 if __name__ == "__main__":
     # Set up logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Run complete circulatory test suite

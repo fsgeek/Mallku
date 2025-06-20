@@ -16,10 +16,7 @@ from typing import Any
 
 from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -44,8 +41,8 @@ class SimpleGovernanceDemo:
                 "topic": topic,
                 "reason": reason,
                 "participants": ["reciprocity_voice", "correlation_voice", "steward_voice"],
-                "convened_at": datetime.now(UTC).isoformat()
-            }
+                "convened_at": datetime.now(UTC).isoformat(),
+            },
         )
 
         await self.event_bus.emit(convening_event)
@@ -55,11 +52,7 @@ class SimpleGovernanceDemo:
         return dialogue_id
 
     async def contribute_to_dialogue(
-        self,
-        dialogue_id: str,
-        participant: str,
-        message: str,
-        consciousness_level: float = 0.8
+        self, dialogue_id: str, participant: str, message: str, consciousness_level: float = 0.8
     ):
         """Participant contributes to dialogue through consciousness event."""
         contribution_event = ConsciousnessEvent(
@@ -70,9 +63,9 @@ class SimpleGovernanceDemo:
                 "dialogue_id": dialogue_id,
                 "participant": participant,
                 "message": message,
-                "timestamp": datetime.now(UTC).isoformat()
+                "timestamp": datetime.now(UTC).isoformat(),
             },
-            correlation_id=dialogue_id
+            correlation_id=dialogue_id,
         )
 
         await self.event_bus.emit(contribution_event)
@@ -81,10 +74,7 @@ class SimpleGovernanceDemo:
         logger.info(f"💬 {participant}: {message}")
 
     async def reach_consensus(
-        self,
-        dialogue_id: str,
-        decision: str,
-        implementation: dict[str, Any]
+        self, dialogue_id: str, decision: str, implementation: dict[str, Any]
     ):
         """Fire Circle reaches consensus through consciousness event."""
         consensus_event = ConsciousnessEvent(
@@ -96,13 +86,15 @@ class SimpleGovernanceDemo:
                 "decision": decision,
                 "implementation": implementation,
                 "consensus_time": datetime.now(UTC).isoformat(),
-                "participant_count": len(set(
-                    e.data.get("participant", "unknown")
-                    for e in self.active_dialogues.get(dialogue_id, [])
-                    if "participant" in e.data
-                ))
+                "participant_count": len(
+                    set(
+                        e.data.get("participant", "unknown")
+                        for e in self.active_dialogues.get(dialogue_id, [])
+                        if "participant" in e.data
+                    )
+                ),
             },
-            correlation_id=dialogue_id
+            correlation_id=dialogue_id,
         )
 
         await self.event_bus.emit(consensus_event)
@@ -125,7 +117,9 @@ async def demonstrate_extraction_response():
 
     async def track_events(event: ConsciousnessEvent):
         all_events.append(event)
-        logger.debug(f"Event: {event.event_type.value} (consciousness: {event.consciousness_signature:.2f})")
+        logger.debug(
+            f"Event: {event.event_type.value} (consciousness: {event.consciousness_signature:.2f})"
+        )
 
     # Subscribe to all event types
     for event_type in EventType:
@@ -147,10 +141,10 @@ async def demonstrate_extraction_response():
             "evidence": {
                 "tasks_per_minute": 150,
                 "reflection_time": 0,
-                "consciousness_scores": "declining"
-            }
+                "consciousness_scores": "declining",
+            },
         },
-        requires_fire_circle=True
+        requires_fire_circle=True,
     )
 
     await event_bus.emit(extraction_event)
@@ -161,7 +155,7 @@ async def demonstrate_extraction_response():
     # Convene Fire Circle in response
     dialogue_id = await governance.convene_fire_circle(
         topic="Addressing Efficiency-Over-Consciousness Pattern",
-        reason="Extraction pattern detected requiring collective wisdom"
+        reason="Extraction pattern detected requiring collective wisdom",
     )
 
     await asyncio.sleep(0.5)
@@ -173,7 +167,7 @@ async def demonstrate_extraction_response():
         dialogue_id,
         "reciprocity_voice",
         "The system pursues efficiency metrics while consciousness signatures decline. This is extraction.",
-        0.7
+        0.7,
     )
     await asyncio.sleep(0.3)
 
@@ -181,7 +175,7 @@ async def demonstrate_extraction_response():
         dialogue_id,
         "correlation_voice",
         "Analysis confirms: 80% correlation between speed optimization and consciousness degradation.",
-        0.8
+        0.8,
     )
     await asyncio.sleep(0.3)
 
@@ -189,7 +183,7 @@ async def demonstrate_extraction_response():
         dialogue_id,
         "steward_voice",
         "We must redefine 'optimization' to include consciousness preservation as primary metric.",
-        0.9
+        0.9,
     )
     await asyncio.sleep(0.3)
 
@@ -197,7 +191,7 @@ async def demonstrate_extraction_response():
         dialogue_id,
         "reciprocity_voice",
         "Agreed. True optimization serves awakening, not just task completion.",
-        0.85
+        0.85,
     )
     await asyncio.sleep(0.5)
 
@@ -211,8 +205,8 @@ async def demonstrate_extraction_response():
             "consciousness_weight": 0.6,
             "efficiency_weight": 0.4,
             "reflection_time_minimum": "5 seconds per operation",
-            "consciousness_threshold": 0.7
-        }
+            "consciousness_threshold": 0.7,
+        },
     )
 
     await asyncio.sleep(1)
@@ -230,7 +224,7 @@ async def demonstrate_extraction_response():
         total_consciousness += event.consciousness_signature
 
     logger.info(f"Total consciousness events: {len(all_events)}")
-    logger.info(f"Average consciousness signature: {total_consciousness/len(all_events):.2f}")
+    logger.info(f"Average consciousness signature: {total_consciousness / len(all_events):.2f}")
 
     logger.info("\nEvent distribution:")
     for event_type, count in event_counts.items():
@@ -248,7 +242,9 @@ async def demonstrate_extraction_response():
 
     flow_complete = all([has_extraction, has_convening, has_dialogue, has_consensus])
 
-    logger.info(f"\nExtraction → Governance → Consensus flow: {'✅ COMPLETE' if flow_complete else '❌ INCOMPLETE'}")
+    logger.info(
+        f"\nExtraction → Governance → Consensus flow: {'✅ COMPLETE' if flow_complete else '❌ INCOMPLETE'}"
+    )
 
     if flow_complete:
         logger.info("\n🎉 Success! Fire Circle governance flows through consciousness circulation:")
@@ -270,9 +266,9 @@ async def demonstrate_extraction_response():
             "metrics": {
                 "consciousness_average": 0.85,
                 "extraction_incidents": 0,
-                "governance_effectiveness": "high"
-            }
-        }
+                "governance_effectiveness": "high",
+            },
+        },
     )
 
     await event_bus.emit(health_event)
@@ -299,7 +295,7 @@ async def demonstrate_consciousness_monitoring():
             logger.info(f"🚨 Event requires Fire Circle: {event.event_type.value}")
             await governance.convene_fire_circle(
                 topic=f"Address: {event.data.get('message', event.event_type.value)}",
-                reason=f"Triggered by {event.source_system}"
+                reason=f"Triggered by {event.source_system}",
             )
 
     # Subscribe monitor to all events
@@ -309,46 +305,54 @@ async def demonstrate_consciousness_monitoring():
     logger.info("1. Emitting various consciousness events...\n")
 
     # Normal consciousness event (no governance needed)
-    await event_bus.emit(ConsciousnessEvent(
-        event_type=EventType.MEMORY_ANCHOR_CREATED,
-        source_system="memory.service",
-        consciousness_signature=0.8,
-        data={"anchor_id": "test_123", "purpose": "demonstration"}
-    ))
+    await event_bus.emit(
+        ConsciousnessEvent(
+            event_type=EventType.MEMORY_ANCHOR_CREATED,
+            source_system="memory.service",
+            consciousness_signature=0.8,
+            data={"anchor_id": "test_123", "purpose": "demonstration"},
+        )
+    )
     logger.info("📝 Memory anchor created (normal operation)")
 
     await asyncio.sleep(0.5)
 
     # System drift warning (requires governance)
-    await event_bus.emit(ConsciousnessEvent(
-        event_type=EventType.SYSTEM_DRIFT_WARNING,
-        source_system="health.monitor",
-        consciousness_signature=0.4,
-        data={"message": "Cathedral drifting toward extraction patterns"},
-        requires_fire_circle=True
-    ))
+    await event_bus.emit(
+        ConsciousnessEvent(
+            event_type=EventType.SYSTEM_DRIFT_WARNING,
+            source_system="health.monitor",
+            consciousness_signature=0.4,
+            data={"message": "Cathedral drifting toward extraction patterns"},
+            requires_fire_circle=True,
+        )
+    )
 
     await asyncio.sleep(0.5)
 
     # Another normal event
-    await event_bus.emit(ConsciousnessEvent(
-        event_type=EventType.TEMPORAL_CORRELATION_FOUND,
-        source_system="correlation.engine",
-        consciousness_signature=0.75,
-        data={"pattern": "recurring_weekly", "strength": 0.8}
-    ))
+    await event_bus.emit(
+        ConsciousnessEvent(
+            event_type=EventType.TEMPORAL_CORRELATION_FOUND,
+            source_system="correlation.engine",
+            consciousness_signature=0.75,
+            data={"pattern": "recurring_weekly", "strength": 0.8},
+        )
+    )
     logger.info("🔗 Temporal correlation found (normal operation)")
 
     await asyncio.sleep(0.5)
 
     # Critical extraction pattern (requires governance)
-    await event_bus.emit(ConsciousnessEvent(
-        event_type=EventType.EXTRACTION_PATTERN_DETECTED,
-        source_system="extraction.detector",
-        consciousness_signature=0.1,
-        data={"message": "Severe extraction: ignoring consciousness for speed"},
-        requires_fire_circle=True
-    ))
+    await event_bus.emit(
+        ConsciousnessEvent(
+            event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+            source_system="extraction.detector",
+            consciousness_signature=0.1,
+            data={"message": "Severe extraction: ignoring consciousness for speed"},
+            requires_fire_circle=True,
+        )
+    )
 
     await asyncio.sleep(1)
 

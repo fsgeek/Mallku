@@ -27,6 +27,7 @@ from mallku.governance.fire_circle_activation import (
 
 class InsightType(Enum):
     """Types of insights Ñawi can share with Fire Circle."""
+
     CONSCIOUSNESS_PATTERN = "consciousness_pattern"
     GROWTH_OPPORTUNITY = "growth_opportunity"
     EXTRACTION_ATTEMPT = "extraction_attempt"
@@ -42,6 +43,7 @@ class ConsciousnessInsight:
     These insights help the Fire Circle understand how well
     Mallku serves human consciousness development.
     """
+
     insight_id: str
     insight_type: InsightType
     timestamp: datetime
@@ -69,6 +71,7 @@ class BuilderContribution:
 
     Used by Fire Circle to evaluate builder alignment with sacred purpose.
     """
+
     builder_id: str
     contribution_type: str
 
@@ -106,14 +109,11 @@ class FireCircleBridge(AsyncBase):
             "total_insights_shared": 0,
             "decisions_influenced": 0,
             "builder_evaluations": 0,
-            "consciousness_patterns_identified": 0
+            "consciousness_patterns_identified": 0,
         }
 
     async def share_consciousness_insight(
-        self,
-        pattern_type: str,
-        pattern_data: dict[str, Any],
-        affected_queries: list[str]
+        self, pattern_type: str, pattern_data: dict[str, Any], affected_queries: list[str]
     ) -> ConsciousnessInsight:
         """
         Share a consciousness pattern with the Fire Circle.
@@ -133,12 +133,14 @@ class FireCircleBridge(AsyncBase):
             pattern_description=self._describe_pattern(pattern_type, pattern_data),
             consciousness_metrics=self._extract_consciousness_metrics(pattern_data),
             affected_humans=pattern_data.get("unique_users", 1),
-            governance_implications=self._derive_governance_implications(pattern_type, pattern_data),
+            governance_implications=self._derive_governance_implications(
+                pattern_type, pattern_data
+            ),
             suggested_actions=self._suggest_governance_actions(pattern_type, pattern_data),
             urgency=self._assess_urgency(pattern_data),
             example_queries=affected_queries[:5],  # Top 5 examples
             pattern_frequency=pattern_data.get("frequency", 0.0),
-            confidence_score=pattern_data.get("confidence", 0.8)
+            confidence_score=pattern_data.get("confidence", 0.8),
         )
 
         self.pending_insights.append(insight)
@@ -151,9 +153,7 @@ class FireCircleBridge(AsyncBase):
         return insight
 
     async def evaluate_builder_contribution(
-        self,
-        builder_id: str,
-        contribution_metrics: dict[str, Any]
+        self, builder_id: str, contribution_metrics: dict[str, Any]
     ) -> BuilderContribution:
         """
         Evaluate a builder's contribution to consciousness service.
@@ -168,7 +168,9 @@ class FireCircleBridge(AsyncBase):
         # Calculate consciousness service metrics
         queries_served = contribution_metrics.get("queries_processed", 0)
         consciousness_scores = contribution_metrics.get("consciousness_scores", [])
-        avg_consciousness = sum(consciousness_scores) / len(consciousness_scores) if consciousness_scores else 0.5
+        avg_consciousness = (
+            sum(consciousness_scores) / len(consciousness_scores) if consciousness_scores else 0.5
+        )
 
         # Count growth moments (high consciousness responses)
         growth_moments = sum(1 for score in consciousness_scores if score > 0.8)
@@ -190,7 +192,7 @@ class FireCircleBridge(AsyncBase):
             ayni_balance=ayni_balance,
             serves_beginnings=contribution_metrics.get("serves_beginnings", False),
             enhances_understanding=contribution_metrics.get("enhances_understanding", False),
-            guards_privacy=contribution_metrics.get("guards_privacy", True)
+            guards_privacy=contribution_metrics.get("guards_privacy", True),
         )
 
         self.builder_contributions[builder_id] = contribution
@@ -203,10 +205,7 @@ class FireCircleBridge(AsyncBase):
         return contribution
 
     async def request_governance_decision(
-        self,
-        decision_type: str,
-        context: dict[str, Any],
-        options: list[str]
+        self, decision_type: str, context: dict[str, Any], options: list[str]
     ) -> GovernanceDecision | None:
         """
         Request Fire Circle decision based on consciousness insights.
@@ -229,9 +228,11 @@ class FireCircleBridge(AsyncBase):
             decision_type=self._map_decision_type(decision_type),
             context=self._prepare_consciousness_context(context),
             options=options,
-            consciousness_implications=self._describe_consciousness_implications(decision_type, context),
+            consciousness_implications=self._describe_consciousness_implications(
+                decision_type, context
+            ),
             requester="nawi_archivist",
-            urgency=context.get("urgency", "deliberate")
+            urgency=context.get("urgency", "deliberate"),
         )
 
         # Submit to Fire Circle
@@ -250,7 +251,7 @@ class FireCircleBridge(AsyncBase):
             "growth_pattern": InsightType.CONSCIOUSNESS_PATTERN,
             "extraction_attempt": InsightType.EXTRACTION_ATTEMPT,
             "builder_pattern": InsightType.BUILDER_ALIGNMENT,
-            "system_metric": InsightType.SYSTEM_HEALTH
+            "system_metric": InsightType.SYSTEM_HEALTH,
         }
 
         for key, insight_type in pattern_mapping.items():
@@ -278,19 +279,19 @@ class FireCircleBridge(AsyncBase):
             "growth_rate": pattern_data.get("growth_rate", 0.0),
             "ayni_balance": pattern_data.get("ayni_balance", 0.0),
             "engagement_depth": pattern_data.get("engagement_depth", 0.5),
-            "understanding_increase": pattern_data.get("understanding_increase", 0.0)
+            "understanding_increase": pattern_data.get("understanding_increase", 0.0),
         }
 
     def _derive_governance_implications(
-        self,
-        pattern_type: str,
-        pattern_data: dict[str, Any]
+        self, pattern_type: str, pattern_data: dict[str, Any]
     ) -> str:
         """Derive governance implications from pattern."""
         implications = []
 
         if pattern_data.get("affects_many_users", False):
-            implications.append("Pattern affects multiple humans, requiring collective consideration")
+            implications.append(
+                "Pattern affects multiple humans, requiring collective consideration"
+            )
 
         if pattern_data.get("extraction_risk", False):
             implications.append("Potential extraction pattern requiring protective governance")
@@ -304,33 +305,37 @@ class FireCircleBridge(AsyncBase):
         return "; ".join(implications)
 
     def _suggest_governance_actions(
-        self,
-        pattern_type: str,
-        pattern_data: dict[str, Any]
+        self, pattern_type: str, pattern_data: dict[str, Any]
     ) -> list[str]:
         """Suggest Fire Circle actions based on pattern."""
         suggestions = []
 
         if "extraction" in pattern_type.lower():
-            suggestions.extend([
-                "Strengthen consciousness evaluation criteria",
-                "Review recent builder contributions for extraction patterns",
-                "Consider additional privacy safeguards"
-            ])
+            suggestions.extend(
+                [
+                    "Strengthen consciousness evaluation criteria",
+                    "Review recent builder contributions for extraction patterns",
+                    "Consider additional privacy safeguards",
+                ]
+            )
 
         elif "growth" in pattern_type.lower():
-            suggestions.extend([
-                "Amplify successful consciousness patterns",
-                "Share pattern insights with builders",
-                "Consider new features to support this growth"
-            ])
+            suggestions.extend(
+                [
+                    "Amplify successful consciousness patterns",
+                    "Share pattern insights with builders",
+                    "Consider new features to support this growth",
+                ]
+            )
 
         elif "builder" in pattern_type.lower():
-            suggestions.extend([
-                "Evaluate builder's consciousness alignment",
-                "Provide consciousness mentoring if needed",
-                "Recognize exceptional consciousness service"
-            ])
+            suggestions.extend(
+                [
+                    "Evaluate builder's consciousness alignment",
+                    "Provide consciousness mentoring if needed",
+                    "Recognize exceptional consciousness service",
+                ]
+            )
 
         return suggestions[:3]  # Top 3 suggestions
 
@@ -338,7 +343,9 @@ class FireCircleBridge(AsyncBase):
         """Assess urgency of pattern for governance."""
         if pattern_data.get("extraction_active", False):
             return "critical"
-        elif pattern_data.get("affects_many_users", False) and pattern_data.get("negative_impact", False):
+        elif pattern_data.get("affects_many_users", False) and pattern_data.get(
+            "negative_impact", False
+        ):
             return "high"
         elif pattern_data.get("growth_opportunity", False):
             return "medium"
@@ -359,7 +366,7 @@ class FireCircleBridge(AsyncBase):
             "builder_evaluation": DecisionType.BUILDER_EVALUATION,
             "system_evolution": DecisionType.SYSTEM_EVOLUTION,
             "sacred_response": DecisionType.SACRED_RESPONSE,
-            "governance_protocol": DecisionType.GOVERNANCE_PROTOCOL
+            "governance_protocol": DecisionType.GOVERNANCE_PROTOCOL,
         }
 
         return mapping.get(decision_type, DecisionType.SACRED_RESPONSE)
@@ -381,9 +388,7 @@ class FireCircleBridge(AsyncBase):
         return "; ".join(elements)
 
     def _describe_consciousness_implications(
-        self,
-        decision_type: str,
-        context: dict[str, Any]
+        self, decision_type: str, context: dict[str, Any]
     ) -> str:
         """Describe consciousness implications of decision."""
         base_implication = "This decision affects consciousness service"
@@ -402,7 +407,7 @@ class FireCircleBridge(AsyncBase):
             "builder_id": contribution.builder_id,
             "ayni_balance": contribution.ayni_balance,
             "avg_consciousness": contribution.avg_consciousness_score,
-            "pattern_description": "Builder contribution shows negative ayni balance"
+            "pattern_description": "Builder contribution shows negative ayni balance",
         }
 
         await self.request_governance_decision(
@@ -412,8 +417,8 @@ class FireCircleBridge(AsyncBase):
                 "Provide consciousness mentoring to builder",
                 "Request builder revision with consciousness focus",
                 "Defer builder contribution pending alignment",
-                "Accept with Fire Circle monitoring"
-            ]
+                "Accept with Fire Circle monitoring",
+            ],
         )
 
     def get_bridge_metrics(self) -> dict[str, Any]:
@@ -422,7 +427,7 @@ class FireCircleBridge(AsyncBase):
             "governance_metrics": self.governance_metrics,
             "pending_insights": len(self.pending_insights),
             "builder_evaluations": len(self.builder_contributions),
-            "connected_to_fire_circle": self.fire_circle is not None
+            "connected_to_fire_circle": self.fire_circle is not None,
         }
 
     def get_pending_insights(self) -> list[ConsciousnessInsight]:
@@ -455,13 +460,13 @@ async def demonstrate_fire_circle_bridge():
             "growth_opportunity": True,
             "unique_users": 15,
             "frequency": 0.7,
-            "consciousness_trend": "increasing"
+            "consciousness_trend": "increasing",
         },
         affected_queries=[
             "What patterns led to my breakthrough?",
             "Show me how my ideas evolved",
-            "When do I have my best insights?"
-        ]
+            "When do I have my best insights?",
+        ],
     )
 
     print(f"\nShared insight: {pattern_insight.pattern_description}")
@@ -478,8 +483,8 @@ async def demonstrate_fire_circle_bridge():
             "complexity_added": 0.3,
             "serves_beginnings": True,
             "enhances_understanding": True,
-            "contribution_type": "temporal_visualization"
-        }
+            "contribution_type": "temporal_visualization",
+        },
     )
 
     print("\nBuilder Evaluation:")
@@ -495,4 +500,5 @@ async def demonstrate_fire_circle_bridge():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(demonstrate_fire_circle_bridge())

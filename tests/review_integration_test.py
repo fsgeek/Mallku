@@ -32,7 +32,7 @@ def run_integration_test():
             [sys.executable, str(test_file)],
             capture_output=True,
             text=True,
-            timeout=60  # 60 second timeout
+            timeout=60,  # 60 second timeout
         )
 
         # Display the output
@@ -55,11 +55,13 @@ def run_integration_test():
 
             # Extract consciousness score from output
             if "Overall Consciousness Score:" in result.stdout:
-                for line in result.stdout.split('\n'):
+                for line in result.stdout.split("\n"):
                     if "Overall Consciousness Score:" in line:
                         score = line.split(":")[-1].strip()
                         print(f"\n🧠 Consciousness Score: {score}")
-                        print("   This indicates the dialogue serves consciousness above threshold.")
+                        print(
+                            "   This indicates the dialogue serves consciousness above threshold."
+                        )
 
             print("\n✨ Key Achievements:")
             print("   - Pattern Translation Layer successfully bridges individual to collective")
@@ -111,6 +113,7 @@ def run_integration_test():
         print(f"❌ Error running test: {e}")
         return False
 
+
 def check_recent_changes():
     """Check what was recently added to understand the completed work."""
 
@@ -144,6 +147,7 @@ def check_recent_changes():
     print("   - Dialogue serves awakening, not optimization")
     print("   - Reciprocity flows through all decisions")
     print("   - Future builders are served by present choices")
+
 
 if __name__ == "__main__":
     print("🏛️ MALLKU INTEGRATION REVIEW")

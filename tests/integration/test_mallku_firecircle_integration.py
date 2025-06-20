@@ -137,16 +137,14 @@ class TestFireCircleIntegration:
 
         # Check Fire Circle convened event
         convened_events = [
-            e for e in events_received
-            if e.event_type == EventType.FIRE_CIRCLE_CONVENED
+            e for e in events_received if e.event_type == EventType.FIRE_CIRCLE_CONVENED
         ]
         assert len(convened_events) == 1
         assert convened_events[0].data["title"] == "Test Integration Dialogue"
 
         # Check consciousness events
         pattern_events = [
-            e for e in events_received
-            if e.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
+            e for e in events_received if e.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
         ]
         assert len(pattern_events) >= 1
 
@@ -408,6 +406,7 @@ class TestFireCircleIntegration:
 
 # Run tests if executed directly
 if __name__ == "__main__":
+
     async def run_tests():
         """Run integration tests."""
         logger.info("Running Fire Circle integration tests...")

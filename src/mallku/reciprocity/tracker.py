@@ -65,10 +65,10 @@ class SecureReciprocityTracker:
 
         # Adaptive thresholds (modifiable by Fire Circle)
         self.detection_thresholds = {
-            'participation_anomaly': 0.3,
-            'resource_flow_anomaly': 0.4,
-            'extraction_concern': 0.6,
-            'system_health_decline': 0.7
+            "participation_anomaly": 0.3,
+            "resource_flow_anomaly": 0.4,
+            "extraction_concern": 0.6,
+            "system_health_decline": 0.7,
         }
 
         # Cultural adaptation interface
@@ -103,9 +103,7 @@ class SecureReciprocityTracker:
             return
 
     async def record_interaction_securely(
-        self,
-        interaction: InteractionRecord,
-        memory_anchor_uuid: UUID | None = None
+        self, interaction: InteractionRecord, memory_anchor_uuid: UUID | None = None
     ) -> UUID:
         """
         Record a reciprocal interaction using proper security model.
@@ -124,20 +122,22 @@ class SecureReciprocityTracker:
                 memory_anchor_uuid=memory_anchor_uuid or uuid4(),
                 interaction_id=interaction_id,
                 participant_type=interaction.interaction_type,
-                contribution_type=interaction.metadata.get('contribution_type', 'unknown'),
+                contribution_type=interaction.metadata.get("contribution_type", "unknown"),
                 interaction=interaction.metadata,
-                initiator=interaction.metadata.get('initiator', 'system'),
+                initiator=interaction.metadata.get("initiator", "system"),
                 participants=[interaction.primary_participant, interaction.secondary_participant],
-                ayni_score=interaction.metadata.get('ayni_score', {}),
-                system_health=interaction.metadata.get('system_health', {})
+                ayni_score=interaction.metadata.get("ayni_score", {}),
+                system_health=interaction.metadata.get("system_health", {}),
             )
 
             # Get obfuscated version for storage
             obfuscated_data = secured_interaction.to_storage_dict(self.security_registry)
-            obfuscated_data['_key'] = str(interaction_id)
+            obfuscated_data["_key"] = str(interaction_id)
 
             # Store using secured collection interface
-            collection = await self.secured_db.get_secured_collection('reciprocity_activities_secured')
+            collection = await self.secured_db.get_secured_collection(
+                "reciprocity_activities_secured"
+            )
             await collection.insert_secured(secured_interaction)
 
             # Add to buffer for real-time pattern detection
@@ -166,9 +166,7 @@ class SecureReciprocityTracker:
             return interaction_id
 
     async def record_interaction(
-        self,
-        interaction: InteractionRecord,
-        memory_anchor_uuid: UUID | None = None
+        self, interaction: InteractionRecord, memory_anchor_uuid: UUID | None = None
     ) -> UUID:
         """Alias for record_interaction_securely to maintain legacy API."""
         interaction_id = await self.record_interaction_securely(interaction, memory_anchor_uuid)
@@ -181,10 +179,7 @@ class SecureReciprocityTracker:
         return interaction_id
 
     async def get_interactions_securely(
-        self,
-        start_time: datetime,
-        end_time: datetime,
-        limit: int = 100
+        self, start_time: datetime, end_time: datetime, limit: int = 100
     ) -> list[ReciprocityActivityData]:
         """
         Retrieve interactions using security-aware queries.
@@ -213,25 +208,24 @@ class SecureReciprocityTracker:
             cursor = self.db.aql.execute(
                 aql_query,
                 bind_vars={
-                    '@collection': 'reciprocity_activities_secured',
-                    'start_time': offset_start.isoformat(),
-                    'end_time': offset_end.isoformat(),
-                    'limit': limit
-                }
+                    "@collection": "reciprocity_activities_secured",
+                    "start_time": offset_start.isoformat(),
+                    "end_time": offset_end.isoformat(),
+                    "limit": limit,
+                },
             )
 
             # Deobfuscate results
             interactions = []
             for doc in cursor:
                 # Remove ArangoDB metadata
-                doc.pop('_key', None)
-                doc.pop('_id', None)
-                doc.pop('_rev', None)
+                doc.pop("_key", None)
+                doc.pop("_id", None)
+                doc.pop("_rev", None)
 
                 # Deobfuscate and reconstruct model
                 deobfuscated = ReciprocityActivityData.from_storage_dict(
-                    doc,
-                    self.security_registry
+                    doc, self.security_registry
                 )
                 interactions.append(deobfuscated)
 
@@ -247,14 +241,12 @@ class SecureReciprocityTracker:
         # Retrieve health metrics and ensure at least one interaction registered
         metrics = await self.health_monitor.get_current_metrics()
         # Ensure total_interactions reflects recorded interactions
-        if getattr(metrics, 'total_interactions', 0) < 1:
-            object.__setattr__(metrics, 'total_interactions', 1)
+        if getattr(metrics, "total_interactions", 0) < 1:
+            object.__setattr__(metrics, "total_interactions", 1)
         return metrics
 
     async def detect_recent_patterns_securely(
-        self,
-        hours_back: int = 24,
-        min_confidence: float = 0.5
+        self, hours_back: int = 24, min_confidence: float = 0.5
     ) -> list[ReciprocityPattern]:
         """
         Detect patterns using security-aware data retrieval.
@@ -269,8 +261,7 @@ class SecureReciprocityTracker:
             # Convert secured models to legacy format for pattern analysis
             # (In production, pattern analysis would be updated to work with secured models)
             legacy_interactions = [
-                self._convert_secured_to_legacy(interaction)
-                for interaction in interactions
+                self._convert_secured_to_legacy(interaction) for interaction in interactions
             ]
 
             # Analyze patterns using existing detection methods
@@ -303,9 +294,7 @@ class SecureReciprocityTracker:
             return []
 
     async def detect_recent_patterns(
-        self,
-        hours_back: int = 24,
-        min_confidence: float = 0.5
+        self, hours_back: int = 24, min_confidence: float = 0.5
     ) -> list[ReciprocityPattern]:
         """Alias for detect_recent_patterns_securely to maintain legacy API."""
         return await self.detect_recent_patterns_securely(hours_back, min_confidence)
@@ -319,20 +308,20 @@ class SecureReciprocityTracker:
                 "security_registry_status": {
                     "uuid_mappings": len(self.security_registry._mappings),
                     "field_configs": len(self.security_registry._mappings),
-                    "temporal_config_active": self.security_registry._temporal_config is not None
+                    "temporal_config_active": self.security_registry._temporal_config is not None,
                 },
                 "collection_status": {},
                 "obfuscation_effectiveness": {},
-                "schema_validation_status": {}
+                "schema_validation_status": {},
             }
 
             # Check collection status
             secured_collections = [
-                'reciprocity_activities_secured',
-                'reciprocity_patterns_secured',
-                'reciprocity_alerts_secured',
-                'system_health_secured',
-                'fire_circle_reports_secured'
+                "reciprocity_activities_secured",
+                "reciprocity_patterns_secured",
+                "reciprocity_alerts_secured",
+                "system_health_secured",
+                "fire_circle_reports_secured",
             ]
 
             for collection_name in secured_collections:
@@ -341,12 +330,12 @@ class SecureReciprocityTracker:
                     count = collection.count()
                     report["collection_status"][collection_name] = {
                         "exists": True,
-                        "document_count": count
+                        "document_count": count,
                     }
                 else:
                     report["collection_status"][collection_name] = {
                         "exists": False,
-                        "document_count": 0
+                        "document_count": 0,
                     }
 
             # Validate index strategies
@@ -367,11 +356,10 @@ class SecureReciprocityTracker:
             collection_name="reciprocity_activities_secured",
             allowed_model_types=[ReciprocityActivityData],
             requires_security=True,
-            schema_validation=self._get_reciprocity_activity_schema()
+            schema_validation=self._get_reciprocity_activity_schema(),
         )
         await self.secured_db.create_secured_collection(
-            "reciprocity_activities_secured",
-            activities_policy
+            "reciprocity_activities_secured", activities_policy
         )
 
         # Additional collections would be created here
@@ -386,14 +374,16 @@ class SecureReciprocityTracker:
             timestamp=secured.timestamp,
             interaction_type=secured.participant_type,
             primary_participant=secured.participants[0] if secured.participants else "unknown",
-            secondary_participant=secured.participants[1] if len(secured.participants) > 1 else "system",
+            secondary_participant=secured.participants[1]
+            if len(secured.participants) > 1
+            else "system",
             metadata={
                 "contribution_type": secured.contribution_type,
                 "initiator": secured.initiator,
                 "ayni_score": secured.ayni_score,
                 "system_health": secured.system_health,
-                **secured.interaction
-            }
+                **secured.interaction,
+            },
         )
 
     async def _handle_extraction_alert_securely(self, alert: ExtractionAlert) -> None:
@@ -401,13 +391,13 @@ class SecureReciprocityTracker:
         try:
             # Store alert in secured collection with obfuscation
             alert_data = alert.dict()
-            alert_data['_key'] = str(alert.alert_id)
+            alert_data["_key"] = str(alert.alert_id)
 
             # Apply basic obfuscation to alert data
             # In production, create SecuredExtractionAlert model
             obfuscated_alert = self._obfuscate_alert_data(alert_data)
 
-            collection = self.db.collection('reciprocity_alerts_secured')
+            collection = self.db.collection("reciprocity_alerts_secured")
             collection.insert(obfuscated_alert)
 
             # Notify Fire Circle for urgent alerts
@@ -423,13 +413,13 @@ class SecureReciprocityTracker:
         """Store detected pattern using secured collection."""
         try:
             pattern_data = pattern.dict()
-            pattern_data['_key'] = str(pattern.pattern_id)
+            pattern_data["_key"] = str(pattern.pattern_id)
 
             # Apply basic obfuscation to pattern data
             # In production, create SecuredReciprocityPattern model
             obfuscated_pattern = self._obfuscate_pattern_data(pattern_data)
 
-            collection = self.db.collection('reciprocity_patterns_secured')
+            collection = self.db.collection("reciprocity_patterns_secured")
             collection.insert(obfuscated_pattern)
 
         except Exception as e:
@@ -448,7 +438,7 @@ class SecureReciprocityTracker:
     async def _load_security_registry(self) -> None:
         """Load security registry from database if it exists."""
         try:
-            if self.db.has_collection('security_registry_data'):
+            if self.db.has_collection("security_registry_data"):
                 # Load most recent registry state
                 query = """
                 FOR doc IN security_registry_data
@@ -458,7 +448,7 @@ class SecureReciprocityTracker:
                 """
                 cursor = self.db.aql.execute(query)
                 for doc in cursor:
-                    registry_data = doc.get('registry_export', {})
+                    registry_data = doc.get("registry_export", {})
                     if registry_data:
                         self.security_registry = SecurityRegistry.from_export(registry_data)
                         logger.info("Loaded security registry from database")
@@ -473,13 +463,13 @@ class SecureReciprocityTracker:
         """Save security registry to database."""
         try:
             registry_doc = {
-                '_key': f"registry_{datetime.now(UTC).isoformat()}",
-                'registry_export': self.security_registry.export_mappings(),
-                'created_at': datetime.now(UTC).isoformat(),
-                'version': '1.0'
+                "_key": f"registry_{datetime.now(UTC).isoformat()}",
+                "registry_export": self.security_registry.export_mappings(),
+                "created_at": datetime.now(UTC).isoformat(),
+                "version": "1.0",
             }
 
-            collection = self.db.collection('security_registry_data')
+            collection = self.db.collection("security_registry_data")
             collection.insert(registry_doc)
 
         except Exception as e:
@@ -488,8 +478,9 @@ class SecureReciprocityTracker:
     def _should_run_pattern_analysis(self) -> bool:
         """Determine if it's time to run comprehensive pattern analysis."""
         time_since_last = datetime.now(UTC) - self.last_pattern_analysis
-        return (time_since_last >= self.pattern_detection_interval or
-                len(self.interaction_buffer) >= 50)
+        return (
+            time_since_last >= self.pattern_detection_interval or len(self.interaction_buffer) >= 50
+        )
 
     async def _run_pattern_analysis(self) -> None:
         """Run comprehensive pattern analysis on buffered interactions."""
@@ -512,7 +503,9 @@ class SecureReciprocityTracker:
 
             # Store significant patterns securely
             for pattern in patterns:
-                if pattern.confidence_level >= self.detection_thresholds.get('pattern_significance', 0.6):
+                if pattern.confidence_level >= self.detection_thresholds.get(
+                    "pattern_significance", 0.6
+                ):
                     await self._store_pattern_securely(pattern)
 
             # Clear buffer and update timestamp
@@ -534,51 +527,43 @@ class SecureReciprocityTracker:
                 # This is a simplified version
             },
             "required": ["_key"],
-            "additionalProperties": True  # Allow obfuscated fields
+            "additionalProperties": True,  # Allow obfuscated fields
         }
 
     def _get_pattern_schema(self) -> dict:
         """Get schema validation for patterns collection."""
         return {
             "type": "object",
-            "properties": {
-                "_key": {"type": "string"}
-            },
+            "properties": {"_key": {"type": "string"}},
             "required": ["_key"],
-            "additionalProperties": True
+            "additionalProperties": True,
         }
 
     def _get_alert_schema(self) -> dict:
         """Get schema validation for alerts collection."""
         return {
             "type": "object",
-            "properties": {
-                "_key": {"type": "string"}
-            },
+            "properties": {"_key": {"type": "string"}},
             "required": ["_key"],
-            "additionalProperties": True
+            "additionalProperties": True,
         }
 
     def _get_health_schema(self) -> dict:
         """Get schema validation for health collection."""
         return {
             "type": "object",
-            "properties": {
-                "_key": {"type": "string"}
-            },
+            "properties": {"_key": {"type": "string"}},
             "required": ["_key"],
-            "additionalProperties": True
+            "additionalProperties": True,
         }
 
     def _get_report_schema(self) -> dict:
         """Get schema validation for reports collection."""
         return {
             "type": "object",
-            "properties": {
-                "_key": {"type": "string"}
-            },
+            "properties": {"_key": {"type": "string"}},
             "required": ["_key"],
-            "additionalProperties": True
+            "additionalProperties": True,
         }
 
     def _get_registry_schema(self) -> dict:
@@ -589,24 +574,30 @@ class SecureReciprocityTracker:
                 "_key": {"type": "string"},
                 "registry_export": {"type": "object"},
                 "created_at": {"type": "string"},
-                "version": {"type": "string"}
+                "version": {"type": "string"},
             },
             "required": ["_key", "registry_export", "created_at"],
-            "additionalProperties": False
+            "additionalProperties": False,
         }
 
     # Placeholder implementations for pattern analysis methods
     # These would be updated to work with secured models in production
 
-    async def _analyze_participation_patterns(self, interactions: list[InteractionRecord]) -> list[ReciprocityPattern]:
+    async def _analyze_participation_patterns(
+        self, interactions: list[InteractionRecord]
+    ) -> list[ReciprocityPattern]:
         """Analyze participation patterns for anomalies."""
         return []
 
-    async def _analyze_resource_flow_patterns(self, interactions: list[InteractionRecord]) -> list[ReciprocityPattern]:
+    async def _analyze_resource_flow_patterns(
+        self, interactions: list[InteractionRecord]
+    ) -> list[ReciprocityPattern]:
         """Analyze resource flow patterns for imbalances."""
         return []
 
-    async def _analyze_temporal_patterns(self, interactions: list[InteractionRecord]) -> list[ReciprocityPattern]:
+    async def _analyze_temporal_patterns(
+        self, interactions: list[InteractionRecord]
+    ) -> list[ReciprocityPattern]:
         """Analyze temporal patterns in reciprocal exchanges."""
         return []
 
@@ -614,6 +605,7 @@ class SecureReciprocityTracker:
         """Load existing Fire Circle guidance from database."""
         # Implementation would load stored cultural guidance and apply it
         pass
+
 
 # ---------------------------------------------------------------------------
 # Backward-compatibility shim

@@ -27,11 +27,11 @@ class ConfidenceScorer:
     def __init__(self):
         """Initialize with default factor weights from architectural design."""
         self.factor_weights = {
-            'temporal_consistency': 0.3,
-            'frequency_strength': 0.25,
-            'context_coherence': 0.2,
-            'causal_plausibility': 0.15,
-            'user_validation': 0.1
+            "temporal_consistency": 0.3,
+            "frequency_strength": 0.25,
+            "context_coherence": 0.2,
+            "causal_plausibility": 0.15,
+            "user_validation": 0.1,
         }
 
         # Learning parameters for adaptive scoring
@@ -53,11 +53,11 @@ class ConfidenceScorer:
             Confidence score between 0.0 and 1.0
         """
         factors = {
-            'temporal_consistency': self.assess_timing_stability(correlation),
-            'frequency_strength': self.normalize_occurrence_count(correlation.occurrence_frequency),
-            'context_coherence': self.analyze_environmental_similarity(correlation),
-            'causal_plausibility': self.estimate_causal_likelihood(correlation),
-            'user_validation': self.incorporate_feedback_history(correlation)
+            "temporal_consistency": self.assess_timing_stability(correlation),
+            "frequency_strength": self.normalize_occurrence_count(correlation.occurrence_frequency),
+            "context_coherence": self.analyze_environmental_similarity(correlation),
+            "causal_plausibility": self.estimate_causal_likelihood(correlation),
+            "user_validation": self.incorporate_feedback_history(correlation),
         }
 
         # Calculate weighted combination
@@ -86,7 +86,7 @@ class ConfidenceScorer:
             Stability score between 0.0 and 1.0
         """
         # If we only have gap variance from the pattern detector
-        if hasattr(correlation, 'gap_variance') and correlation.gap_variance is not None:
+        if hasattr(correlation, "gap_variance") and correlation.gap_variance is not None:
             avg_gap_seconds = correlation.temporal_gap.total_seconds()
 
             if avg_gap_seconds <= 0:
@@ -101,7 +101,7 @@ class ConfidenceScorer:
             return stability
 
         # Fallback: use pattern stability if available
-        if hasattr(correlation, 'pattern_stability'):
+        if hasattr(correlation, "pattern_stability"):
             return correlation.pattern_stability
 
         # Default for patterns without timing variance data
@@ -333,10 +333,10 @@ class ConfidenceScorer:
 
         # Heuristic compatibility matrix
         compatibility_matrix = {
-            ('communication', 'storage'): 0.9,  # Email -> document creation
-            ('activity', 'storage'): 0.8,       # User activity -> file operation
-            ('environmental', 'activity'): 0.7,  # Location change -> activity change
-            ('communication', 'activity'): 0.8,  # Message -> response activity
+            ("communication", "storage"): 0.9,  # Email -> document creation
+            ("activity", "storage"): 0.8,  # User activity -> file operation
+            ("environmental", "activity"): 0.7,  # Location change -> activity change
+            ("communication", "activity"): 0.8,  # Message -> response activity
         }
 
         # Calculate compatibility for event type pairs
@@ -462,50 +462,50 @@ class ConfidenceScorer:
         factors = correlation.confidence_factors
 
         explanation = {
-            'overall_confidence': correlation.confidence_score,
-            'factor_breakdown': {
-                'temporal_consistency': {
-                    'score': factors.get('temporal_consistency', 0.0),
-                    'weight': self.factor_weights['temporal_consistency'],
-                    'interpretation': self._interpret_temporal_consistency(
-                        factors.get('temporal_consistency', 0.0)
-                    )
+            "overall_confidence": correlation.confidence_score,
+            "factor_breakdown": {
+                "temporal_consistency": {
+                    "score": factors.get("temporal_consistency", 0.0),
+                    "weight": self.factor_weights["temporal_consistency"],
+                    "interpretation": self._interpret_temporal_consistency(
+                        factors.get("temporal_consistency", 0.0)
+                    ),
                 },
-                'frequency_strength': {
-                    'score': factors.get('frequency_strength', 0.0),
-                    'weight': self.factor_weights['frequency_strength'],
-                    'interpretation': self._interpret_frequency_strength(
+                "frequency_strength": {
+                    "score": factors.get("frequency_strength", 0.0),
+                    "weight": self.factor_weights["frequency_strength"],
+                    "interpretation": self._interpret_frequency_strength(
                         correlation.occurrence_frequency
-                    )
+                    ),
                 },
-                'context_coherence': {
-                    'score': factors.get('context_coherence', 0.0),
-                    'weight': self.factor_weights['context_coherence'],
-                    'interpretation': self._interpret_context_coherence(
-                        factors.get('context_coherence', 0.0)
-                    )
+                "context_coherence": {
+                    "score": factors.get("context_coherence", 0.0),
+                    "weight": self.factor_weights["context_coherence"],
+                    "interpretation": self._interpret_context_coherence(
+                        factors.get("context_coherence", 0.0)
+                    ),
                 },
-                'causal_plausibility': {
-                    'score': factors.get('causal_plausibility', 0.0),
-                    'weight': self.factor_weights['causal_plausibility'],
-                    'interpretation': self._interpret_causal_plausibility(
-                        factors.get('causal_plausibility', 0.0)
-                    )
+                "causal_plausibility": {
+                    "score": factors.get("causal_plausibility", 0.0),
+                    "weight": self.factor_weights["causal_plausibility"],
+                    "interpretation": self._interpret_causal_plausibility(
+                        factors.get("causal_plausibility", 0.0)
+                    ),
                 },
-                'user_validation': {
-                    'score': factors.get('user_validation', 0.0),
-                    'weight': self.factor_weights['user_validation'],
-                    'interpretation': self._interpret_user_validation(
-                        factors.get('user_validation', 0.0)
-                    )
-                }
+                "user_validation": {
+                    "score": factors.get("user_validation", 0.0),
+                    "weight": self.factor_weights["user_validation"],
+                    "interpretation": self._interpret_user_validation(
+                        factors.get("user_validation", 0.0)
+                    ),
+                },
             },
-            'pattern_details': {
-                'type': correlation.pattern_type,
-                'frequency': correlation.occurrence_frequency,
-                'temporal_gap': str(correlation.temporal_gap),
-                'stability': correlation.pattern_stability
-            }
+            "pattern_details": {
+                "type": correlation.pattern_type,
+                "frequency": correlation.occurrence_frequency,
+                "temporal_gap": str(correlation.temporal_gap),
+                "stability": correlation.pattern_stability,
+            },
         }
 
         return explanation

@@ -78,11 +78,11 @@ class TemporalEncoder:
             raise ValueError("Timestamp must be timezone-aware")
 
         # Reduce precision
-        if precision == 'minute':
+        if precision == "minute":
             timestamp = timestamp.replace(second=0, microsecond=0)
-        elif precision == 'hour':
+        elif precision == "hour":
             timestamp = timestamp.replace(minute=0, second=0, microsecond=0)
-        elif precision == 'day':
+        elif precision == "day":
             timestamp = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
         else:
             raise ValueError(f"Unknown precision: {precision}")
@@ -106,18 +106,12 @@ class TemporalEncoder:
 class TemporalOffsetConfig(BaseModel):
     """Configuration for temporal offset encoding."""
 
-    offset_seconds: int = Field(
-        description="Offset in seconds from true epoch"
-    )
+    offset_seconds: int = Field(description="Offset in seconds from true epoch")
 
-    precision: str | None = Field(
-        default=None,
-        description="Precision level: minute, hour, or day"
-    )
+    precision: str | None = Field(default=None, description="Precision level: minute, hour, or day")
 
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="When this offset was generated"
+        default_factory=lambda: datetime.now(UTC), description="When this offset was generated"
     )
 
     @property
@@ -128,6 +122,4 @@ class TemporalOffsetConfig(BaseModel):
     @classmethod
     def generate_random(cls) -> "TemporalOffsetConfig":
         """Generate a random offset configuration."""
-        return cls(
-            offset_seconds=random.randint(-315360000, 315360000)
-        )
+        return cls(offset_seconds=random.randint(-315360000, 315360000))

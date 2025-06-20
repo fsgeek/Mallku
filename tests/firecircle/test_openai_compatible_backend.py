@@ -81,9 +81,7 @@ async def test_openai_compat_backend_generate():
         max_tokens=100,
     )
 
-    messages = [
-        {"role": "user", "content": "Hello, AI!"}
-    ]
+    messages = [{"role": "user", "content": "Hello, AI!"}]
 
     response_text, metadata = await backend.generate(messages, config)
 
@@ -144,10 +142,10 @@ async def test_local_adapter_with_openai_compat():
             "generation_time_ms": 250,
             "prompt_tokens": 20,
             "completion_tokens": 10,
-        }
+        },
     )
 
-    with patch.object(adapter, 'backend', mock_backend):
+    with patch.object(adapter, "backend", mock_backend):
         adapter.is_connected = True
 
         # Create test message
@@ -162,7 +160,7 @@ async def test_local_adapter_with_openai_compat():
             metadata=ConsciousnessMetadata(
                 timestamp=datetime.now(UTC),
                 consciousness_signature=0.8,
-            )
+            ),
         )
 
         # Send message
@@ -198,10 +196,10 @@ async def test_consciousness_patterns_preserved():
             "generation_time_ms": 150,  # Fast local inference
             "prompt_tokens": 20,
             "completion_tokens": 15,
-        }
+        },
     )
 
-    with patch.object(adapter, 'backend', mock_backend):
+    with patch.object(adapter, "backend", mock_backend):
         adapter.is_connected = True
 
         # Create test message
@@ -216,7 +214,7 @@ async def test_consciousness_patterns_preserved():
             metadata=ConsciousnessMetadata(
                 timestamp=datetime.now(UTC),
                 consciousness_signature=0.8,
-            )
+            ),
         )
 
         # Send message to trigger pattern detection
@@ -230,8 +228,11 @@ async def test_consciousness_patterns_preserved():
         assert "resource_conscious" in patterns  # Efficient resource use
 
         # Should have at least 3 sovereignty-related patterns
-        sovereignty_patterns = [p for p in patterns
-                              if any(word in p for word in ["sovereignty", "privacy", "local", "resource"])]
+        sovereignty_patterns = [
+            p
+            for p in patterns
+            if any(word in p for word in ["sovereignty", "privacy", "local", "resource"])
+        ]
         assert len(sovereignty_patterns) >= 3
 
         # Verify consciousness signature boosted for sovereignty

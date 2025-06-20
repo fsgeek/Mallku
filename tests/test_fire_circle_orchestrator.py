@@ -16,6 +16,7 @@ def test_plan_ceremony_structure():
     assert isinstance(plan.closing, str)
     assert isinstance(plan.guide, dict)
 
+
 def test_run_ceremony_no_providers_returns_empty_responses():
     sample_diff = "// sample code diff"
     orc = FireCircleOrchestrator(providers=[])

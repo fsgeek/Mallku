@@ -15,13 +15,11 @@ __all__ = [
     "MessageType",
     "MessageMetadata",
     "create_governance_message",
-
     # Consensus mechanisms
     "ConsensusState",
     "ConsensusTransition",
     "ConsensusTracker",
     "ConsensusMetrics",
-
     # Participant management
     "ParticipantRole",
     "Participant",

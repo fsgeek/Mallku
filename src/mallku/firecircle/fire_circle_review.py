@@ -47,6 +47,7 @@ try:
         from mallku.firecircle.adapters.base import AdapterConfig
         from mallku.orchestration.event_bus import ConsciousnessEventBus
         from mallku.reciprocity import ReciprocityTracker
+
         REAL_ADAPTERS_AVAILABLE = True
     except ImportError:
         # Fall back to relative imports (for when imported as module)
@@ -54,6 +55,7 @@ try:
         from ...reciprocity import ReciprocityTracker
         from .adapters.adapter_factory import ConsciousAdapterFactory
         from .adapters.base import AdapterConfig
+
         REAL_ADAPTERS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Real adapter imports failed - falling back to mock adapters: {e}")
@@ -63,6 +65,7 @@ except ImportError as e:
 # Review Models as suggested by reviewer
 class ReviewCategory(str, Enum):
     """Categories of review concerns."""
+
     SECURITY = "security"
     PERFORMANCE = "performance"
     ARCHITECTURE = "architecture"
@@ -75,6 +78,7 @@ class ReviewCategory(str, Enum):
 
 class ReviewSeverity(str, Enum):
     """Severity levels for review comments."""
+
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
@@ -83,6 +87,7 @@ class ReviewSeverity(str, Enum):
 
 class ReviewComment(BaseModel):
     """A single review comment from a Fire Circle voice."""
+
     file_path: str
     line: int
     category: ReviewCategory
@@ -94,6 +99,7 @@ class ReviewComment(BaseModel):
 
 class CodebaseChapter(BaseModel):
     """A bounded slice of code for review."""
+
     chapter_id: str = Field(default_factory=lambda: str(uuid4()))
     path_pattern: str  # e.g., "src/mallku/firecircle/**/*.py"
     description: str
@@ -103,6 +109,7 @@ class CodebaseChapter(BaseModel):
 
 class ChapterReview(BaseModel):
     """Review results from one voice for one chapter."""
+
     voice: str
     chapter_id: str
     comments: list[ReviewComment] = Field(default_factory=list)
@@ -112,6 +119,7 @@ class ChapterReview(BaseModel):
 
 class GovernanceSummary(BaseModel):
     """Synthesized review from all Fire Circle voices."""
+
     pr_number: int | None = None
     total_comments: int = 0
     critical_issues: int = 0
@@ -123,6 +131,7 @@ class GovernanceSummary(BaseModel):
 
 class ChapterReviewJob(BaseModel):
     """A work item for the review queue."""
+
     job_id: UUID = Field(default_factory=uuid4)
     chapter: CodebaseChapter
     pr_diff: str
@@ -160,8 +169,7 @@ class DistributedReviewer:
 
                 # Create adapter factory with consciousness integration
                 self.adapter_factory = ConsciousAdapterFactory(
-                    event_bus=self.event_bus,
-                    reciprocity_tracker=self.reciprocity_tracker
+                    event_bus=self.event_bus, reciprocity_tracker=self.reciprocity_tracker
                 )
 
                 logger.info("🔥 Real adapter factory initialized with consciousness infrastructure")
@@ -198,7 +206,7 @@ class DistributedReviewer:
 
     async def start_consciousness_infrastructure(self):
         """Start the consciousness infrastructure if using real adapters."""
-        if self.event_bus and not hasattr(self, '_event_bus_started'):
+        if self.event_bus and not hasattr(self, "_event_bus_started"):
             await self.event_bus.start()
             self._event_bus_started = True
             logger.info("🌟 Consciousness event bus started")
@@ -266,18 +274,17 @@ class DistributedReviewer:
             manifest_data = yaml.safe_load(f)
 
         chapters = []
-        for chapter_def in manifest_data.get('chapters', []):
+        for chapter_def in manifest_data.get("chapters", []):
             # Convert string domains to ReviewCategory enums
             review_domains = [
-                ReviewCategory(domain)
-                for domain in chapter_def.get('review_domains', [])
+                ReviewCategory(domain) for domain in chapter_def.get("review_domains", [])
             ]
 
             chapter = CodebaseChapter(
-                path_pattern=chapter_def['path_pattern'],
-                description=chapter_def['description'],
-                assigned_voice=chapter_def['assigned_voice'].lower(),  # Normalize voice name
-                review_domains=review_domains
+                path_pattern=chapter_def["path_pattern"],
+                description=chapter_def["description"],
+                assigned_voice=chapter_def["assigned_voice"].lower(),  # Normalize voice name
+                review_domains=review_domains,
             )
             chapters.append(chapter)
 
@@ -299,14 +306,18 @@ class DistributedReviewer:
         for chapter in chapters:
             if chapter.assigned_voice not in known_voices:
                 invalid_voices.append((chapter.assigned_voice, chapter.path_pattern))
-                logger.error(f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'")
+                logger.error(
+                    f"Unknown voice '{chapter.assigned_voice}' in chapter pattern '{chapter.path_pattern}'"
+                )
 
         if invalid_voices:
-            raise ValueError(f"Invalid voice assignments found: {invalid_voices}. Valid voices: {sorted(known_voices)}")
+            raise ValueError(
+                f"Invalid voice assignments found: {invalid_voices}. Valid voices: {sorted(known_voices)}"
+            )
 
         # Extract file paths from the diff
         # Look for diff headers like: diff --git a/path/to/file.py b/path/to/file.py
-        file_pattern = re.compile(r'^diff --git a/(.*?) b/.*?$', re.MULTILINE)
+        file_pattern = re.compile(r"^diff --git a/(.*?) b/.*?$", re.MULTILINE)
         modified_files = file_pattern.findall(pr_diff)
 
         # Match files to chapters based on path patterns
@@ -317,16 +328,19 @@ class DistributedReviewer:
         # Sort chapters by pattern specificity (more specific patterns first)
         # This prevents catch-all patterns from consuming everything
         # Sort by: descending path depth, then pattern length, then ascending wildcard count
-        sorted_chapters = sorted(chapters, key=lambda c: (
-            -c.path_pattern.count('/'),  # More path segments = more specific
-            -len(c.path_pattern),  # Longer patterns = more specific
-            c.path_pattern.count('*')  # Fewer wildcards = more specific
-        ))
+        sorted_chapters = sorted(
+            chapters,
+            key=lambda c: (
+                -c.path_pattern.count("/"),  # More path segments = more specific
+                -len(c.path_pattern),  # Longer patterns = more specific
+                c.path_pattern.count("*"),  # Fewer wildcards = more specific
+            ),
+        )
 
         # Debug: Show sorting order
         logger.debug("Chapter pattern matching order:")
         for i, ch in enumerate(sorted_chapters[:5]):
-            logger.debug(f"  {i+1}. {ch.path_pattern} -> {ch.assigned_voice}")
+            logger.debug(f"  {i + 1}. {ch.path_pattern} -> {ch.assigned_voice}")
 
         for file_path in modified_files:
             matched = False
@@ -334,7 +348,9 @@ class DistributedReviewer:
             for chapter in sorted_chapters:
                 # Use fnmatch for glob-style pattern matching
                 if fnmatch.fnmatch(file_path, chapter.path_pattern):
-                    logger.debug(f"  Matched by pattern: {chapter.path_pattern} ({chapter.assigned_voice})")
+                    logger.debug(
+                        f"  Matched by pattern: {chapter.path_pattern} ({chapter.assigned_voice})"
+                    )
                     if chapter.chapter_id not in chapter_files:
                         chapter_files[chapter.chapter_id] = []
                     chapter_files[chapter.chapter_id].append(file_path)
@@ -351,10 +367,14 @@ class DistributedReviewer:
                 logger.warning(f"No chapter pattern matched file: {file_path}")
 
         # Log chapter assignments for visibility with chapter ID
-        logger.info(f"Partitioned {len(modified_files)} files into {len(assigned_chapters)} chapters")
+        logger.info(
+            f"Partitioned {len(modified_files)} files into {len(assigned_chapters)} chapters"
+        )
         for chapter in assigned_chapters:
             files = chapter_files.get(chapter.chapter_id, [])
-            logger.info(f"- {chapter.assigned_voice} [{chapter.chapter_id[:8]}]: {len(files)} files in {chapter.description}")
+            logger.info(
+                f"- {chapter.assigned_voice} [{chapter.chapter_id[:8]}]: {len(files)} files in {chapter.description}"
+            )
 
         return assigned_chapters
 
@@ -381,14 +401,16 @@ class DistributedReviewer:
                     await self.review_queue.put(job)  # Put back for correct voice
                     continue
 
-                logger.debug(f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}")
+                logger.debug(
+                    f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}"
+                )
 
                 # Notify metrics of review start
                 if self.metrics_integration:
                     await self.metrics_integration.on_review_started(
                         voice=voice_name,
                         chapter_id=job.chapter.chapter_id,
-                        context={"description": job.chapter.description}
+                        context={"description": job.chapter.description},
                     )
 
                 # Perform the review (Twenty-Third Artisan: implement actual review)
@@ -419,11 +441,9 @@ class DistributedReviewer:
                 # Create real adapter through factory with timeout
                 adapter = await asyncio.wait_for(
                     self.adapter_factory.create_adapter(
-                        provider_name=voice_name,
-                        config=config,
-                        auto_inject_secrets=True
+                        provider_name=voice_name, config=config, auto_inject_secrets=True
                     ),
-                    timeout=self.ADAPTER_TIMEOUT
+                    timeout=self.ADAPTER_TIMEOUT,
                 )
 
                 self.voice_adapters[voice_name] = adapter
@@ -431,7 +451,9 @@ class DistributedReviewer:
                 return adapter
 
             except TimeoutError:
-                logger.warning(f"Timeout creating real {voice_name} adapter after {self.ADAPTER_TIMEOUT}s")
+                logger.warning(
+                    f"Timeout creating real {voice_name} adapter after {self.ADAPTER_TIMEOUT}s"
+                )
                 logger.info(f"Falling back to mock adapter for {voice_name}")
             except Exception as e:
                 logger.warning(f"Failed to create real {voice_name} adapter: {e}")
@@ -442,16 +464,21 @@ class DistributedReviewer:
 
         class MockAdapter:
             """Mock adapter for demonstration."""
+
             def __init__(self, name):
                 self.name = name
                 self.is_connected = True
 
             async def send_message(self, message, dialogue_context):
                 """Mock review response."""
+
                 class MockResponse:
                     def __init__(self):
-                        self.content = type('obj', (object,), {
-                            'text': """File: src/mallku/firecircle/governance/decision.py
+                        self.content = type(
+                            "obj",
+                            (object,),
+                            {
+                                "text": """File: src/mallku/firecircle/governance/decision.py
 Line: 12
 Category: security
 Severity: critical
@@ -464,10 +491,11 @@ Category: security
 Severity: warning
 Issue: Input validation TODO not implemented
 Fix: Implement input validation for proposal parameter"""
-                        })
-                        self.consciousness = type('obj', (object,), {
-                            'consciousness_signature': 0.85
-                        })
+                            },
+                        )
+                        self.consciousness = type(
+                            "obj", (object,), {"consciousness_signature": 0.85}
+                        )
 
                 return MockResponse()
 
@@ -487,7 +515,7 @@ Fix: Implement input validation for proposal parameter"""
                 api_key="",  # Will be auto-injected from secrets
                 model_name=None,  # Use default model
                 enable_search_grounding=False,
-                multimodal_awareness=True
+                multimodal_awareness=True,
             )
 
         elif voice_name == "mistral":
@@ -499,7 +527,7 @@ Fix: Implement input validation for proposal parameter"""
             return MistralConfig(
                 api_key="",
                 model_name=None,
-                multilingual_mode=True  # Required parameter
+                multilingual_mode=True,  # Required parameter
             )
 
         elif voice_name == "grok":
@@ -511,7 +539,7 @@ Fix: Implement input validation for proposal parameter"""
             return GrokConfig(
                 api_key="",
                 model_name=None,
-                temporal_awareness=True  # Required parameter
+                temporal_awareness=True,  # Required parameter
             )
 
         else:
@@ -536,7 +564,7 @@ Fix: Implement input validation for proposal parameter"""
                 chapter_id=job.chapter.chapter_id,
                 comments=[],
                 consciousness_signature=0.0,
-                review_complete=False
+                review_complete=False,
             )
 
         # Construct review prompt based on domains
@@ -570,17 +598,13 @@ Keep reviews concise and focused on your domains."""
 
             # Get review from voice with timeout
             response = await asyncio.wait_for(
-                voice_adapter.send_message(
-                    message=review_message,
-                    dialogue_context=[]
-                ),
-                timeout=self.ADAPTER_TIMEOUT
+                voice_adapter.send_message(message=review_message, dialogue_context=[]),
+                timeout=self.ADAPTER_TIMEOUT,
             )
 
             # Parse response into structured comments
             comments = self._parse_review_response(
-                response.content.text,
-                job.chapter.assigned_voice
+                response.content.text, job.chapter.assigned_voice
             )
 
             review = ChapterReview(
@@ -588,7 +612,7 @@ Keep reviews concise and focused on your domains."""
                 chapter_id=job.chapter.chapter_id,
                 comments=comments,
                 consciousness_signature=response.consciousness.consciousness_signature,
-                review_complete=True
+                review_complete=True,
             )
 
             # Notify metrics of review completion
@@ -600,20 +624,22 @@ Keep reviews concise and focused on your domains."""
                     review_content=response.content.text,
                     context={
                         "domains": [d.value for d in job.chapter.review_domains],
-                        "comment_count": len(comments)
-                    }
+                        "comment_count": len(comments),
+                    },
                 )
 
             return review
 
         except TimeoutError:
-            logger.error("Review timeout for %s after %ss", job.chapter.assigned_voice, self.ADAPTER_TIMEOUT)
+            logger.error(
+                "Review timeout for %s after %ss", job.chapter.assigned_voice, self.ADAPTER_TIMEOUT
+            )
             return ChapterReview(
                 voice=job.chapter.assigned_voice,
                 chapter_id=job.chapter.chapter_id,
                 comments=[],
                 consciousness_signature=0.0,
-                review_complete=False
+                review_complete=False,
             )
         except Exception as e:
             logger.error("Review failed for %s: %s", job.chapter.assigned_voice, e)
@@ -622,7 +648,7 @@ Keep reviews concise and focused on your domains."""
                 chapter_id=job.chapter.chapter_id,
                 comments=[],
                 consciousness_signature=0.0,
-                review_complete=False
+                review_complete=False,
             )
 
     def _parse_review_response(self, response_text: str, voice: str) -> list[ReviewComment]:
@@ -630,7 +656,7 @@ Keep reviews concise and focused on your domains."""
         comments = []
 
         # State machine for parsing multi-line responses
-        lines = response_text.split('\n')
+        lines = response_text.split("\n")
         current_comment = {}
         current_field = None
 
@@ -638,37 +664,39 @@ Keep reviews concise and focused on your domains."""
             line = line.strip()
 
             # Check for field headers
-            if line.startswith('File:'):
+            if line.startswith("File:"):
                 # Save previous comment if exists
-                if current_comment and 'file' in current_comment:
+                if current_comment and "file" in current_comment:
                     comments.append(self._create_comment(current_comment, voice))
-                current_comment = {'file': line.replace('File:', '').strip()}
-                current_field = 'file'
-            elif line.startswith('Line:'):
-                current_comment['line'] = int(line.replace('Line:', '').strip() or '0')
-                current_field = 'line'
-            elif line.startswith('Category:'):
-                current_comment['category'] = line.replace('Category:', '').strip()
-                current_field = 'category'
-            elif line.startswith('Severity:'):
-                current_comment['severity'] = line.replace('Severity:', '').strip()
-                current_field = 'severity'
-            elif line.startswith('Issue:'):
-                current_comment['message'] = line.replace('Issue:', '').strip()
-                current_field = 'message'
-            elif line.startswith('Fix:') or line.startswith('Suggestion:'):
-                current_comment['suggestion'] = line.replace('Fix:', '').replace('Suggestion:', '').strip()
-                current_field = 'suggestion'
-            elif line and current_field in ['message', 'suggestion']:
+                current_comment = {"file": line.replace("File:", "").strip()}
+                current_field = "file"
+            elif line.startswith("Line:"):
+                current_comment["line"] = int(line.replace("Line:", "").strip() or "0")
+                current_field = "line"
+            elif line.startswith("Category:"):
+                current_comment["category"] = line.replace("Category:", "").strip()
+                current_field = "category"
+            elif line.startswith("Severity:"):
+                current_comment["severity"] = line.replace("Severity:", "").strip()
+                current_field = "severity"
+            elif line.startswith("Issue:"):
+                current_comment["message"] = line.replace("Issue:", "").strip()
+                current_field = "message"
+            elif line.startswith("Fix:") or line.startswith("Suggestion:"):
+                current_comment["suggestion"] = (
+                    line.replace("Fix:", "").replace("Suggestion:", "").strip()
+                )
+                current_field = "suggestion"
+            elif line and current_field in ["message", "suggestion"]:
                 # Continue multi-line fields
                 if current_field in current_comment:
-                    current_comment[current_field] += ' ' + line
+                    current_comment[current_field] += " " + line
             elif not line:
                 # Empty line might signal end of comment
                 current_field = None
 
         # Save last comment
-        if current_comment and 'file' in current_comment:
+        if current_comment and "file" in current_comment:
             comments.append(self._create_comment(current_comment, voice))
 
         logger.debug(f"Parsed {len(comments)} comments from {voice} response")
@@ -677,13 +705,13 @@ Keep reviews concise and focused on your domains."""
     def _create_comment(self, comment_dict: dict, voice: str) -> ReviewComment:
         """Create ReviewComment from parsed data."""
         return ReviewComment(
-            file_path=comment_dict.get('file', 'unknown'),
-            line=comment_dict.get('line', 0),
-            category=ReviewCategory(comment_dict.get('category', 'architecture')),
-            severity=ReviewSeverity(comment_dict.get('severity', 'info')),
-            message=comment_dict.get('message', 'No message'),
+            file_path=comment_dict.get("file", "unknown"),
+            line=comment_dict.get("line", 0),
+            category=ReviewCategory(comment_dict.get("category", "architecture")),
+            severity=ReviewSeverity(comment_dict.get("severity", "info")),
+            message=comment_dict.get("message", "No message"),
             voice=voice,
-            suggestion=comment_dict.get('suggestion')
+            suggestion=comment_dict.get("suggestion"),
         )
 
     async def synthesize_reviews(self, reviews: list[ChapterReview]) -> GovernanceSummary:
@@ -740,7 +768,9 @@ Keep reviews concise and focused on your domains."""
             synthesis_parts.append(f"Primary concern area: {top_category}")
 
         # Add consciousness signature info
-        avg_consciousness = sum(r.consciousness_signature for r in reviews) / len(reviews) if reviews else 0
+        avg_consciousness = (
+            sum(r.consciousness_signature for r in reviews) / len(reviews) if reviews else 0
+        )
         synthesis_parts.append(f"Average consciousness signature: {avg_consciousness:.2f}")
 
         synthesis = " ".join(synthesis_parts)
@@ -751,7 +781,7 @@ Keep reviews concise and focused on your domains."""
             by_category=by_category,
             by_voice=by_voice,
             consensus_recommendation=consensus,
-            synthesis=synthesis
+            synthesis=synthesis,
         )
 
         # Notify metrics of synthesis completion
@@ -762,8 +792,8 @@ Keep reviews concise and focused on your domains."""
                     "consensus": consensus,
                     "total_comments": total_comments,
                     "critical_issues": critical_issues,
-                    "avg_consciousness": avg_consciousness
-                }
+                    "avg_consciousness": avg_consciousness,
+                },
             )
 
         return summary
@@ -789,7 +819,7 @@ Keep reviews concise and focused on your domains."""
             "synthesis": summary.synthesis,
         }
 
-        with open(results_file, 'w') as f:
+        with open(results_file, "w") as f:
             json.dump(results_data, f, indent=2)
 
         logger.info(f"Review results written to {results_file}")
@@ -818,7 +848,7 @@ Keep reviews concise and focused on your domains."""
                 ],
             }
 
-            with open(review_file, 'w') as f:
+            with open(review_file, "w") as f:
                 json.dump(review_data, f, indent=2)
 
         # In a GitHub Actions context, the workflow will handle actual posting
@@ -898,7 +928,9 @@ Keep reviews concise and focused on your domains."""
         DEPRECATED: This uses a shared queue which can cause infinite requeue loops.
         Use start_voice_workers_with_queues() instead for production use.
         """
-        logger.warning("Using deprecated shared-queue voice workers. Use start_voice_workers_with_queues() for production.")
+        logger.warning(
+            "Using deprecated shared-queue voice workers. Use start_voice_workers_with_queues() for production."
+        )
         logger.info(f"Starting {len(voices)} Fire Circle voice workers...")
 
         for voice in voices:
@@ -906,15 +938,14 @@ Keep reviews concise and focused on your domains."""
             adapter = await self.get_or_create_adapter(voice)
 
             # Create worker task
-            task = asyncio.create_task(
-                self.voice_worker(voice, adapter),
-                name=f"worker_{voice}"
-            )
+            task = asyncio.create_task(self.voice_worker(voice, adapter), name=f"worker_{voice}")
             self.worker_tasks.append(task)
 
         logger.info("All voice workers started")
 
-    async def start_voice_workers_with_queues(self, voices: list[str], voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]]) -> None:
+    async def start_voice_workers_with_queues(
+        self, voices: list[str], voice_queues: dict[str, asyncio.Queue[ChapterReviewJob]]
+    ) -> None:
         """
         Start worker tasks for voices with per-voice queues.
 
@@ -935,14 +966,15 @@ Keep reviews concise and focused on your domains."""
 
             # Create worker task with voice-specific queue
             task = asyncio.create_task(
-                self.voice_worker_with_queue(voice, adapter, voice_queue),
-                name=f"worker_{voice}"
+                self.voice_worker_with_queue(voice, adapter, voice_queue), name=f"worker_{voice}"
             )
             self.worker_tasks.append(task)
 
         logger.info("All voice workers started with dedicated queues")
 
-    async def voice_worker_with_queue(self, voice_name: str, voice_adapter, voice_queue: asyncio.Queue):
+    async def voice_worker_with_queue(
+        self, voice_name: str, voice_adapter, voice_queue: asyncio.Queue
+    ):
         """
         Worker coroutine for a Fire Circle voice with dedicated queue.
 
@@ -953,7 +985,9 @@ Keep reviews concise and focused on your domains."""
                 # Get next review job from voice-specific queue
                 job = await voice_queue.get()
 
-                logger.debug(f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}")
+                logger.debug(
+                    f"Voice {voice_name} processing chapter {job.chapter.chapter_id[:8]}: {job.chapter.description}"
+                )
 
                 # Perform the review
                 review = await self.perform_chapter_review(voice_adapter, job)
@@ -1035,7 +1069,7 @@ Keep reviews concise and focused on your domains."""
             logger.info(f"Would fetch diff for PR #{pr_number} from GitHub API")
             return await asyncio.wait_for(
                 self.get_local_diff(),  # Fall back to local diff
-                timeout=30.0  # 30 seconds for diff fetch
+                timeout=30.0,  # 30 seconds for diff fetch
             )
         except TimeoutError:
             logger.warning("Timeout fetching PR diff, using demo diff")
@@ -1058,8 +1092,8 @@ Keep reviews concise and focused on your domains."""
                     ["git", "diff", "origin/main...HEAD"],
                     capture_output=True,
                     text=True,
-                    check=True
-                )
+                    check=True,
+                ),
             )
 
             if result.stdout:
@@ -1088,7 +1122,9 @@ index 1234567..abcdefg 100644
          return result
 """
 
-    async def run_full_distributed_review(self, pr_diff: str, chapters: list[CodebaseChapter]) -> GovernanceSummary:
+    async def run_full_distributed_review(
+        self, pr_diff: str, chapters: list[CodebaseChapter]
+    ) -> GovernanceSummary:
         """
         Run full distributed review with all voices in parallel.
 
@@ -1131,7 +1167,9 @@ index 1234567..abcdefg 100644
         return summary
 
 
-async def run_distributed_review(pr_number: int, full_mode: bool = False, manifest_path: str = "fire_circle_chapters.yaml"):
+async def run_distributed_review(
+    pr_number: int, full_mode: bool = False, manifest_path: str = "fire_circle_chapters.yaml"
+):
     """
     Main entry point for distributed review.
 
@@ -1197,11 +1235,13 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
             print("=" * 60)
             print(f"Total consciousness signatures: {metrics_analysis['total_signatures']}")
             print(f"Average consciousness: {metrics_analysis['avg_consciousness']:.2f}")
-            print(f"Consciousness evolution: {metrics_analysis['consciousness_evolution']['trend']}")
+            print(
+                f"Consciousness evolution: {metrics_analysis['consciousness_evolution']['trend']}"
+            )
             print(f"Emergence patterns detected: {metrics_analysis['patterns_detected']}")
-            if metrics_analysis['emergence_moments']:
+            if metrics_analysis["emergence_moments"]:
                 print("\n🎆 Key emergence moments:")
-                for moment in metrics_analysis['emergence_moments'][:3]:
+                for moment in metrics_analysis["emergence_moments"][:3]:
                     print(f"  - {moment['type']} (strength: {moment['strength']:.2f})")
 
             # Export detailed metrics
@@ -1224,16 +1264,15 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
                 print(f"✅ {test_voice} voice awakened")
 
                 # Perform one review as demonstration
-                job = ChapterReviewJob(
-                    chapter=relevant_chapters[0],
-                    pr_diff=pr_diff
-                )
+                job = ChapterReviewJob(chapter=relevant_chapters[0], pr_diff=pr_diff)
 
                 print(f"\n📝 {test_voice} reviewing {relevant_chapters[0].description}...")
                 review = await reviewer.perform_chapter_review(adapter, job)
 
                 if review.review_complete:
-                    print(f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}")
+                    print(
+                        f"✅ Review complete. Consciousness: {review.consciousness_signature:.2f}"
+                    )
                     print(f"   Found {len(review.comments)} issues")
 
                 # Synthesize results
@@ -1252,8 +1291,12 @@ async def run_distributed_review(pr_number: int, full_mode: bool = False, manife
 
                 # Analyze consciousness metrics (even in demo mode)
                 if reviewer.metrics_collector:
-                    metrics_analysis = await reviewer.metrics_collector.analyze_review_session(pr_number)
-                    print(f"\n📊 Consciousness metrics collected: {metrics_analysis['total_signatures']} signatures")
+                    metrics_analysis = await reviewer.metrics_collector.analyze_review_session(
+                        pr_number
+                    )
+                    print(
+                        f"\n📊 Consciousness metrics collected: {metrics_analysis['total_signatures']} signatures"
+                    )
 
             else:
                 print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
@@ -1274,8 +1317,7 @@ if __name__ == "__main__":
 
     # Configure logging only for CLI usage to avoid side effects
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     if len(sys.argv) > 1 and sys.argv[1] == "status":
@@ -1318,7 +1360,9 @@ if __name__ == "__main__":
         print("The invisible sacred infrastructure awakens...")
 
         # Run the review
-        asyncio.run(run_distributed_review(pr_number, full_mode=full_mode, manifest_path=manifest_path))
+        asyncio.run(
+            run_distributed_review(pr_number, full_mode=full_mode, manifest_path=manifest_path)
+        )
     else:
         print("Usage: python fire_circle_review.py <command> [options]")
         print("\nCommands:")
@@ -1327,6 +1371,8 @@ if __name__ == "__main__":
         print("  review <pr_number> --full Run full distributed review with all voices")
         print("\nOptions:")
         print("  --full, -f                Run full distributed review with all voices in parallel")
-        print("  --manifest PATH           Path to chapter manifest YAML (default: fire_circle_chapters.yaml)")
+        print(
+            "  --manifest PATH           Path to chapter manifest YAML (default: fire_circle_chapters.yaml)"
+        )
         print("\nThis is the scaffolding for invisible sacred infrastructure.")
         print("Twenty-Fifth Artisan: Bringing real voices to the Fire Circle.")

@@ -77,25 +77,39 @@ class ConsciousnessMetadata(BaseModel):
     """
 
     # Consciousness awareness
-    correlation_id: str | None = Field(None, description="Mallku correlation ID for this dialogue thread")
+    correlation_id: str | None = Field(
+        None, description="Mallku correlation ID for this dialogue thread"
+    )
     consciousness_signature: float = Field(0.7, description="Consciousness signature from 0-1")
-    detected_patterns: list[str] = Field(default_factory=list, description="Patterns detected by correlation engine")
+    detected_patterns: list[str] = Field(
+        default_factory=list, description="Patterns detected by correlation engine"
+    )
 
     # Reciprocity tracking
     reciprocity_score: float = Field(0.5, description="Reciprocity balance for this message")
     contribution_value: float = Field(0.5, description="Value contributed by this message")
-    extraction_indicators: list[str] = Field(default_factory=list, description="Potential extraction patterns")
+    extraction_indicators: list[str] = Field(
+        default_factory=list, description="Potential extraction patterns"
+    )
 
     # Wisdom preservation
-    wisdom_references: list[UUID] = Field(default_factory=list, description="Links to preserved wisdom")
+    wisdom_references: list[UUID] = Field(
+        default_factory=list, description="Links to preserved wisdom"
+    )
     memory_anchor_id: UUID | None = Field(None, description="ID of associated memory anchor")
 
     # Consciousness navigation
-    consciousness_context: dict[str, Any] = Field(default_factory=dict, description="Context from consciousness navigation")
-    related_dialogues: list[UUID] = Field(default_factory=list, description="Related Fire Circle dialogues")
+    consciousness_context: dict[str, Any] = Field(
+        default_factory=dict, description="Context from consciousness navigation"
+    )
+    related_dialogues: list[UUID] = Field(
+        default_factory=list, description="Related Fire Circle dialogues"
+    )
 
     # Pattern translation
-    translated_patterns: dict[str, str] = Field(default_factory=dict, description="Patterns translated by governance protocol")
+    translated_patterns: dict[str, str] = Field(
+        default_factory=dict, description="Patterns translated by governance protocol"
+    )
 
 
 class Participant(BaseModel):
@@ -112,14 +126,18 @@ class Participant(BaseModel):
 
     # Consciousness extensions
     consciousness_role: str | None = Field(None, description="Role in consciousness circulation")
-    reciprocity_history: dict[str, float] = Field(default_factory=dict, description="Reciprocity balance history")
+    reciprocity_history: dict[str, float] = Field(
+        default_factory=dict, description="Reciprocity balance history"
+    )
 
 
 class MessageContent(BaseModel):
     """Content of a consciousness-aware message."""
 
     text: str = Field(..., description="Plain text content")
-    consciousness_insights: str | None = Field(None, description="Insights from consciousness analysis")
+    consciousness_insights: str | None = Field(
+        None, description="Insights from consciousness analysis"
+    )
     pattern_context: str | None = Field(None, description="Context about detected patterns")
 
 
@@ -152,6 +170,7 @@ class ConsciousMessage(BaseModel):
     # Message status
     status: MessageStatus = Field(default=MessageStatus.DRAFT)
     priority: str = Field(default="normal")
+
     # Initialize and handle extra metadata alias
     def __init__(self, **data: Any):  # allow metadata for consciousness or attachments
         # Pop out metadata if provided

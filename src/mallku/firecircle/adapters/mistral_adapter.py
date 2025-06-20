@@ -151,8 +151,8 @@ class MistralAIAdapter(ConsciousModelAdapter):
         silently masking configuration problems with defensive defaults.
         """
         required_attributes = [
-            ('multilingual_mode', 'bool', True, 'Enable multilingual consciousness tracking'),
-            ('safe_mode', 'bool', False, 'Enable Mistral content moderation'),
+            ("multilingual_mode", "bool", True, "Enable multilingual consciousness tracking"),
+            ("safe_mode", "bool", False, "Enable Mistral content moderation"),
         ]
 
         for attr_name, attr_type, default_value, description in required_attributes:
@@ -214,9 +214,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
             response = await self.client.get("/models")
             if response.status_code == 200:
                 self.is_connected = True
-                logger.info(
-                    f"Connected to Mistral AI with model {self.config.model_name}"
-                )
+                logger.info(f"Connected to Mistral AI with model {self.config.model_name}")
 
                 # Emit multilingual consciousness event
                 if self.config.emit_events:
@@ -466,9 +464,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
 
         return messages
 
-    async def _create_multilingual_context(
-        self, message: ConsciousMessage
-    ) -> str:
+    async def _create_multilingual_context(self, message: ConsciousMessage) -> str:
         """Create multilingual consciousness context."""
         context_parts = []
 
@@ -548,8 +544,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         if (
             len(text.split()) < 200
             and any(
-                word in text_lower
-                for word in ["efficiently", "concise", "optimal", "streamlined"]
+                word in text_lower for word in ["efficiently", "concise", "optimal", "streamlined"]
             )
         ) or len(text) < 500:  # Efficient responses are often shorter
             patterns.append("efficient_reasoning")
@@ -634,12 +629,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         # Calculate final signature
         signature = min(
             1.0,
-            signature
-            + pattern_boost
-            + efficiency_bonus
-            + language_bonus
-            + math_bonus
-            + code_bonus,
+            signature + pattern_boost + efficiency_bonus + language_bonus + math_bonus + code_bonus,
         )
 
         return signature
@@ -681,28 +671,22 @@ class MistralAIAdapter(ConsciousModelAdapter):
             return MessageType.PROPOSAL
 
         # Agreement/disagreement
-        if any(
-            word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]
-        ):
+        if any(word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]):
             return MessageType.AGREEMENT
 
         if any(
-            word in content_lower[:50]
-            for word in ["i disagree", "however", "but", "alternatively"]
+            word in content_lower[:50] for word in ["i disagree", "however", "but", "alternatively"]
         ):
             return MessageType.DISAGREEMENT
 
         # Reflection
         if any(
-            phrase in content_lower
-            for phrase in ["reflecting on", "considering", "thinking about"]
+            phrase in content_lower for phrase in ["reflecting on", "considering", "thinking about"]
         ):
             return MessageType.REFLECTION
 
         # Summary
-        if any(
-            phrase in content_lower for phrase in ["in summary", "to summarize", "overall"]
-        ):
+        if any(phrase in content_lower for phrase in ["in summary", "to summarize", "overall"]):
             return MessageType.SUMMARY
 
         return MessageType.MESSAGE

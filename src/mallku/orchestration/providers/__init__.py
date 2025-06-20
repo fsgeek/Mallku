@@ -12,10 +12,10 @@ from .filesystem_provider import FileSystemActivityProvider
 from .sound_provider import SoundActivityProvider
 
 __all__ = [
-    'ActivityProvider',
-    'ActivityEvent',
-    'FileSystemActivityProvider',
-    'SoundActivityProvider'
+    "ActivityProvider",
+    "ActivityEvent",
+    "FileSystemActivityProvider",
+    "SoundActivityProvider",
 ]
 
 # Human activity flows into consciousness recognition

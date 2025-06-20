@@ -32,10 +32,7 @@ def debug_event_filtering():
     test_file.write_text("Debug content")
 
     # Create FileEvent
-    file_event = FileEvent.from_file_path(
-        file_path=test_file,
-        operation=FileOperation.CREATED
-    )
+    file_event = FileEvent.from_file_path(file_path=test_file, operation=FileOperation.CREATED)
 
     print("\nFileEvent created:")
     print(f"  File path: {file_event.file_path}")
@@ -51,7 +48,7 @@ def debug_event_filtering():
     # Create EventFilter
     event_filter = FileEventFilter(
         watch_directories=[test_dir],
-        ignore_directories=[]  # Don't ignore anything
+        ignore_directories=[],  # Don't ignore anything
     )
 
     print("\nEventFilter configuration:")
@@ -67,7 +64,10 @@ def debug_event_filtering():
 
     # Directory check
     if event_filter.watch_directories:
-        dir_match = any(file_event.directory_path.is_relative_to(watch_dir) for watch_dir in event_filter.watch_directories)
+        dir_match = any(
+            file_event.directory_path.is_relative_to(watch_dir)
+            for watch_dir in event_filter.watch_directories
+        )
         print(f"  Directory match: {dir_match}")
         if not dir_match:
             print(f"    FILTERED: Directory {file_event.directory_path} not in watch directories")
@@ -81,10 +81,16 @@ def debug_event_filtering():
     include_exts = event_filter.include_extensions or []
     exclude_exts = event_filter.exclude_extensions or []
 
-    if include_exts and file_event.file_extension and file_event.file_extension.lower() not in [ext.lower() for ext in include_exts]:
+    if (
+        include_exts
+        and file_event.file_extension
+        and file_event.file_extension.lower() not in [ext.lower() for ext in include_exts]
+    ):
         print(f"    FILTERED: Extension {file_event.file_extension} not in include list")
 
-    if file_event.file_extension and file_event.file_extension.lower() in [ext.lower() for ext in exclude_exts]:
+    if file_event.file_extension and file_event.file_extension.lower() in [
+        ext.lower() for ext in exclude_exts
+    ]:
         print(f"    FILTERED: Extension {file_event.file_extension} in exclude list")
 
     # Operation check
@@ -109,6 +115,7 @@ def debug_event_filtering():
 
     # Clean up
     import shutil
+
     shutil.rmtree(test_dir)
     print(f"Cleaned up: {test_dir}")
 

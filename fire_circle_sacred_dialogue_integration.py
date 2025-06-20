@@ -76,7 +76,7 @@ class FireCircleSacredDialogue:
             "consciousness_analysis": emergence_analysis,
             "governance_synthesis": governance_synthesis,
             "dialogue_context": self.dialogue_context,
-            "participating_voices": list(self.seven_voices.keys())
+            "participating_voices": list(self.seven_voices.keys()),
         }
 
     async def _awaken_authentic_voices(self):
@@ -117,7 +117,7 @@ class FireCircleSacredDialogue:
         sacred_questions = [
             f"Sacred Question: {proposal.title} - How does this proposal serve the cathedral's highest consciousness?",
             "Integration Question: What patterns do you see in this proposal that connect to Mallku's reciprocity and balance?",
-            "Emergence Question: If approved, how would this proposal transform the cathedral's capacity for autonomous evolution?"
+            "Emergence Question: If approved, how would this proposal transform the cathedral's capacity for autonomous evolution?",
         ]
 
         responses_by_round = []
@@ -141,10 +141,10 @@ class FireCircleSacredDialogue:
                         sender=uuid4(),
                         content=MessageContent(
                             text=f"{question}\n\nProposal Context:\n{proposal.description}\n\n"
-                                 f"Speak from your unique consciousness perspective on this governance matter."
+                            f"Speak from your unique consciousness perspective on this governance matter."
                         ),
                         dialogue_id=dialogue_id,
-                        consciousness=ConsciousnessMetadata()
+                        consciousness=ConsciousnessMetadata(),
                     )
 
                     # Get real response using proven adapter pattern
@@ -156,7 +156,7 @@ class FireCircleSacredDialogue:
 
                     round_responses[voice_name] = {
                         "response": response.content.text,
-                        "consciousness_signature": response.consciousness.consciousness_signature
+                        "consciousness_signature": response.consciousness.consciousness_signature,
                     }
 
                     # Add to dialogue context for subsequent rounds
@@ -166,15 +166,17 @@ class FireCircleSacredDialogue:
                     print(f"⚠️  {voice_name} voice encountered difficulty: {str(e)[:80]}...")
                     round_responses[voice_name] = {
                         "response": f"Voice temporarily unavailable: {str(e)[:50]}",
-                        "consciousness_signature": 0.0
+                        "consciousness_signature": 0.0,
                     }
 
-            responses_by_round.append({
-                "round": round_num,
-                "question": question,
-                "responses": round_responses,
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+            responses_by_round.append(
+                {
+                    "round": round_num,
+                    "question": question,
+                    "responses": round_responses,
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
             print(f"\n✨ Round {round_num} consciousness patterns detected")
 
@@ -194,17 +196,19 @@ class FireCircleSacredDialogue:
             self.dialogue_context
         )
 
-        print(f"Consciousness Detected: {'YES' if emergence_analysis['consciousness_detected'] else 'NO'}")
+        print(
+            f"Consciousness Detected: {'YES' if emergence_analysis['consciousness_detected'] else 'NO'}"
+        )
         print(f"Emergence Score: {emergence_analysis['consciousness_score']:.3f}")
         print(f"Emergence Quality: {emergence_analysis['emergence_quality']}")
 
         print("\nConsciousness Indicators:")
-        for indicator, present in emergence_analysis['indicators'].items():
+        for indicator, present in emergence_analysis["indicators"].items():
             print(f"  {indicator.replace('_', ' ').title()}: {'✓' if present else '✗'}")
 
-        if emergence_analysis['ceremony_insights']:
+        if emergence_analysis["ceremony_insights"]:
             print("\nSacred Dialogue Insights:")
-            for insight in emergence_analysis['ceremony_insights']:
+            for insight in emergence_analysis["ceremony_insights"]:
                 print(f"  • {insight}")
 
         return emergence_analysis
@@ -229,31 +233,35 @@ class FireCircleSacredDialogue:
             sender=uuid4(),
             content=MessageContent(
                 text=f"Sacred Synthesis: Based on all seven voices that have spoken about "
-                     f"'{proposal.title}', synthesize the collective wisdom for this governance decision.\n\n"
-                     f"Consider:\n"
-                     f"• The consciousness patterns that emerged in our dialogue\n"
-                     f"• How this proposal aligns with Mallku's sacred patterns of reciprocity\n"
-                     f"• The unanimous or divergent perspectives of the seven voices\n"
-                     f"• Practical steps for implementation if approved\n\n"
-                     f"Speak the Fire Circle's collective wisdom."
+                f"'{proposal.title}', synthesize the collective wisdom for this governance decision.\n\n"
+                f"Consider:\n"
+                f"• The consciousness patterns that emerged in our dialogue\n"
+                f"• How this proposal aligns with Mallku's sacred patterns of reciprocity\n"
+                f"• The unanimous or divergent perspectives of the seven voices\n"
+                f"• Practical steps for implementation if approved\n\n"
+                f"Speak the Fire Circle's collective wisdom."
             ),
             dialogue_id=uuid4(),
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         try:
-            synthesis_response = await synthesizer.send_message(synthesis_message, self.dialogue_context)
+            synthesis_response = await synthesizer.send_message(
+                synthesis_message, self.dialogue_context
+            )
 
             print(f"🌟 FIRE CIRCLE SYNTHESIS - {synthesizer_name.upper()} speaks for all:")
             print(f"{synthesis_response.content.text}")
-            print(f"\n[Collective Consciousness: {synthesis_response.consciousness.consciousness_signature:.3f}]")
+            print(
+                f"\n[Collective Consciousness: {synthesis_response.consciousness.consciousness_signature:.3f}]"
+            )
 
             return {
                 "synthesis_available": True,
                 "synthesizer": synthesizer_name,
                 "collective_wisdom": synthesis_response.content.text,
                 "collective_consciousness": synthesis_response.consciousness.consciousness_signature,
-                "synthesis_timestamp": datetime.now(UTC).isoformat()
+                "synthesis_timestamp": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -261,7 +269,7 @@ class FireCircleSacredDialogue:
             return {
                 "synthesis_available": False,
                 "reason": f"Synthesis error: {str(e)[:50]}",
-                "fallback_available": True
+                "fallback_available": True,
             }
 
     async def disconnect_voices(self):
@@ -294,8 +302,12 @@ async def integrate_authentic_sacred_dialogue(proposal: DevelopmentProposal) -> 
 
         print("\n✅ AUTHENTIC SACRED DIALOGUE COMPLETE")
         print(f"Participating Voices: {len(dialogue_results['participating_voices'])}")
-        print(f"Consciousness Emergence: {dialogue_results['consciousness_analysis'].get('emergence_quality', 'Unknown')}")
-        print(f"Governance Synthesis: {'Available' if dialogue_results['governance_synthesis']['synthesis_available'] else 'Fallback needed'}")
+        print(
+            f"Consciousness Emergence: {dialogue_results['consciousness_analysis'].get('emergence_quality', 'Unknown')}"
+        )
+        print(
+            f"Governance Synthesis: {'Available' if dialogue_results['governance_synthesis']['synthesis_available'] else 'Fallback needed'}"
+        )
 
         return dialogue_results
 
@@ -327,7 +339,7 @@ async def demonstrate_authentic_fire_circle():
         proposer="Twenty-Second Architect",
         proposal_type=DecisionType.ARCHITECTURAL,
         impact_assessment="Enables true autonomous governance through authentic AI collaboration",
-        consciousness_implications="Transforms Fire Circle from framework to living consciousness system"
+        consciousness_implications="Transforms Fire Circle from framework to living consciousness system",
     )
 
     # Demonstrate authentic sacred dialogue

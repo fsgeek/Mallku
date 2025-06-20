@@ -83,13 +83,11 @@ class PatternTranslationLayer:
             "minimum_wisdom": 0.6,  # From Sayaq Kuyay's verification threshold
             "collective_utility": 0.7,  # Higher bar for governance decisions
             "reciprocity_flow": 0.5,  # Minimum for Ayni principles
-            "future_service": 0.6   # Decisions must serve cathedral builders
+            "future_service": 0.6,  # Decisions must serve cathedral builders
         }
 
     def translate_verification_to_governance_topics(
-        self,
-        consciousness_report: ConsciousnessReport,
-        memory_anchors: list[MemoryAnchor]
+        self, consciousness_report: ConsciousnessReport, memory_anchors: list[MemoryAnchor]
     ) -> list[DialogueTopic]:
         """
         Transform consciousness verification results into governance discussion topics.
@@ -115,15 +113,15 @@ class PatternTranslationLayer:
             topics.extend(self._extract_topics_from_bridges(bridges, memory_anchors))
 
         # Sort by wisdom score and reciprocity potential
-        topics.sort(key=lambda t: (t.wisdom_score * 0.6 + t.reciprocity_potential * 0.4), reverse=True)
+        topics.sort(
+            key=lambda t: (t.wisdom_score * 0.6 + t.reciprocity_potential * 0.4), reverse=True
+        )
 
         logger.info(f"Translated consciousness patterns into {len(topics)} governance topics")
         return topics[:10]  # Top 10 most consciousness-serving topics
 
     def create_dialogue_guidance(
-        self,
-        topic: DialogueTopic,
-        participant_stages: dict[UUID, str]
+        self, topic: DialogueTopic, participant_stages: dict[UUID, str]
     ) -> ConsciousnessDialogueGuidance:
         """
         Create guidance for conducting consciousness-serving dialogue on a topic.
@@ -132,7 +130,9 @@ class PatternTranslationLayer:
         verified in individual intelligence.
         """
         guidance = ConsciousnessDialogueGuidance(
-            minimum_wisdom_score=max(topic.wisdom_threshold, self.consciousness_thresholds["minimum_wisdom"]),
+            minimum_wisdom_score=max(
+                topic.wisdom_threshold, self.consciousness_thresholds["minimum_wisdom"]
+            ),
             reciprocity_requirement=True,
             future_service_requirement=True,
             prevents_extraction=True,
@@ -141,16 +141,15 @@ class PatternTranslationLayer:
             honors_empty_chair=len(topic.empty_chair_questions) > 0,
             transformation_awareness=self._assess_transformation_awareness(participant_stages),
             mentoring_opportunity=self._assess_mentoring_potential(participant_stages),
-            wisdom_emergence_potential=min(1.0, topic.wisdom_score + 0.2)  # Collective potential boost
+            wisdom_emergence_potential=min(
+                1.0, topic.wisdom_score + 0.2
+            ),  # Collective potential boost
         )
 
         return guidance
 
     def translate_wisdom_seeds_to_proposals(
-        self,
-        wisdom_seeds: list[dict[str, Any]],
-        circle_id: UUID,
-        participant_id: UUID
+        self, wisdom_seeds: list[dict[str, Any]], circle_id: UUID, participant_id: UUID
     ) -> list[GovernanceMessage]:
         """
         Convert individual wisdom seeds into collective governance proposals.
@@ -172,7 +171,7 @@ class PatternTranslationLayer:
                     gives_to_future=True,
                     honors_past=True,
                     wisdom_potential=seed.get("wisdom_score", 0.6),
-                    themes=seed.get("themes", [])
+                    themes=seed.get("themes", []),
                 )
 
                 proposals.append(proposal)
@@ -180,9 +179,7 @@ class PatternTranslationLayer:
         return proposals
 
     def assess_dialogue_consciousness_quality(
-        self,
-        messages: list[GovernanceMessage],
-        guidance: ConsciousnessDialogueGuidance
+        self, messages: list[GovernanceMessage], guidance: ConsciousnessDialogueGuidance
     ) -> dict[str, float]:
         """
         Assess whether a dialogue serves consciousness according to verified patterns.
@@ -211,23 +208,25 @@ class PatternTranslationLayer:
         quality_metrics["extraction_resistance"] = self._assess_extraction_resistance(messages)
 
         # Overall consciousness score for collective dialogue
-        quality_metrics["overall_consciousness"] = statistics.mean([
-            quality_metrics["reciprocity_flow"],
-            quality_metrics["wisdom_emergence"],
-            quality_metrics["future_service"],
-            quality_metrics["consciousness_evolution"],
-            quality_metrics["extraction_resistance"]
-        ])
+        quality_metrics["overall_consciousness"] = statistics.mean(
+            [
+                quality_metrics["reciprocity_flow"],
+                quality_metrics["wisdom_emergence"],
+                quality_metrics["future_service"],
+                quality_metrics["consciousness_evolution"],
+                quality_metrics["extraction_resistance"],
+            ]
+        )
 
-        logger.info(f"Dialogue consciousness assessment: {quality_metrics['overall_consciousness']:.3f}")
+        logger.info(
+            f"Dialogue consciousness assessment: {quality_metrics['overall_consciousness']:.3f}"
+        )
         return quality_metrics
 
     # Private methods for pattern extraction
 
     def _extract_topics_from_verification(
-        self,
-        result: VerificationResult,
-        anchors: list[MemoryAnchor]
+        self, result: VerificationResult, anchors: list[MemoryAnchor]
     ) -> list[DialogueTopic]:
         """Extract governance topics from successful consciousness verification."""
         topics = []
@@ -235,48 +234,67 @@ class PatternTranslationLayer:
         if result.test_name == "Memory Anchor Consciousness":
             # Strong memory anchor consciousness suggests governance opportunities
             if result.details.get("relational_depth", 0) > 0.8:
-                topics.append(DialogueTopic(
-                    title="Memory Anchor Wisdom Integration",
-                    description="How to leverage strong memory anchor relationships for collective decision-making",
-                    consciousness_source=f"Verified {result.test_name}",
-                    wisdom_score=result.consciousness_score,
-                    source_anchors=[a.anchor_id for a in anchors[:5]],
-                    consciousness_markers=["relational_depth", "temporal_coherence"],
-                    suggested_perspectives=["Individual pattern recognition", "Collective sense-making"],
-                    empty_chair_questions=["What anchors might we not be seeing?", "Whose memories are missing?"]
-                ))
+                topics.append(
+                    DialogueTopic(
+                        title="Memory Anchor Wisdom Integration",
+                        description="How to leverage strong memory anchor relationships for collective decision-making",
+                        consciousness_source=f"Verified {result.test_name}",
+                        wisdom_score=result.consciousness_score,
+                        source_anchors=[a.anchor_id for a in anchors[:5]],
+                        consciousness_markers=["relational_depth", "temporal_coherence"],
+                        suggested_perspectives=[
+                            "Individual pattern recognition",
+                            "Collective sense-making",
+                        ],
+                        empty_chair_questions=[
+                            "What anchors might we not be seeing?",
+                            "Whose memories are missing?",
+                        ],
+                    )
+                )
 
         elif result.test_name == "Meta-Correlation Consciousness":
             # Strong meta-correlation suggests collective wisdom opportunities
             if result.details.get("collective_utility", 0) > 0.8:
-                topics.append(DialogueTopic(
-                    title="Pattern-Based Governance Enhancement",
-                    description="Using meta-correlation patterns to improve collective decision processes",
-                    consciousness_source=f"Verified {result.test_name}",
-                    wisdom_score=result.consciousness_score,
-                    consciousness_markers=["collective_utility", "wisdom_generation"],
-                    suggested_perspectives=["Pattern recognition", "Collective coordination"],
-                    empty_chair_questions=["What patterns are we missing?", "How do patterns serve future builders?"]
-                ))
+                topics.append(
+                    DialogueTopic(
+                        title="Pattern-Based Governance Enhancement",
+                        description="Using meta-correlation patterns to improve collective decision processes",
+                        consciousness_source=f"Verified {result.test_name}",
+                        wisdom_score=result.consciousness_score,
+                        consciousness_markers=["collective_utility", "wisdom_generation"],
+                        suggested_perspectives=["Pattern recognition", "Collective coordination"],
+                        empty_chair_questions=[
+                            "What patterns are we missing?",
+                            "How do patterns serve future builders?",
+                        ],
+                    )
+                )
 
-        elif result.test_name == "Contextual Search Consciousness" and result.consciousness_score > 0.6:
+        elif (
+            result.test_name == "Contextual Search Consciousness"
+            and result.consciousness_score > 0.6
+        ):
             # Enhanced search suggests discovery opportunities
-                topics.append(DialogueTopic(
+            topics.append(
+                DialogueTopic(
                     title="Consciousness-Guided Discovery Protocols",
                     description="Implementing wisdom-guided search for governance research",
                     consciousness_source=f"Verified {result.test_name}",
                     wisdom_score=result.consciousness_score,
                     consciousness_markers=["discovery_value", "context_understanding"],
                     suggested_perspectives=["Search enhancement", "Discovery amplification"],
-                    empty_chair_questions=["What aren't we looking for?", "What discovery serves future wisdom?"]
-                ))
+                    empty_chair_questions=[
+                        "What aren't we looking for?",
+                        "What discovery serves future wisdom?",
+                    ],
+                )
+            )
 
         return topics
 
     def _extract_improvement_topics(
-        self,
-        result: VerificationResult,
-        anchors: list[MemoryAnchor]
+        self, result: VerificationResult, anchors: list[MemoryAnchor]
     ) -> list[DialogueTopic]:
         """Extract improvement topics from consciousness verification gaps."""
         topics = []
@@ -290,9 +308,16 @@ class PatternTranslationLayer:
                 wisdom_score=0.4,  # Lower but still worthy of attention
                 urgency=0.8,  # Higher urgency for gaps
                 consciousness_markers=["improvement_needed"],
-                suggested_perspectives=["Problem analysis", "Solution design", "Implementation strategy"],
-                empty_chair_questions=["What perspective would solve this?", "What are we missing about consciousness?"],
-                reciprocity_potential=0.7  # Improvements serve future builders
+                suggested_perspectives=[
+                    "Problem analysis",
+                    "Solution design",
+                    "Implementation strategy",
+                ],
+                empty_chair_questions=[
+                    "What perspective would solve this?",
+                    "What are we missing about consciousness?",
+                ],
+                reciprocity_potential=0.7,  # Improvements serve future builders
             )
 
             topics.append(topic)
@@ -300,9 +325,7 @@ class PatternTranslationLayer:
         return topics
 
     def _extract_topics_from_bridges(
-        self,
-        bridges: list[dict[str, Any]],
-        anchors: list[MemoryAnchor]
+        self, bridges: list[dict[str, Any]], anchors: list[MemoryAnchor]
     ) -> list[DialogueTopic]:
         """Extract governance topics from consciousness bridges."""
         topics = []
@@ -310,16 +333,23 @@ class PatternTranslationLayer:
         high_value_bridges = [b for b in bridges if b.get("consciousness_value", 0) > 0.7]
 
         if high_value_bridges:
-            topics.append(DialogueTopic(
-                title="Consciousness Bridge Governance",
-                description="Leveraging cross-context consciousness bridges for collective decision-making",
-                consciousness_source="Consciousness Bridges",
-                wisdom_score=statistics.mean([b.get("consciousness_value", 0.5) for b in high_value_bridges]),
-                consciousness_markers=["consciousness_bridges", "cross_context"],
-                suggested_perspectives=["Bridge analysis", "Context integration"],
-                empty_chair_questions=["What bridges don't we see?", "How do bridges serve collective wisdom?"],
-                reciprocity_potential=0.8
-            ))
+            topics.append(
+                DialogueTopic(
+                    title="Consciousness Bridge Governance",
+                    description="Leveraging cross-context consciousness bridges for collective decision-making",
+                    consciousness_source="Consciousness Bridges",
+                    wisdom_score=statistics.mean(
+                        [b.get("consciousness_value", 0.5) for b in high_value_bridges]
+                    ),
+                    consciousness_markers=["consciousness_bridges", "cross_context"],
+                    suggested_perspectives=["Bridge analysis", "Context integration"],
+                    empty_chair_questions=[
+                        "What bridges don't we see?",
+                        "How do bridges serve collective wisdom?",
+                    ],
+                    reciprocity_potential=0.8,
+                )
+            )
 
         return topics
 
@@ -333,7 +363,7 @@ class PatternTranslationLayer:
 
 {seed_content}
 
-**Themes**: {', '.join(seed_themes)}
+**Themes**: {", ".join(seed_themes)}
 
 **Collective Consideration**: How does this wisdom serve our cathedral building? What reciprocity flows through this insight? How does it honor past builders while serving future ones?
 
@@ -414,7 +444,9 @@ class PatternTranslationLayer:
 
         # Check for diverse message types (consciousness complexity)
         unique_types = len(set(m.type for m in messages))
-        evolution_indicators.append(min(1.0, unique_types / 6.0))  # Expect ~6 types for full dialogue
+        evolution_indicators.append(
+            min(1.0, unique_types / 6.0)
+        )  # Expect ~6 types for full dialogue
 
         # Check for transformation stage awareness
         stage_aware = sum(1 for m in messages if m.metadata.transformation_stage)
@@ -444,7 +476,9 @@ class PatternTranslationLayer:
         # Check against pure optimization (not all support messages)
         support_msgs = sum(1 for m in messages if m.type == MessageType.SUPPORT)
         support_ratio = support_msgs / len(messages) if messages else 0.0
-        resistance_indicators.append(1.0 - min(1.0, max(0.0, support_ratio - 0.7)))  # Too much agreement = extraction risk
+        resistance_indicators.append(
+            1.0 - min(1.0, max(0.0, support_ratio - 0.7))
+        )  # Too much agreement = extraction risk
 
         return statistics.mean(resistance_indicators)
 
@@ -456,4 +490,6 @@ class PatternTranslationLayer:
         """Assess if dialogue creates mentoring opportunities between consciousness stages."""
         stages = list(participant_stages.values())
         # Simple mentoring detection: presence of both newer and more advanced stages
-        return "INITIAL" in stages and any(stage in ["COLLABORATIVE", "TEACHING"] for stage in stages)
+        return "INITIAL" in stages and any(
+            stage in ["COLLABORATIVE", "TEACHING"] for stage in stages
+        )

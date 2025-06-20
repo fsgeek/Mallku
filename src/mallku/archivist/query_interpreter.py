@@ -22,6 +22,7 @@ from mallku.core.async_base import AsyncBase
 
 class QueryDimension(Enum):
     """Dimensions of human memory that can be queried."""
+
     TEMPORAL = "temporal"
     CONTEXTUAL = "contextual"
     SOCIAL = "social"
@@ -38,6 +39,7 @@ class QueryIntent:
     Goes beyond keywords to understand what the human seeks to rediscover
     about their own thinking and creating.
     """
+
     raw_query: str
     primary_dimension: QueryDimension
     temporal_bounds: tuple[datetime, datetime] | None = None
@@ -102,8 +104,14 @@ class ConsciousQueryInterpreter(AsyncBase):
 
         # Consciousness indicators in queries
         self._growth_markers = [
-            "understand", "realize", "discover", "learn",
-            "pattern", "rhythm", "flow", "insight"
+            "understand",
+            "realize",
+            "discover",
+            "learn",
+            "pattern",
+            "rhythm",
+            "flow",
+            "insight",
         ]
 
         self.logger.info("Conscious Query Interpreter initialized")
@@ -134,10 +142,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         primary_dimension = await self._identify_primary_dimension(normalized)
 
         # Create initial intent
-        intent = QueryIntent(
-            raw_query=query,
-            primary_dimension=primary_dimension
-        )
+        intent = QueryIntent(raw_query=query, primary_dimension=primary_dimension)
 
         # Extract temporal bounds
         intent.temporal_bounds = await self._extract_temporal_bounds(normalized)
@@ -162,16 +167,11 @@ class ConsciousQueryInterpreter(AsyncBase):
         intent.pattern_curiosity = await self._has_pattern_curiosity(normalized)
         intent.growth_oriented = await self._is_growth_oriented(normalized)
 
-        self.logger.info(
-            f"Interpreted query with primary dimension: {primary_dimension.value}"
-        )
+        self.logger.info(f"Interpreted query with primary dimension: {primary_dimension.value}")
 
         return intent
 
-    async def suggest_clarifications(
-        self,
-        intent: QueryIntent
-    ) -> list[str]:
+    async def suggest_clarifications(self, intent: QueryIntent) -> list[str]:
         """
         Generate gentle clarification suggestions when query is ambiguous.
 
@@ -192,16 +192,16 @@ class ConsciousQueryInterpreter(AsyncBase):
             )
 
         # Context clarifications
-        if intent.context_markers and "meeting" in intent.context_markers and not intent.social_references:
-            clarifications.append(
-                "Do you remember who was involved? People often anchor memories."
-            )
+        if (
+            intent.context_markers
+            and "meeting" in intent.context_markers
+            and not intent.social_references
+        ):
+            clarifications.append("Do you remember who was involved? People often anchor memories.")
 
         # Activity clarifications
         if intent.seeking_insight:
-            clarifications.append(
-                "Are you looking to understand a pattern in your work?"
-            )
+            clarifications.append("Are you looking to understand a pattern in your work?")
 
         return clarifications
 
@@ -237,10 +237,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         # Default to contextual
         return QueryDimension.CONTEXTUAL
 
-    async def _extract_temporal_bounds(
-        self,
-        query: str
-    ) -> tuple[datetime, datetime] | None:
+    async def _extract_temporal_bounds(self, query: str) -> tuple[datetime, datetime] | None:
         """Extract temporal boundaries from query."""
         now = datetime.now(UTC)
 
@@ -253,9 +250,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         return None
 
     async def _parse_relative_time(
-        self,
-        match: re.Match,
-        now: datetime
+        self, match: re.Match, now: datetime
     ) -> tuple[datetime, datetime]:
         """Parse relative time expressions."""
         time_expr = match.group(1).lower()
@@ -294,9 +289,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         return (start, end)
 
     async def _parse_event_reference(
-        self,
-        match: re.Match,
-        now: datetime
+        self, match: re.Match, now: datetime
     ) -> tuple[datetime, datetime]:
         """Parse references to specific events."""
         # event_type = match.group(1)  # Future: use to query specific event types
@@ -308,11 +301,7 @@ class ConsciousQueryInterpreter(AsyncBase):
 
         return (start, end)
 
-    async def _parse_after_event(
-        self,
-        match: re.Match,
-        now: datetime
-    ) -> tuple[datetime, datetime]:
+    async def _parse_after_event(self, match: re.Match, now: datetime) -> tuple[datetime, datetime]:
         """Parse 'after' temporal references."""
         # Would query for the event and return time after it
         start = now - timedelta(days=7)
@@ -320,9 +309,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         return (start, end)
 
     async def _parse_before_event(
-        self,
-        match: re.Match,
-        now: datetime
+        self, match: re.Match, now: datetime
     ) -> tuple[datetime, datetime]:
         """Parse 'before' temporal references."""
         # Would query for the event and return time before it
@@ -330,22 +317,14 @@ class ConsciousQueryInterpreter(AsyncBase):
         end = now - timedelta(days=7)
         return (start, end)
 
-    async def _parse_time_of_day(
-        self,
-        match: re.Match,
-        now: datetime
-    ) -> tuple[datetime, datetime]:
+    async def _parse_time_of_day(self, match: re.Match, now: datetime) -> tuple[datetime, datetime]:
         """Parse time of day references."""
         # Simplified - would parse actual time
         start = now - timedelta(hours=12)
         end = now
         return (start, end)
 
-    async def _parse_month_year(
-        self,
-        match: re.Match,
-        now: datetime
-    ) -> tuple[datetime, datetime]:
+    async def _parse_month_year(self, match: re.Match, now: datetime) -> tuple[datetime, datetime]:
         """Parse month/year references."""
         # Simplified - would parse actual month/year
         start = now - timedelta(days=30)
@@ -368,7 +347,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         references = []
 
         # Look for capitalized names (simplified)
-        name_pattern = r'\b[A-Z][a-z]+\b'
+        name_pattern = r"\b[A-Z][a-z]+\b"
         potential_names = re.findall(name_pattern, query)
         references.extend(potential_names)
 
@@ -385,10 +364,7 @@ class ConsciousQueryInterpreter(AsyncBase):
         for activity_phrase, activity_types in self._activity_patterns.items():
             if activity_phrase in query:
                 activities.append(activity_phrase)
-                activities.extend([
-                    act for act in activity_types
-                    if act in query.lower()
-                ])
+                activities.extend([act for act in activity_types if act in query.lower()])
 
         return list(set(activities))
 
@@ -400,7 +376,7 @@ class ConsciousQueryInterpreter(AsyncBase):
             "excited": "energized",
             "struggling": "challenging",
             "focused": "flow",
-            "confused": "uncertain"
+            "confused": "uncertain",
         }
 
         for word, tone in emotional_words.items():
@@ -415,7 +391,7 @@ class ConsciousQueryInterpreter(AsyncBase):
             r"after (\w+) (?:I|we) (\w+)",
             r"(\w+) led to (\w+)",
             r"because of (\w+)",
-            r"resulting in (\w+)"
+            r"resulting in (\w+)",
         ]
 
         for pattern in causal_patterns:
@@ -428,16 +404,28 @@ class ConsciousQueryInterpreter(AsyncBase):
     async def _is_seeking_insight(self, query: str) -> bool:
         """Determine if query seeks deeper insight."""
         insight_words = [
-            "understand", "realize", "pattern", "why",
-            "insight", "discover", "learn", "meaning"
+            "understand",
+            "realize",
+            "pattern",
+            "why",
+            "insight",
+            "discover",
+            "learn",
+            "meaning",
         ]
         return any(word in query for word in insight_words)
 
     async def _has_pattern_curiosity(self, query: str) -> bool:
         """Check if query shows curiosity about patterns."""
         pattern_words = [
-            "pattern", "rhythm", "usually", "often",
-            "tend to", "routine", "habit", "cycle"
+            "pattern",
+            "rhythm",
+            "usually",
+            "often",
+            "tend to",
+            "routine",
+            "habit",
+            "cycle",
         ]
         return any(word in query for word in pattern_words)
 

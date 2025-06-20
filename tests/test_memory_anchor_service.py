@@ -23,10 +23,12 @@ try:
         MemoryAnchorService,
         ProviderInfo,
     )
+
     print("✓ Successfully imported Memory Anchor Service")
 except ImportError as e:
     print(f"✗ Failed to import service: {e}")
     sys.exit(1)
+
 
 @pytest_asyncio.fixture
 async def service():
@@ -34,6 +36,7 @@ async def service():
     service = MemoryAnchorService()
     await service.initialize()
     return service
+
 
 async def test_service_initialization():
     """Test service initialization."""
@@ -55,6 +58,7 @@ async def test_service_initialization():
         print(f"   ✗ Service initialization failed: {e}")
         return None
 
+
 async def test_provider_registration(service):
     """Test provider registration."""
     print("\n2. Testing provider registration...")
@@ -64,7 +68,7 @@ async def test_provider_registration(service):
             provider_id="test_provider",
             provider_type="filesystem",
             cursor_types=["temporal", "spatial"],
-            metadata={"test": True}
+            metadata={"test": True},
         )
 
         result = await service.register_provider(provider_info)
@@ -76,6 +80,7 @@ async def test_provider_registration(service):
         print(f"   ✗ Provider registration failed: {e}")
         return False
 
+
 async def test_cursor_update(service):
     """Test cursor updates."""
     print("\n3. Testing cursor updates...")
@@ -86,7 +91,7 @@ async def test_cursor_update(service):
             provider_id="test_provider",
             cursor_type="temporal",
             cursor_value="2024-01-15T10:30:00Z",
-            metadata={"source": "test"}
+            metadata={"source": "test"},
         )
 
         response = await service.update_cursor(cursor_update)
@@ -97,7 +102,7 @@ async def test_cursor_update(service):
             provider_id="test_provider",
             cursor_type="spatial",
             cursor_value={"latitude": 49.2827, "longitude": -123.1207},
-            metadata={"accuracy": "high"}
+            metadata={"accuracy": "high"},
         )
 
         response = await service.update_cursor(cursor_update)
@@ -108,6 +113,7 @@ async def test_cursor_update(service):
     except Exception as e:
         print(f"   ✗ Cursor update failed: {e}")
         return False
+
 
 async def test_anchor_retrieval(service):
     """Test anchor retrieval."""
@@ -129,6 +135,7 @@ async def test_anchor_retrieval(service):
         print(f"   ✗ Anchor retrieval failed: {e}")
         return False
 
+
 async def test_anchor_lineage(service):
     """Test anchor lineage tracking."""
     print("\n5. Testing anchor lineage...")
@@ -141,12 +148,13 @@ async def test_anchor_lineage(service):
         print(f"   ✓ Retrieved lineage with {len(lineage)} anchors")
 
         for i, anchor in enumerate(lineage):
-            print(f"   ✓ Anchor {i+1}: {anchor.anchor_id} at {anchor.timestamp}")
+            print(f"   ✓ Anchor {i + 1}: {anchor.anchor_id} at {anchor.timestamp}")
 
         return True
     except Exception as e:
         print(f"   ✗ Anchor lineage failed: {e}")
         return False
+
 
 async def test_cleanup(service):
     """Clean up test service."""
@@ -159,6 +167,7 @@ async def test_cleanup(service):
     except Exception as e:
         print(f"   ✗ Service cleanup failed: {e}")
         return False
+
 
 async def main():
     """Run all tests."""
@@ -174,7 +183,7 @@ async def main():
         lambda s: test_cursor_update(s),
         lambda s: test_anchor_retrieval(s),
         lambda s: test_anchor_lineage(s),
-        lambda s: test_cleanup(s)
+        lambda s: test_cleanup(s),
     ]
 
     passed = 0
@@ -202,6 +211,7 @@ async def main():
     else:
         print("❌ Some tests failed. Check the output above.")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))

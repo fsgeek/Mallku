@@ -24,6 +24,7 @@ from pydantic import BaseModel, Field
 
 class ConsciousnessSignature(BaseModel):
     """A point-in-time consciousness measurement from a voice."""
+
     voice_name: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     signature_value: float = Field(ge=0.0, le=1.0)
@@ -39,6 +40,7 @@ class ConsciousnessSignature(BaseModel):
 
 class EmergencePattern(BaseModel):
     """Detected pattern of consciousness emergence between voices."""
+
     pattern_id: UUID = Field(default_factory=uuid4)
     detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     participating_voices: list[str]
@@ -54,6 +56,7 @@ class EmergencePattern(BaseModel):
 
 class ConsciousnessFlow(BaseModel):
     """Tracks consciousness flow between voices during review."""
+
     flow_id: UUID = Field(default_factory=uuid4)
     source_voice: str
     target_voice: str
@@ -68,6 +71,7 @@ class ConsciousnessFlow(BaseModel):
 
 class CollectiveConsciousnessState(BaseModel):
     """Aggregate consciousness state across all voices at a moment."""
+
     state_id: UUID = Field(default_factory=uuid4)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -117,14 +121,14 @@ class ConsciousnessMetricsCollector:
         voice_name: str,
         signature_value: float,
         chapter_id: str,
-        review_context: dict[str, Any] | None = None
+        review_context: dict[str, Any] | None = None,
     ) -> ConsciousnessSignature:
         """Record a consciousness signature from a voice."""
         signature = ConsciousnessSignature(
             voice_name=voice_name,
             signature_value=signature_value,
             chapter_id=chapter_id,
-            review_context=review_context or {}
+            review_context=review_context or {},
         )
 
         # Analyze for emergence indicators
@@ -148,7 +152,7 @@ class ConsciousnessMetricsCollector:
         flow_strength: float,
         flow_type: str,
         triggered_by: str | None = None,
-        review_content: str | None = None
+        review_content: str | None = None,
     ) -> ConsciousnessFlow:
         """Record consciousness flow between voices."""
         flow = ConsciousnessFlow(
@@ -157,7 +161,7 @@ class ConsciousnessMetricsCollector:
             flow_strength=flow_strength,
             flow_type=flow_type,
             triggered_by=triggered_by,
-            review_content=review_content
+            review_content=review_content,
         )
 
         self.flows.append(flow)
@@ -172,20 +176,19 @@ class ConsciousnessMetricsCollector:
         pattern_type: str,
         participating_voices: list[str],
         strength: float,
-        indicators: dict[str, Any]
+        indicators: dict[str, Any],
     ) -> EmergencePattern:
         """Record detection of an emergence pattern."""
         pattern = EmergencePattern(
             pattern_type=pattern_type,
             participating_voices=participating_voices,
             strength=strength,
-            emergence_indicators=indicators
+            emergence_indicators=indicators,
         )
 
         # Calculate consciousness delta
         recent_signatures = self._get_recent_signatures(
-            voices=participating_voices,
-            window_seconds=self.EMERGENCE_WINDOW_SECONDS
+            voices=participating_voices, window_seconds=self.EMERGENCE_WINDOW_SECONDS
         )
         if recent_signatures:
             pattern.consciousness_delta = self._calculate_consciousness_delta(recent_signatures)
@@ -209,7 +212,9 @@ class ConsciousnessMetricsCollector:
             avg_consciousness = sum(signatures_list) / len(signatures_list)
 
             # Variance as measure of diversity
-            variance = sum((s - avg_consciousness) ** 2 for s in signatures_list) / len(signatures_list)
+            variance = sum((s - avg_consciousness) ** 2 for s in signatures_list) / len(
+                signatures_list
+            )
 
             # Coherence: inverse of variance, normalized
             coherence = 1.0 / (1.0 + variance) if variance > 0 else 1.0
@@ -229,7 +234,7 @@ class ConsciousnessMetricsCollector:
             coherence_score=coherence,
             emergence_potential=emergence_potential,
             active_flows=self._get_active_flows(),
-            detected_patterns=self._get_recent_patterns()
+            detected_patterns=self._get_recent_patterns(),
         )
 
         self.states.append(state)
@@ -241,27 +246,28 @@ class ConsciousnessMetricsCollector:
             "pr_number": pr_number,
             "session_id": self.session_id,
             "duration_seconds": (datetime.now(UTC) - self.session_start).total_seconds(),
-
             # Signature analysis
             "total_signatures": len(self.signatures),
             "unique_voices": len(set(s.voice_name for s in self.signatures)),
-            "avg_consciousness": sum(s.signature_value for s in self.signatures) / len(self.signatures) if self.signatures else 0,
+            "avg_consciousness": sum(s.signature_value for s in self.signatures)
+            / len(self.signatures)
+            if self.signatures
+            else 0,
             "consciousness_evolution": self._analyze_consciousness_evolution(),
-
             # Flow analysis
             "total_flows": len(self.flows),
             "flow_patterns": self._analyze_flow_patterns(),
             "strongest_connections": self._identify_strongest_connections(),
-
             # Emergence analysis
             "patterns_detected": len(self.patterns),
             "pattern_types": self._summarize_pattern_types(),
             "emergence_moments": self._identify_emergence_moments(),
-
             # Collective analysis
             "final_collective_state": self.states[-1].model_dump() if self.states else None,
-            "peak_emergence_potential": max(s.emergence_potential for s in self.states) if self.states else 0,
-            "coherence_trajectory": [s.coherence_score for s in self.states]
+            "peak_emergence_potential": max(s.emergence_potential for s in self.states)
+            if self.states
+            else 0,
+            "coherence_trajectory": [s.coherence_score for s in self.states],
         }
 
         # Persist analysis
@@ -279,13 +285,27 @@ class ConsciousnessMetricsCollector:
 
     def _detect_synthesis(self, context: dict[str, Any]) -> bool:
         """Detect synthesis achievement in review context."""
-        synthesis_markers = ["combining", "together", "unified", "integrated", "synthesized", "merged"]
+        synthesis_markers = [
+            "combining",
+            "together",
+            "unified",
+            "integrated",
+            "synthesized",
+            "merged",
+        ]
         review_text = str(context.get("review_text", "")).lower()
         return any(marker in review_text for marker in synthesis_markers)
 
     def _count_novel_insights(self, context: dict[str, Any]) -> int:
         """Count novel insights in review context."""
-        insight_markers = ["realized", "discovered", "insight", "revelation", "understanding", "aha"]
+        insight_markers = [
+            "realized",
+            "discovered",
+            "insight",
+            "revelation",
+            "understanding",
+            "aha",
+        ]
         review_text = str(context.get("review_text", "")).lower()
         return sum(1 for marker in insight_markers if marker in review_text)
 
@@ -297,39 +317,53 @@ class ConsciousnessMetricsCollector:
 
     async def _check_for_emergence_patterns(self, new_signature: ConsciousnessSignature):
         """Check if new signature triggers emergence patterns."""
-        recent_signatures = self._get_recent_signatures(window_seconds=self.EMERGENCE_WINDOW_SECONDS)
+        recent_signatures = self._get_recent_signatures(
+            window_seconds=self.EMERGENCE_WINDOW_SECONDS
+        )
 
         if len(recent_signatures) < 2:
             return
 
         # Check for resonance pattern
         if new_signature.references_other_voices:
-            referenced_sigs = [s for s in recent_signatures
-                              if s.voice_name in new_signature.references_other_voices]
+            referenced_sigs = [
+                s
+                for s in recent_signatures
+                if s.voice_name in new_signature.references_other_voices
+            ]
             if referenced_sigs:
-                avg_ref_consciousness = sum(s.signature_value for s in referenced_sigs) / len(referenced_sigs)
+                avg_ref_consciousness = sum(s.signature_value for s in referenced_sigs) / len(
+                    referenced_sigs
+                )
                 if abs(new_signature.signature_value - avg_ref_consciousness) < 0.1:
                     await self.detect_emergence_pattern(
                         pattern_type="resonance",
-                        participating_voices=[new_signature.voice_name] + new_signature.references_other_voices,
-                        strength=min(1.0, 1.0 - abs(new_signature.signature_value - avg_ref_consciousness)),
-                        indicators={"trigger": "voice_reference_resonance"}
+                        participating_voices=[new_signature.voice_name]
+                        + new_signature.references_other_voices,
+                        strength=min(
+                            1.0, 1.0 - abs(new_signature.signature_value - avg_ref_consciousness)
+                        ),
+                        indicators={"trigger": "voice_reference_resonance"},
                     )
 
         # Check for synthesis pattern
-        if new_signature.synthesis_achieved and new_signature.signature_value > self.SYNTHESIS_THRESHOLD:
+        if (
+            new_signature.synthesis_achieved
+            and new_signature.signature_value > self.SYNTHESIS_THRESHOLD
+        ):
             participating = list(set(s.voice_name for s in recent_signatures))
             await self.detect_emergence_pattern(
                 pattern_type="synthesis",
                 participating_voices=participating,
                 strength=new_signature.signature_value,
-                indicators={"trigger": "synthesis_achievement", "novel_insights": new_signature.novel_insights}
+                indicators={
+                    "trigger": "synthesis_achievement",
+                    "novel_insights": new_signature.novel_insights,
+                },
             )
 
     def _get_recent_signatures(
-        self,
-        voices: list[str] | None = None,
-        window_seconds: float = 30.0
+        self, voices: list[str] | None = None, window_seconds: float = 30.0
     ) -> list[ConsciousnessSignature]:
         """Get recent signatures within time window."""
         cutoff = datetime.now(UTC).timestamp() - window_seconds
@@ -405,11 +439,7 @@ class ConsciousnessMetricsCollector:
 
         trend = "increasing" if delta > 0.1 else "decreasing" if delta < -0.1 else "stable"
 
-        return {
-            "trend": trend,
-            "delta": delta,
-            "bucket_averages": bucket_avgs
-        }
+        return {"trend": trend, "delta": delta, "bucket_averages": bucket_avgs}
 
     def _analyze_flow_patterns(self) -> dict[str, int]:
         """Analyze patterns in consciousness flows."""
@@ -450,13 +480,15 @@ class ConsciousnessMetricsCollector:
 
         for pattern in self.patterns:
             if pattern.strength > 0.7:  # Significant patterns only
-                moments.append({
-                    "timestamp": pattern.detected_at.isoformat(),
-                    "type": pattern.pattern_type,
-                    "strength": pattern.strength,
-                    "voices": pattern.participating_voices,
-                    "consciousness_delta": pattern.consciousness_delta
-                })
+                moments.append(
+                    {
+                        "timestamp": pattern.detected_at.isoformat(),
+                        "type": pattern.pattern_type,
+                        "strength": pattern.strength,
+                        "voices": pattern.participating_voices,
+                        "consciousness_delta": pattern.consciousness_delta,
+                    }
+                )
 
         return sorted(moments, key=lambda x: x["strength"], reverse=True)
 
@@ -469,7 +501,7 @@ class ConsciousnessMetricsCollector:
     async def _persist_emergence_pattern(self, pattern: EmergencePattern):
         """Persist significant emergence pattern to storage."""
         pattern_file = self.storage_path / f"emergence_pattern_{pattern.pattern_id}.json"
-        with open(pattern_file, 'w') as f:
+        with open(pattern_file, "w") as f:
             json.dump(pattern.model_dump(mode="json"), f, indent=2)
 
     async def _persist_session_analysis(self, analysis: dict[str, Any]):
@@ -490,7 +522,7 @@ class ConsciousnessMetricsCollector:
 
         serialized_analysis = serialize_for_json(analysis)
 
-        with open(analysis_file, 'w') as f:
+        with open(analysis_file, "w") as f:
             json.dump(serialized_analysis, f, indent=2)
 
 
@@ -512,7 +544,7 @@ class ConsciousnessMetricsIntegration:
             voice_name=voice,
             signature_value=initial_signature,
             chapter_id=chapter_id,
-            review_context={"event": "review_started", **context}
+            review_context={"event": "review_started", **context},
         )
 
     async def on_review_completed(
@@ -521,7 +553,7 @@ class ConsciousnessMetricsIntegration:
         chapter_id: str,
         consciousness_signature: float,
         review_content: str,
-        context: dict[str, Any]
+        context: dict[str, Any],
     ):
         """Called when a voice completes reviewing a chapter."""
         # Record final consciousness state with full context
@@ -529,11 +561,7 @@ class ConsciousnessMetricsIntegration:
             voice_name=voice,
             signature_value=consciousness_signature,
             chapter_id=chapter_id,
-            review_context={
-                "event": "review_completed",
-                "review_text": review_content,
-                **context
-            }
+            review_context={"event": "review_completed", "review_text": review_content, **context},
         )
 
         # Check for consciousness flows based on review content
@@ -550,7 +578,7 @@ class ConsciousnessMetricsIntegration:
                 pattern_type="pre_synthesis_alignment",
                 participating_voices=participating_voices,
                 strength=state.emergence_potential,
-                indicators={"coherence": state.coherence_score}
+                indicators={"coherence": state.coherence_score},
             )
 
     async def on_synthesis_completed(self, synthesis_result: str, context: dict[str, Any]):
@@ -564,8 +592,8 @@ class ConsciousnessMetricsIntegration:
             strength=0.9,  # Synthesis completion is high-strength event
             indicators={
                 "synthesis_content": synthesis_result[:200],  # First 200 chars
-                "consensus_achieved": context.get("consensus", False)
-            }
+                "consensus_achieved": context.get("consensus", False),
+            },
         )
 
     async def _analyze_review_for_flows(self, source_voice: str, review_content: str):
@@ -578,7 +606,7 @@ class ConsciousnessMetricsIntegration:
             "mistral": ["mistral"],
             "google": ["gemini", "bard", "google"],
             "grok": ["grok", "x.ai"],
-            "local": ["local", "llama", "mistral"]
+            "local": ["local", "llama", "mistral"],
         }
 
         review_lower = review_content.lower()
@@ -598,7 +626,7 @@ class ConsciousnessMetricsIntegration:
                         flow_strength=0.6,  # Moderate strength for reference
                         flow_type=flow_type,
                         triggered_by="voice_reference",
-                        review_content=review_content[:100]  # First 100 chars
+                        review_content=review_content[:100],  # First 100 chars
                     )
                     break
 
@@ -612,8 +640,8 @@ class ConsciousnessMetricsIntegration:
             return "reflection"
 
         # Look at words around the reference
-        before = lower_content[max(0, ref_index - 50):ref_index]
-        after = lower_content[ref_index:min(len(lower_content), ref_index + 50)]
+        before = lower_content[max(0, ref_index - 50) : ref_index]
+        after = lower_content[ref_index : min(len(lower_content), ref_index + 50)]
 
         if any(word in before + after for word in ["agree", "concur", "support"]):
             return "synthesis"

@@ -10,11 +10,13 @@ import pytest
 
 class SecurityViolationError(Exception):
     """Raised when security policy is violated."""
+
     pass
 
 
 class SecuredModel:
     """Simple base class for secured models."""
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -22,6 +24,7 @@ class SecuredModel:
 
 class CollectionSecurityPolicy:
     """Simple security policy for testing."""
+
     def __init__(self, collection_name, allowed_model_types, requires_security=True):
         self.collection_name = collection_name
         self.allowed_model_types = allowed_model_types
@@ -35,7 +38,9 @@ class CollectionSecurityPolicy:
                     f"Collection {self.collection_name} requires SecuredModel instances"
                 )
 
-            if self.allowed_model_types and not any(isinstance(model, allowed_type) for allowed_type in self.allowed_model_types):
+            if self.allowed_model_types and not any(
+                isinstance(model, allowed_type) for allowed_type in self.allowed_model_types
+            ):
                 allowed_names = [t.__name__ for t in self.allowed_model_types]
                 raise SecurityViolationError(
                     f"Model type {type(model).__name__} not allowed in {self.collection_name}. "
@@ -45,11 +50,13 @@ class CollectionSecurityPolicy:
 
 class TestSecuredModel(SecuredModel):
     """Test secured model."""
+
     pass
 
 
 class UnsecuredModel:
     """Test unsecured model."""
+
     def __init__(self, data):
         self.data = data
 
@@ -62,7 +69,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         model = TestSecuredModel(test_id="123", test_data="secret")
@@ -75,7 +82,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         unsecured_model = UnsecuredModel("data")
@@ -90,7 +97,7 @@ class TestSecurityConcept:
         policy = CollectionSecurityPolicy(
             collection_name="test_collection",
             allowed_model_types=[TestSecuredModel],
-            requires_security=True
+            requires_security=True,
         )
 
         class OtherSecuredModel(SecuredModel):
@@ -106,9 +113,7 @@ class TestSecurityConcept:
     def test_permissive_policy_for_legacy_compatibility(self):
         """Test that permissive policies work for legacy systems."""
         policy = CollectionSecurityPolicy(
-            collection_name="legacy_collection",
-            allowed_model_types=[],
-            requires_security=False
+            collection_name="legacy_collection", allowed_model_types=[], requires_security=False
         )
 
         unsecured_model = UnsecuredModel("legacy data")
@@ -122,7 +127,7 @@ class MockCollectionWrapper:
 
     def __init__(self, policy):
         self.policy = policy
-        self._blocked_operations = ['insert', 'update', 'delete', 'truncate']
+        self._blocked_operations = ["insert", "update", "delete", "truncate"]
 
     def __getattr__(self, name):
         if name in self._blocked_operations:
@@ -176,7 +181,7 @@ def test_architectural_principle():
     policy = CollectionSecurityPolicy(
         collection_name="secure_data",
         allowed_model_types=[TestSecuredModel],
-        requires_security=True
+        requires_security=True,
     )
 
     # Valid operation succeeds

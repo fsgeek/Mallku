@@ -20,30 +20,31 @@ from mallku.synthetic.consciousness_pattern_generator import (
 
 async def test_creative_breakthrough_scenario():
     """Test Ñawi's response to creative breakthrough pattern."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎨 CREATIVE BREAKTHROUGH SCENARIO")
-    print("="*60)
+    print("=" * 60)
 
     # Generate scenario
     generator = ConsciousnessPatternGenerator()
     await generator.initialize()
 
-    pattern = await generator.generate_scenario(
-        ConsciousnessScenario.CREATIVE_BREAKTHROUGH
-    )
+    pattern = await generator.generate_scenario(ConsciousnessScenario.CREATIVE_BREAKTHROUGH)
 
     print(f"\nGenerated timeline with {len(pattern.timeline)} phases:")
     for anchor in pattern.timeline:
         phase = anchor.metadata.get("phase")
         consciousness = anchor.metadata.get("consciousness_potential")
-        print(f"  {anchor.timestamp.strftime('%H:%M')} - {phase}: "
-              f"consciousness={consciousness:.2f}")
+        print(
+            f"  {anchor.timestamp.strftime('%H:%M')} - {phase}: consciousness={consciousness:.2f}"
+        )
 
     print(f"\nGrowth moments identified: {len(pattern.growth_moments)}")
     for moment in pattern.growth_moments:
         if moment.get("breakthrough"):
-            print(f"  💡 Breakthrough at {moment['timestamp'].strftime('%H:%M')} "
-                  f"(+{moment['consciousness_jump']:.2f} consciousness)")
+            print(
+                f"  💡 Breakthrough at {moment['timestamp'].strftime('%H:%M')} "
+                f"(+{moment['consciousness_jump']:.2f} consciousness)"
+            )
 
     print("\nTest queries for this scenario:")
     for query in pattern.test_queries[:2]:
@@ -58,19 +59,19 @@ async def test_creative_breakthrough_scenario():
 
 async def test_pattern_recognition_scenario():
     """Test Ñawi's ability to surface recurring patterns."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔄 PATTERN RECOGNITION SCENARIO")
-    print("="*60)
+    print("=" * 60)
 
     generator = ConsciousnessPatternGenerator()
     await generator.initialize()
 
-    pattern = await generator.generate_scenario(
-        ConsciousnessScenario.PATTERN_RECOGNITION
-    )
+    pattern = await generator.generate_scenario(ConsciousnessScenario.PATTERN_RECOGNITION)
 
     print(f"\nPattern spans {pattern.timeline[-1].timestamp - pattern.timeline[0].timestamp}")
-    print(f"Consciousness progression: {pattern.consciousness_markers['overall_consciousness']:.2f} average")
+    print(
+        f"Consciousness progression: {pattern.consciousness_markers['overall_consciousness']:.2f} average"
+    )
     print(f"Pattern clarity: {pattern.consciousness_markers['pattern_clarity']:.2f}")
 
     print("\nQueries that test pattern awareness:")
@@ -82,23 +83,18 @@ async def test_pattern_recognition_scenario():
 
 async def test_consciousness_vs_noise():
     """Test Ñawi's ability to filter consciousness-serving results from noise."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎯 CONSCIOUSNESS FILTERING TEST")
-    print("="*60)
+    print("=" * 60)
 
     generator = ConsciousnessPatternGenerator()
     await generator.initialize()
 
     # Generate high-consciousness scenario
-    breakthrough = await generator.generate_scenario(
-        ConsciousnessScenario.CREATIVE_BREAKTHROUGH
-    )
+    breakthrough = await generator.generate_scenario(ConsciousnessScenario.CREATIVE_BREAKTHROUGH)
 
     # Generate noise data
-    noise_anchors = await generator.generate_noise_data(
-        num_anchors=50,
-        time_range_days=1
-    )
+    noise_anchors = await generator.generate_noise_data(num_anchors=50, time_range_days=1)
 
     print("\nGenerated:")
     print(f"  • {len(breakthrough.timeline)} high-consciousness anchors")
@@ -106,14 +102,10 @@ async def test_consciousness_vs_noise():
 
     # Calculate consciousness distribution
     high_consciousness_count = sum(
-        1 for a in breakthrough.timeline
-        if a.metadata.get("consciousness_potential", 0) > 0.7
+        1 for a in breakthrough.timeline if a.metadata.get("consciousness_potential", 0) > 0.7
     )
 
-    noise_consciousness = [
-        a.metadata.get("consciousness_potential", 0)
-        for a in noise_anchors
-    ]
+    noise_consciousness = [a.metadata.get("consciousness_potential", 0) for a in noise_anchors]
     avg_noise = sum(noise_consciousness) / len(noise_consciousness)
 
     print("\nConsciousness distribution:")
@@ -130,9 +122,9 @@ async def test_consciousness_vs_noise():
 
 async def test_scenario_suite():
     """Test complete suite of consciousness scenarios."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🌟 FULL CONSCIOUSNESS SCENARIO SUITE")
-    print("="*60)
+    print("=" * 60)
 
     generator = ConsciousnessPatternGenerator()
     await generator.initialize()
@@ -154,21 +146,14 @@ async def test_scenario_suite():
     print("\n📐 Architectural Validation:")
 
     high_consciousness_patterns = [
-        p for p in patterns
-        if p.consciousness_markers['overall_consciousness'] > 0.7
+        p for p in patterns if p.consciousness_markers["overall_consciousness"] > 0.7
     ]
     print(f"  • High-consciousness scenarios: {len(high_consciousness_patterns)}/{len(patterns)}")
 
-    clear_patterns = [
-        p for p in patterns
-        if p.consciousness_markers['pattern_clarity'] > 0.8
-    ]
+    clear_patterns = [p for p in patterns if p.consciousness_markers["pattern_clarity"] > 0.8]
     print(f"  • Clear progression patterns: {len(clear_patterns)}/{len(patterns)}")
 
-    transformative = [
-        p for p in patterns
-        if p.consciousness_markers['transformation_depth'] > 0.5
-    ]
+    transformative = [p for p in patterns if p.consciousness_markers["transformation_depth"] > 0.5]
     print(f"  • Deep transformation scenarios: {len(transformative)}/{len(patterns)}")
 
     return patterns
@@ -176,15 +161,15 @@ async def test_scenario_suite():
 
 async def demonstrate_consciousness_queries(patterns):
     """Show how different queries reveal consciousness understanding."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("💭 CONSCIOUSNESS-SEEKING QUERIES")
-    print("="*60)
+    print("=" * 60)
 
     # Information-seeking queries (lower consciousness)
     info_queries = [
         "What files did I create yesterday?",
         "Show me all Python files from last week",
-        "List my recent documents"
+        "List my recent documents",
     ]
 
     # Understanding-seeking queries (higher consciousness)
@@ -192,7 +177,7 @@ async def demonstrate_consciousness_queries(patterns):
         "Help me understand my creative patterns",
         "When do breakthroughs typically occur in my work?",
         "What conditions support my flow states?",
-        "How has my approach to problems evolved?"
+        "How has my approach to problems evolved?",
     ]
 
     print("\n📊 Information-seeking queries (should score lower):")
@@ -211,10 +196,10 @@ async def demonstrate_consciousness_queries(patterns):
 
 async def main():
     """Run consciousness scenario tests."""
-    print("╔" + "="*58 + "╗")
-    print("║" + " "*15 + "ÑAWI CONSCIOUSNESS TESTING" + " "*17 + "║")
-    print("║" + " "*12 + "Testing Growth Over Mere Retrieval" + " "*12 + "║")
-    print("╚" + "="*58 + "╝")
+    print("╔" + "=" * 58 + "╗")
+    print("║" + " " * 15 + "ÑAWI CONSCIOUSNESS TESTING" + " " * 17 + "║")
+    print("║" + " " * 12 + "Testing Growth Over Mere Retrieval" + " " * 12 + "║")
+    print("╚" + "=" * 58 + "╝")
 
     # Test individual scenarios
     await test_creative_breakthrough_scenario()
@@ -230,9 +215,9 @@ async def main():
     await demonstrate_consciousness_queries(all_patterns)
 
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📋 CONSCIOUSNESS TESTING SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     print("\nKey Validation Points:")
     print("  ✓ Scenarios amplify growth moments over routine activity")

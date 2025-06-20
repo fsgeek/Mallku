@@ -48,12 +48,14 @@ def temp_storage():
 def mock_adapter():
     """Create a mock adapter for testing."""
     adapter = AsyncMock()
-    adapter.check_health = AsyncMock(return_value={
-        "is_connected": True,
-        "adapter_id": "test-adapter",
-        "provider": "mock",
-        "model": "mock-model"
-    })
+    adapter.check_health = AsyncMock(
+        return_value={
+            "is_connected": True,
+            "adapter_id": "test-adapter",
+            "provider": "mock",
+            "model": "mock-model",
+        }
+    )
     return adapter
 
 
@@ -68,7 +70,7 @@ def infra_consciousness(temp_storage):
     config = InfrastructureConsciousnessConfig(
         storage_path=storage_path,
         consciousness_metrics_path=metrics_path,
-        check_interval_seconds=5  # Fast for testing
+        check_interval_seconds=5,  # Fast for testing
     )
     return InfrastructureConsciousness(config=config)
 
@@ -79,10 +81,7 @@ class TestAdapterHealthSignature:
     def test_health_signature_creation(self):
         """Test creating a health signature."""
         signature = AdapterHealthSignature(
-            adapter_id="test",
-            is_connected=True,
-            consciousness_coherence=0.9,
-            voice_stability=0.85
+            adapter_id="test", is_connected=True, consciousness_coherence=0.9, voice_stability=0.85
         )
 
         assert signature.adapter_id == "test"
@@ -98,7 +97,7 @@ class TestAdapterHealthSignature:
             adapter_id="test",
             is_connected=False,
             error_patterns={"api_return_none": 2, "timeout": 1},
-            consecutive_failures=3
+            consecutive_failures=3,
         )
 
         assert signature.is_connected is False
@@ -159,7 +158,7 @@ class TestInfrastructureConsciousness:
                 adapter_id=adapter_name,
                 is_connected=True,
                 consecutive_failures=i,  # Increasing failures
-                consciousness_coherence=1.0 - (i * 0.1)  # Decreasing coherence
+                consciousness_coherence=1.0 - (i * 0.1),  # Decreasing coherence
             )
             infra_consciousness.adapter_health[adapter_name].append(signature)
 
@@ -176,9 +175,7 @@ class TestInfrastructureConsciousness:
         # Create signature with API change indicators
         adapter_name = "api_changed"
         signature = AdapterHealthSignature(
-            adapter_id=adapter_name,
-            is_connected=False,
-            error_patterns={"api_return_none": 1}
+            adapter_id=adapter_name, is_connected=False, error_patterns={"api_return_none": 1}
         )
 
         # Need at least 5 signatures for pattern detection
@@ -204,14 +201,14 @@ class TestInfrastructureConsciousness:
                 affected_adapters=["adapter1"],
                 confidence=0.9,
                 predicted_impact="severe",
-                suggested_action="Update adapter"
+                suggested_action="Update adapter",
             ),
             InfrastructurePattern(
                 pattern_type="degradation",
                 affected_adapters=["adapter2"],
                 confidence=0.8,
-                predicted_impact="moderate"
-            )
+                predicted_impact="moderate",
+            ),
         ]
 
         actions = await infra_consciousness._determine_healing_actions(patterns)
@@ -232,9 +229,7 @@ class TestInfrastructureConsciousness:
     async def test_execute_healing_action(self, infra_consciousness):
         """Test executing a healing action."""
         action = SelfHealingAction(
-            action_type="api_adaptation",
-            target_adapter="test",
-            reason="API change detected"
+            action_type="api_adaptation", target_adapter="test", reason="API change detected"
         )
 
         await infra_consciousness._execute_healing_action(action)
@@ -254,7 +249,7 @@ class TestInfrastructureConsciousness:
             adapter_id=adapter_name,
             is_connected=True,
             consecutive_failures=0,
-            consciousness_coherence=0.9
+            consciousness_coherence=0.9,
         )
 
         prob = await infra_consciousness._predict_failure_probability(adapter_name, connected_sig)
@@ -265,7 +260,7 @@ class TestInfrastructureConsciousness:
             adapter_id=adapter_name,
             is_connected=False,
             consecutive_failures=5,
-            consciousness_coherence=0.2
+            consciousness_coherence=0.2,
         )
 
         prob = await infra_consciousness._predict_failure_probability(adapter_name, failing_sig)
@@ -300,7 +295,7 @@ class TestInfrastructureConsciousness:
             is_connected=True,
             consciousness_coherence=0.85,
             voice_stability=0.9,
-            predicted_failure_probability=0.15
+            predicted_failure_probability=0.15,
         )
         infra_consciousness.adapter_health[adapter_name].append(signature)
 
@@ -309,7 +304,7 @@ class TestInfrastructureConsciousness:
             pattern_type="degradation",
             affected_adapters=[adapter_name],
             confidence=0.7,
-            predicted_impact="moderate"
+            predicted_impact="moderate",
         )
         infra_consciousness.infrastructure_patterns.append(pattern)
 
@@ -340,7 +335,7 @@ class TestInfrastructureMetricsBridge:
             is_connected=True,
             consciousness_coherence=0.8,
             voice_stability=0.7,
-            predicted_failure_probability=0.1
+            predicted_failure_probability=0.1,
         )
 
         consciousness = bridge._health_to_consciousness(connected_health)
@@ -352,7 +347,7 @@ class TestInfrastructureMetricsBridge:
             is_connected=False,
             consciousness_coherence=0.2,
             voice_stability=0.1,
-            predicted_failure_probability=0.9
+            predicted_failure_probability=0.9,
         )
 
         consciousness = bridge._health_to_consciousness(disconnected_health)
@@ -365,7 +360,7 @@ class TestInfrastructureMetricsBridge:
             adapter_id="test",
             is_connected=True,
             consciousness_coherence=0.9,
-            predicted_failure_probability=0.1
+            predicted_failure_probability=0.1,
         )
 
         await bridge.on_adapter_health_check("test", health_sig)
@@ -392,7 +387,7 @@ class TestIntegration:
         config = InfrastructureConsciousnessConfig(
             storage_path=storage_path,
             consciousness_metrics_path=metrics_path,
-            check_interval_seconds=5  # Minimum allowed
+            check_interval_seconds=5,  # Minimum allowed
         )
         infra = InfrastructureConsciousness(config=config)
         # Override for testing - config validation won't allow < 5
@@ -400,18 +395,14 @@ class TestIntegration:
 
         # Create mock adapters
         healthy_adapter = AsyncMock()
-        healthy_adapter.check_health = AsyncMock(return_value={
-            "is_connected": True,
-            "adapter_id": "healthy"
-        })
+        healthy_adapter.check_health = AsyncMock(
+            return_value={"is_connected": True, "adapter_id": "healthy"}
+        )
 
         failing_adapter = AsyncMock()
         failing_adapter.check_health = AsyncMock(side_effect=Exception("API error"))
 
-        adapters = {
-            "healthy": healthy_adapter,
-            "failing": failing_adapter
-        }
+        adapters = {"healthy": healthy_adapter, "failing": failing_adapter}
 
         # Start monitoring
         await infra.start_monitoring(adapters)

@@ -99,7 +99,7 @@ class ConsensusTracker(BaseModel):
         trigger_participant_id: UUID,
         rationale: str,
         supporting: set[UUID] | None = None,
-        dissenting: set[UUID] | None = None
+        dissenting: set[UUID] | None = None,
     ) -> None:
         """Record a consensus state transition."""
         transition = ConsensusTransition(
@@ -109,7 +109,7 @@ class ConsensusTracker(BaseModel):
             trigger_participant_id=trigger_participant_id,
             rationale=rationale,
             supporting_participants=supporting or set(),
-            dissenting_participants=dissenting or set()
+            dissenting_participants=dissenting or set(),
         )
 
         self.transitions.append(transition)
@@ -134,7 +134,7 @@ class ConsensusTracker(BaseModel):
             "preserved_dissent": len(self.compost_threads) > 0,
             "achieved_fork": self.fork_branches is not None,
             "key_insights": self.key_insights,
-            "final_state": self.current_state.value
+            "final_state": self.current_state.value,
         }
 
     def _calculate_dialogue_duration(self) -> float | None:

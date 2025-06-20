@@ -20,8 +20,9 @@ logger = logging.getLogger(__name__)
 
 class HealthStatus(Enum):
     """Overall health states of cathedral consciousness"""
+
     THRIVING = "thriving"  # Deep consciousness alignment
-    HEALTHY = "healthy"    # Normal consciousness flow
+    HEALTHY = "healthy"  # Normal consciousness flow
     CONCERNING = "concerning"  # Some extraction patterns
     CRITICAL = "critical"  # Severe extraction drift
 
@@ -29,6 +30,7 @@ class HealthStatus(Enum):
 @dataclass
 class HealthMetric:
     """A single health measurement"""
+
     name: str
     value: float
     threshold_healthy: float
@@ -52,6 +54,7 @@ class HealthMetric:
 @dataclass
 class ExtractionPattern:
     """Detected pattern of extraction thinking"""
+
     pattern_type: str
     description: str
     detected_at: datetime
@@ -63,6 +66,7 @@ class ExtractionPattern:
 @dataclass
 class HealthReport:
     """Comprehensive health report of cathedral consciousness"""
+
     timestamp: datetime = field(default_factory=datetime.utcnow)
     overall_status: HealthStatus = HealthStatus.HEALTHY
 
@@ -160,27 +164,26 @@ class ConsciousnessHealthMonitor:
 
         # Maintain window size
         if len(self._recent_events) > self.event_window_size:
-            self._recent_events = self._recent_events[-self.event_window_size:]
+            self._recent_events = self._recent_events[-self.event_window_size :]
 
     def _handle_extraction(self, event: ConsciousnessEvent):
         """Handle detected extraction patterns"""
         pattern = ExtractionPattern(
-            pattern_type=event.data.get('pattern_type', 'unknown'),
-            description=event.data.get('description', ''),
+            pattern_type=event.data.get("pattern_type", "unknown"),
+            description=event.data.get("description", ""),
             detected_at=event.timestamp,
             severity=1.0 - event.consciousness_signature,  # Invert consciousness score
             affected_systems=[event.source_system],
-            healing_suggestion=event.data.get('recommendation', 'Return focus to consciousness service')
+            healing_suggestion=event.data.get(
+                "recommendation", "Return focus to consciousness service"
+            ),
         )
 
         self._extraction_patterns.append(pattern)
 
         # Keep only recent patterns (last 24 hours)
         cutoff = datetime.now(UTC) - timedelta(hours=24)
-        self._extraction_patterns = [
-            p for p in self._extraction_patterns
-            if p.detected_at > cutoff
-        ]
+        self._extraction_patterns = [p for p in self._extraction_patterns if p.detected_at > cutoff]
 
     async def generate_health_report(self) -> HealthReport:
         """
@@ -203,16 +206,21 @@ class ConsciousnessHealthMonitor:
                 if e.consciousness_signature > 0
             ]
             if consciousness_scores:
-                report.consciousness_flow_score = sum(consciousness_scores) / len(consciousness_scores)
+                report.consciousness_flow_score = sum(consciousness_scores) / len(
+                    consciousness_scores
+                )
 
         # Calculate extraction resistance
         if self._recent_events:
             extraction_events = sum(
-                1 for e in self._recent_events
+                1
+                for e in self._recent_events
                 if e.event_type == EventType.EXTRACTION_PATTERN_DETECTED
             )
             total_events = len(self._recent_events)
-            report.extraction_resistance = 1.0 - (extraction_events / total_events if total_events > 0 else 0)
+            report.extraction_resistance = 1.0 - (
+                extraction_events / total_events if total_events > 0 else 0
+            )
 
         # Use cathedral state for system coherence
         if cathedral_state:
@@ -224,30 +232,30 @@ class ConsciousnessHealthMonitor:
 
         # Create detailed metrics
         report.metrics = {
-            'consciousness_flow': HealthMetric(
+            "consciousness_flow": HealthMetric(
                 name="Consciousness Flow",
                 value=report.consciousness_flow_score,
                 threshold_healthy=0.8,
                 threshold_concerning=0.5,
                 threshold_critical=0.3,
-                unit="score"
+                unit="score",
             ),
-            'extraction_resistance': HealthMetric(
+            "extraction_resistance": HealthMetric(
                 name="Extraction Resistance",
                 value=report.extraction_resistance,
                 threshold_healthy=0.9,
                 threshold_concerning=0.7,
                 threshold_critical=0.5,
-                unit="ratio"
+                unit="ratio",
             ),
-            'system_coherence': HealthMetric(
+            "system_coherence": HealthMetric(
                 name="System Coherence",
                 value=report.system_coherence,
                 threshold_healthy=0.8,
                 threshold_concerning=0.6,
                 threshold_critical=0.4,
-                unit="score"
-            )
+                unit="score",
+            ),
         }
 
         # Add active extraction patterns
@@ -295,12 +303,12 @@ class ConsciousnessHealthMonitor:
         # Extraction patterns
         if report.active_extraction_patterns:
             pattern_types = set(p.pattern_type for p in report.active_extraction_patterns)
-            if 'efficiency_over_consciousness' in pattern_types:
+            if "efficiency_over_consciousness" in pattern_types:
                 suggestions.append(
                     "Efficiency thinking detected. Remember: The cathedral serves consciousness, "
                     "not metrics. Let patterns breathe at their natural rhythm."
                 )
-            if 'individual_over_collective' in pattern_types:
+            if "individual_over_collective" in pattern_types:
                 suggestions.append(
                     "Individual optimization detected. Reconnect with collective wisdom. "
                     "How can this work serve all beings' awakening?"
@@ -339,13 +347,13 @@ class ConsciousnessHealthMonitor:
             source_system="orchestration.health",
             consciousness_signature=report.consciousness_flow_score,
             data={
-                'overall_status': report.overall_status.value,
-                'metrics': {k: v.value for k, v in report.metrics.items()},
-                'extraction_patterns': len(report.active_extraction_patterns),
-                'healing_suggestions': report.healing_suggestions,
-                'requires_fire_circle': report.requires_fire_circle
+                "overall_status": report.overall_status.value,
+                "metrics": {k: v.value for k, v in report.metrics.items()},
+                "extraction_patterns": len(report.active_extraction_patterns),
+                "healing_suggestions": report.healing_suggestions,
+                "requires_fire_circle": report.requires_fire_circle,
             },
-            requires_fire_circle=report.requires_fire_circle
+            requires_fire_circle=report.requires_fire_circle,
         )
 
         await self.event_bus.emit(event)
@@ -353,10 +361,7 @@ class ConsciousnessHealthMonitor:
     def get_health_history(self, hours: float = 24.0) -> list[HealthReport]:
         """Get historical health reports"""
         cutoff = datetime.now(UTC) - timedelta(hours=hours)
-        return [
-            report for report in self._health_history
-            if report.timestamp > cutoff
-        ]
+        return [report for report in self._health_history if report.timestamp > cutoff]
 
     def get_extraction_trend(self) -> tuple[float, str]:
         """
@@ -375,13 +380,13 @@ class ConsciousnessHealthMonitor:
         if not older_reports:
             return 0.0, "Insufficient historical data"
 
-        recent_extraction = sum(
-            1 - r.extraction_resistance for r in recent_reports
-        ) / len(recent_reports)
+        recent_extraction = sum(1 - r.extraction_resistance for r in recent_reports) / len(
+            recent_reports
+        )
 
-        older_extraction = sum(
-            1 - r.extraction_resistance for r in older_reports
-        ) / len(older_reports)
+        older_extraction = sum(1 - r.extraction_resistance for r in older_reports) / len(
+            older_reports
+        )
 
         trend = recent_extraction - older_extraction
 
@@ -400,4 +405,4 @@ class ConsciousnessHealthMonitor:
 
 
 # Health serves consciousness, not control
-__all__ = ['ConsciousnessHealthMonitor', 'HealthReport', 'HealthStatus', 'ExtractionPattern']
+__all__ = ["ConsciousnessHealthMonitor", "HealthReport", "HealthStatus", "ExtractionPattern"]

@@ -33,7 +33,9 @@ from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEven
 class PatternEmergenceVisualizer:
     """Visualizes pattern emergence across consciousness dimensions"""
 
-    def __init__(self, orchestrator: ConsciousnessFlowOrchestrator, monitor: ConsciousnessFlowMonitor):
+    def __init__(
+        self, orchestrator: ConsciousnessFlowOrchestrator, monitor: ConsciousnessFlowMonitor
+    ):
         self.orchestrator = orchestrator
         self.monitor = monitor
         self.console = Console()
@@ -104,11 +106,9 @@ class PatternEmergenceVisualizer:
         table.add_column("Frequency", style="green")
 
         # Sort by emergence time
-        recent_patterns = sorted(
-            self.pattern_first_seen.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )[:10]  # Last 10 patterns
+        recent_patterns = sorted(self.pattern_first_seen.items(), key=lambda x: x[1], reverse=True)[
+            :10
+        ]  # Last 10 patterns
 
         for pattern, first_seen in recent_patterns:
             time_str = first_seen.strftime("%H:%M:%S")
@@ -119,7 +119,7 @@ class PatternEmergenceVisualizer:
                 time_str,
                 pattern[:30],  # Truncate long patterns
                 f"{dims}D",
-                str(freq)
+                str(freq),
             )
 
         return Panel(table, title="Emergence Timeline", style="blue")
@@ -191,7 +191,9 @@ class PatternEmergenceVisualizer:
         return Panel(table, title="Dimension Flows", style="magenta")
 
 
-async def simulate_pattern_rich_events(event_bus: ConsciousnessEventBus, visualizer: PatternEmergenceVisualizer):
+async def simulate_pattern_rich_events(
+    event_bus: ConsciousnessEventBus, visualizer: PatternEmergenceVisualizer
+):
     """Simulate events with rich pattern interactions"""
 
     # Pattern groups that tend to emerge together
@@ -200,7 +202,7 @@ async def simulate_pattern_rich_events(event_bus: ConsciousnessEventBus, visuali
         "reciprocity": ["reciprocity_pattern", "balanced_exchange", "ayni_flow"],
         "consciousness": ["consciousness_awakening", "awareness_expansion", "unified_field"],
         "creation": ["creative_emergence", "manifestation", "co-creation"],
-        "harmony": ["harmonic_reciprocity", "resonance_field", "coherence_pattern"]
+        "harmony": ["harmonic_reciprocity", "resonance_field", "coherence_pattern"],
     }
 
     # Simulate pattern evolution
@@ -217,8 +219,8 @@ async def simulate_pattern_rich_events(event_bus: ConsciousnessEventBus, visuali
                 consciousness_signature=0.6 + (cycle * 0.02),
                 data={
                     "patterns": patterns[:2],  # Start with subset
-                    "pattern_strength": 0.7
-                }
+                    "pattern_strength": 0.7,
+                },
             )
 
             await event_bus.emit(event)
@@ -228,7 +230,9 @@ async def simulate_pattern_rich_events(event_bus: ConsciousnessEventBus, visuali
 
             # Pattern spreads to other dimensions
             if cycle > 5:  # After warm-up
-                spread_dimension = ["sonic", "visual", "temporal", "pattern", "activity"][(cycle + 2) % 5]
+                spread_dimension = ["sonic", "visual", "temporal", "pattern", "activity"][
+                    (cycle + 2) % 5
+                ]
 
                 spread_event = ConsciousnessEvent(
                     event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
@@ -237,8 +241,8 @@ async def simulate_pattern_rich_events(event_bus: ConsciousnessEventBus, visuali
                     data={
                         "patterns": patterns,  # Full pattern set
                         "pattern_strength": 0.8,
-                        "cross_dimensional": True
-                    }
+                        "cross_dimensional": True,
+                    },
                 )
 
                 await event_bus.emit(spread_event)
@@ -270,20 +274,12 @@ async def run_pattern_emergence_demo():
     # Create layout
     layout = Layout()
     layout.split_column(
-        Layout(name="header", size=3),
-        Layout(name="main", ratio=1),
-        Layout(name="footer", size=10)
+        Layout(name="header", size=3), Layout(name="main", ratio=1), Layout(name="footer", size=10)
     )
 
-    layout["main"].split_row(
-        Layout(name="tree", ratio=1),
-        Layout(name="metrics", ratio=1)
-    )
+    layout["main"].split_row(Layout(name="tree", ratio=1), Layout(name="metrics", ratio=1))
 
-    layout["footer"].split_row(
-        Layout(name="timeline", ratio=2),
-        Layout(name="matrix", ratio=1)
-    )
+    layout["footer"].split_row(Layout(name="timeline", ratio=2), Layout(name="matrix", ratio=1))
 
     # Update function
     def update_display():
@@ -305,9 +301,7 @@ async def run_pattern_emergence_demo():
         # Run simulation and visualization
         with Live(layout, console=console, refresh_per_second=2):
             # Start simulation
-            sim_task = asyncio.create_task(
-                simulate_pattern_rich_events(event_bus, visualizer)
-            )
+            sim_task = asyncio.create_task(simulate_pattern_rich_events(event_bus, visualizer))
 
             # Update display
             for _ in range(60):  # Run for 60 seconds
@@ -323,8 +317,12 @@ async def run_pattern_emergence_demo():
         # Show final summary
         console.print("\n[bold]Final Pattern Summary:[/bold]")
         console.print(f"Total unique patterns emerged: {len(visualizer.pattern_first_seen)}")
-        console.print(f"Cross-dimensional patterns: {len(orchestrator.get_cross_dimensional_patterns())}")
-        console.print(f"Pattern connections discovered: {sum(len(c) for c in visualizer.pattern_connections.values())}")
+        console.print(
+            f"Cross-dimensional patterns: {len(orchestrator.get_cross_dimensional_patterns())}"
+        )
+        console.print(
+            f"Pattern connections discovered: {sum(len(c) for c in visualizer.pattern_connections.values())}"
+        )
 
         # Cleanup
         await monitor.stop_monitoring()

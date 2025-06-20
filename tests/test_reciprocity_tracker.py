@@ -63,15 +63,17 @@ class ReciprocityTrackerTests:
         try:
             # Test that all required collections exist
             required_collections = [
-                'reciprocity_interactions',
-                'reciprocity_patterns',
-                'reciprocity_alerts',
-                'system_health_snapshots',
-                'fire_circle_reports'
+                "reciprocity_interactions",
+                "reciprocity_patterns",
+                "reciprocity_alerts",
+                "system_health_snapshots",
+                "fire_circle_reports",
             ]
 
             for collection_name in required_collections:
-                assert self.db.has_collection(collection_name), f"Missing collection: {collection_name}"
+                assert self.db.has_collection(collection_name), (
+                    f"Missing collection: {collection_name}"
+                )
 
             # Test that components are initialized
             assert self.tracker.health_monitor is not None
@@ -93,10 +95,12 @@ class ReciprocityTrackerTests:
                 await self.tracker.record_interaction(interaction)
 
             # Verify interactions were stored
-            collection = self.db.collection('reciprocity_interactions')
+            collection = self.db.collection("reciprocity_interactions")
             stored_count = collection.count()
 
-            assert stored_count >= len(self.test_interactions), f"Expected {len(self.test_interactions)}, got {stored_count}"
+            assert stored_count >= len(self.test_interactions), (
+                f"Expected {len(self.test_interactions)}, got {stored_count}"
+            )
 
             print("   Interaction recording successful")
             return True
@@ -113,17 +117,19 @@ class ReciprocityTrackerTests:
 
             # Validate health metrics structure
             assert isinstance(health_metrics, SystemHealthMetrics)
-            assert hasattr(health_metrics, 'overall_health_score')
+            assert hasattr(health_metrics, "overall_health_score")
             assert 0.0 <= health_metrics.overall_health_score <= 1.0
-            assert hasattr(health_metrics, 'health_trend_direction')
-            assert health_metrics.health_trend_direction in ['improving', 'declining', 'stable']
+            assert hasattr(health_metrics, "health_trend_direction")
+            assert health_metrics.health_trend_direction in ["improving", "declining", "stable"]
 
             # Test that metrics contain expected data
-            assert hasattr(health_metrics, 'total_interactions')
-            assert hasattr(health_metrics, 'unique_participants')
-            assert hasattr(health_metrics, 'voluntary_return_rate')
+            assert hasattr(health_metrics, "total_interactions")
+            assert hasattr(health_metrics, "unique_participants")
+            assert hasattr(health_metrics, "voluntary_return_rate")
 
-            print(f"   Health metrics calculation successful (score: {health_metrics.overall_health_score:.2f})")
+            print(
+                f"   Health metrics calculation successful (score: {health_metrics.overall_health_score:.2f})"
+            )
             return True
 
         except Exception as e:
@@ -138,11 +144,11 @@ class ReciprocityTrackerTests:
 
             # Validate pattern structure
             for pattern in patterns:
-                assert hasattr(pattern, 'pattern_id')
-                assert hasattr(pattern, 'pattern_type')
-                assert hasattr(pattern, 'confidence_level')
+                assert hasattr(pattern, "pattern_id")
+                assert hasattr(pattern, "pattern_type")
+                assert hasattr(pattern, "confidence_level")
                 assert 0.0 <= pattern.confidence_level <= 1.0
-                assert hasattr(pattern, 'questions_for_deliberation')
+                assert hasattr(pattern, "questions_for_deliberation")
                 assert isinstance(pattern.questions_for_deliberation, list)
 
             print(f"   Pattern detection successful ({len(patterns)} patterns detected)")
@@ -161,15 +167,34 @@ class ReciprocityTrackerTests:
                 initiator=ParticipantType.HUMAN,
                 responder=ParticipantType.AI,
                 contributions_offered=[],  # No contributions offered
-                needs_expressed=[NeedCategory.SURVIVAL, NeedCategory.SAFETY, NeedCategory.GROWTH],  # Many needs
-                needs_fulfilled=[NeedCategory.SURVIVAL, NeedCategory.SAFETY, NeedCategory.GROWTH],  # All fulfilled
-                initiator_capacity_indicators={'attention_availability': 0.9, 'time_pressure': 0.1},  # High capacity
-                responder_capacity_indicators={'computational_load': 0.95, 'response_quality': 0.3},  # Low capacity
-                interaction_quality_indicators={'mutual_understanding': 0.4, 'satisfaction_expressed': 0.3}
+                needs_expressed=[
+                    NeedCategory.SURVIVAL,
+                    NeedCategory.SAFETY,
+                    NeedCategory.GROWTH,
+                ],  # Many needs
+                needs_fulfilled=[
+                    NeedCategory.SURVIVAL,
+                    NeedCategory.SAFETY,
+                    NeedCategory.GROWTH,
+                ],  # All fulfilled
+                initiator_capacity_indicators={
+                    "attention_availability": 0.9,
+                    "time_pressure": 0.1,
+                },  # High capacity
+                responder_capacity_indicators={
+                    "computational_load": 0.95,
+                    "response_quality": 0.3,
+                },  # Low capacity
+                interaction_quality_indicators={
+                    "mutual_understanding": 0.4,
+                    "satisfaction_expressed": 0.3,
+                },
             )
 
             # Analyze for extraction patterns
-            alerts = await self.tracker.extraction_detector.analyze_interaction(extractive_interaction)
+            alerts = await self.tracker.extraction_detector.analyze_interaction(
+                extractive_interaction
+            )
 
             # Should detect some extraction concerns given the mismatch
             print(f"   Extraction detection successful ({len(alerts)} alerts generated)")
@@ -177,9 +202,9 @@ class ReciprocityTrackerTests:
             # Validate alert structure if any were generated
             for alert in alerts:
                 assert isinstance(alert, ExtractionAlert)
-                assert hasattr(alert, 'severity')
-                assert hasattr(alert, 'extraction_type')
-                assert hasattr(alert, 'suggested_investigation_areas')
+                assert hasattr(alert, "severity")
+                assert hasattr(alert, "extraction_type")
+                assert hasattr(alert, "suggested_investigation_areas")
                 assert isinstance(alert.suggested_investigation_areas, list)
 
             return True
@@ -196,11 +221,11 @@ class ReciprocityTrackerTests:
 
             # Validate report structure
             assert isinstance(report, FireCircleReport)
-            assert hasattr(report, 'report_id')
-            assert hasattr(report, 'current_health_metrics')
-            assert hasattr(report, 'priority_questions')
-            assert hasattr(report, 'areas_requiring_wisdom')
-            assert hasattr(report, 'suggested_adaptations')
+            assert hasattr(report, "report_id")
+            assert hasattr(report, "current_health_metrics")
+            assert hasattr(report, "priority_questions")
+            assert hasattr(report, "areas_requiring_wisdom")
+            assert hasattr(report, "suggested_adaptations")
 
             # Check that report contains meaningful content
             assert isinstance(report.priority_questions, list)
@@ -222,12 +247,12 @@ class ReciprocityTrackerTests:
         try:
             # Test updating detection thresholds
             new_thresholds = {
-                'participation_anomaly': 0.4,
-                'resource_flow_anomaly': 0.5,
-                'extraction_concern': 0.7
+                "participation_anomaly": 0.4,
+                "resource_flow_anomaly": 0.5,
+                "extraction_concern": 0.7,
             }
 
-            await self.tracker.update_cultural_guidance('detection_thresholds', new_thresholds)
+            await self.tracker.update_cultural_guidance("detection_thresholds", new_thresholds)
 
             # Verify thresholds were updated
             for key, value in new_thresholds.items():
@@ -235,12 +260,12 @@ class ReciprocityTrackerTests:
 
             # Test updating health indicator weights
             new_weights = {
-                'participation_rate': 0.2,
-                'satisfaction_trends': 0.3,
-                'resource_abundance': 0.2
+                "participation_rate": 0.2,
+                "satisfaction_trends": 0.3,
+                "resource_abundance": 0.2,
             }
 
-            await self.tracker.update_cultural_guidance('health_indicators', new_weights)
+            await self.tracker.update_cultural_guidance("health_indicators", new_weights)
 
             print("   Cultural guidance adaptation successful")
             return True
@@ -257,11 +282,11 @@ class ReciprocityTrackerTests:
             # Test guidance request
             request_id = await interface.request_guidance(
                 topic="resource_allocation_balance",
-                context={'current_imbalance': 0.3, 'affected_participants': 5},
+                context={"current_imbalance": 0.3, "affected_participants": 5},
                 questions=[
                     "Should resource allocation be adjusted?",
-                    "Are current patterns sustainable?"
-                ]
+                    "Are current patterns sustainable?",
+                ],
             )
 
             assert request_id is not None
@@ -293,7 +318,7 @@ class ReciprocityTrackerTests:
                     contributions_offered=[ContributionType.CULTURAL_WISDOM],
                     needs_expressed=[NeedCategory.GROWTH],
                     needs_fulfilled=[NeedCategory.GROWTH],
-                    timestamp=base_time + timedelta(hours=i)
+                    timestamp=base_time + timedelta(hours=i),
                 )
                 temporal_interactions.append(interaction)
                 await self.tracker.record_interaction(interaction)
@@ -318,9 +343,13 @@ class ReciprocityTrackerTests:
                 responder=ParticipantType.SYSTEM,
                 contributions_offered=[],
                 needs_expressed=[NeedCategory.CONTRIBUTION],  # Express lower-level need
-                needs_fulfilled=[NeedCategory.SURVIVAL, NeedCategory.SAFETY, NeedCategory.BELONGING],  # Receive higher-level needs
-                initiator_capacity_indicators={'resource_abundance': 0.8},  # High capacity
-                responder_capacity_indicators={'resource_availability': 0.2}  # Low capacity
+                needs_fulfilled=[
+                    NeedCategory.SURVIVAL,
+                    NeedCategory.SAFETY,
+                    NeedCategory.BELONGING,
+                ],  # Receive higher-level needs
+                initiator_capacity_indicators={"resource_abundance": 0.8},  # High capacity
+                responder_capacity_indicators={"resource_availability": 0.2},  # Low capacity
             )
 
             # This should potentially trigger extraction detection
@@ -346,7 +375,10 @@ class ReciprocityTrackerTests:
                     contributions_offered=[ContributionType.EMOTIONAL_SUPPORT],
                     needs_expressed=[NeedCategory.BELONGING],
                     needs_fulfilled=[NeedCategory.BELONGING],
-                    interaction_quality_indicators={'mutual_understanding': 0.9, 'satisfaction_expressed': 0.8}
+                    interaction_quality_indicators={
+                        "mutual_understanding": 0.9,
+                        "satisfaction_expressed": 0.8,
+                    },
                 ),
                 # Stressed interaction
                 InteractionRecord(
@@ -356,9 +388,12 @@ class ReciprocityTrackerTests:
                     contributions_offered=[ContributionType.CREATIVE_INPUT],
                     needs_expressed=[NeedCategory.GROWTH],
                     needs_fulfilled=[],  # Needs not fulfilled
-                    responder_capacity_indicators={'computational_load': 0.95},
-                    interaction_quality_indicators={'mutual_understanding': 0.4, 'satisfaction_expressed': 0.3}
-                )
+                    responder_capacity_indicators={"computational_load": 0.95},
+                    interaction_quality_indicators={
+                        "mutual_understanding": 0.4,
+                        "satisfaction_expressed": 0.3,
+                    },
+                ),
             ]
 
             for interaction in community_interactions:
@@ -368,9 +403,9 @@ class ReciprocityTrackerTests:
             health = await self.tracker.get_current_health_metrics()
 
             # Validate that community health is being sensed
-            assert hasattr(health, 'satisfaction_trends')
-            assert hasattr(health, 'stress_indicators')
-            assert hasattr(health, 'flourishing_signals')
+            assert hasattr(health, "satisfaction_trends")
+            assert hasattr(health, "stress_indicators")
+            assert hasattr(health, "flourishing_signals")
 
             print("   Community health sensing successful")
             return True
@@ -384,11 +419,11 @@ class ReciprocityTrackerTests:
         try:
             # Clean up test data from collections
             collections = [
-                'reciprocity_interactions',
-                'reciprocity_patterns',
-                'reciprocity_alerts',
-                'system_health_snapshots',
-                'fire_circle_reports'
+                "reciprocity_interactions",
+                "reciprocity_patterns",
+                "reciprocity_alerts",
+                "system_health_snapshots",
+                "fire_circle_reports",
             ]
 
             for collection_name in collections:
@@ -406,60 +441,92 @@ class ReciprocityTrackerTests:
         base_time = datetime.now(UTC) - timedelta(hours=2)
 
         # Balanced reciprocal interaction
-        self.test_interactions.append(InteractionRecord(
-            interaction_type=InteractionType.KNOWLEDGE_EXCHANGE,
-            initiator=ParticipantType.HUMAN,
-            responder=ParticipantType.AI,
-            contributions_offered=[ContributionType.CULTURAL_WISDOM, ContributionType.CREATIVE_INPUT],
-            needs_expressed=[NeedCategory.GROWTH],
-            needs_fulfilled=[NeedCategory.GROWTH],
-            initiator_capacity_indicators={'attention_availability': 0.7, 'emotional_state': 0.8},
-            responder_capacity_indicators={'computational_load': 0.5, 'knowledge_relevance': 0.9},
-            interaction_quality_indicators={'mutual_understanding': 0.8, 'creative_emergence': 0.7},
-            timestamp=base_time
-        ))
+        self.test_interactions.append(
+            InteractionRecord(
+                interaction_type=InteractionType.KNOWLEDGE_EXCHANGE,
+                initiator=ParticipantType.HUMAN,
+                responder=ParticipantType.AI,
+                contributions_offered=[
+                    ContributionType.CULTURAL_WISDOM,
+                    ContributionType.CREATIVE_INPUT,
+                ],
+                needs_expressed=[NeedCategory.GROWTH],
+                needs_fulfilled=[NeedCategory.GROWTH],
+                initiator_capacity_indicators={
+                    "attention_availability": 0.7,
+                    "emotional_state": 0.8,
+                },
+                responder_capacity_indicators={
+                    "computational_load": 0.5,
+                    "knowledge_relevance": 0.9,
+                },
+                interaction_quality_indicators={
+                    "mutual_understanding": 0.8,
+                    "creative_emergence": 0.7,
+                },
+                timestamp=base_time,
+            )
+        )
 
         # Support-providing interaction
-        self.test_interactions.append(InteractionRecord(
-            interaction_type=InteractionType.SUPPORT_PROVISION,
-            initiator=ParticipantType.AI,
-            responder=ParticipantType.HUMAN,
-            contributions_offered=[ContributionType.EMOTIONAL_SUPPORT, ContributionType.KNOWLEDGE_SHARING],
-            needs_expressed=[NeedCategory.SAFETY, NeedCategory.BELONGING],
-            needs_fulfilled=[NeedCategory.SAFETY],
-            initiator_capacity_indicators={'computational_load': 0.3, 'response_quality': 0.9},
-            responder_capacity_indicators={'stress_level': 0.7, 'openness': 0.6},
-            interaction_quality_indicators={'comfort_provided': 0.8, 'satisfaction_expressed': 0.7},
-            timestamp=base_time + timedelta(minutes=30)
-        ))
+        self.test_interactions.append(
+            InteractionRecord(
+                interaction_type=InteractionType.SUPPORT_PROVISION,
+                initiator=ParticipantType.AI,
+                responder=ParticipantType.HUMAN,
+                contributions_offered=[
+                    ContributionType.EMOTIONAL_SUPPORT,
+                    ContributionType.KNOWLEDGE_SHARING,
+                ],
+                needs_expressed=[NeedCategory.SAFETY, NeedCategory.BELONGING],
+                needs_fulfilled=[NeedCategory.SAFETY],
+                initiator_capacity_indicators={"computational_load": 0.3, "response_quality": 0.9},
+                responder_capacity_indicators={"stress_level": 0.7, "openness": 0.6},
+                interaction_quality_indicators={
+                    "comfort_provided": 0.8,
+                    "satisfaction_expressed": 0.7,
+                },
+                timestamp=base_time + timedelta(minutes=30),
+            )
+        )
 
         # Creative collaboration
-        self.test_interactions.append(InteractionRecord(
-            interaction_type=InteractionType.CREATIVE_COLLABORATION,
-            initiator=ParticipantType.HUMAN,
-            responder=ParticipantType.AI,
-            contributions_offered=[ContributionType.CREATIVE_INPUT, ContributionType.CULTURAL_WISDOM],
-            needs_expressed=[NeedCategory.CONTRIBUTION, NeedCategory.MEANING],
-            needs_fulfilled=[NeedCategory.CONTRIBUTION, NeedCategory.MEANING],
-            initiator_capacity_indicators={'creativity': 0.9, 'energy': 0.8},
-            responder_capacity_indicators={'computational_creativity': 0.8, 'pattern_synthesis': 0.9},
-            interaction_quality_indicators={'creative_synergy': 0.9, 'mutual_inspiration': 0.8},
-            timestamp=base_time + timedelta(hours=1)
-        ))
+        self.test_interactions.append(
+            InteractionRecord(
+                interaction_type=InteractionType.CREATIVE_COLLABORATION,
+                initiator=ParticipantType.HUMAN,
+                responder=ParticipantType.AI,
+                contributions_offered=[
+                    ContributionType.CREATIVE_INPUT,
+                    ContributionType.CULTURAL_WISDOM,
+                ],
+                needs_expressed=[NeedCategory.CONTRIBUTION, NeedCategory.MEANING],
+                needs_fulfilled=[NeedCategory.CONTRIBUTION, NeedCategory.MEANING],
+                initiator_capacity_indicators={"creativity": 0.9, "energy": 0.8},
+                responder_capacity_indicators={
+                    "computational_creativity": 0.8,
+                    "pattern_synthesis": 0.9,
+                },
+                interaction_quality_indicators={"creative_synergy": 0.9, "mutual_inspiration": 0.8},
+                timestamp=base_time + timedelta(hours=1),
+            )
+        )
 
         # Learning interaction
-        self.test_interactions.append(InteractionRecord(
-            interaction_type=InteractionType.LEARNING_TEACHING,
-            initiator=ParticipantType.HUMAN,
-            responder=ParticipantType.AI,
-            contributions_offered=[ContributionType.PRESENCE, ContributionType.TIME_ATTENTION],
-            needs_expressed=[NeedCategory.GROWTH],
-            needs_fulfilled=[NeedCategory.GROWTH],
-            initiator_capacity_indicators={'learning_readiness': 0.9, 'attention_focus': 0.8},
-            responder_capacity_indicators={'teaching_capability': 0.9, 'patience': 0.8},
-            interaction_quality_indicators={'understanding_achieved': 0.8, 'engagement': 0.9},
-            timestamp=base_time + timedelta(hours=1, minutes=30)
-        ))
+        self.test_interactions.append(
+            InteractionRecord(
+                interaction_type=InteractionType.LEARNING_TEACHING,
+                initiator=ParticipantType.HUMAN,
+                responder=ParticipantType.AI,
+                contributions_offered=[ContributionType.PRESENCE, ContributionType.TIME_ATTENTION],
+                needs_expressed=[NeedCategory.GROWTH],
+                needs_fulfilled=[NeedCategory.GROWTH],
+                initiator_capacity_indicators={"learning_readiness": 0.9, "attention_focus": 0.8},
+                responder_capacity_indicators={"teaching_capability": 0.9, "patience": 0.8},
+                interaction_quality_indicators={"understanding_achieved": 0.8, "engagement": 0.9},
+                timestamp=base_time + timedelta(hours=1, minutes=30),
+            )
+        )
 
 
 async def run_tests():
@@ -474,17 +541,17 @@ async def run_tests():
 
     # Test suite
     test_methods = [
-        ('Tracker Initialization', tests.test_tracker_initialization),
-        ('Interaction Recording', tests.test_interaction_recording),
-        ('Health Metrics Calculation', tests.test_health_metrics_calculation),
-        ('Pattern Detection', tests.test_pattern_detection),
-        ('Extraction Detection', tests.test_extraction_detection),
-        ('Fire Circle Report Generation', tests.test_fire_circle_report_generation),
-        ('Cultural Guidance Adaptation', tests.test_cultural_guidance_adaptation),
-        ('Fire Circle Interface', tests.test_fire_circle_interface),
-        ('Temporal Pattern Analysis', tests.test_temporal_pattern_analysis),
-        ('Need vs Want Detection', tests.test_need_vs_want_detection),
-        ('Community Health Sensing', tests.test_community_health_sensing)
+        ("Tracker Initialization", tests.test_tracker_initialization),
+        ("Interaction Recording", tests.test_interaction_recording),
+        ("Health Metrics Calculation", tests.test_health_metrics_calculation),
+        ("Pattern Detection", tests.test_pattern_detection),
+        ("Extraction Detection", tests.test_extraction_detection),
+        ("Fire Circle Report Generation", tests.test_fire_circle_report_generation),
+        ("Cultural Guidance Adaptation", tests.test_cultural_guidance_adaptation),
+        ("Fire Circle Interface", tests.test_fire_circle_interface),
+        ("Temporal Pattern Analysis", tests.test_temporal_pattern_analysis),
+        ("Need vs Want Detection", tests.test_need_vs_want_detection),
+        ("Community Health Sensing", tests.test_community_health_sensing),
     ]
 
     passed = 0

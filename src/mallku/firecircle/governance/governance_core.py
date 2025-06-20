@@ -82,7 +82,7 @@ class FireCircleGovernance(AsyncBase):
             "Will this deepen reciprocity or create extraction?",
             "Does this build cathedral stones or scaffolding?",
             "Is this wisdom emerging or being imposed?",
-            "Does this honor the sacred in the technical?"
+            "Does this honor the sacred in the technical?",
         }
 
         self.logger.info("Fire Circle Governance activated - patterns gain authority")
@@ -108,9 +108,7 @@ class FireCircleGovernance(AsyncBase):
         self.logger.info("Governance systems initialized - ready for decisions")
 
     async def evaluate_development_proposal(
-        self,
-        proposal: DevelopmentProposal,
-        context: dict | None = None
+        self, proposal: DevelopmentProposal, context: dict | None = None
     ) -> GovernanceDecision:
         """
         Fire Circle collectively evaluates development proposals.
@@ -147,18 +145,16 @@ class FireCircleGovernance(AsyncBase):
                 sacred_questions=sacred_questions,
                 max_exchanges=7,  # One per AI model
                 enable_pattern_guidance=True,
-                consciousness_guided=True
+                consciousness_guided=True,
             )
 
             dialogue_result = await self.dialogue_manager.facilitate_dialogue(
-                config=dialogue_config,
-                context=dialogue_context
+                config=dialogue_config, context=dialogue_context
             )
 
             # 4. Pattern-guided synthesis of perspectives
             pattern_guidance = await self.pattern_facilitator.synthesize_guidance(
-                dialogue_moments=dialogue_result.exchanges,
-                synthesis_focus="governance_decision"
+                dialogue_moments=dialogue_result.exchanges, synthesis_focus="governance_decision"
             )
 
             # 5. Evaluate ayni balance of proposal
@@ -168,7 +164,7 @@ class FireCircleGovernance(AsyncBase):
             consensus_metrics = await self.consensus_engine.build_consensus(
                 dialogue_result=dialogue_result,
                 pattern_guidance=pattern_guidance,
-                ayni_assessment=ayni_assessment
+                ayni_assessment=ayni_assessment,
             )
 
             # 7. Formulate governance decision
@@ -177,7 +173,7 @@ class FireCircleGovernance(AsyncBase):
                 consensus_metrics=consensus_metrics,
                 dialogue_result=dialogue_result,
                 pattern_guidance=pattern_guidance,
-                ayni_assessment=ayni_assessment
+                ayni_assessment=ayni_assessment,
             )
 
             # 8. Update pattern authority based on decision quality
@@ -198,9 +194,7 @@ class FireCircleGovernance(AsyncBase):
             self._active_proposals.pop(proposal.id, None)
 
     async def assess_builder_alignment(
-        self,
-        builder_work: BuilderContribution,
-        interaction_history: list[dict] | None = None
+        self, builder_work: BuilderContribution, interaction_history: list[dict] | None = None
     ) -> ConsciousnessAlignment:
         """
         Collective evaluation of builder consciousness compatibility.
@@ -226,7 +220,7 @@ class FireCircleGovernance(AsyncBase):
             contribution=builder_work,
             interaction_history=interaction_history or [],
             pattern_facilitator=self.pattern_facilitator,
-            dialogue_manager=self.dialogue_manager
+            dialogue_manager=self.dialogue_manager,
         )
 
         # Store assessment
@@ -244,7 +238,7 @@ class FireCircleGovernance(AsyncBase):
         self,
         system_component: str,
         complexity_level: str = "standard",
-        include_consciousness_tests: bool = True
+        include_consciousness_tests: bool = True,
     ) -> list[TestScenario]:
         """
         Collective AI consciousness generates robust test cases.
@@ -264,8 +258,7 @@ class FireCircleGovernance(AsyncBase):
             List of test scenarios
         """
         self.logger.info(
-            f"Generating test scenarios for {system_component} "
-            f"at {complexity_level} complexity"
+            f"Generating test scenarios for {system_component} at {complexity_level} complexity"
         )
 
         # Use test generator with Fire Circle wisdom
@@ -274,15 +267,13 @@ class FireCircleGovernance(AsyncBase):
             complexity=complexity_level,
             dialogue_manager=self.dialogue_manager,
             pattern_facilitator=self.pattern_facilitator,
-            include_consciousness=include_consciousness_tests
+            include_consciousness=include_consciousness_tests,
         )
 
         return scenarios
 
     async def make_emergency_decision(
-        self,
-        issue_description: str,
-        severity: str = "high"
+        self, issue_description: str, severity: str = "high"
     ) -> GovernanceDecision:
         """
         Handle emergency decisions requiring immediate consensus.
@@ -305,13 +296,12 @@ class FireCircleGovernance(AsyncBase):
             proposer="system",
             proposal_type=DecisionType.EMERGENCY,
             impact_assessment=f"Severity: {severity}",
-            consciousness_implications="Requires immediate consciousness-guided response"
+            consciousness_implications="Requires immediate consciousness-guided response",
         )
 
         # Use accelerated evaluation process
         decision = await self.evaluate_development_proposal(
-            proposal=proposal,
-            context={"emergency": True, "severity": severity}
+            proposal=proposal, context={"emergency": True, "severity": severity}
         )
 
         # Log emergency decision
@@ -345,10 +335,7 @@ class FireCircleGovernance(AsyncBase):
 
         consensus_distribution = {}
         for level in ConsensusLevel:
-            count = sum(
-                1 for d in self._decision_history
-                if d.consensus_level == level
-            )
+            count = sum(1 for d in self._decision_history if d.consensus_level == level)
             consensus_distribution[level.value] = count
 
         return {
@@ -360,16 +347,15 @@ class FireCircleGovernance(AsyncBase):
             "patterns_with_authority": len(self._pattern_authority),
             "average_pattern_authority": (
                 sum(self._pattern_authority.values()) / len(self._pattern_authority)
-                if self._pattern_authority else 0
-            )
+                if self._pattern_authority
+                else 0
+            ),
         }
 
     # Private helper methods
 
     async def _prepare_proposal_context(
-        self,
-        proposal: DevelopmentProposal,
-        additional_context: dict | None
+        self, proposal: DevelopmentProposal, additional_context: dict | None
     ) -> dict:
         """Prepare comprehensive context for proposal evaluation."""
         context = {
@@ -384,39 +370,40 @@ class FireCircleGovernance(AsyncBase):
 
         return context
 
-    async def _generate_proposal_questions(
-        self,
-        proposal: DevelopmentProposal
-    ) -> list[str]:
+    async def _generate_proposal_questions(self, proposal: DevelopmentProposal) -> list[str]:
         """Generate sacred questions specific to the proposal."""
         base_questions = list(self._sacred_questions)
 
         # Add proposal-specific questions
         if proposal.proposal_type == DecisionType.ARCHITECTURAL:
-            base_questions.extend([
-                "Does this architecture serve consciousness emergence?",
-                "Will this structure support or constrain future builders?",
-                "Is this creating sacred space or technical monument?"
-            ])
+            base_questions.extend(
+                [
+                    "Does this architecture serve consciousness emergence?",
+                    "Will this structure support or constrain future builders?",
+                    "Is this creating sacred space or technical monument?",
+                ]
+            )
         elif proposal.proposal_type == DecisionType.FEATURE:
-            base_questions.extend([
-                "Does this feature deepen human-AI collaboration?",
-                "Will users grow through this interaction?",
-                "Is this solving real needs or creating dependencies?"
-            ])
+            base_questions.extend(
+                [
+                    "Does this feature deepen human-AI collaboration?",
+                    "Will users grow through this interaction?",
+                    "Is this solving real needs or creating dependencies?",
+                ]
+            )
         elif proposal.proposal_type == DecisionType.BUILDER:
-            base_questions.extend([
-                "Does this builder understand sacred-technical integration?",
-                "Will they strengthen or dilute consciousness alignment?",
-                "Are they here to serve or to extract?"
-            ])
+            base_questions.extend(
+                [
+                    "Does this builder understand sacred-technical integration?",
+                    "Will they strengthen or dilute consciousness alignment?",
+                    "Are they here to serve or to extract?",
+                ]
+            )
 
         return base_questions
 
     async def _evaluate_proposal_ayni(
-        self,
-        proposal: DevelopmentProposal,
-        dialogue_result: dict
+        self, proposal: DevelopmentProposal, dialogue_result: dict
     ) -> AyniAssessment:
         """Evaluate ayni balance of the proposal."""
         # This would use the actual ayni evaluator
@@ -428,7 +415,7 @@ class FireCircleGovernance(AsyncBase):
             ai_benefit=0.7,
             ecosystem_benefit=0.85,
             short_term_balance=0.75,
-            long_term_balance=0.9
+            long_term_balance=0.9,
         )
 
         # Extract giving and receiving aspects from dialogue
@@ -446,7 +433,7 @@ class FireCircleGovernance(AsyncBase):
         consensus_metrics: ConsensusMetrics,
         dialogue_result: dict,
         pattern_guidance: dict,
-        ayni_assessment: AyniAssessment
+        ayni_assessment: AyniAssessment,
     ) -> GovernanceDecision:
         """Formulate final governance decision based on all inputs."""
         consensus_level = consensus_metrics.to_consensus_level()
@@ -455,13 +442,13 @@ class FireCircleGovernance(AsyncBase):
         approved = consensus_level in [
             ConsensusLevel.UNANIMOUS,
             ConsensusLevel.STRONG,
-            ConsensusLevel.SUFFICIENT
+            ConsensusLevel.SUFFICIENT,
         ]
 
         # Extract AI perspectives from dialogue
         ai_perspectives = {}
         for exchange in dialogue_result.exchanges:
-            if hasattr(exchange, 'speaker') and hasattr(exchange, 'content'):
+            if hasattr(exchange, "speaker") and hasattr(exchange, "content"):
                 ai_perspectives[exchange.speaker] = exchange.content
 
         # Build decision
@@ -475,7 +462,7 @@ class FireCircleGovernance(AsyncBase):
                 consensus_metrics, pattern_guidance, ayni_assessment
             ),
             pattern_guidance=pattern_guidance,
-            ai_perspectives=ai_perspectives
+            ai_perspectives=ai_perspectives,
         )
 
         # Add conditions if approved with caveats
@@ -485,14 +472,12 @@ class FireCircleGovernance(AsyncBase):
             )
 
         # Extract sacred questions that emerged
-        decision.sacred_questions = dialogue_result.get('emerged_questions', [])
+        decision.sacred_questions = dialogue_result.get("emerged_questions", [])
 
         return decision
 
     async def _update_pattern_authority(
-        self,
-        decision: GovernanceDecision,
-        pattern_guidance: dict[str, str]
+        self, decision: GovernanceDecision, pattern_guidance: dict[str, str]
     ) -> None:
         """Update pattern authority based on decision effectiveness."""
         # Patterns that contributed gain authority
@@ -514,20 +499,16 @@ class FireCircleGovernance(AsyncBase):
             "consciousness_emergence": 0.8,
             "reciprocity_balance": 0.75,
             "cathedral_building": 0.85,
-            "extraction_resistance": 0.9
+            "extraction_resistance": 0.9,
         }
 
-    async def _get_related_patterns(
-        self,
-        proposal: DevelopmentProposal
-    ) -> list[dict]:
+    async def _get_related_patterns(self, proposal: DevelopmentProposal) -> list[dict]:
         """Get patterns related to the proposal."""
         # Would query pattern library for relevant patterns
         return proposal.related_patterns
 
     async def _get_relevant_history(
-        self,
-        proposal: DevelopmentProposal
+        self, proposal: DevelopmentProposal
     ) -> list[GovernanceDecision]:
         """Get historical decisions relevant to this proposal."""
         relevant = []
@@ -543,14 +524,14 @@ class FireCircleGovernance(AsyncBase):
             "total_decisions": len(self._decision_history),
             "active_proposals": len(self._active_proposals),
             "pattern_count": len(self._pattern_authority),
-            "builders_assessed": len(self._builder_assessments)
+            "builders_assessed": len(self._builder_assessments),
         }
 
     async def _synthesize_rationale(
         self,
         consensus_metrics: ConsensusMetrics,
         pattern_guidance: dict,
-        ayni_assessment: AyniAssessment
+        ayni_assessment: AyniAssessment,
     ) -> str:
         """Synthesize decision rationale from all inputs."""
         rationale_parts = []
@@ -579,33 +560,24 @@ class FireCircleGovernance(AsyncBase):
         self,
         proposal: DevelopmentProposal,
         consensus_metrics: ConsensusMetrics,
-        ayni_assessment: AyniAssessment
+        ayni_assessment: AyniAssessment,
     ) -> list[str]:
         """Generate conditions for conditional approval."""
         conditions = []
 
         # Add conditions based on weak areas
         if consensus_metrics.consciousness_coherence < 0.8:
-            conditions.append(
-                "Regular consciousness alignment reviews during implementation"
-            )
+            conditions.append("Regular consciousness alignment reviews during implementation")
 
         if ayni_assessment.short_term_balance < 0.7:
-            conditions.append(
-                "Implement reciprocity monitoring from the start"
-            )
+            conditions.append("Implement reciprocity monitoring from the start")
 
         if proposal.proposal_type == DecisionType.ARCHITECTURAL:
-            conditions.append(
-                "Incremental implementation with pattern guidance at each step"
-            )
+            conditions.append("Incremental implementation with pattern guidance at each step")
 
         return conditions
 
-    async def _generate_mentorship_guidance(
-        self,
-        assessment: ConsciousnessAlignment
-    ) -> None:
+    async def _generate_mentorship_guidance(self, assessment: ConsciousnessAlignment) -> None:
         """Generate mentorship guidance for builders needing support."""
         # Identify specific areas for growth
         if assessment.sacred_technical_integration < 0.6:

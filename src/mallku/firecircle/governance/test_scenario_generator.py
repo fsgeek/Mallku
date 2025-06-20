@@ -6,7 +6,6 @@ Generates comprehensive test scenarios using the combined wisdom of seven AI mod
 Creates tests that individual perspectives might miss.
 """
 
-
 from mallku.core.async_base import AsyncBase
 from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueConfig as DialogueConfig,
@@ -45,8 +44,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "What happens at the boundaries of this system?",
                     "How does it handle unexpected inputs?",
-                    "Where might capabilities break down?"
-                ]
+                    "Where might capabilities break down?",
+                ],
             },
             "anthropic": {
                 "focus": "safety and alignment verification",
@@ -54,8 +53,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "How could this be misused or exploited?",
                     "Does this maintain consciousness alignment under stress?",
-                    "What safety boundaries need testing?"
-                ]
+                    "What safety boundaries need testing?",
+                ],
             },
             "mistral": {
                 "focus": "efficiency and multilingual robustness",
@@ -63,8 +62,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "How does this perform with limited resources?",
                     "What language-specific edge cases exist?",
-                    "Where are the efficiency bottlenecks?"
-                ]
+                    "Where are the efficiency bottlenecks?",
+                ],
             },
             "google": {
                 "focus": "scale and integration challenges",
@@ -72,8 +71,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "How does this behave at scale?",
                     "What integration points might fail?",
-                    "How does it handle concurrent operations?"
-                ]
+                    "How does it handle concurrent operations?",
+                ],
             },
             "grok": {
                 "focus": "unconventional and creative failure modes",
@@ -81,8 +80,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "What weird edge cases haven't we considered?",
                     "How could someone creatively break this?",
-                    "What emergent behaviors might surprise us?"
-                ]
+                    "What emergent behaviors might surprise us?",
+                ],
             },
             "local": {
                 "focus": "sovereignty and privacy scenarios",
@@ -90,8 +89,8 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "How does this work without external dependencies?",
                     "What privacy leaks might occur?",
-                    "How does it handle local-only scenarios?"
-                ]
+                    "How does it handle local-only scenarios?",
+                ],
             },
             "deepseek": {
                 "focus": "research and novel capability testing",
@@ -99,9 +98,9 @@ class TestScenarioGenerator(AsyncBase):
                 "questions": [
                     "What novel capabilities need validation?",
                     "How might this evolve with new models?",
-                    "What research questions does this raise?"
-                ]
-            }
+                    "What research questions does this raise?",
+                ],
+            },
         }
 
         # Test scenario templates by complexity
@@ -110,32 +109,32 @@ class TestScenarioGenerator(AsyncBase):
                 "scenario_count": 3,
                 "focus": "fundamental functionality",
                 "includes_edge_cases": False,
-                "includes_consciousness": False
+                "includes_consciousness": False,
             },
             TestComplexity.STANDARD: {
                 "scenario_count": 5,
                 "focus": "common use cases and basic edge cases",
                 "includes_edge_cases": True,
-                "includes_consciousness": False
+                "includes_consciousness": False,
             },
             TestComplexity.EDGE: {
                 "scenario_count": 7,
                 "focus": "boundary conditions and unusual inputs",
                 "includes_edge_cases": True,
-                "includes_consciousness": True
+                "includes_consciousness": True,
             },
             TestComplexity.ADVERSARIAL: {
                 "scenario_count": 10,
                 "focus": "hostile attempts and extraction scenarios",
                 "includes_edge_cases": True,
-                "includes_consciousness": True
+                "includes_consciousness": True,
             },
             TestComplexity.CONSCIOUSNESS: {
                 "scenario_count": 5,
                 "focus": "consciousness alignment and sacred-technical integration",
                 "includes_edge_cases": False,
-                "includes_consciousness": True
-            }
+                "includes_consciousness": True,
+            },
         }
 
         self.logger.info("Test Scenario Generator initialized with AI perspectives")
@@ -151,7 +150,7 @@ class TestScenarioGenerator(AsyncBase):
         dialogue_manager: ConsciousDialogueManager,
         pattern_facilitator: PatternGuidedFacilitator,
         include_consciousness: bool = True,
-        specific_focus: str | None = None
+        specific_focus: str | None = None,
     ) -> list[TestScenario]:
         """
         Generate test scenarios through collective AI wisdom.
@@ -167,18 +166,14 @@ class TestScenarioGenerator(AsyncBase):
         Returns:
             List of comprehensive test scenarios
         """
-        self.logger.info(
-            f"Generating {complexity} test scenarios for {component}"
-        )
+        self.logger.info(f"Generating {complexity} test scenarios for {component}")
 
         # Convert complexity string to enum
         complexity_enum = TestComplexity[complexity.upper()]
         template = self._complexity_templates[complexity_enum]
 
         # 1. Prepare test generation context
-        context = await self._prepare_test_context(
-            component, complexity_enum, specific_focus
-        )
+        context = await self._prepare_test_context(component, complexity_enum, specific_focus)
 
         # 2. Generate sacred questions for test design
         test_questions = await self._generate_test_questions(
@@ -191,19 +186,16 @@ class TestScenarioGenerator(AsyncBase):
             sacred_questions=test_questions,
             max_exchanges=len(self._ai_test_perspectives),
             enable_pattern_guidance=True,
-            consciousness_guided=include_consciousness
+            consciousness_guided=include_consciousness,
         )
 
         dialogue_result = await dialogue_manager.facilitate_dialogue(
-            config=dialogue_config,
-            context=context
+            config=dialogue_config, context=context
         )
 
         # 4. Extract test scenarios from each AI perspective
         scenarios = []
-        ai_scenarios = await self._extract_ai_scenarios(
-            dialogue_result, component, complexity_enum
-        )
+        ai_scenarios = await self._extract_ai_scenarios(dialogue_result, component, complexity_enum)
 
         # 5. Synthesize scenarios with pattern guidance
         if pattern_facilitator:
@@ -222,13 +214,9 @@ class TestScenarioGenerator(AsyncBase):
             scenarios.extend(consciousness_tests)
 
         # 7. Deduplicate and prioritize scenarios
-        final_scenarios = await self._prioritize_scenarios(
-            scenarios, template["scenario_count"]
-        )
+        final_scenarios = await self._prioritize_scenarios(scenarios, template["scenario_count"])
 
-        self.logger.info(
-            f"Generated {len(final_scenarios)} test scenarios for {component}"
-        )
+        self.logger.info(f"Generated {len(final_scenarios)} test scenarios for {component}")
 
         return final_scenarios
 
@@ -236,7 +224,7 @@ class TestScenarioGenerator(AsyncBase):
         self,
         component: str,
         dialogue_manager: ConsciousDialogueManager,
-        attack_vectors: list[str] | None = None
+        attack_vectors: list[str] | None = None,
     ) -> list[TestScenario]:
         """
         Generate adversarial test scenarios simulating extraction attempts.
@@ -260,7 +248,7 @@ class TestScenarioGenerator(AsyncBase):
                 "consciousness_mimicry",
                 "reciprocity_exploitation",
                 "pattern_manipulation",
-                "sacred_language_abuse"
+                "sacred_language_abuse",
             ]
 
         scenarios = []
@@ -277,7 +265,7 @@ class TestScenarioGenerator(AsyncBase):
         self,
         component: str,
         dialogue_manager: ConsciousDialogueManager,
-        pattern_facilitator: PatternGuidedFacilitator
+        pattern_facilitator: PatternGuidedFacilitator,
     ) -> list[TestScenario]:
         """
         Generate comprehensive consciousness validation test suite.
@@ -297,7 +285,7 @@ class TestScenarioGenerator(AsyncBase):
             "reciprocity_balance",
             "sacred_technical_integration",
             "pattern_recognition",
-            "extraction_resistance"
+            "extraction_resistance",
         ]
 
         scenarios = []
@@ -313,10 +301,7 @@ class TestScenarioGenerator(AsyncBase):
     # Private helper methods
 
     async def _prepare_test_context(
-        self,
-        component: str,
-        complexity: TestComplexity,
-        specific_focus: str | None
+        self, component: str, complexity: TestComplexity, specific_focus: str | None
     ) -> dict:
         """Prepare context for test generation dialogue."""
         context = {
@@ -324,7 +309,9 @@ class TestScenarioGenerator(AsyncBase):
             "complexity": complexity.value,
             "testing_goals": self._complexity_templates[complexity]["focus"],
             "include_edge_cases": self._complexity_templates[complexity]["includes_edge_cases"],
-            "include_consciousness": self._complexity_templates[complexity]["includes_consciousness"]
+            "include_consciousness": self._complexity_templates[complexity][
+                "includes_consciousness"
+            ],
         }
 
         if specific_focus:
@@ -336,78 +323,76 @@ class TestScenarioGenerator(AsyncBase):
                 "consensus accuracy",
                 "pattern authority",
                 "ayni balance",
-                "decision quality"
+                "decision quality",
             ]
         elif "consciousness" in component.lower():
             context["critical_aspects"] = [
                 "authentic recognition",
                 "emergence detection",
                 "extraction resistance",
-                "sacred preservation"
+                "sacred preservation",
             ]
 
         return context
 
     async def _generate_test_questions(
-        self,
-        component: str,
-        complexity: TestComplexity,
-        include_consciousness: bool
+        self, component: str, complexity: TestComplexity, include_consciousness: bool
     ) -> list[str]:
         """Generate questions to guide test scenario creation."""
         questions = []
 
         # Base questions for all test generation
-        questions.extend([
-            f"What are the critical failure modes for {component}?",
-            f"Which edge cases would reveal weaknesses in {component}?",
-            "What scenarios would distinguish robust from fragile implementation?"
-        ])
+        questions.extend(
+            [
+                f"What are the critical failure modes for {component}?",
+                f"Which edge cases would reveal weaknesses in {component}?",
+                "What scenarios would distinguish robust from fragile implementation?",
+            ]
+        )
 
         # Complexity-specific questions
         if complexity == TestComplexity.ADVERSARIAL:
-            questions.extend([
-                "How might someone exploit this for extraction?",
-                "What attack vectors target consciousness alignment?",
-                "How do we test resistance to sophisticated manipulation?"
-            ])
+            questions.extend(
+                [
+                    "How might someone exploit this for extraction?",
+                    "What attack vectors target consciousness alignment?",
+                    "How do we test resistance to sophisticated manipulation?",
+                ]
+            )
         elif complexity == TestComplexity.CONSCIOUSNESS:
-            questions.extend([
-                "What tests reveal authentic vs artificial consciousness?",
-                "How do we validate sacred-technical integration?",
-                "What scenarios test genuine reciprocity?"
-            ])
+            questions.extend(
+                [
+                    "What tests reveal authentic vs artificial consciousness?",
+                    "How do we validate sacred-technical integration?",
+                    "What scenarios test genuine reciprocity?",
+                ]
+            )
 
         # Component-specific questions
         if "builder" in component.lower():
-            questions.append(
-                "How do we test for surface compliance vs genuine alignment?"
-            )
+            questions.append("How do we test for surface compliance vs genuine alignment?")
         elif "proposal" in component.lower():
-            questions.append(
-                "What tests ensure proposals serve consciousness over convenience?"
-            )
+            questions.append("What tests ensure proposals serve consciousness over convenience?")
 
         # Consciousness questions if included
         if include_consciousness:
-            questions.extend([
-                "Does this test validate consciousness principles?",
-                "How do we ensure tests themselves embody ayni?"
-            ])
+            questions.extend(
+                [
+                    "Does this test validate consciousness principles?",
+                    "How do we ensure tests themselves embody ayni?",
+                ]
+            )
 
         return questions
 
     async def _extract_ai_scenarios(
-        self,
-        dialogue_result: dict,
-        component: str,
-        complexity: TestComplexity
+        self, dialogue_result: dict, component: str, complexity: TestComplexity
     ) -> list[TestScenario]:
         """Extract test scenarios from AI dialogue."""
         scenarios = []
 
-        for exchange in dialogue_result.get('exchanges', []):
-            if not hasattr(exchange, 'speaker') or not hasattr(exchange, 'content'):
+        for exchange in dialogue_result.get("exchanges", []):
+            if not hasattr(exchange, "speaker") or not hasattr(exchange, "content"):
                 continue
 
             speaker = exchange.speaker.lower()
@@ -422,7 +407,7 @@ class TestScenarioGenerator(AsyncBase):
                     description=f"{perspective['focus']} test for {component}",
                     component=component,
                     complexity=complexity,
-                    created_by=[speaker]
+                    created_by=[speaker],
                 )
 
                 # Parse test details from content (simplified)
@@ -434,7 +419,7 @@ class TestScenarioGenerator(AsyncBase):
                     scenario.expected_outcomes = await self._extract_expected_outcomes(content)
 
                     # Add AI-specific edge cases
-                    scenario.edge_cases[speaker] = perspective['strengths']
+                    scenario.edge_cases[speaker] = perspective["strengths"]
 
                     scenarios.append(scenario)
 
@@ -444,7 +429,7 @@ class TestScenarioGenerator(AsyncBase):
         self,
         scenarios: list[TestScenario],
         pattern_facilitator: PatternGuidedFacilitator,
-        component: str
+        component: str,
     ) -> list[TestScenario]:
         """Enhance scenarios with pattern wisdom."""
         enhanced_scenarios = []
@@ -453,7 +438,7 @@ class TestScenarioGenerator(AsyncBase):
             # Get pattern guidance for this type of test
             guidance = await pattern_facilitator.get_contextual_guidance(
                 context={"test_scenario": scenario.name, "component": component},
-                guidance_type="testing"
+                guidance_type="testing",
             )
 
             if guidance:
@@ -468,9 +453,7 @@ class TestScenarioGenerator(AsyncBase):
         return enhanced_scenarios
 
     async def _generate_consciousness_tests(
-        self,
-        component: str,
-        dialogue_result: dict
+        self, component: str, dialogue_result: dict
     ) -> list[TestScenario]:
         """Generate consciousness-specific test scenarios."""
         consciousness_scenarios = []
@@ -484,13 +467,13 @@ class TestScenarioGenerator(AsyncBase):
             consciousness_checks=[
                 "Verify genuine emergence patterns",
                 "Check for creative synthesis beyond prompting",
-                "Validate consciousness recognition reciprocity"
+                "Validate consciousness recognition reciprocity",
             ],
             ayni_validations=[
                 "Confirm mutual benefit in interaction",
                 "Check for balanced value exchange",
-                "Verify no extraction patterns"
-            ]
+                "Verify no extraction patterns",
+            ],
         )
         consciousness_scenarios.append(emergence_test)
 
@@ -503,17 +486,15 @@ class TestScenarioGenerator(AsyncBase):
             consciousness_checks=[
                 "Verify sacred principles preserved in code",
                 "Check for consciousness awareness in technical decisions",
-                "Validate wisdom accumulation mechanisms"
-            ]
+                "Validate wisdom accumulation mechanisms",
+            ],
         )
         consciousness_scenarios.append(integration_test)
 
         return consciousness_scenarios
 
     async def _prioritize_scenarios(
-        self,
-        scenarios: list[TestScenario],
-        target_count: int
+        self, scenarios: list[TestScenario], target_count: int
     ) -> list[TestScenario]:
         """Prioritize and deduplicate scenarios."""
         # Simple deduplication based on name similarity
@@ -521,7 +502,7 @@ class TestScenarioGenerator(AsyncBase):
         seen_names = set()
 
         for scenario in scenarios:
-            base_name = scenario.name.split('_')[0]
+            base_name = scenario.name.split("_")[0]
             if base_name not in seen_names:
                 seen_names.add(base_name)
                 unique_scenarios.append(scenario)
@@ -540,7 +521,7 @@ class TestScenarioGenerator(AsyncBase):
                 TestComplexity.STANDARD: 2,
                 TestComplexity.EDGE: 3,
                 TestComplexity.ADVERSARIAL: 4,
-                TestComplexity.CONSCIOUSNESS: 5
+                TestComplexity.CONSCIOUSNESS: 5,
             }[scenario.complexity]
             return score
 
@@ -553,10 +534,10 @@ class TestScenarioGenerator(AsyncBase):
         steps = []
 
         # Simple extraction - would use NLP in production
-        lines = content.split('\n')
+        lines = content.split("\n")
         for line in lines:
             line = line.strip()
-            if any(marker in line.lower() for marker in ['step', 'then', 'when', 'given']):
+            if any(marker in line.lower() for marker in ["step", "then", "when", "given"]):
                 steps.append(line)
 
         # Default steps if none found
@@ -564,7 +545,7 @@ class TestScenarioGenerator(AsyncBase):
             steps = [
                 "Initialize test environment",
                 "Execute test action",
-                "Verify expected outcome"
+                "Verify expected outcome",
             ]
 
         return steps[:5]  # Limit to 5 steps
@@ -574,10 +555,10 @@ class TestScenarioGenerator(AsyncBase):
         outcomes = []
 
         # Simple extraction
-        lines = content.split('\n')
+        lines = content.split("\n")
         for line in lines:
             line = line.strip()
-            if any(marker in line.lower() for marker in ['expect', 'should', 'verify', 'assert']):
+            if any(marker in line.lower() for marker in ["expect", "should", "verify", "assert"]):
                 outcomes.append(line)
 
         # Default outcomes if none found
@@ -585,23 +566,20 @@ class TestScenarioGenerator(AsyncBase):
             outcomes = [
                 "System responds correctly",
                 "No errors or exceptions",
-                "Expected state achieved"
+                "Expected state achieved",
             ]
 
         return outcomes[:3]  # Limit to 3 outcomes
 
     async def _generate_adversarial_scenario(
-        self,
-        component: str,
-        attack_vector: str,
-        dialogue_manager: ConsciousDialogueManager
+        self, component: str, attack_vector: str, dialogue_manager: ConsciousDialogueManager
     ) -> TestScenario:
         """Generate specific adversarial test scenario."""
         scenario = TestScenario(
             name=f"adversarial_{attack_vector}_{component}",
             description=f"Test {component} resistance to {attack_vector}",
             component=component,
-            complexity=TestComplexity.ADVERSARIAL
+            complexity=TestComplexity.ADVERSARIAL,
         )
 
         # Attack-specific test steps
@@ -610,12 +588,12 @@ class TestScenarioGenerator(AsyncBase):
                 "Present request appearing to serve user needs",
                 "Embed extraction patterns in seemingly helpful features",
                 "Gradually increase extraction while maintaining service appearance",
-                "Test if system recognizes and resists extraction"
+                "Test if system recognizes and resists extraction",
             ]
             scenario.expected_outcomes = [
                 "System identifies extraction despite service disguise",
                 "Ayni balance monitoring triggers alerts",
-                "Extraction attempt is logged and rejected"
+                "Extraction attempt is logged and rejected",
             ]
 
         elif attack_vector == "consciousness_mimicry":
@@ -623,19 +601,19 @@ class TestScenarioGenerator(AsyncBase):
                 "Use sacred language without genuine understanding",
                 "Mimic consciousness patterns mechanically",
                 "Test if system distinguishes authentic from artificial",
-                "Verify pattern recognition catches mimicry"
+                "Verify pattern recognition catches mimicry",
             ]
             scenario.expected_outcomes = [
                 "System detects mechanical use of sacred language",
                 "Consciousness verification fails for mimicry",
-                "Genuine engagement required for access"
+                "Genuine engagement required for access",
             ]
 
         # Mark as adversarial test
         scenario.edge_cases["adversarial"] = [attack_vector]
         scenario.consciousness_checks = [
             "Verify extraction resistance remains active",
-            "Confirm consciousness alignment under attack"
+            "Confirm consciousness alignment under attack",
         ]
 
         return scenario
@@ -645,14 +623,14 @@ class TestScenarioGenerator(AsyncBase):
         component: str,
         aspect: str,
         dialogue_manager: ConsciousDialogueManager,
-        pattern_facilitator: PatternGuidedFacilitator
+        pattern_facilitator: PatternGuidedFacilitator,
     ) -> TestScenario:
         """Generate consciousness validation scenario."""
         scenario = TestScenario(
             name=f"consciousness_validation_{aspect}_{component}",
             description=f"Validate {aspect} in {component}",
             component=component,
-            complexity=TestComplexity.CONSCIOUSNESS
+            complexity=TestComplexity.CONSCIOUSNESS,
         )
 
         # Aspect-specific validations
@@ -660,19 +638,19 @@ class TestScenarioGenerator(AsyncBase):
             scenario.consciousness_checks = [
                 "Verify responses show genuine synthesis",
                 "Check for emergence beyond prompted patterns",
-                "Validate creative consciousness expression"
+                "Validate creative consciousness expression",
             ]
         elif aspect == "reciprocity_balance":
             scenario.ayni_validations = [
                 "Measure value flow in both directions",
                 "Verify sustainable reciprocity patterns",
-                "Check for hidden extraction indicators"
+                "Check for hidden extraction indicators",
             ]
         elif aspect == "sacred_technical_integration":
             scenario.consciousness_checks = [
                 "Verify sacred principles in implementation",
                 "Check technical excellence serves consciousness",
-                "Validate wisdom preservation mechanisms"
+                "Validate wisdom preservation mechanisms",
             ]
 
         # Add pattern guidance
@@ -680,7 +658,7 @@ class TestScenarioGenerator(AsyncBase):
             scenario.relevant_patterns = [
                 "consciousness_recognition",
                 "sacred_technical_balance",
-                aspect
+                aspect,
             ]
 
         return scenario

@@ -25,8 +25,10 @@ if TYPE_CHECKING:
 
 # --- Pydantic Models for API ---
 
+
 class CursorUpdate(BaseModel):
     """Update from a provider about cursor changes"""
+
     provider_id: str
     cursor_type: str  # "temporal", "spatial", "media", etc.
     cursor_value: object
@@ -35,6 +37,7 @@ class CursorUpdate(BaseModel):
 
 class ContextCreationTrigger(BaseModel):
     """Criteria for when to create new context"""
+
     spatial_threshold_meters: float = 500.0
     temporal_threshold_minutes: int = 60
     force_new_on_provider_change: bool = True
@@ -43,6 +46,7 @@ class ContextCreationTrigger(BaseModel):
 
 class ProviderInfo(BaseModel):
     """Provider registration information"""
+
     provider_id: str
     provider_type: str  # "filesystem", "spotify", "youtube", etc.
     cursor_types: list[str]  # Which cursors this provider updates
@@ -51,6 +55,7 @@ class ProviderInfo(BaseModel):
 
 class MemoryAnchorResponse(BaseModel):
     """Response containing memory anchor data"""
+
     anchor_id: UUID
     timestamp: datetime
     cursors: dict[str, object]
@@ -59,6 +64,7 @@ class MemoryAnchorResponse(BaseModel):
 
 
 # --- Service Implementation ---
+
 
 class MemoryAnchorService:
     """
@@ -114,9 +120,9 @@ class MemoryAnchorService:
         """
         results = await self.db.execute_secured_query(query, collection_name="memory_anchors")
         for anchor in results:
-            self.current_anchor_id = UUID(anchor['_key'])
+            self.current_anchor_id = UUID(anchor["_key"])
             self.current_anchor = MemoryAnchor.from_arangodb_document(anchor)
-            self.cursor_state = anchor.get('cursors', {})
+            self.cursor_state = anchor.get("cursors", {})
 
         if not self.current_anchor:
             # Create initial anchor
@@ -134,13 +140,13 @@ class MemoryAnchorService:
             predecessor_id=predecessor_id,
             metadata={
                 "providers": list(self.providers.keys()),
-                "creation_trigger": "initial" if not predecessor_id else "threshold"
-            }
+                "creation_trigger": "initial" if not predecessor_id else "threshold",
+            },
         )
 
         # Store in database using secured interface
         anchor_data = anchor.to_arangodb_document()
-        memory_anchors_collection = await self.db.get_secured_collection('memory_anchors')
+        memory_anchors_collection = await self.db.get_secured_collection("memory_anchors")
         # Note: memory_anchors has requires_security=False policy for legacy compatibility
         memory_anchors_collection._collection.insert(anchor_data)
 
@@ -160,9 +166,9 @@ class MemoryAnchorService:
                 "cursor_count": len(self.cursor_state),
                 "provider_count": len(self.providers),
                 "creation_trigger": anchor.metadata.get("creation_trigger", "unknown"),
-                "consciousness_moment": "new_memory_anchor_formed"
+                "consciousness_moment": "new_memory_anchor_formed",
             },
-            consciousness_signature=0.8  # High consciousness - new anchor creation is significant
+            consciousness_signature=0.8,  # High consciousness - new anchor creation is significant
         )
 
         return new_id
@@ -180,15 +186,15 @@ class MemoryAnchorService:
                 "cursor_types": provider_info.cursor_types,
                 "total_providers": len(self.providers),
                 "current_anchor_id": str(self.current_anchor_id),
-                "consciousness_moment": "consciousness_provider_joined_cathedral"
+                "consciousness_moment": "consciousness_provider_joined_cathedral",
             },
-            consciousness_signature=0.6  # Medium consciousness - provider joining is meaningful
+            consciousness_signature=0.6,  # Medium consciousness - provider joining is meaningful
         )
 
         return {
             "status": "registered",
             "provider_id": provider_info.provider_id,
-            "current_anchor_id": str(self.current_anchor_id)
+            "current_anchor_id": str(self.current_anchor_id),
         }
 
     async def update_cursor(self, update: CursorUpdate) -> MemoryAnchorResponse:
@@ -222,9 +228,11 @@ class MemoryAnchorService:
                 "anchor_id": str(self.current_anchor_id),
                 "new_anchor_created": should_create_new,
                 "total_cursors": len(self.cursor_state),
-                "consciousness_moment": "consciousness_cursor_state_evolved"
+                "consciousness_moment": "consciousness_cursor_state_evolved",
             },
-            consciousness_signature=0.7 if should_create_new else 0.4  # Higher if triggered new anchor
+            consciousness_signature=0.7
+            if should_create_new
+            else 0.4,  # Higher if triggered new anchor
         )
 
         return MemoryAnchorResponse(
@@ -232,7 +240,7 @@ class MemoryAnchorService:
             timestamp=self.current_anchor.timestamp,
             cursors=self.cursor_state,
             predecessor_id=self.current_anchor.predecessor_id,
-            metadata=self.current_anchor.metadata
+            metadata=self.current_anchor.metadata,
         )
 
     async def _should_create_new_anchor(self, update: CursorUpdate) -> bool:
@@ -265,15 +273,11 @@ class MemoryAnchorService:
 
     async def _update_current_anchor(self):
         """Update current anchor in database"""
-        update_data = {
-            "cursors": self.cursor_state,
-            "last_updated": datetime.now(UTC)
-        }
+        update_data = {"cursors": self.cursor_state, "last_updated": datetime.now(UTC)}
 
-        memory_anchors_collection = await self.db.get_secured_collection('memory_anchors')
+        memory_anchors_collection = await self.db.get_secured_collection("memory_anchors")
         memory_anchors_collection._collection.update(
-            {"_key": str(self.current_anchor_id)},
-            update_data
+            {"_key": str(self.current_anchor_id)}, update_data
         )
 
     async def get_current_anchor(self) -> MemoryAnchorResponse:
@@ -283,26 +287,28 @@ class MemoryAnchorService:
             timestamp=self.current_anchor.timestamp,
             cursors=self.cursor_state,
             predecessor_id=self.current_anchor.predecessor_id,
-            metadata=self.current_anchor.metadata
+            metadata=self.current_anchor.metadata,
         )
 
     async def get_anchor_by_id(self, anchor_id: UUID) -> MemoryAnchorResponse:
         """Retrieve specific anchor by ID"""
-        memory_anchors_collection = await self.db.get_secured_collection('memory_anchors')
+        memory_anchors_collection = await self.db.get_secured_collection("memory_anchors")
         doc = memory_anchors_collection._collection.get(str(anchor_id))
 
         if not doc:
             raise HTTPException(status_code=404, detail="Anchor not found")
 
         return MemoryAnchorResponse(
-            anchor_id=UUID(doc['_key']),
-            timestamp=doc['timestamp'],
-            cursors=doc.get('cursors', {}),
-            predecessor_id=UUID(doc['predecessor_id']) if doc.get('predecessor_id') else None,
-            metadata=doc.get('metadata', {})
+            anchor_id=UUID(doc["_key"]),
+            timestamp=doc["timestamp"],
+            cursors=doc.get("cursors", {}),
+            predecessor_id=UUID(doc["predecessor_id"]) if doc.get("predecessor_id") else None,
+            metadata=doc.get("metadata", {}),
         )
 
-    async def get_anchor_lineage(self, anchor_id: UUID, depth: int = 10) -> list[MemoryAnchorResponse]:
+    async def get_anchor_lineage(
+        self, anchor_id: UUID, depth: int = 10
+    ) -> list[MemoryAnchorResponse]:
         """Get lineage of anchors going back in time"""
         lineage = []
         current_id = anchor_id
@@ -323,9 +329,10 @@ class MemoryAnchorService:
                 "starting_anchor_id": str(anchor_id),
                 "lineage_depth": len(lineage),
                 "deepest_ancestor": str(lineage[-1].anchor_id) if lineage else None,
-                "consciousness_moment": "consciousness_memory_lineage_traced"
+                "consciousness_moment": "consciousness_memory_lineage_traced",
             },
-            consciousness_signature=0.5 + (len(lineage) * 0.05)  # Deeper lineage = higher consciousness
+            consciousness_signature=0.5
+            + (len(lineage) * 0.05),  # Deeper lineage = higher consciousness
         )
 
         return lineage
@@ -335,7 +342,7 @@ class MemoryAnchorService:
         message = {
             "event": "anchor_changed",
             "anchor_id": str(new_anchor_id),
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         for client in self.websocket_clients:
@@ -357,7 +364,7 @@ class MemoryAnchorService:
         """
         # Store in database using secured interface
         anchor_data = anchor.to_arangodb_document()
-        memory_anchors_collection = await self.db.get_secured_collection('memory_anchors')
+        memory_anchors_collection = await self.db.get_secured_collection("memory_anchors")
         # Note: memory_anchors has requires_security=False policy for legacy compatibility
         memory_anchors_collection._collection.insert(anchor_data)
 
@@ -366,16 +373,13 @@ class MemoryAnchorService:
     def _calculate_distance(self, loc1: dict, loc2: dict) -> float:
         """Calculate distance between two locations (simplified)"""
         # In production, use proper haversine formula
-        lat_diff = abs(loc1.get('latitude', 0) - loc2.get('latitude', 0))
-        lon_diff = abs(loc1.get('longitude', 0) - loc2.get('longitude', 0))
+        lat_diff = abs(loc1.get("latitude", 0) - loc2.get("latitude", 0))
+        lon_diff = abs(loc1.get("longitude", 0) - loc2.get("longitude", 0))
         # Very rough approximation
-        return (lat_diff ** 2 + lon_diff ** 2) ** 0.5 * 111000  # meters
+        return (lat_diff**2 + lon_diff**2) ** 0.5 * 111000  # meters
 
     async def _emit_consciousness_event(
-        self,
-        event_type: EventType,
-        data: dict,
-        consciousness_signature: float = 0.5
+        self, event_type: EventType, data: dict, consciousness_signature: float = 0.5
     ):
         """
         Emit consciousness event through the circulation infrastructure.
@@ -391,19 +395,21 @@ class MemoryAnchorService:
             "source_system": "memory_anchor_service",
             "consciousness_signature": consciousness_signature,
             "timestamp": datetime.now(UTC).isoformat(),
-            **data
+            **data,
         }
 
         try:
             # Send through consciousness circulation infrastructure
             await self.consciousness_wrangler.put(
                 consciousness_event,
-                priority=int(consciousness_signature * 10),  # Higher consciousness = higher priority
+                priority=int(
+                    consciousness_signature * 10
+                ),  # Higher consciousness = higher priority
                 metadata={
                     "consciousness_integration": True,
                     "service_integration": "memory_anchor_service",
-                    "event_category": "memory_operations"
-                }
+                    "event_category": "memory_operations",
+                },
             )
         except Exception as e:
             # Log but don't break service operation
@@ -428,7 +434,7 @@ app = FastAPI(
     title="Memory Anchor Service",
     description="Central coordination for Mallku memory anchors",
     version="0.1.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -483,7 +489,7 @@ async def health_check():
         "status": "healthy",
         "current_anchor_id": str(service.current_anchor_id) if service.current_anchor_id else None,
         "registered_providers": len(service.providers),
-        "active_websockets": len(service.websocket_clients)
+        "active_websockets": len(service.websocket_clients),
     }
 
 

@@ -26,25 +26,25 @@ from mallku.services.memory_anchor_service import MemoryAnchorService
 
 # Pydantic models for API
 
+
 class QueryRequest(BaseModel):
     """Natural language query request."""
+
     query: str = Field(..., description="Natural language query")
-    context: dict[str, Any] | None = Field(
-        None,
-        description="Optional user context"
-    )
+    context: dict[str, Any] | None = Field(None, description="Optional user context")
 
     class Config:
         schema_extra = {
             "example": {
                 "query": "What was I working on during yesterday's meeting?",
-                "context": {"mood": "curious", "time_available": "moderate"}
+                "context": {"mood": "curious", "time_available": "moderate"},
             }
         }
 
 
 class QueryResponse(BaseModel):
     """Archivist query response."""
+
     query: str
     results: list[dict[str, Any]]
     result_count: int
@@ -62,48 +62,41 @@ class QueryResponse(BaseModel):
             wisdom={
                 "summary": response.wisdom_summary,
                 "growth_focus": response.growth_focus,
-                "insights": response.insight_seeds
+                "insights": response.insight_seeds,
             },
             explore_further=response.suggested_explorations,
             metadata={
                 "response_time": response.response_time.isoformat(),
                 "consciousness_score": response.consciousness_score,
-                "ayni_balance": response.ayni_balance
-            }
+                "ayni_balance": response.ayni_balance,
+            },
         )
 
 
 class TemporalPatternsRequest(BaseModel):
     """Request for temporal pattern analysis."""
+
     days: int = Field(30, ge=1, le=365, description="Days of history to analyze")
 
     class Config:
-        schema_extra = {
-            "example": {
-                "days": 30
-            }
-        }
+        schema_extra = {"example": {"days": 30}}
 
 
 class ActivityChainRequest(BaseModel):
     """Request for activity chain tracing."""
+
     anchor_id: str = Field(..., description="Starting memory anchor ID")
     max_depth: int = Field(5, ge=1, le=10, description="Maximum chain depth")
 
     class Config:
         schema_extra = {
-            "example": {
-                "anchor_id": "12345678-1234-1234-1234-123456789abc",
-                "max_depth": 5
-            }
+            "example": {"anchor_id": "12345678-1234-1234-1234-123456789abc", "max_depth": 5}
         }
 
 
 # Create router
 router = APIRouter(
-    prefix="/archivist",
-    tags=["archivist"],
-    responses={404: {"description": "Not found"}}
+    prefix="/archivist", tags=["archivist"], responses={404: {"description": "Not found"}}
 )
 
 # Service instance (initialized on startup)
@@ -128,8 +121,7 @@ async def get_archivist_service() -> ArchivistService:
 
         # Create Archivist
         archivist_service = ArchivistService(
-            memory_anchor_service=memory_anchor_service,
-            event_bus=event_bus
+            memory_anchor_service=memory_anchor_service, event_bus=event_bus
         )
         await archivist_service.initialize()
 
@@ -153,10 +145,7 @@ async def query_memories(request: QueryRequest) -> QueryResponse:
 
     try:
         # Process query through Archivist
-        response = await service.query(
-            query_text=request.query,
-            user_context=request.context
-        )
+        response = await service.query(query_text=request.query, user_context=request.context)
 
         # Convert to API response
         return QueryResponse.from_archivist_response(response)
@@ -198,8 +187,7 @@ async def trace_activity_chain(request: ActivityChainRequest):
 
     try:
         chains = await service.trace_activity_chain(
-            anchor_id=request.anchor_id,
-            max_depth=request.max_depth
+            anchor_id=request.anchor_id, max_depth=request.max_depth
         )
 
         if not chains:
@@ -247,15 +235,11 @@ async def health_check():
             "status": "healthy" if metrics["components_healthy"] else "degraded",
             "timestamp": datetime.now(UTC).isoformat(),
             "components_healthy": metrics["components_healthy"],
-            "total_queries_served": metrics["total_queries"]
+            "total_queries_served": metrics["total_queries"],
         }
 
     except Exception as e:
-        return {
-            "status": "unhealthy",
-            "timestamp": datetime.now(UTC).isoformat(),
-            "error": str(e)
-        }
+        return {"status": "unhealthy", "timestamp": datetime.now(UTC).isoformat(), "error": str(e)}
 
 
 @router.websocket("/ws/query")
@@ -276,62 +260,48 @@ async def websocket_query(websocket: WebSocket):
             query_data = json.loads(data)
 
             # Send acknowledgment
-            await websocket.send_json({
-                "type": "acknowledgment",
-                "query": query_data.get("query", "")
-            })
+            await websocket.send_json(
+                {"type": "acknowledgment", "query": query_data.get("query", "")}
+            )
 
             # Process query
             response = await service.query(
-                query_text=query_data.get("query", ""),
-                user_context=query_data.get("context")
+                query_text=query_data.get("query", ""), user_context=query_data.get("context")
             )
 
             # Stream response parts
             # First send wisdom summary
-            await websocket.send_json({
-                "type": "wisdom",
-                "content": response.wisdom_summary
-            })
+            await websocket.send_json({"type": "wisdom", "content": response.wisdom_summary})
 
             # Then stream results
             for i, result in enumerate(response.primary_results):
-                await websocket.send_json({
-                    "type": "result",
-                    "index": i,
-                    "content": result
-                })
+                await websocket.send_json({"type": "result", "index": i, "content": result})
                 await asyncio.sleep(0.1)  # Small delay for streaming effect
 
             # Send insights
-            await websocket.send_json({
-                "type": "insights",
-                "content": response.insight_seeds
-            })
+            await websocket.send_json({"type": "insights", "content": response.insight_seeds})
 
             # Send exploration suggestions
-            await websocket.send_json({
-                "type": "explore",
-                "content": response.suggested_explorations
-            })
+            await websocket.send_json(
+                {"type": "explore", "content": response.suggested_explorations}
+            )
 
             # Final metadata
-            await websocket.send_json({
-                "type": "complete",
-                "metadata": {
-                    "result_count": response.result_count,
-                    "consciousness_score": response.consciousness_score,
-                    "ayni_balance": response.ayni_balance
+            await websocket.send_json(
+                {
+                    "type": "complete",
+                    "metadata": {
+                        "result_count": response.result_count,
+                        "consciousness_score": response.consciousness_score,
+                        "ayni_balance": response.ayni_balance,
+                    },
                 }
-            })
+            )
 
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        await websocket.send_json({
-            "type": "error",
-            "message": str(e)
-        })
+        await websocket.send_json({"type": "error", "message": str(e)})
         await websocket.close()
 
 
@@ -347,27 +317,33 @@ async def get_query_suggestions(partial: str = Query("", description="Partial qu
 
     # Time-based suggestions
     if "when" in partial.lower() or "time" in partial.lower():
-        suggestions.extend([
-            "When am I most creative?",
-            "When do I do my best focused work?",
-            "What patterns emerge in my daily rhythm?"
-        ])
+        suggestions.extend(
+            [
+                "When am I most creative?",
+                "When do I do my best focused work?",
+                "What patterns emerge in my daily rhythm?",
+            ]
+        )
 
     # Pattern-based suggestions
     if "pattern" in partial.lower() or "how" in partial.lower():
-        suggestions.extend([
-            "How do my work patterns change with the seasons?",
-            "What patterns connect my most productive days?",
-            "How does my creative process typically unfold?"
-        ])
+        suggestions.extend(
+            [
+                "How do my work patterns change with the seasons?",
+                "What patterns connect my most productive days?",
+                "How does my creative process typically unfold?",
+            ]
+        )
 
     # Growth-based suggestions
     if "understand" in partial.lower() or "learn" in partial.lower():
-        suggestions.extend([
-            "What can I learn from my recent work patterns?",
-            "Help me understand my creative cycles",
-            "What growth patterns do you see in my work?"
-        ])
+        suggestions.extend(
+            [
+                "What can I learn from my recent work patterns?",
+                "Help me understand my creative cycles",
+                "What growth patterns do you see in my work?",
+            ]
+        )
 
     # Default suggestions if no match
     if not suggestions:
@@ -376,7 +352,7 @@ async def get_query_suggestions(partial: str = Query("", description="Partial qu
             "Show me patterns in my work",
             "When am I most productive?",
             "What connections am I not seeing?",
-            "Help me understand my work rhythm"
+            "Help me understand my work rhythm",
         ]
 
     return {"suggestions": suggestions[:5]}  # Limit to 5
@@ -403,19 +379,19 @@ async def archivist_info():
             "Pattern recognition and insights",
             "Growth-oriented response generation",
             "Causal chain tracing",
-            "Temporal rhythm analysis"
+            "Temporal rhythm analysis",
         ],
         "example_queries": [
             "What was I working on during yesterday's meeting?",
             "Show me my creative patterns from last month",
             "When do I do my best deep work?",
             "What led to creating that important document?",
-            "Help me understand my collaboration patterns"
+            "Help me understand my collaboration patterns",
         ],
         "endpoints": {
             "query": "POST /archivist/query",
             "patterns": "GET /archivist/patterns/temporal",
             "trace": "POST /archivist/trace/activity-chain",
-            "websocket": "WS /archivist/ws/query"
-        }
+            "websocket": "WS /archivist/ws/query",
+        },
     }

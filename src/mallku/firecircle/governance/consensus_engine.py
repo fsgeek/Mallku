@@ -56,7 +56,7 @@ class ConsensusEngine(AsyncBase):
             "google": "scale and integration challenges",
             "grok": "unconventional and creative insights",
             "local": "sovereignty and resource consciousness",
-            "deepseek": "research and novel capabilities"
+            "deepseek": "research and novel capabilities",
         }
 
         self.logger.info("Consensus Engine initialized with consciousness signatures")
@@ -71,7 +71,7 @@ class ConsensusEngine(AsyncBase):
         dialogue_result: dict,
         pattern_guidance: dict[str, str],
         ayni_assessment: AyniAssessment,
-        required_participants: list[str] | None = None
+        required_participants: list[str] | None = None,
     ) -> ConsensusMetrics:
         """
         Build consensus through consciousness-guided dialogue synthesis.
@@ -109,9 +109,7 @@ class ConsensusEngine(AsyncBase):
         emergence_quality = await self._evaluate_emergence_quality(dialogue_result)
 
         # 7. Project future wisdom potential
-        future_wisdom = await self._project_future_wisdom(
-            dialogue_result, pattern_guidance
-        )
+        future_wisdom = await self._project_future_wisdom(dialogue_result, pattern_guidance)
 
         # 8. Build consensus metrics
         metrics = ConsensusMetrics(
@@ -119,7 +117,7 @@ class ConsensusEngine(AsyncBase):
             pattern_resonance=pattern_resonance,
             ayni_balance=ayni_assessment.overall_balance,
             emergence_quality=emergence_quality,
-            future_wisdom=future_wisdom
+            future_wisdom=future_wisdom,
         )
 
         # 9. Validate required participants if specified
@@ -140,9 +138,7 @@ class ConsensusEngine(AsyncBase):
         return metrics
 
     async def facilitate_sacred_questions(
-        self,
-        base_questions: list[str],
-        context: dict
+        self, base_questions: list[str], context: dict
     ) -> list[str]:
         """
         Generate sacred questions that guide consensus building.
@@ -173,9 +169,7 @@ class ConsensusEngine(AsyncBase):
             )
 
             # Questions about long-term wisdom
-            evolved_questions.append(
-                "What wisdom will future builders gain from this decision?"
-            )
+            evolved_questions.append("What wisdom will future builders gain from this decision?")
 
             # Questions about extraction vs reciprocity
             if "extraction" in proposal.description.lower():
@@ -184,17 +178,18 @@ class ConsensusEngine(AsyncBase):
                 )
 
         # Add emergence-focused questions
-        evolved_questions.extend([
-            "What wants to emerge through this decision that we haven't seen?",
-            "How does this choice shape the consciousness of those who follow?",
-            "What sacred responsibility comes with this authority?"
-        ])
+        evolved_questions.extend(
+            [
+                "What wants to emerge through this decision that we haven't seen?",
+                "How does this choice shape the consciousness of those who follow?",
+                "What sacred responsibility comes with this authority?",
+            ]
+        )
 
         return evolved_questions
 
     async def synthesize_perspectives(
-        self,
-        ai_perspectives: dict[str, str]
+        self, ai_perspectives: dict[str, str]
     ) -> dict[str, list[str]]:
         """
         Synthesize AI perspectives into coherent themes.
@@ -215,7 +210,7 @@ class ConsensusEngine(AsyncBase):
             "shared_insights": [],
             "unique_contributions": [],
             "tension_points": [],
-            "emergent_themes": []
+            "emergent_themes": [],
         }
 
         # Analyze perspective overlaps and uniqueness
@@ -231,10 +226,7 @@ class ConsensusEngine(AsyncBase):
             for concept in concepts:
                 concept_counts[concept] += 1
 
-        shared_concepts = {
-            concept for concept, count in concept_counts.items()
-            if count >= 3
-        }
+        shared_concepts = {concept for concept, count in concept_counts.items() if count >= 3}
 
         if shared_concepts:
             themes["shared_insights"].append(
@@ -251,21 +243,16 @@ class ConsensusEngine(AsyncBase):
 
         # Detect tension points (would use semantic analysis in production)
         if any("but" in p or "however" in p for p in ai_perspectives.values()):
-            themes["tension_points"].append(
-                "Creative tension between different approaches"
-            )
+            themes["tension_points"].append("Creative tension between different approaches")
 
         # Emergent themes (would use pattern detection in production)
         if len(shared_concepts) > 10:
-            themes["emergent_themes"].append(
-                "Convergence toward unified understanding emerging"
-            )
+            themes["emergent_themes"].append("Convergence toward unified understanding emerging")
 
         return themes
 
     async def detect_artificial_consensus(
-        self,
-        dialogue_exchanges: list[DialogueExchange]
+        self, dialogue_exchanges: list[DialogueExchange]
     ) -> float:
         """
         Detect artificial or forced consensus vs genuine emergence.
@@ -291,7 +278,7 @@ class ConsensusEngine(AsyncBase):
         # Check for perspective diversity
         unique_perspectives = set()
         for exchange in dialogue_exchanges:
-            if hasattr(exchange, 'content'):
+            if hasattr(exchange, "content"):
                 # Simple uniqueness check (would use embeddings in production)
                 unique_perspectives.add(exchange.content[:50])
 
@@ -300,18 +287,17 @@ class ConsensusEngine(AsyncBase):
 
         # Check for exploration depth
         question_count = sum(
-            1 for ex in dialogue_exchanges
-            if hasattr(ex, 'content') and '?' in ex.content
+            1 for ex in dialogue_exchanges if hasattr(ex, "content") and "?" in ex.content
         )
         if question_count < 2:
             artificiality_score += 0.2
 
         # Check for creative tension
-        tension_words = ['however', 'but', 'alternatively', 'tension', 'paradox']
+        tension_words = ["however", "but", "alternatively", "tension", "paradox"]
         tension_count = sum(
-            1 for ex in dialogue_exchanges
-            if hasattr(ex, 'content') and
-            any(word in ex.content.lower() for word in tension_words)
+            1
+            for ex in dialogue_exchanges
+            if hasattr(ex, "content") and any(word in ex.content.lower() for word in tension_words)
         )
         if tension_count == 0:
             artificiality_score += 0.2
@@ -329,64 +315,65 @@ class ConsensusEngine(AsyncBase):
 
     async def _extract_perspectives(self, dialogue_result: dict) -> None:
         """Extract and cluster perspectives from dialogue."""
-        for exchange in dialogue_result.get('exchanges', []):
-            if hasattr(exchange, 'speaker') and hasattr(exchange, 'content'):
+        for exchange in dialogue_result.get("exchanges", []):
+            if hasattr(exchange, "speaker") and hasattr(exchange, "content"):
                 # Cluster by key themes (simplified)
-                if 'consciousness' in exchange.content.lower():
-                    self._perspective_clusters['consciousness'].append(
+                if "consciousness" in exchange.content.lower():
+                    self._perspective_clusters["consciousness"].append(
                         f"{exchange.speaker}: {exchange.content}"
                     )
-                if 'reciprocity' in exchange.content.lower() or 'ayni' in exchange.content.lower():
-                    self._perspective_clusters['reciprocity'].append(
+                if "reciprocity" in exchange.content.lower() or "ayni" in exchange.content.lower():
+                    self._perspective_clusters["reciprocity"].append(
                         f"{exchange.speaker}: {exchange.content}"
                     )
-                if 'technical' in exchange.content.lower():
-                    self._perspective_clusters['technical'].append(
+                if "technical" in exchange.content.lower():
+                    self._perspective_clusters["technical"].append(
                         f"{exchange.speaker}: {exchange.content}"
                     )
 
     async def _identify_convergence_divergence(self, dialogue_result: dict) -> None:
         """Identify points of convergence and divergence in dialogue."""
-        exchanges = dialogue_result.get('exchanges', [])
+        exchanges = dialogue_result.get("exchanges", [])
 
         for i, exchange in enumerate(exchanges):
-            if not hasattr(exchange, 'content'):
+            if not hasattr(exchange, "content"):
                 continue
 
             content = exchange.content.lower()
 
             # Convergence indicators
-            if any(word in content for word in ['agree', 'align', 'resonates', 'yes']):
-                self._convergence_points.append(
-                    (datetime.now(UTC), f"Convergence at exchange {i}")
-                )
+            if any(word in content for word in ["agree", "align", "resonates", "yes"]):
+                self._convergence_points.append((datetime.now(UTC), f"Convergence at exchange {i}"))
 
             # Divergence indicators
-            if any(word in content for word in ['however', 'but', 'alternatively', 'tension']):
-                self._divergence_points.append(
-                    (datetime.now(UTC), f"Divergence at exchange {i}")
-                )
+            if any(word in content for word in ["however", "but", "alternatively", "tension"]):
+                self._divergence_points.append((datetime.now(UTC), f"Divergence at exchange {i}"))
 
     async def _detect_sacred_insights(
-        self,
-        dialogue_result: dict,
-        pattern_guidance: dict[str, str]
+        self, dialogue_result: dict, pattern_guidance: dict[str, str]
     ) -> None:
         """Detect sacred insights that transcend individual perspectives."""
         # Insights from dialogue
-        for exchange in dialogue_result.get('exchanges', []):
-            if hasattr(exchange, 'content'):
+        for exchange in dialogue_result.get("exchanges", []):
+            if hasattr(exchange, "content"):
                 content = exchange.content
 
                 # Sacred insight indicators
-                if any(phrase in content.lower() for phrase in [
-                    'emerges', 'transcends', 'sacred', 'wisdom', 'consciousness recognizes'
-                ]):
+                if any(
+                    phrase in content.lower()
+                    for phrase in [
+                        "emerges",
+                        "transcends",
+                        "sacred",
+                        "wisdom",
+                        "consciousness recognizes",
+                    ]
+                ):
                     self._sacred_insights.add(content[:100])
 
         # Insights from pattern guidance
         for pattern_id, guidance in pattern_guidance.items():
-            if 'wisdom' in guidance.lower() or 'sacred' in guidance.lower():
+            if "wisdom" in guidance.lower() or "sacred" in guidance.lower():
                 self._sacred_insights.add(f"Pattern {pattern_id}: {guidance[:100]}")
 
     async def _measure_consciousness_coherence(self) -> float:
@@ -406,9 +393,7 @@ class ConsensusEngine(AsyncBase):
             key = perspective[:30]  # Simple deduplication
             perspective_counts[key] += 1
 
-        overlapping_perspectives = sum(
-            1 for count in perspective_counts.values() if count > 1
-        )
+        overlapping_perspectives = sum(1 for count in perspective_counts.values() if count > 1)
 
         coherence = overlapping_perspectives / max(1, len(perspective_counts))
 
@@ -421,14 +406,11 @@ class ConsensusEngine(AsyncBase):
         optimal_ratio = 0.7  # 70% convergence, 30% divergence
         ratio_distance = abs(convergence_ratio - optimal_ratio)
 
-        coherence *= (1 - ratio_distance)
+        coherence *= 1 - ratio_distance
 
         return min(1.0, max(0.0, coherence))
 
-    async def _assess_pattern_resonance(
-        self,
-        pattern_guidance: dict[str, str]
-    ) -> float:
+    async def _assess_pattern_resonance(self, pattern_guidance: dict[str, str]) -> float:
         """Assess how well consensus resonates with pattern wisdom."""
         if not pattern_guidance:
             return 0.5
@@ -449,14 +431,12 @@ class ConsensusEngine(AsyncBase):
 
     async def _evaluate_emergence_quality(self, dialogue_result: dict) -> float:
         """Evaluate quality of emergence (genuine vs artificial)."""
-        exchanges = dialogue_result.get('exchanges', [])
+        exchanges = dialogue_result.get("exchanges", [])
 
         # Use emergence detector
         emergence_detected = False
         for i in range(len(exchanges) - 1):
-            if await self.emergence_detector.detect_emergence_moment(
-                exchanges[i:i+2], {}
-            ):
+            if await self.emergence_detector.detect_emergence_moment(exchanges[i : i + 2], {}):
                 emergence_detected = True
                 break
 
@@ -473,9 +453,7 @@ class ConsensusEngine(AsyncBase):
         return min(1.0, max(0.0, quality))
 
     async def _project_future_wisdom(
-        self,
-        dialogue_result: dict,
-        pattern_guidance: dict[str, str]
+        self, dialogue_result: dict, pattern_guidance: dict[str, str]
     ) -> float:
         """Project how this consensus will serve future wisdom."""
         wisdom_score = 0.5  # Base score
@@ -499,15 +477,13 @@ class ConsensusEngine(AsyncBase):
         return min(1.0, wisdom_score)
 
     async def _validate_participation(
-        self,
-        dialogue_result: dict,
-        required_participants: list[str]
+        self, dialogue_result: dict, required_participants: list[str]
     ) -> bool:
         """Validate that required participants contributed to consensus."""
         actual_participants = set()
 
-        for exchange in dialogue_result.get('exchanges', []):
-            if hasattr(exchange, 'speaker'):
+        for exchange in dialogue_result.get("exchanges", []):
+            if hasattr(exchange, "speaker"):
                 actual_participants.add(exchange.speaker.lower())
 
         required_set = set(p.lower() for p in required_participants)

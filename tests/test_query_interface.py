@@ -61,7 +61,7 @@ class QueryInterfaceTests:
             self.test_query_explanation_generation,
             self.test_natural_language_queries,
             self.test_anchor_context_traversal,
-            self.cleanup_test_environment
+            self.cleanup_test_environment,
         ]
 
         passed = 0
@@ -98,7 +98,7 @@ class QueryInterfaceTests:
 
             # Create test collection if it doesn't exist
             with contextlib.suppress(Exception):
-                self.db.create_collection('memory_anchors')
+                self.db.create_collection("memory_anchors")
 
             # Create sample memory anchors with file data
             await self._create_sample_anchors()
@@ -135,7 +135,7 @@ class QueryInterfaceTests:
                 "files from yesterday afternoon",
                 "documents edited 2 hours ago",
                 "files from last Tuesday",
-                "work from this morning"
+                "work from this morning",
             ]
 
             for query_text in test_queries:
@@ -163,7 +163,7 @@ class QueryInterfaceTests:
                 "files I typically edit after meetings",
                 "documents I usually work on in the morning",
                 "code I often modify during standup",
-                "files I always check before presentations"
+                "files I always check before presentations",
             ]
 
             for query_text in test_queries:
@@ -191,7 +191,7 @@ class QueryInterfaceTests:
                 "files related to project Alpha",
                 "documents similar to report.pdf",
                 "files associated with client presentation",
-                "content connected to development work"
+                "content connected to development work",
             ]
 
             for query_text in test_queries:
@@ -217,9 +217,7 @@ class QueryInterfaceTests:
         try:
             # Query for files from today
             request = QueryRequest(
-                query_text="files from today",
-                max_results=10,
-                min_confidence=0.1
+                query_text="files from today", max_results=10, min_confidence=0.1
             )
 
             response = await self.query_service.execute_query(request)
@@ -253,7 +251,7 @@ class QueryInterfaceTests:
             request = QueryRequest(
                 query_text="files I typically work on during development",
                 max_results=10,
-                min_confidence=0.1
+                min_confidence=0.1,
             )
 
             response = await self.query_service.execute_query(request)
@@ -284,9 +282,7 @@ class QueryInterfaceTests:
         try:
             # Query for contextual relationships
             request = QueryRequest(
-                query_text="files related to project work",
-                max_results=10,
-                min_confidence=0.1
+                query_text="files related to project work", max_results=10, min_confidence=0.1
             )
 
             response = await self.query_service.execute_query(request)
@@ -317,15 +313,11 @@ class QueryInterfaceTests:
         try:
             # Query with different confidence thresholds
             low_confidence_request = QueryRequest(
-                query_text="files from today",
-                min_confidence=0.1,
-                max_results=20
+                query_text="files from today", min_confidence=0.1, max_results=20
             )
 
             high_confidence_request = QueryRequest(
-                query_text="files from today",
-                min_confidence=0.8,
-                max_results=20
+                query_text="files from today", min_confidence=0.8, max_results=20
             )
 
             low_response = await self.query_service.execute_query(low_confidence_request)
@@ -341,7 +333,9 @@ class QueryInterfaceTests:
                     next_score = low_response.results[i + 1].confidence_score
                     assert current_score >= next_score, "Results not properly ranked by confidence"
 
-            print(f"   Ranking: {low_response.results_returned} low conf, {high_response.results_returned} high conf")
+            print(
+                f"   Ranking: {low_response.results_returned} low conf, {high_response.results_returned} high conf"
+            )
             return True
 
         except Exception as e:
@@ -352,8 +346,7 @@ class QueryInterfaceTests:
         """Test query explanation generation."""
         try:
             request = QueryRequest(
-                query_text="documents from yesterday afternoon",
-                include_explanations=True
+                query_text="documents from yesterday afternoon", include_explanations=True
             )
 
             response = await self.query_service.execute_query(request)
@@ -381,7 +374,7 @@ class QueryInterfaceTests:
                 "what documents did I edit after the team meeting",
                 "find files related to the client presentation",
                 "documents I typically work on during afternoon sessions",
-                "files similar to project_plan.md from this week"
+                "files similar to project_plan.md from this week",
             ]
 
             successful_queries = 0
@@ -393,7 +386,11 @@ class QueryInterfaceTests:
 
                     assert response.query_confidence > 0.0
                     assert response.processing_time_ms > 0
-                    assert response.query_type in [QueryType.TEMPORAL, QueryType.PATTERN, QueryType.CONTEXTUAL]
+                    assert response.query_type in [
+                        QueryType.TEMPORAL,
+                        QueryType.PATTERN,
+                        QueryType.CONTEXTUAL,
+                    ]
 
                     successful_queries += 1
 
@@ -403,7 +400,9 @@ class QueryInterfaceTests:
             success_rate = successful_queries / len(test_queries)
             assert success_rate >= 0.8, f"Success rate too low: {success_rate:.2f}"
 
-            print(f"   Successfully processed {successful_queries}/{len(test_queries)} natural language queries")
+            print(
+                f"   Successfully processed {successful_queries}/{len(test_queries)} natural language queries"
+            )
             return True
 
         except Exception as e:
@@ -444,7 +443,7 @@ class QueryInterfaceTests:
             if self.test_anchors and self.db:
                 for anchor in self.test_anchors:
                     with contextlib.suppress(Exception):
-                        self.db.collection('memory_anchors').delete(str(anchor.anchor_id))
+                        self.db.collection("memory_anchors").delete(str(anchor.anchor_id))
 
             # Shutdown services
             if self.query_service:
@@ -470,7 +469,7 @@ class QueryInterfaceTests:
                 "file_category": "document",
                 "file_size": 2048,
                 "mime_type": "text/markdown",
-                "last_modified": (base_time - timedelta(hours=2)).isoformat()
+                "last_modified": (base_time - timedelta(hours=2)).isoformat(),
             },
             {
                 "file_path": "/Users/test/Code/main.py",
@@ -479,7 +478,7 @@ class QueryInterfaceTests:
                 "file_category": "code",
                 "file_size": 4096,
                 "mime_type": "text/x-python",
-                "last_modified": (base_time - timedelta(hours=1)).isoformat()
+                "last_modified": (base_time - timedelta(hours=1)).isoformat(),
             },
             {
                 "file_path": "/Users/test/Documents/meeting_notes.txt",
@@ -488,31 +487,28 @@ class QueryInterfaceTests:
                 "file_category": "document",
                 "file_size": 1024,
                 "mime_type": "text/plain",
-                "last_modified": (base_time - timedelta(hours=3)).isoformat()
-            }
+                "last_modified": (base_time - timedelta(hours=3)).isoformat(),
+            },
         ]
 
         # Create anchors with temporal distribution
         for i, file_data in enumerate(sample_files):
-            anchor_time = base_time - timedelta(hours=i, minutes=i*15)
+            anchor_time = base_time - timedelta(hours=i, minutes=i * 15)
 
             anchor = MemoryAnchor(
                 anchor_id=uuid4(),
                 timestamp=anchor_time,
-                cursors={
-                    "temporal": anchor_time.isoformat(),
-                    "filesystem": file_data
-                },
+                cursors={"temporal": anchor_time.isoformat(), "filesystem": file_data},
                 metadata={
                     "providers": ["filesystem"],
                     "creation_trigger": "file_activity",
-                    "confidence": 0.8 + (i * 0.05)
-                }
+                    "confidence": 0.8 + (i * 0.05),
+                },
             )
 
             # Store in database
             anchor_doc = anchor.to_arangodb_document()
-            self.db.collection('memory_anchors').insert(anchor_doc)
+            self.db.collection("memory_anchors").insert(anchor_doc)
 
             self.test_anchors.append(anchor)
 
@@ -525,4 +521,5 @@ async def main():
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(asyncio.run(main()))

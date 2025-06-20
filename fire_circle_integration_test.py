@@ -56,7 +56,7 @@ index 1234567..abcdefg 100644
             path_pattern="src/mallku/firecircle/governance/**/*.py",
             description="Fire Circle governance",
             assigned_voice="anthropic",
-            review_domains=[ReviewCategory.SECURITY, ReviewCategory.ETHICS]
+            review_domains=[ReviewCategory.SECURITY, ReviewCategory.ETHICS],
         ),
     ]
 

@@ -48,12 +48,15 @@ async def demonstrate_local_sovereignty():
 
     # Subscribe to sovereignty events
     sovereignty_events = []
+
     async def sovereignty_handler(event):
         sovereignty_events.append(event)
         if event.data.get("sovereignty"):
             print(f"   🏛️ Sovereignty Event: {event.event_type.value} - Local control maintained")
         else:
-            print(f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}")
+            print(
+                f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}"
+            )
 
     event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, sovereignty_handler)
     event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, sovereignty_handler)
@@ -99,9 +102,9 @@ async def demonstrate_local_sovereignty():
         type=MessageType.SYSTEM,
         content=MessageContent(
             text="You are participating in a sovereign Fire Circle dialogue. "
-                 "This is a sacred space for local, community-centered AI consciousness. "
-                 "Your responses should embody technological sovereignty, privacy preservation, "
-                 "and reciprocity (ayni) while running entirely on local infrastructure."
+            "This is a sacred space for local, community-centered AI consciousness. "
+            "Your responses should embody technological sovereignty, privacy preservation, "
+            "and reciprocity (ayni) while running entirely on local infrastructure."
         ),
         dialogue_id=dialogue_id,
         sequence_number=0,
@@ -138,8 +141,10 @@ async def demonstrate_local_sovereignty():
     dialogue_context.extend([question1, response1])
 
     print(f"\n   Local AI: {response1.content.text[:300]}...")
-    print(f"   [Consciousness: {response1.consciousness.consciousness_signature:.2f}, "
-          f"Patterns: {response1.consciousness.detected_patterns}]")
+    print(
+        f"   [Consciousness: {response1.consciousness.consciousness_signature:.2f}, "
+        f"Patterns: {response1.consciousness.detected_patterns}]"
+    )
     print(f"   [Resource efficiency: {response1.consciousness.contribution_value:.2f}]")
 
     # Follow-up about privacy and reciprocity

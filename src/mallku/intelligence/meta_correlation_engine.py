@@ -32,7 +32,7 @@ class MetaPattern:
         pattern_type: str,
         anchors: list[MemoryAnchor],
         confidence: float,
-        metadata: dict[str, Any]
+        metadata: dict[str, Any],
     ):
         self.pattern_id = pattern_id
         self.pattern_type = pattern_type
@@ -57,8 +57,8 @@ class TemporalCascade(MetaPattern):
             metadata={
                 "cascade_length": len(anchors),
                 "time_span": self._calculate_time_span(anchors),
-                "trigger_patterns": self._identify_triggers(anchors)
-            }
+                "trigger_patterns": self._identify_triggers(anchors),
+            },
         )
 
     def _calculate_time_span(self, anchors: list[MemoryAnchor]) -> float:
@@ -81,12 +81,14 @@ class TemporalCascade(MetaPattern):
             common_files = curr_files.intersection(next_files)
 
             if common_files:
-                triggers.append({
-                    "type": "file_continuity",
-                    "trigger_anchor": str(curr.anchor_id),
-                    "triggered_anchor": str(next_anchor.anchor_id),
-                    "common_elements": list(common_files)
-                })
+                triggers.append(
+                    {
+                        "type": "file_continuity",
+                        "trigger_anchor": str(curr.anchor_id),
+                        "triggered_anchor": str(next_anchor.anchor_id),
+                        "common_elements": list(common_files),
+                    }
+                )
 
         return triggers
 
@@ -94,15 +96,17 @@ class TemporalCascade(MetaPattern):
         """Extract file paths from anchor cursors."""
         files = set()
         for cursor_data in anchor.cursors.values():
-            if isinstance(cursor_data, dict) and 'file_path' in cursor_data:
-                files.add(cursor_data['file_path'])
+            if isinstance(cursor_data, dict) and "file_path" in cursor_data:
+                files.add(cursor_data["file_path"])
         return files
 
 
 class ContextualNeighborhood(MetaPattern):
     """A group of anchors that share contextual similarity."""
 
-    def __init__(self, anchors: list[MemoryAnchor], similarity_matrix: dict[tuple[str, str], float]):
+    def __init__(
+        self, anchors: list[MemoryAnchor], similarity_matrix: dict[tuple[str, str], float]
+    ):
         center = self._find_center_anchor(anchors, similarity_matrix)
         super().__init__(
             pattern_id=f"neighborhood_{datetime.now(UTC).timestamp()}",
@@ -113,14 +117,12 @@ class ContextualNeighborhood(MetaPattern):
                 "center_anchor": str(center.anchor_id) if center else None,
                 "neighborhood_size": len(anchors),
                 "cohesion_score": self._calculate_cohesion(similarity_matrix),
-                "common_themes": self._extract_themes(anchors)
-            }
+                "common_themes": self._extract_themes(anchors),
+            },
         )
 
     def _find_center_anchor(
-        self,
-        anchors: list[MemoryAnchor],
-        similarity_matrix: dict[tuple[str, str], float]
+        self, anchors: list[MemoryAnchor], similarity_matrix: dict[tuple[str, str], float]
     ) -> MemoryAnchor | None:
         """Find the most central anchor in the neighborhood."""
         if not anchors:
@@ -149,9 +151,9 @@ class ContextualNeighborhood(MetaPattern):
         # Count pattern types
         pattern_types = Counter()
         for anchor in anchors:
-            corr_meta = anchor.metadata.get('correlation_metadata', {})
-            if 'pattern_type' in corr_meta:
-                pattern_types[corr_meta['pattern_type']] += 1
+            corr_meta = anchor.metadata.get("correlation_metadata", {})
+            if "pattern_type" in corr_meta:
+                pattern_types[corr_meta["pattern_type"]] += 1
 
         # Extract most common themes
         themes = []
@@ -174,7 +176,7 @@ class MetaCorrelationEngine:
         self,
         cascade_threshold: float = 0.7,
         neighborhood_threshold: float = 0.6,
-        temporal_window: timedelta = timedelta(minutes=5)
+        temporal_window: timedelta = timedelta(minutes=5),
     ):
         self.cascade_threshold = cascade_threshold
         self.neighborhood_threshold = neighborhood_threshold
@@ -259,28 +261,28 @@ class MetaCorrelationEngine:
         files2 = set()
 
         for cursor in anchor1.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files1.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files1.add(cursor["file_path"])
 
         for cursor in anchor2.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files2.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files2.add(cursor["file_path"])
 
         # If they share files, there's a potential trigger
         if files1.intersection(files2):
             return True
 
         # Check for pattern type progression
-        meta1 = anchor1.metadata.get('correlation_metadata', {})
-        meta2 = anchor2.metadata.get('correlation_metadata', {})
+        meta1 = anchor1.metadata.get("correlation_metadata", {})
+        meta2 = anchor2.metadata.get("correlation_metadata", {})
 
-        pattern1 = meta1.get('pattern_type')
-        pattern2 = meta2.get('pattern_type')
+        pattern1 = meta1.get("pattern_type")
+        pattern2 = meta2.get("pattern_type")
 
         # Known progressions
         progressions = {
-            'sequential': ['contextual', 'cyclical'],
-            'contextual': ['cyclical'],
+            "sequential": ["contextual", "cyclical"],
+            "contextual": ["cyclical"],
         }
 
         return bool(pattern1 in progressions and pattern2 in progressions.get(pattern1, []))
@@ -296,7 +298,7 @@ class MetaCorrelationEngine:
         # 1. Temporal regularity
         time_gaps = []
         for i in range(1, len(cascade)):
-            gap = (cascade[i].timestamp - cascade[i-1].timestamp).total_seconds()
+            gap = (cascade[i].timestamp - cascade[i - 1].timestamp).total_seconds()
             time_gaps.append(gap)
 
         if time_gaps:
@@ -308,9 +310,9 @@ class MetaCorrelationEngine:
         # 2. Pattern consistency
         patterns = []
         for anchor in cascade:
-            meta = anchor.metadata.get('correlation_metadata', {})
-            if 'pattern_type' in meta:
-                patterns.append(meta['pattern_type'])
+            meta = anchor.metadata.get("correlation_metadata", {})
+            if "pattern_type" in meta:
+                patterns.append(meta["pattern_type"])
 
         if patterns:
             # Check for pattern progression or consistency
@@ -321,9 +323,9 @@ class MetaCorrelationEngine:
         # 3. Confidence trend
         confidences = []
         for anchor in cascade:
-            meta = anchor.metadata.get('correlation_metadata', {})
-            if 'confidence_score' in meta:
-                confidences.append(meta['confidence_score'])
+            meta = anchor.metadata.get("correlation_metadata", {})
+            if "confidence_score" in meta:
+                confidences.append(meta["confidence_score"])
 
         if len(confidences) >= 2:
             # Check if confidence is increasing
@@ -337,7 +339,7 @@ class MetaCorrelationEngine:
         similarity_matrix = {}
 
         for i, anchor1 in enumerate(anchors):
-            for j, anchor2 in enumerate(anchors[i+1:], start=i+1):
+            for j, anchor2 in enumerate(anchors[i + 1 :], start=i + 1):
                 similarity = self._calculate_similarity(anchor1, anchor2)
                 key1 = (str(anchor1.anchor_id), str(anchor2.anchor_id))
                 key2 = (str(anchor2.anchor_id), str(anchor1.anchor_id))
@@ -358,8 +360,8 @@ class MetaCorrelationEngine:
             factors.append(jaccard)
 
         # 2. Pattern type similarity
-        pattern1 = anchor1.metadata.get('correlation_metadata', {}).get('pattern_type')
-        pattern2 = anchor2.metadata.get('correlation_metadata', {}).get('pattern_type')
+        pattern1 = anchor1.metadata.get("correlation_metadata", {}).get("pattern_type")
+        pattern2 = anchor2.metadata.get("correlation_metadata", {}).get("pattern_type")
         if pattern1 and pattern2:
             factors.append(1.0 if pattern1 == pattern2 else 0.0)
 
@@ -368,20 +370,20 @@ class MetaCorrelationEngine:
         files2 = set()
 
         for cursor in anchor1.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files1.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files1.add(cursor["file_path"])
 
         for cursor in anchor2.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files2.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files2.add(cursor["file_path"])
 
         if files1 or files2:
             file_jaccard = len(files1.intersection(files2)) / len(files1.union(files2))
             factors.append(file_jaccard)
 
         # 4. Confidence similarity
-        conf1 = anchor1.metadata.get('correlation_metadata', {}).get('confidence_score', 0)
-        conf2 = anchor2.metadata.get('correlation_metadata', {}).get('confidence_score', 0)
+        conf1 = anchor1.metadata.get("correlation_metadata", {}).get("confidence_score", 0)
+        conf2 = anchor2.metadata.get("correlation_metadata", {}).get("confidence_score", 0)
         if conf1 and conf2:
             conf_similarity = 1.0 - abs(conf1 - conf2)
             factors.append(conf_similarity)
@@ -389,9 +391,7 @@ class MetaCorrelationEngine:
         return statistics.mean(factors) if factors else 0.0
 
     def _discover_neighborhoods(
-        self,
-        anchors: list[MemoryAnchor],
-        similarity_matrix: dict[tuple[str, str], float]
+        self, anchors: list[MemoryAnchor], similarity_matrix: dict[tuple[str, str], float]
     ) -> None:
         """Discover contextual neighborhood patterns."""
         # Use simple clustering approach
@@ -436,9 +436,9 @@ class MetaCorrelationEngine:
         pattern_confidences = defaultdict(list)
 
         for anchor in sorted_anchors:
-            meta = anchor.metadata.get('correlation_metadata', {})
-            pattern_type = meta.get('pattern_type')
-            confidence = meta.get('confidence_score')
+            meta = anchor.metadata.get("correlation_metadata", {})
+            pattern_type = meta.get("pattern_type")
+            confidence = meta.get("confidence_score")
 
             if pattern_type and confidence is not None:
                 pattern_confidences[pattern_type].append((anchor.timestamp, confidence))
@@ -454,25 +454,29 @@ class MetaCorrelationEngine:
             "cascade_details": [],
             "neighborhood_details": [],
             "confidence_trends": {},
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Cascade details
         for cascade in self.cascades[:5]:  # Top 5
-            summary["cascade_details"].append({
-                "length": len(cascade.anchors),
-                "time_span_seconds": cascade.metadata["time_span"],
-                "confidence": cascade.confidence,
-                "triggers": len(cascade.metadata["trigger_patterns"])
-            })
+            summary["cascade_details"].append(
+                {
+                    "length": len(cascade.anchors),
+                    "time_span_seconds": cascade.metadata["time_span"],
+                    "confidence": cascade.confidence,
+                    "triggers": len(cascade.metadata["trigger_patterns"]),
+                }
+            )
 
         # Neighborhood details
         for neighborhood in self.neighborhoods[:5]:  # Top 5
-            summary["neighborhood_details"].append({
-                "size": len(neighborhood.anchors),
-                "cohesion": neighborhood.metadata["cohesion_score"],
-                "themes": neighborhood.metadata["common_themes"]
-            })
+            summary["neighborhood_details"].append(
+                {
+                    "size": len(neighborhood.anchors),
+                    "cohesion": neighborhood.metadata["cohesion_score"],
+                    "themes": neighborhood.metadata["common_themes"],
+                }
+            )
 
         # Confidence trends
         for pattern_type, evolution in self.confidence_evolution.items():
@@ -483,7 +487,7 @@ class MetaCorrelationEngine:
                 summary["confidence_trends"][pattern_type] = {
                     "trend": trend,
                     "change": end_conf - start_conf,
-                    "samples": len(evolution)
+                    "samples": len(evolution),
                 }
 
         # Generate recommendations
@@ -514,7 +518,7 @@ class MetaCorrelationEngine:
             "likely_pattern_type": None,
             "expected_confidence": None,
             "expected_time_window": None,
-            "trigger_files": []
+            "trigger_files": [],
         }
 
         if not recent_anchors:
@@ -525,27 +529,29 @@ class MetaCorrelationEngine:
             # Simple pattern matching - could be made more sophisticated
             if len(recent_anchors) >= 2:
                 # Check if recent pattern matches cascade beginning
-                cascade_start = cascade.anchors[:len(recent_anchors)]
+                cascade_start = cascade.anchors[: len(recent_anchors)]
                 if self._matches_pattern(recent_anchors, cascade_start):
                     # Predict based on cascade continuation
                     next_idx = len(recent_anchors)
                     if next_idx < len(cascade.anchors):
                         next_anchor = cascade.anchors[next_idx]
-                        meta = next_anchor.metadata.get('correlation_metadata', {})
+                        meta = next_anchor.metadata.get("correlation_metadata", {})
 
-                        prediction["likely_pattern_type"] = meta.get('pattern_type')
-                        prediction["expected_confidence"] = meta.get('confidence_score')
+                        prediction["likely_pattern_type"] = meta.get("pattern_type")
+                        prediction["expected_confidence"] = meta.get("confidence_score")
 
                         # Calculate expected time
                         if next_idx > 0:
-                            prev_gap = (cascade.anchors[next_idx].timestamp -
-                                      cascade.anchors[next_idx-1].timestamp)
+                            prev_gap = (
+                                cascade.anchors[next_idx].timestamp
+                                - cascade.anchors[next_idx - 1].timestamp
+                            )
                             prediction["expected_time_window"] = prev_gap.total_seconds()
 
                         # Extract trigger files
                         for cursor in next_anchor.cursors.values():
-                            if isinstance(cursor, dict) and 'file_path' in cursor:
-                                prediction["trigger_files"].append(cursor['file_path'])
+                            if isinstance(cursor, dict) and "file_path" in cursor:
+                                prediction["trigger_files"].append(cursor["file_path"])
 
                     break
 
@@ -558,10 +564,10 @@ class MetaCorrelationEngine:
 
         for a1, a2 in zip(anchors1, anchors2):
             # Compare pattern types
-            meta1 = a1.metadata.get('correlation_metadata', {})
-            meta2 = a2.metadata.get('correlation_metadata', {})
+            meta1 = a1.metadata.get("correlation_metadata", {})
+            meta2 = a2.metadata.get("correlation_metadata", {})
 
-            if meta1.get('pattern_type') != meta2.get('pattern_type'):
+            if meta1.get("pattern_type") != meta2.get("pattern_type"):
                 return False
 
         return True

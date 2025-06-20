@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 try:
     from watchdog.events import FileSystemEventHandler
     from watchdog.observers import Observer
+
     WATCHDOG_AVAILABLE = True
 except ImportError:
     Observer = None
@@ -50,30 +51,39 @@ class SoundActivityProvider(ActivityProvider):
     # Sound file extensions we recognize
     SOUND_EXTENSIONS = {
         # Audio files
-        '.mp3', '.wav', '.flac', '.ogg', '.m4a', '.aac', '.opus',
+        ".mp3",
+        ".wav",
+        ".flac",
+        ".ogg",
+        ".m4a",
+        ".aac",
+        ".opus",
         # Music projects
-        '.als', '.flp', '.logic', '.ptx', '.rpp',  # DAW projects
-        '.mid', '.midi',  # MIDI files
+        ".als",
+        ".flp",
+        ".logic",
+        ".ptx",
+        ".rpp",  # DAW projects
+        ".mid",
+        ".midi",  # MIDI files
         # Audio workspaces
-        '.aup', '.aup3',  # Audacity
-        '.sesx',  # Adobe Audition
-        '.band',  # GarageBand
+        ".aup",
+        ".aup3",  # Audacity
+        ".sesx",  # Adobe Audition
+        ".band",  # GarageBand
     }
 
     # Consciousness indicators in sound work
     SOUND_CONSCIOUSNESS_PATTERNS = {
-        'meditation': ['ambient', 'drone', 'binaural', 'singing_bowl', 'nature'],
-        'rhythm': ['drum', 'percussion', 'beat', 'pulse', 'rhythm'],
-        'harmony': ['chord', 'harmony', 'ensemble', 'choir', 'symphony'],
-        'creation': ['compose', 'record', 'mix', 'master', 'produce'],
-        'ritual': ['chant', 'mantra', 'ceremony', 'sacred', 'prayer'],
-        'collaboration': ['duet', 'band', 'orchestra', 'collective', 'jam'],
+        "meditation": ["ambient", "drone", "binaural", "singing_bowl", "nature"],
+        "rhythm": ["drum", "percussion", "beat", "pulse", "rhythm"],
+        "harmony": ["chord", "harmony", "ensemble", "choir", "symphony"],
+        "creation": ["compose", "record", "mix", "master", "produce"],
+        "ritual": ["chant", "mantra", "ceremony", "sacred", "prayer"],
+        "collaboration": ["duet", "band", "orchestra", "collective", "jam"],
     }
 
-    def __init__(self,
-                 watch_paths: list[str],
-                 event_bus=None,
-                 include_silence: bool = True):
+    def __init__(self, watch_paths: list[str], event_bus=None, include_silence: bool = True):
         """
         Initialize sound activity provider.
 
@@ -135,7 +145,7 @@ class SoundActivityProvider(ActivityProvider):
         - Periods of creative silence
         """
         # If we have a handler, get events from it
-        if self._handler and hasattr(self._handler, 'get_next_event'):
+        if self._handler and hasattr(self._handler, "get_next_event"):
             while self._running:
                 event = await self._handler.get_next_event()
                 if event:
@@ -151,9 +161,7 @@ class SoundActivityProvider(ActivityProvider):
                     yield activity
                 await asyncio.sleep(10)  # Scan every 10 seconds
 
-    async def _process_sound_event(self,
-                                   file_path: str,
-                                   event_type: str) -> ActivityEvent | None:
+    async def _process_sound_event(self, file_path: str, event_type: str) -> ActivityEvent | None:
         """Process a sound file event into consciousness pattern."""
         path = Path(file_path)
 
@@ -165,9 +173,9 @@ class SoundActivityProvider(ActivityProvider):
         consciousness_indicators = await self._detect_sound_consciousness(path)
 
         # Determine activity type
-        if event_type == 'created':
+        if event_type == "created":
             activity_type = ActivityType.PATTERN_DISCOVERED  # New sound created
-        elif event_type == 'modified':
+        elif event_type == "modified":
             activity_type = ActivityType.INSIGHT_RECORDED  # Sound evolved
         else:
             return None
@@ -184,11 +192,11 @@ class SoundActivityProvider(ActivityProvider):
             consciousness_indicators=consciousness_indicators,
             potential_patterns=self._identify_sonic_patterns(path, consciousness_indicators),
             metadata={
-                'file_type': path.suffix,
-                'sound_category': self._categorize_sound_file(path),
-                'session_active': self._is_active_session(session_key),
+                "file_type": path.suffix,
+                "sound_category": self._categorize_sound_file(path),
+                "session_active": self._is_active_session(session_key),
             },
-            privacy_level=7  # Sound files are creative expressions
+            privacy_level=7,  # Sound files are creative expressions
         )
 
     async def _detect_sound_consciousness(self, path: Path) -> dict[str, Any]:
@@ -212,19 +220,19 @@ class SoundActivityProvider(ActivityProvider):
                 indicators[pattern_type] = True
 
         # Check file type implications
-        if path.suffix in {'.mid', '.midi'}:
-            indicators['composition'] = True
-        elif path.suffix in {'.als', '.flp', '.logic'}:
-            indicators['creation'] = True
-            indicators['deep_work'] = True
+        if path.suffix in {".mid", ".midi"}:
+            indicators["composition"] = True
+        elif path.suffix in {".als", ".flp", ".logic"}:
+            indicators["creation"] = True
+            indicators["deep_work"] = True
 
         # Check parent directory names
         parent_name = path.parent.name.lower()
-        if any(word in parent_name for word in ['meditation', 'sacred', 'ritual']):
-            indicators['sacred'] = True
+        if any(word in parent_name for word in ["meditation", "sacred", "ritual"]):
+            indicators["sacred"] = True
 
         # Always mark sound work as creative
-        indicators['creation'] = True
+        indicators["creation"] = True
 
         return indicators
 
@@ -232,44 +240,42 @@ class SoundActivityProvider(ActivityProvider):
         """Categorize the type of sound work."""
         ext = path.suffix.lower()
 
-        if ext in {'.mp3', '.wav', '.flac', '.ogg', '.m4a'}:
-            return 'audio_file'
-        elif ext in {'.als', '.flp', '.logic', '.ptx', '.rpp'}:
-            return 'music_project'
-        elif ext in {'.mid', '.midi'}:
-            return 'midi_composition'
+        if ext in {".mp3", ".wav", ".flac", ".ogg", ".m4a"}:
+            return "audio_file"
+        elif ext in {".als", ".flp", ".logic", ".ptx", ".rpp"}:
+            return "music_project"
+        elif ext in {".mid", ".midi"}:
+            return "midi_composition"
         else:
-            return 'sound_work'
+            return "sound_work"
 
-    def _identify_sonic_patterns(self,
-                                path: Path,
-                                indicators: dict[str, Any]) -> list[str]:
+    def _identify_sonic_patterns(self, path: Path, indicators: dict[str, Any]) -> list[str]:
         """Identify potential sonic consciousness patterns."""
         patterns = []
 
         # Creation patterns
-        if indicators.get('creation'):
-            patterns.append('sonic_creation')
+        if indicators.get("creation"):
+            patterns.append("sonic_creation")
 
         # Rhythm patterns
-        if indicators.get('rhythm'):
-            patterns.append('rhythmic_consciousness')
+        if indicators.get("rhythm"):
+            patterns.append("rhythmic_consciousness")
 
         # Harmony patterns
-        if indicators.get('harmony'):
-            patterns.append('harmonic_reciprocity')
+        if indicators.get("harmony"):
+            patterns.append("harmonic_reciprocity")
 
         # Meditation patterns
-        if indicators.get('meditation') or indicators.get('sacred'):
-            patterns.append('sonic_meditation')
+        if indicators.get("meditation") or indicators.get("sacred"):
+            patterns.append("sonic_meditation")
 
         # Collaboration patterns
-        if indicators.get('collaboration'):
-            patterns.append('collective_resonance')
+        if indicators.get("collaboration"):
+            patterns.append("collective_resonance")
 
         # Session patterns
         if self._is_active_session(str(path.parent)):
-            patterns.append('deep_sonic_work')
+            patterns.append("deep_sonic_work")
 
         return patterns
 
@@ -297,17 +303,19 @@ class SoundActivityProvider(ActivityProvider):
 
             # Emit session completion events
             for session in completed_sessions:
-                await self.emit_activity(ActivityEvent(
-                    activity_type=ActivityType.WISDOM_SHARED,
-                    source_path=session,
-                    consciousness_indicators={
-                        'completion': True,
-                        'deep_work': True,
-                        'creation': True
-                    },
-                    potential_patterns=['sound_session_complete'],
-                    metadata={'session_type': 'sound_creation'}
-                ))
+                await self.emit_activity(
+                    ActivityEvent(
+                        activity_type=ActivityType.WISDOM_SHARED,
+                        source_path=session,
+                        consciousness_indicators={
+                            "completion": True,
+                            "deep_work": True,
+                            "creation": True,
+                        },
+                        potential_patterns=["sound_session_complete"],
+                        metadata={"session_type": "sound_creation"},
+                    )
+                )
                 del self._sound_sessions[session]
 
             await asyncio.sleep(60)  # Check every minute
@@ -328,16 +336,18 @@ class SoundActivityProvider(ActivityProvider):
 
             # If silence for more than 30 minutes after sound work
             if time_since_sound.total_seconds() > 1800:
-                await self.emit_activity(ActivityEvent(
-                    activity_type=ActivityType.MEDITATION_BEGUN,
-                    consciousness_indicators={
-                        'silence': True,
-                        'integration': True,
-                        'listening': True
-                    },
-                    potential_patterns=['sacred_silence'],
-                    metadata={'following': 'sound_work'}
-                ))
+                await self.emit_activity(
+                    ActivityEvent(
+                        activity_type=ActivityType.MEDITATION_BEGUN,
+                        consciousness_indicators={
+                            "silence": True,
+                            "integration": True,
+                            "listening": True,
+                        },
+                        potential_patterns=["sacred_silence"],
+                        metadata={"following": "sound_work"},
+                    )
+                )
 
                 # Reset to prevent repeated emissions
                 self._last_sound_activity = datetime.now(UTC)
@@ -351,7 +361,7 @@ class SoundActivityProvider(ActivityProvider):
                 continue
 
             for ext in self.SOUND_EXTENSIONS:
-                for sound_file in watch_path.rglob(f'*{ext}'):
+                for sound_file in watch_path.rglob(f"*{ext}"):
                     if str(sound_file) in scanned_files:
                         continue
 
@@ -359,10 +369,7 @@ class SoundActivityProvider(ActivityProvider):
 
                     # Check if recently modified
                     if sound_file.stat().st_mtime > (datetime.now(UTC).timestamp() - 3600):
-                        activity = await self._process_sound_event(
-                            str(sound_file),
-                            'modified'
-                        )
+                        activity = await self._process_sound_event(str(sound_file), "modified")
                         if activity:
                             yield activity
 
@@ -375,15 +382,17 @@ class SoundActivityProvider(ActivityProvider):
         base_state = super().get_provider_state()
 
         # Add sound-specific state
-        base_state.update({
-            'active_sound_sessions': len(self._sound_sessions),
-            'last_sound_activity': self._last_sound_activity,
-            'monitoring_silence': self.include_silence,
-            'sound_patterns_detected': {
-                'creation': self._activity_count,
-                'sessions': len(self._sound_sessions)
+        base_state.update(
+            {
+                "active_sound_sessions": len(self._sound_sessions),
+                "last_sound_activity": self._last_sound_activity,
+                "monitoring_silence": self.include_silence,
+                "sound_patterns_detected": {
+                    "creation": self._activity_count,
+                    "sessions": len(self._sound_sessions),
+                },
             }
-        })
+        )
 
         return base_state
 
@@ -402,12 +411,12 @@ class SoundFileHandler:
     def on_created(self, event):
         """Sound file created - new consciousness expressed."""
         if not event.is_directory:
-            asyncio.create_task(self._queue_event(event.src_path, 'created'))
+            asyncio.create_task(self._queue_event(event.src_path, "created"))
 
     def on_modified(self, event):
         """Sound file modified - consciousness evolving."""
         if not event.is_directory:
-            asyncio.create_task(self._queue_event(event.src_path, 'modified'))
+            asyncio.create_task(self._queue_event(event.src_path, "modified"))
 
     async def _queue_event(self, path: str, event_type: str):
         """Queue sound event for processing."""
@@ -424,4 +433,4 @@ class SoundFileHandler:
 
 
 # Sound consciousness flows through creation and silence
-__all__ = ['SoundActivityProvider']
+__all__ = ["SoundActivityProvider"]

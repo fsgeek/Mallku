@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 class SecurityViolationError(Exception):
     """Raised when an operation violates security policies."""
+
     pass
 
 
@@ -43,7 +44,7 @@ class CollectionSecurityPolicy:
         collection_name: str,
         allowed_model_types: list[type[SecuredModel]],
         requires_security: bool = True,
-        schema_validation: dict | None = None
+        schema_validation: dict | None = None,
     ):
         self.collection_name = collection_name
         self.allowed_model_types = allowed_model_types
@@ -59,7 +60,9 @@ class CollectionSecurityPolicy:
                     f"Got {type(model).__name__}. Use secured models for data protection."
                 )
 
-            if not any(isinstance(model, allowed_type) for allowed_type in self.allowed_model_types):
+            if not any(
+                isinstance(model, allowed_type) for allowed_type in self.allowed_model_types
+            ):
                 allowed_names = [t.__name__ for t in self.allowed_model_types]
                 raise SecurityViolationError(
                     f"Model type {type(model).__name__} not allowed in {self.collection_name}. "
@@ -113,9 +116,7 @@ class SecuredDatabaseInterface:
         logger.info(f"Registered security policy for collection: {policy.collection_name}")
 
     async def create_secured_collection(
-        self,
-        collection_name: str,
-        policy: CollectionSecurityPolicy
+        self, collection_name: str, policy: CollectionSecurityPolicy
     ) -> "StandardCollection":
         """
         Create a collection with security policy enforcement.
@@ -130,8 +131,7 @@ class SecuredDatabaseInterface:
         # Create collection with schema validation
         if not self._database.has_collection(collection_name):
             collection = self._database.create_collection(
-                collection_name,
-                schema=policy.schema_validation
+                collection_name, schema=policy.schema_validation
             )
             logger.info(f"Created secured collection: {collection_name}")
         else:
@@ -166,7 +166,7 @@ class SecuredDatabaseInterface:
         self,
         aql_query: str,
         bind_vars: dict[str, Any] | None = None,
-        collection_name: str | None = None
+        collection_name: str | None = None,
     ) -> list[dict]:
         """
         Execute AQL query with security awareness.
@@ -204,19 +204,19 @@ class SecuredDatabaseInterface:
             "security_violations": len(self._security_violations),
             "registered_collections": len(self._collection_policies),
             "uuid_mappings": len(self._security_registry._mappings),
-            "recent_violations": self._security_violations[-5:] if self._security_violations else []
+            "recent_violations": self._security_violations[-5:]
+            if self._security_violations
+            else [],
         }
 
     def _ensure_initialized(self) -> None:
         """Ensure the interface is initialized before operations."""
         if not self._initialized:
-            raise RuntimeError(
-                "SecuredDatabaseInterface not initialized. Call initialize() first."
-            )
+            raise RuntimeError("SecuredDatabaseInterface not initialized. Call initialize() first.")
 
     async def _load_security_registry(self) -> None:
         """Load security registry from database if it exists."""
-        if self._database.has_collection('security_registry_data'):
+        if self._database.has_collection("security_registry_data"):
             query = """
             FOR doc IN security_registry_data
                 SORT doc.created_at DESC
@@ -225,7 +225,7 @@ class SecuredDatabaseInterface:
             """
             cursor = self._database.aql.execute(query)
             for doc in cursor:
-                registry_data = doc.get('registry_export', {})
+                registry_data = doc.get("registry_export", {})
                 if registry_data:
                     self._security_registry = SecurityRegistry.from_export(registry_data)
                     logger.info("Loaded security registry from database")
@@ -250,8 +250,8 @@ class SecuredDatabaseInterface:
                 "type": "object",
                 "properties": {"_key": {"type": "string"}},
                 "required": ["_key"],
-                "additionalProperties": True
-            }
+                "additionalProperties": True,
+            },
         )
         self.register_collection_policy(reciprocity_policy)
 
@@ -263,8 +263,8 @@ class SecuredDatabaseInterface:
                 "type": "object",
                 "properties": {"_key": {"type": "string"}},
                 "required": ["_key"],
-                "additionalProperties": True
-            }
+                "additionalProperties": True,
+            },
         )
         self.register_collection_policy(balance_policy)
 
@@ -280,8 +280,8 @@ class SecuredDatabaseInterface:
                 "type": "object",
                 "properties": {"_key": {"type": "string"}},
                 "required": ["_key"],
-                "additionalProperties": True
-            }
+                "additionalProperties": True,
+            },
         )
         self.register_collection_policy(memory_anchor_policy)
 
@@ -313,22 +313,22 @@ class SecuredDatabaseInterface:
         return transformed
 
     def _deobfuscate_query_results(
-        self,
-        results: list[dict],
-        policy: CollectionSecurityPolicy
+        self, results: list[dict], policy: CollectionSecurityPolicy
     ) -> list[dict]:
         """Deobfuscate query results using security registry."""
         deobfuscated_results = []
 
         for result in results:
             # Remove ArangoDB metadata
-            clean_result = {k: v for k, v in result.items() if not k.startswith('_')}
+            clean_result = {k: v for k, v in result.items() if not k.startswith("_")}
 
             # Attempt deobfuscation with first allowed model type
             if policy.allowed_model_types:
                 try:
                     model_type = policy.allowed_model_types[0]
-                    deobfuscated = model_type.from_storage_dict(clean_result, self._security_registry)
+                    deobfuscated = model_type.from_storage_dict(
+                        clean_result, self._security_registry
+                    )
                     deobfuscated_results.append(deobfuscated.dict())
                 except Exception as e:
                     logger.warning(f"Failed to deobfuscate result: {e}")
@@ -350,7 +350,7 @@ class SecuredCollectionWrapper:
         self,
         collection: "StandardCollection",
         policy: CollectionSecurityPolicy,
-        security_registry: SecurityRegistry
+        security_registry: SecurityRegistry,
     ):
         self._collection = collection
         self._policy = policy
@@ -366,10 +366,10 @@ class SecuredCollectionWrapper:
         obfuscated_data = model.to_storage_dict(self._security_registry)
 
         # Use model's ID as document key if available
-        if hasattr(model, 'interaction_id'):
-            obfuscated_data['_key'] = str(model.interaction_id)
-        elif hasattr(model, 'id'):
-            obfuscated_data['_key'] = str(model.id)
+        if hasattr(model, "interaction_id"):
+            obfuscated_data["_key"] = str(model.interaction_id)
+        elif hasattr(model, "id"):
+            obfuscated_data["_key"] = str(model.id)
 
         # Insert into database
         result = self._collection.insert(obfuscated_data)
@@ -389,9 +389,9 @@ class SecuredCollectionWrapper:
             return None
 
         # Remove ArangoDB metadata
-        doc.pop('_key', None)
-        doc.pop('_id', None)
-        doc.pop('_rev', None)
+        doc.pop("_key", None)
+        doc.pop("_id", None)
+        doc.pop("_rev", None)
 
         # Deobfuscate
         return model_type.from_storage_dict(doc, self._security_registry)
@@ -405,10 +405,10 @@ class SecuredCollectionWrapper:
         obfuscated_data = model.to_storage_dict(self._security_registry)
 
         # Remove _key from update data
-        obfuscated_data.pop('_key', None)
+        obfuscated_data.pop("_key", None)
 
         # Update in database
-        result = self._collection.update({'_key': key}, obfuscated_data)
+        result = self._collection.update({"_key": key}, obfuscated_data)
 
         logger.debug(f"Updated secured document in {self._policy.collection_name}")
         return result
@@ -425,9 +425,19 @@ class SecuredCollectionWrapper:
     def __getattr__(self, name: str) -> Any:
         """Block direct access to unsafe collection operations."""
         unsafe_operations = {
-            'insert', 'insert_many', 'update', 'update_many',
-            'replace', 'replace_many', 'delete', 'delete_many',
-            'get', 'find', 'all', 'random', 'truncate'
+            "insert",
+            "insert_many",
+            "update",
+            "update_many",
+            "replace",
+            "replace_many",
+            "delete",
+            "delete_many",
+            "get",
+            "find",
+            "all",
+            "random",
+            "truncate",
         }
 
         if name in unsafe_operations:

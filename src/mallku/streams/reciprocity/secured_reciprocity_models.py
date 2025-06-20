@@ -30,7 +30,7 @@ class ReciprocityActivityData(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.BLIND,
         search_capabilities=[SearchCapability.EQUALITY],
-        security_notes="UUID already obfuscated, blind index for lookups"
+        security_notes="UUID already obfuscated, blind index for lookups",
     )
 
     # Timestamp - critical for temporal queries
@@ -40,7 +40,7 @@ class ReciprocityActivityData(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET,
         search_capabilities=[SearchCapability.RANGE, SearchCapability.ORDERING],
-        security_notes="Temporal offset preserves query capability while hiding absolute time"
+        security_notes="Temporal offset preserves query capability while hiding absolute time",
     )
 
     # Interaction ID - needs exact match only
@@ -49,7 +49,7 @@ class ReciprocityActivityData(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.IDENTITY,  # UUIDs are already random
         search_capabilities=[SearchCapability.EQUALITY],
-        security_notes="UUIDs provide no semantic information"
+        security_notes="UUIDs provide no semantic information",
     )
 
     # Interaction metadata - sensitive, encrypted
@@ -57,7 +57,7 @@ class ReciprocityActivityData(SecuredModel):
         default_factory=dict,
         obfuscation_level=FieldObfuscationLevel.ENCRYPTED,
         index_strategy=FieldIndexStrategy.NONE,
-        security_notes="Contains potentially sensitive interaction details"
+        security_notes="Contains potentially sensitive interaction details",
     )
 
     # Initiator - categorical, can use deterministic
@@ -66,7 +66,7 @@ class ReciprocityActivityData(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.DETERMINISTIC,
         search_capabilities=[SearchCapability.EQUALITY],
-        security_notes="Limited set of values, deterministic encoding sufficient"
+        security_notes="Limited set of values, deterministic encoding sufficient",
     )
 
     # Participants - encrypted for privacy
@@ -75,7 +75,7 @@ class ReciprocityActivityData(SecuredModel):
         description="All participants in this interaction",
         obfuscation_level=FieldObfuscationLevel.ENCRYPTED,
         index_strategy=FieldIndexStrategy.NONE,
-        security_notes="Participant identities are sensitive"
+        security_notes="Participant identities are sensitive",
     )
 
     # Ayni score - bucketed for range queries
@@ -86,7 +86,7 @@ class ReciprocityActivityData(SecuredModel):
         index_strategy=FieldIndexStrategy.BUCKETED,
         search_capabilities=[SearchCapability.RANGE, SearchCapability.AGGREGATION],
         bucket_boundaries=[-1.0, -0.5, -0.1, 0.0, 0.1, 0.5, 1.0],
-        security_notes="Bucketed to enable range queries while protecting exact scores"
+        security_notes="Bucketed to enable range queries while protecting exact scores",
     )
 
     # System health - less sensitive, identity storage
@@ -95,7 +95,7 @@ class ReciprocityActivityData(SecuredModel):
         description="Track UPI implementation issues affecting reciprocity",
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.IDENTITY,
-        security_notes="System metrics are less sensitive"
+        security_notes="System metrics are less sensitive",
     )
 
 
@@ -110,7 +110,7 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.BLIND,
         search_capabilities=[SearchCapability.EQUALITY],
-        security_notes="Pre-obfuscated IDs, blind index for lookups"
+        security_notes="Pre-obfuscated IDs, blind index for lookups",
     )
 
     participant_b_id: str = SecuredField(
@@ -118,7 +118,7 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.BLIND,
         search_capabilities=[SearchCapability.EQUALITY],
-        security_notes="Pre-obfuscated IDs, blind index for lookups"
+        security_notes="Pre-obfuscated IDs, blind index for lookups",
     )
 
     # Current balance - sensitive but needs queries
@@ -129,7 +129,7 @@ class ReciprocityBalance(SecuredModel):
         index_strategy=FieldIndexStrategy.BUCKETED,
         search_capabilities=[SearchCapability.RANGE],
         bucket_boundaries=[-1.0, -0.8, -0.5, -0.2, 0.0, 0.2, 0.5, 0.8, 1.0],
-        security_notes="Bucketed to identify severely imbalanced relationships"
+        security_notes="Bucketed to identify severely imbalanced relationships",
     )
 
     # Interaction count - less sensitive
@@ -138,7 +138,7 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.IDENTITY,
         search_capabilities=[SearchCapability.RANGE, SearchCapability.AGGREGATION],
-        security_notes="Count data is less sensitive"
+        security_notes="Count data is less sensitive",
     )
 
     # Last interaction - temporal offset
@@ -147,7 +147,7 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET,
         search_capabilities=[SearchCapability.RANGE, SearchCapability.ORDERING],
-        security_notes="Temporal offset hides absolute time"
+        security_notes="Temporal offset hides absolute time",
     )
 
     # Balance history - encrypted, no indexing needed
@@ -156,7 +156,7 @@ class ReciprocityBalance(SecuredModel):
         description="Historical balance snapshots",
         obfuscation_level=FieldObfuscationLevel.ENCRYPTED,
         index_strategy=FieldIndexStrategy.NONE,
-        security_notes="Historical data is sensitive and doesn't need indexing"
+        security_notes="Historical data is sensitive and doesn't need indexing",
     )
 
     # Relationship health - bucketed for monitoring
@@ -167,7 +167,7 @@ class ReciprocityBalance(SecuredModel):
         index_strategy=FieldIndexStrategy.BUCKETED,
         search_capabilities=[SearchCapability.RANGE],
         bucket_boundaries=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-        security_notes="Bucketed to identify unhealthy relationships"
+        security_notes="Bucketed to identify unhealthy relationships",
     )
 
     # Decay tracking - temporal offset
@@ -177,7 +177,7 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.UUID_ONLY,
         index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET,
         search_capabilities=[SearchCapability.RANGE],
-        security_notes="Temporal offset sufficient for decay calculations"
+        security_notes="Temporal offset sufficient for decay calculations",
     )
 
     # Decay rate - configuration, not sensitive
@@ -186,5 +186,5 @@ class ReciprocityBalance(SecuredModel):
         description="Rate at which old imbalances decay",
         obfuscation_level=FieldObfuscationLevel.NONE,
         index_strategy=FieldIndexStrategy.IDENTITY,
-        security_notes="Configuration parameter, not user data"
+        security_notes="Configuration parameter, not user data",
     )

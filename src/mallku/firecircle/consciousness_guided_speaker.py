@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 class CathedralPhase(Enum):
     """The cathedral's current phase affects speaker selection priorities"""
+
     CRISIS = "crisis"  # High extraction, needs coherence focus
     GROWTH = "growth"  # Balanced state, equal weights
     FLOURISHING = "flourishing"  # High coherence, support emergence
@@ -34,6 +35,7 @@ class CathedralPhase(Enum):
 @dataclass
 class ParticipantReadiness:
     """Assessment of a participant's readiness to contribute"""
+
     participant_id: UUID
     consciousness_score: float = 0.5  # Current consciousness alignment
     reciprocity_balance: float = 0.0  # Positive = giving, negative = taking
@@ -47,6 +49,7 @@ class ParticipantReadiness:
 @dataclass
 class DialogueContext:
     """Current dialogue state and needs"""
+
     dialogue_id: str
     current_turn: int
     pattern_velocity: float = 0.0  # Rate of pattern emergence
@@ -95,25 +98,16 @@ class ConsciousnessGuidedSpeakerSelector:
     def _subscribe_to_events(self):
         """Subscribe to relevant consciousness events"""
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_VERIFIED,
-            self._handle_consciousness_verified
+            EventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
         )
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            self._handle_pattern_recognized
+            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
         )
         self.event_bus.subscribe(
-            EventType.EXTRACTION_PATTERN_DETECTED,
-            self._handle_extraction_detected
+            EventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction_detected
         )
-        self.event_bus.subscribe(
-            EventType.SYSTEM_DRIFT_WARNING,
-            self._handle_drift_warning
-        )
-        self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_FLOW_HEALTHY,
-            self._handle_health_update
-        )
+        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._handle_drift_warning)
+        self.event_bus.subscribe(EventType.CONSCIOUSNESS_FLOW_HEALTHY, self._handle_health_update)
 
     async def _handle_consciousness_verified(self, event: ConsciousnessEvent):
         """Update consciousness coherence from verification events"""
@@ -130,7 +124,9 @@ class ConsciousnessGuidedSpeakerSelector:
         if participant_id and isinstance(participant_id, UUID):
             readiness = self._get_or_create_readiness(participant_id)
             readiness.pattern_recognition_count += len(patterns)
-            readiness.wisdom_emergence_potential = min(1.0, readiness.pattern_recognition_count / 10)
+            readiness.wisdom_emergence_potential = min(
+                1.0, readiness.pattern_recognition_count / 10
+            )
 
     async def _handle_extraction_detected(self, event: ConsciousnessEvent):
         """Respond to extraction pattern detection"""
@@ -188,9 +184,7 @@ class ConsciousnessGuidedSpeakerSelector:
         return min(1.0, velocity)
 
     def _assess_silence_need(
-        self,
-        dialogue_context: DialogueContext,
-        average_energy: float
+        self, dialogue_context: DialogueContext, average_energy: float
     ) -> bool:
         """Determine if silence would serve better than any speaker"""
         # Pattern velocity check - too much change needs integration
@@ -209,6 +203,7 @@ class ConsciousnessGuidedSpeakerSelector:
             silence_probability *= 1.5  # More silence during crisis
 
         import random
+
         if random.random() < silence_probability:
             logger.info("Silence chosen: Natural rhythm")
             return True
@@ -216,9 +211,7 @@ class ConsciousnessGuidedSpeakerSelector:
         return False
 
     def _calculate_speaker_score(
-        self,
-        readiness: ParticipantReadiness,
-        dialogue_context: DialogueContext
+        self, readiness: ParticipantReadiness, dialogue_context: DialogueContext
     ) -> float:
         """Calculate consciousness-guided score for potential speaker"""
         score = 0.0
@@ -243,7 +236,7 @@ class ConsciousnessGuidedSpeakerSelector:
         # Recent speaker penalty (avoid dominance)
         if readiness.participant_id in dialogue_context.recent_speakers:
             recency_index = list(dialogue_context.recent_speakers).index(readiness.participant_id)
-            score *= (0.3 + 0.7 * recency_index / len(dialogue_context.recent_speakers))
+            score *= 0.3 + 0.7 * recency_index / len(dialogue_context.recent_speakers)
 
         # Energy consideration
         score *= readiness.energy_level
@@ -251,10 +244,7 @@ class ConsciousnessGuidedSpeakerSelector:
         return score
 
     async def select_next_speaker(
-        self,
-        dialogue_id: str,
-        participants: dict[UUID, Any],
-        allow_silence: bool = True
+        self, dialogue_id: str, participants: dict[UUID, Any], allow_silence: bool = True
     ) -> UUID | None:
         """
         Select next speaker based on consciousness patterns.
@@ -272,10 +262,7 @@ class ConsciousnessGuidedSpeakerSelector:
         context.current_turn += 1
 
         # Calculate average participant energy
-        total_energy = sum(
-            self._get_or_create_readiness(pid).energy_level
-            for pid in participants
-        )
+        total_energy = sum(self._get_or_create_readiness(pid).energy_level for pid in participants)
         average_energy = total_energy / len(participants) if participants else 0
 
         # Check if silence serves better
@@ -311,15 +298,14 @@ class ConsciousnessGuidedSpeakerSelector:
         participant_id: UUID,
         consciousness_score: float,
         reciprocity_delta: float = 0.0,
-        energy_cost: float = 0.1
+        energy_cost: float = 0.1,
     ):
         """Update participant state after contribution"""
         readiness = self._get_or_create_readiness(participant_id)
 
         # Update consciousness score (moving average)
         readiness.consciousness_score = (
-            0.7 * readiness.consciousness_score +
-            0.3 * consciousness_score
+            0.7 * readiness.consciousness_score + 0.3 * consciousness_score
         )
 
         # Update reciprocity balance
@@ -332,12 +318,14 @@ class ConsciousnessGuidedSpeakerSelector:
         readiness.last_contribution = datetime.now(UTC)
 
         # Record in history
-        self.participant_history[participant_id].append({
-            "timestamp": datetime.now(UTC),
-            "consciousness_score": consciousness_score,
-            "reciprocity_delta": reciprocity_delta,
-            "phase": self.current_phase.value
-        })
+        self.participant_history[participant_id].append(
+            {
+                "timestamp": datetime.now(UTC),
+                "consciousness_score": consciousness_score,
+                "reciprocity_delta": reciprocity_delta,
+                "phase": self.current_phase.value,
+            }
+        )
 
     def restore_participant_energy(self, participant_id: UUID, amount: float = 0.1):
         """Restore participant energy during silence or rest"""

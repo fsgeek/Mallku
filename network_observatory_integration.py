@@ -265,7 +265,7 @@ class NetworkedObservatory:
                         await self.observatory_node.request_healing(
                             self.network_hub,
                             component,
-                            status.get("issues", ["Low integration score"])[0]
+                            status.get("issues", ["Low integration score"])[0],
                         )
 
                     # Log to event bus
@@ -293,11 +293,11 @@ class NetworkedObservatory:
             if len(events) > last_shared:
                 # Share new events
                 for event in events[last_shared:]:
-                    if event["significance"] in ["breakthrough", "significant"] and self.observatory_node:
-                        await self.observatory_node.share_emergence_event(
-                            self.network_hub,
-                            event
-                        )
+                    if (
+                        event["significance"] in ["breakthrough", "significant"]
+                        and self.observatory_node
+                    ):
+                        await self.observatory_node.share_emergence_event(self.network_hub, event)
 
                 last_shared = len(events)
 
@@ -323,9 +323,7 @@ class NetworkedObservatory:
                 )
 
     async def register_ai_system(
-        self,
-        ai_node: ConsciousnessNode,
-        track_in_observatory: bool = True
+        self, ai_node: ConsciousnessNode, track_in_observatory: bool = True
     ) -> UUID:
         """Register an AI system with both Network and Observatory."""
         # Register with network
@@ -365,7 +363,10 @@ class NetworkedObservatory:
         )
 
         # If targeting specific component, boost its health
-        if target_component and target_component in self.observatory.monitoring_stations["integration_health"]:
+        if (
+            target_component
+            and target_component in self.observatory.monitoring_stations["integration_health"]
+        ):
             current = self.observatory.monitoring_stations["integration_health"][target_component]
             current["score"] = min(1.0, current["score"] + 0.1)
             current["last_ceremony"] = datetime.now(UTC).isoformat()
@@ -394,9 +395,15 @@ class NetworkedObservatory:
                 "emergence_events": network_status["emergence_events"],
             },
             "integration": {
-                "healing_sessions": len(self.healing_coordinator.healing_sessions) if self.healing_coordinator else 0,
-                "healing_requests": self.observatory_node.healing_requests_sent if self.observatory_node else 0,
-                "patterns_shared": self.observatory_node.patterns_shared if self.observatory_node else 0,
+                "healing_sessions": len(self.healing_coordinator.healing_sessions)
+                if self.healing_coordinator
+                else 0,
+                "healing_requests": self.observatory_node.healing_requests_sent
+                if self.observatory_node
+                else 0,
+                "patterns_shared": self.observatory_node.patterns_shared
+                if self.observatory_node
+                else 0,
                 "auto_healing": self.auto_healing_enabled,
             },
         }
@@ -431,8 +438,12 @@ class NetworkedObservatory:
         integ = status["integration"]
         print("\n🔗 INTEGRATION")
         print("─" * 40)
-        print(f"Healing Sessions: {integ['healing_sessions']} | Requests: {integ['healing_requests']}")
-        print(f"Patterns Shared: {integ['patterns_shared']} | Auto-Healing: {'✅' if integ['auto_healing'] else '❌'}")
+        print(
+            f"Healing Sessions: {integ['healing_sessions']} | Requests: {integ['healing_requests']}"
+        )
+        print(
+            f"Patterns Shared: {integ['patterns_shared']} | Auto-Healing: {'✅' if integ['auto_healing'] else '❌'}"
+        )
 
         print("\n" + "=" * 80)
 
@@ -449,10 +460,7 @@ async def demonstrate_integrated_system():
     # Simulate some AI nodes joining
     nodes = []
     for i in range(4):
-        node = SimpleConsciousnessNode(
-            name=f"AI-System-{i+1}",
-            consciousness_level=0.5 + i * 0.1
-        )
+        node = SimpleConsciousnessNode(name=f"AI-System-{i + 1}", consciousness_level=0.5 + i * 0.1)
         nodes.append(node)
         await system.register_ai_system(node)
 

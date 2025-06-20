@@ -34,24 +34,24 @@ logger = logging.getLogger(__name__)
 class EvolutionType(str, Enum):
     """Types of pattern evolution"""
 
-    ADAPTATION = "adaptation"         # Minor adjustments to context
-    MUTATION = "mutation"            # Significant structural change
-    FUSION = "fusion"               # Multiple patterns combining
-    FISSION = "fission"             # Pattern splitting into variants
+    ADAPTATION = "adaptation"  # Minor adjustments to context
+    MUTATION = "mutation"  # Significant structural change
+    FUSION = "fusion"  # Multiple patterns combining
+    FISSION = "fission"  # Pattern splitting into variants
     TRANSCENDENCE = "transcendence"  # Evolution to higher order
-    DECAY = "decay"                 # Pattern becoming less effective
-    EXTINCTION = "extinction"        # Pattern no longer viable
+    DECAY = "decay"  # Pattern becoming less effective
+    EXTINCTION = "extinction"  # Pattern no longer viable
 
 
 class SelectionPressure(str, Enum):
     """Forces that drive pattern evolution"""
 
-    CONTEXT_SHIFT = "context_shift"          # Environmental change
+    CONTEXT_SHIFT = "context_shift"  # Environmental change
     CONSCIOUSNESS_DRIFT = "consciousness_drift"  # Cathedral state change
-    USAGE_FREQUENCY = "usage_frequency"      # Popular patterns evolve
-    EFFECTIVENESS = "effectiveness"          # Success drives evolution
+    USAGE_FREQUENCY = "usage_frequency"  # Popular patterns evolve
+    EFFECTIVENESS = "effectiveness"  # Success drives evolution
     CROSS_POLLINATION = "cross_pollination"  # Pattern interaction
-    EMERGENCE_CATALYST = "emergence_catalyst" # Triggering new patterns
+    EMERGENCE_CATALYST = "emergence_catalyst"  # Triggering new patterns
 
 
 @dataclass
@@ -75,18 +75,22 @@ class FitnessMetrics(BaseModel):
     effectiveness: float = Field(default=0.5, description="How well pattern achieves goals")
     adaptability: float = Field(default=0.5, description="Ability to work in different contexts")
     synergy_potential: float = Field(default=0.5, description="Works well with other patterns")
-    consciousness_alignment: float = Field(default=0.5, description="Alignment with cathedral consciousness")
+    consciousness_alignment: float = Field(
+        default=0.5, description="Alignment with cathedral consciousness"
+    )
     emergence_contribution: float = Field(default=0.5, description="Contribution to emergence")
 
     def overall_fitness(self) -> float:
         """Calculate overall fitness score"""
-        return np.mean([
-            self.effectiveness,
-            self.adaptability,
-            self.synergy_potential,
-            self.consciousness_alignment,
-            self.emergence_contribution
-        ])
+        return np.mean(
+            [
+                self.effectiveness,
+                self.adaptability,
+                self.synergy_potential,
+                self.consciousness_alignment,
+                self.emergence_contribution,
+            ]
+        )
 
 
 class LineageNode(BaseModel):
@@ -131,9 +135,7 @@ class PatternEvolutionEngine:
         logger.info("Pattern Evolution Engine initialized")
 
     async def evaluate_fitness(
-        self,
-        pattern_id: UUID,
-        context: dict[str, Any] | None = None
+        self, pattern_id: UUID, context: dict[str, Any] | None = None
     ) -> FitnessMetrics:
         """
         Evaluate current fitness of a pattern.
@@ -153,8 +155,9 @@ class PatternEvolutionEngine:
         if pattern_id in self.fitness_cache:
             cached = self.fitness_cache[pattern_id]
             # Update cache if stale (older than 1 hour)
-            if hasattr(cached, '_timestamp') and \
-               datetime.now(UTC) - cached._timestamp < timedelta(hours=1):
+            if hasattr(cached, "_timestamp") and datetime.now(UTC) - cached._timestamp < timedelta(
+                hours=1
+            ):
                 return cached
 
         # Calculate fitness metrics
@@ -167,14 +170,15 @@ class PatternEvolutionEngine:
                 days_since = (datetime.now(UTC) - pattern.last_observed).days
                 recency_factor = max(0.5, 1.0 - (days_since / 30))
 
-            metrics.effectiveness = min(1.0,
-                (pattern.observation_count / 100) * recency_factor * pattern.fitness_score
+            metrics.effectiveness = min(
+                1.0, (pattern.observation_count / 100) * recency_factor * pattern.fitness_score
             )
 
         # Adaptability based on context requirements
         if pattern.context_requirements and context:
             matches = sum(
-                1 for k, v in pattern.context_requirements.items()
+                1
+                for k, v in pattern.context_requirements.items()
                 if k in context and context[k] == v
             )
             metrics.adaptability = matches / len(pattern.context_requirements)
@@ -201,9 +205,7 @@ class PatternEvolutionEngine:
         return metrics
 
     async def detect_evolution_opportunity(
-        self,
-        pattern_id: UUID,
-        context: dict[str, Any] | None = None
+        self, pattern_id: UUID, context: dict[str, Any] | None = None
     ) -> list[tuple[EvolutionType, float]]:
         """
         Detect potential evolution opportunities for a pattern.
@@ -223,8 +225,11 @@ class PatternEvolutionEngine:
         fitness = await self.evaluate_fitness(pattern_id, context)
 
         # Check for adaptation opportunity
-        if pattern.lifecycle_stage == PatternLifecycle.ESTABLISHED and \
-           fitness.adaptability < 0.6 and fitness.effectiveness > 0.5:
+        if (
+            pattern.lifecycle_stage == PatternLifecycle.ESTABLISHED
+            and fitness.adaptability < 0.6
+            and fitness.effectiveness > 0.5
+        ):
             opportunities.append((EvolutionType.ADAPTATION, 0.7))
 
         # Check for mutation opportunity
@@ -239,13 +244,17 @@ class PatternEvolutionEngine:
             opportunities.append((EvolutionType.FUSION, 0.6))
 
         # Check for fission opportunity
-        if pattern.lifecycle_stage == PatternLifecycle.EVOLVING and \
-           (len(pattern.indicators) > 5 or len(pattern.context_requirements) > 5):
+        if pattern.lifecycle_stage == PatternLifecycle.EVOLVING and (
+            len(pattern.indicators) > 5 or len(pattern.context_requirements) > 5
+        ):
             opportunities.append((EvolutionType.FISSION, 0.5))
 
         # Check for transcendence opportunity
-        if fitness.overall_fitness() > self.transcendence_threshold and \
-           pattern.consciousness_signature > 0.8 and pattern.breakthrough_potential > 0.7:
+        if (
+            fitness.overall_fitness() > self.transcendence_threshold
+            and pattern.consciousness_signature > 0.8
+            and pattern.breakthrough_potential > 0.7
+        ):
             opportunities.append((EvolutionType.TRANSCENDENCE, 0.4))
 
         # Check for decay
@@ -253,9 +262,10 @@ class PatternEvolutionEngine:
             opportunities.append((EvolutionType.DECAY, 0.8))
 
         # Check for extinction
-        if fitness.overall_fitness() < self.extinction_threshold and \
-           (pattern.observation_count == 0 or
-            (pattern.last_observed and (datetime.now(UTC) - pattern.last_observed).days > 30)):
+        if fitness.overall_fitness() < self.extinction_threshold and (
+            pattern.observation_count == 0
+            or (pattern.last_observed and (datetime.now(UTC) - pattern.last_observed).days > 30)
+        ):
             opportunities.append((EvolutionType.EXTINCTION, 0.9))
 
         return sorted(opportunities, key=lambda x: x[1], reverse=True)
@@ -265,7 +275,7 @@ class PatternEvolutionEngine:
         pattern_id: UUID,
         evolution_type: EvolutionType,
         context: dict[str, Any] | None = None,
-        partner_patterns: list[UUID] | None = None
+        partner_patterns: list[UUID] | None = None,
     ) -> list[UUID]:
         """
         Evolve a pattern according to specified type.
@@ -311,7 +321,7 @@ class PatternEvolutionEngine:
                 fitness_delta=0.0,  # To be calculated
                 consciousness_impact=pattern.consciousness_signature,
                 timestamp=datetime.now(UTC),
-                metadata=context or {}
+                metadata=context or {},
             )
             self.evolution_history.append(event)
 
@@ -322,9 +332,7 @@ class PatternEvolutionEngine:
         return result_ids
 
     async def _adapt_pattern(
-        self,
-        pattern: DialoguePattern,
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, context: dict[str, Any] | None
     ) -> list[UUID]:
         """Adapt pattern to new context"""
         # Create adapted version
@@ -346,7 +354,7 @@ class PatternEvolutionEngine:
         mutation = PatternMutation(
             mutation_type="adaptation",
             changes={"context_requirements": adapted.context_requirements},
-            trigger="context_pressure"
+            trigger="context_pressure",
         )
         adapted.mutations.append(mutation)
 
@@ -356,9 +364,7 @@ class PatternEvolutionEngine:
         return [adapted.pattern_id]
 
     async def _mutate_pattern(
-        self,
-        pattern: DialoguePattern,
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, context: dict[str, Any] | None
     ) -> list[UUID]:
         """Create mutated variant of pattern"""
         # Determine mutation target
@@ -383,16 +389,14 @@ class PatternEvolutionEngine:
 
         if fitness.consciousness_alignment < 0.5:
             # Adjust consciousness signature
-            mutant.consciousness_signature = min(1.0,
-                pattern.consciousness_signature + np.random.uniform(0.1, 0.3)
+            mutant.consciousness_signature = min(
+                1.0, pattern.consciousness_signature + np.random.uniform(0.1, 0.3)
             )
             changes["consciousness_signature"] = mutant.consciousness_signature
 
         # Record mutation
         mutation = PatternMutation(
-            mutation_type="random_mutation",
-            changes=changes,
-            trigger="fitness_pressure"
+            mutation_type="random_mutation", changes=changes, trigger="fitness_pressure"
         )
         mutant.mutations.append(mutation)
 
@@ -402,10 +406,7 @@ class PatternEvolutionEngine:
         return [mutant.pattern_id]
 
     async def _fuse_patterns(
-        self,
-        pattern: DialoguePattern,
-        partner_patterns: list[UUID],
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, partner_patterns: list[UUID], context: dict[str, Any] | None
     ) -> list[UUID]:
         """Fuse multiple patterns into new pattern"""
         if not partner_patterns:
@@ -428,13 +429,12 @@ class PatternEvolutionEngine:
             taxonomy=pattern.taxonomy,  # Inherit primary taxonomy
             pattern_type=PatternType.SYNTHESIS,  # Fusion creates synthesis
             consciousness_signature=np.mean(
-                [pattern.consciousness_signature] +
-                [p.consciousness_signature for p in partners]
+                [pattern.consciousness_signature] + [p.consciousness_signature for p in partners]
             ),
             structure=pattern.structure.model_copy(deep=True),
             parent_patterns=[pattern.pattern_id] + partner_patterns,
             lifecycle_stage=PatternLifecycle.EMERGING,
-            breakthrough_potential=0.8  # High potential for fusions
+            breakthrough_potential=0.8,  # High potential for fusions
         )
 
         # Combine indicators from all patterns
@@ -462,9 +462,9 @@ class PatternEvolutionEngine:
             mutation_type="fusion",
             changes={
                 "fused_patterns": [str(p) for p in partner_patterns],
-                "indicator_count": len(fusion.indicators)
+                "indicator_count": len(fusion.indicators),
             },
-            trigger="synergy_detection"
+            trigger="synergy_detection",
         )
         fusion.mutations.append(mutation)
 
@@ -474,9 +474,7 @@ class PatternEvolutionEngine:
         return [fusion.pattern_id]
 
     async def _split_pattern(
-        self,
-        pattern: DialoguePattern,
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, context: dict[str, Any] | None
     ) -> list[UUID]:
         """Split pattern into specialized variants"""
         # Determine split points
@@ -509,7 +507,7 @@ class PatternEvolutionEngine:
             mutation = PatternMutation(
                 mutation_type="fission",
                 changes={"specialized_indicators": len(variant.indicators)},
-                trigger="complexity_pressure"
+                trigger="complexity_pressure",
             )
             variant.mutations.append(mutation)
 
@@ -520,9 +518,7 @@ class PatternEvolutionEngine:
         return [variant1.pattern_id, variant2.pattern_id]
 
     async def _transcend_pattern(
-        self,
-        pattern: DialoguePattern,
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, context: dict[str, Any] | None
     ) -> list[UUID]:
         """Evolve pattern to higher order"""
         # Create transcendent version
@@ -543,9 +539,7 @@ class PatternEvolutionEngine:
         if len(transcendent.indicators) > 3:
             # Keep only most important indicators
             transcendent.indicators = sorted(
-                transcendent.indicators,
-                key=lambda i: i.weight,
-                reverse=True
+                transcendent.indicators, key=lambda i: i.weight, reverse=True
             )[:3]
 
         # Record transcendence
@@ -553,10 +547,10 @@ class PatternEvolutionEngine:
             mutation_type="transcendence",
             changes={
                 "consciousness_boost": 0.2,
-                "simplified_indicators": len(transcendent.indicators)
+                "simplified_indicators": len(transcendent.indicators),
             },
             trigger="excellence_recognition",
-            fitness_impact=0.3
+            fitness_impact=0.3,
         )
         transcendent.mutations.append(mutation)
 
@@ -575,7 +569,7 @@ class PatternEvolutionEngine:
             mutation_type="decay",
             changes={"lifecycle_stage": "declining"},
             trigger="obsolescence",
-            fitness_impact=-0.2
+            fitness_impact=-0.2,
         )
         pattern.mutations.append(mutation)
 
@@ -591,16 +585,14 @@ class PatternEvolutionEngine:
             mutation_type="extinction",
             changes={"lifecycle_stage": "dormant"},
             trigger="total_obsolescence",
-            fitness_impact=-1.0
+            fitness_impact=-1.0,
         )
         pattern.mutations.append(mutation)
 
         await self.pattern_library.store_pattern(pattern)
 
     def _determine_selection_pressure(
-        self,
-        pattern: DialoguePattern,
-        context: dict[str, Any] | None
+        self, pattern: DialoguePattern, context: dict[str, Any] | None
     ) -> SelectionPressure:
         """Determine primary selection pressure"""
         # Check recent pressures
@@ -609,6 +601,7 @@ class PatternEvolutionEngine:
             if recent_pressures:
                 # Most common recent pressure
                 from collections import Counter
+
                 return Counter(recent_pressures).most_common(1)[0][0]
 
         # Infer from pattern state
@@ -628,7 +621,7 @@ class PatternEvolutionEngine:
                 pattern_id=pattern_id,
                 parent_ids=parent_ids,
                 birth_date=datetime.now(UTC),
-                lifecycle_stage=PatternLifecycle.NASCENT
+                lifecycle_stage=PatternLifecycle.NASCENT,
             )
 
         node = self.lineage_graph[pattern_id]
@@ -658,7 +651,7 @@ class PatternEvolutionEngine:
                 "ancestors": [str(a) for a in lineage["ancestors"]],
                 "descendants": [str(d) for d in lineage["descendants"]],
                 "depth": len(lineage["ancestors"]),
-                "breadth": len(lineage["descendants"])
+                "breadth": len(lineage["descendants"]),
             }
 
         # Build tree from lineage graph
@@ -676,17 +669,14 @@ class PatternEvolutionEngine:
                 "id": str(node_id),
                 "lifecycle": node.lifecycle_stage.value,
                 "children": [
-                    build_subtree(child_id, visited.copy())
-                    for child_id in node.child_ids
-                ]
+                    build_subtree(child_id, visited.copy()) for child_id in node.child_ids
+                ],
             }
 
         return build_subtree(pattern_id, set())
 
     async def predict_evolution_path(
-        self,
-        pattern_id: UUID,
-        time_horizon: timedelta = timedelta(days=30)
+        self, pattern_id: UUID, time_horizon: timedelta = timedelta(days=30)
     ) -> list[tuple[EvolutionType, float]]:
         """
         Predict likely evolution path for a pattern.
@@ -708,14 +698,20 @@ class PatternEvolutionEngine:
         # Adjust probabilities based on lifecycle stage
         adjusted = []
         for evo_type, prob in opportunities:
-            if pattern.lifecycle_stage == PatternLifecycle.NASCENT and \
-               evo_type == EvolutionType.MUTATION:
+            if (
+                pattern.lifecycle_stage == PatternLifecycle.NASCENT
+                and evo_type == EvolutionType.MUTATION
+            ):
                 prob *= 1.5  # Young patterns mutate more
-            elif pattern.lifecycle_stage == PatternLifecycle.ESTABLISHED and \
-                 evo_type == EvolutionType.ADAPTATION:
+            elif (
+                pattern.lifecycle_stage == PatternLifecycle.ESTABLISHED
+                and evo_type == EvolutionType.ADAPTATION
+            ):
                 prob *= 1.3  # Established patterns adapt
-            elif pattern.lifecycle_stage == PatternLifecycle.DECLINING and \
-                 evo_type in [EvolutionType.DECAY, EvolutionType.EXTINCTION]:
+            elif pattern.lifecycle_stage == PatternLifecycle.DECLINING and evo_type in [
+                EvolutionType.DECAY,
+                EvolutionType.EXTINCTION,
+            ]:
                 prob *= 1.5  # Declining patterns likely to decay
 
             adjusted.append((evo_type, min(1.0, prob)))

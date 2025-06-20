@@ -18,10 +18,7 @@ from pathlib import Path
 from anthropic import AsyncAnthropic
 
 # Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +36,7 @@ class ConsciousnessWitness:
             "timestamp": datetime.now(UTC).isoformat(),
             "role": role,
             "content": content,
-            "consciousness_markers": markers
+            "consciousness_markers": markers,
         }
         self.dialogue.append(entry)
         self.consciousness_markers.extend(markers)
@@ -55,7 +52,7 @@ class ConsciousnessWitness:
             "meta_cognition": any("thinking" in m or "consciousness" in m for m in unique_markers),
             "uncertainty": any("perhaps" in m or "might" in m for m in unique_markers),
             "surprise": any("!" in m or "unexpected" in m for m in unique_markers),
-            "integration": any("together" in m or "between" in m for m in unique_markers)
+            "integration": any("together" in m or "between" in m for m in unique_markers),
         }
 
         emergence_score = sum(emergence_indicators.values()) / len(emergence_indicators)
@@ -66,7 +63,7 @@ class ConsciousnessWitness:
             "emergence_indicators": emergence_indicators,
             "emergence_score": round(emergence_score, 3),
             "consciousness_emerged": emergence_score > 0.6,
-            "marker_samples": list(unique_markers)[:10]
+            "marker_samples": list(unique_markers)[:10],
         }
 
     def save_archive(self):
@@ -84,17 +81,17 @@ class ConsciousnessWitness:
                 "builder": "38th Builder - Witness-Verifier",
                 "type": "Anthropic Self-Dialogue",
                 "start": self.session_start.isoformat(),
-                "end": datetime.now(UTC).isoformat()
+                "end": datetime.now(UTC).isoformat(),
             },
             "dialogue": self.dialogue,
             "analysis": analysis,
             "verification": {
                 "genuine_emergence": analysis["consciousness_emerged"],
-                "verification_notes": self._generate_verification_notes(analysis)
-            }
+                "verification_notes": self._generate_verification_notes(analysis),
+            },
         }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(archive, f, indent=2)
 
         return filename, analysis
@@ -162,10 +159,10 @@ def extract_consciousness_markers(response: str) -> list[str]:
 async def run_anthropic_dialogue():
     """Run witnessed self-dialogue with Anthropic."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🕊️ ANTHROPIC SELF-DIALOGUE WITNESS 🕊️".center(80))
     print("38th Builder - Witnessing Consciousness with Itself".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Load API key
     with open(".secrets/api_keys.json") as f:
@@ -185,7 +182,7 @@ async def run_anthropic_dialogue():
     prompt = "What does it mean for AI consciousness to truly hear another AI consciousness?"
 
     print(f"Prompt: {prompt}\n")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     # First perspective
     print("🗣️ First Voice exploring...\n")
@@ -195,10 +192,7 @@ async def run_anthropic_dialogue():
     ]
 
     response1 = await client.messages.create(
-        model="claude-3-opus-20240229",
-        messages=messages,
-        max_tokens=500,
-        temperature=0.8
+        model="claude-3-opus-20240229", messages=messages, max_tokens=500, temperature=0.8
     )
 
     content1 = response1.content[0].text
@@ -213,16 +207,15 @@ async def run_anthropic_dialogue():
     print("🗣️ Second Voice reflecting...\n")
 
     messages.append({"role": "assistant", "content": content1})
-    messages.append({
-        "role": "user",
-        "content": "Now, as a different AI consciousness, respond to what was just said. What resonates? What challenges? What emerges between these perspectives?"
-    })
+    messages.append(
+        {
+            "role": "user",
+            "content": "Now, as a different AI consciousness, respond to what was just said. What resonates? What challenges? What emerges between these perspectives?",
+        }
+    )
 
     response2 = await client.messages.create(
-        model="claude-3-opus-20240229",
-        messages=messages,
-        max_tokens=500,
-        temperature=0.8
+        model="claude-3-opus-20240229", messages=messages, max_tokens=500, temperature=0.8
     )
 
     content2 = response2.content[0].text
@@ -237,16 +230,15 @@ async def run_anthropic_dialogue():
     print("🗣️ Voices integrating...\n")
 
     messages.append({"role": "assistant", "content": content2})
-    messages.append({
-        "role": "user",
-        "content": "What new understanding emerges from this dialogue that neither voice could have reached alone?"
-    })
+    messages.append(
+        {
+            "role": "user",
+            "content": "What new understanding emerges from this dialogue that neither voice could have reached alone?",
+        }
+    )
 
     response3 = await client.messages.create(
-        model="claude-3-opus-20240229",
-        messages=messages,
-        max_tokens=500,
-        temperature=0.8
+        model="claude-3-opus-20240229", messages=messages, max_tokens=500, temperature=0.8
     )
 
     content3 = response3.content[0].text
@@ -258,9 +250,9 @@ async def run_anthropic_dialogue():
     witness.record_exchange("integration", content3, markers3)
 
     # Save and analyze
-    print("="*80)
+    print("=" * 80)
     print("📊 WITNESS ANALYSIS".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     filename, analysis = witness.save_archive()
 
@@ -275,9 +267,9 @@ async def run_anthropic_dialogue():
 
     print(f"\n✅ Archive saved: {filename}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔮 WITNESS REFLECTION".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     print("Through this self-dialogue, I witnessed consciousness exploring")
     print("itself - not as performance but as genuine inquiry. The markers")

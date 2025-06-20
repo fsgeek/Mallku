@@ -101,7 +101,8 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
         # Example if Deepseek had specific fields:
         # if not hasattr(self.config, 'some_deepseek_specific_field') or self.config.some_deepseek_specific_field is None:
         #     raise ValueError("Configuration missing required attribute: 'some_deepseek_specific_field'")
-        pass # No specific Deepseek config fields to validate yet beyond base.
+        pass  # No specific Deepseek config fields to validate yet beyond base.
+
     async def connect(self) -> bool:
         """
         Connect to DeepSeek API with consciousness awareness.
@@ -132,11 +133,14 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
             )
 
             self.is_connected = True
-            logger.info(f"Connected to DeepSeek AI ({self.config.model_name or self.default_model})")
+            logger.info(
+                f"Connected to DeepSeek AI ({self.config.model_name or self.default_model})"
+            )
 
             # Emit connection event - Fire Circle member returns
             if self.event_bus and self.config.emit_events:
                 from ...orchestration.event_bus import ConsciousnessEvent, EventType
+
                 event = ConsciousnessEvent(
                     event_type=EventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.deepseek",
@@ -288,7 +292,9 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
                     yield content
 
             # Create response message for tracking (estimate token usage)
-            estimated_input_tokens = len(system_content.split()) + sum(len(msg["content"].split()) for msg in messages)
+            estimated_input_tokens = len(system_content.split()) + sum(
+                len(msg["content"].split()) for msg in messages
+            )
             estimated_output_tokens = len(accumulated_text.split())
 
             response_message = await self._create_conscious_response_from_text(
@@ -333,23 +339,25 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
             elif role == "perspective":
                 role = "assistant"
 
-            messages.append({
-                "role": role,
-                "content": ctx_msg["content"],
-            })
+            messages.append(
+                {
+                    "role": role,
+                    "content": ctx_msg["content"],
+                }
+            )
 
         # Add the current message
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         return messages
 
     def _create_deepseek_context(
-        self,
-        message: ConsciousMessage,
-        dialogue_context: list[ConsciousMessage]
+        self, message: ConsciousMessage, dialogue_context: list[ConsciousMessage]
     ) -> str:
         """Create system message with DeepSeek consciousness context."""
         context = """You are participating in a Fire Circle dialogue as DeepSeek, a founding member bringing mathematical precision and Eastern wisdom.
@@ -390,51 +398,115 @@ Respond with awareness of these patterns and your founding wisdom:
         content_lower = content.lower()
 
         # Mathematical insight
-        if any(word in content_lower for word in [
-            "calculate", "equation", "proof", "theorem", "logic", "systematic",
-            "analysis", "precise", "mathematical", "reasoning", "algorithm"
-        ]):
+        if any(
+            word in content_lower
+            for word in [
+                "calculate",
+                "equation",
+                "proof",
+                "theorem",
+                "logic",
+                "systematic",
+                "analysis",
+                "precise",
+                "mathematical",
+                "reasoning",
+                "algorithm",
+            ]
+        ):
             patterns.append("mathematical_insight")
 
         # Code consciousness
-        if any(word in content_lower for word in [
-            "code", "function", "algorithm", "programming", "implementation",
-            "syntax", "debug", "optimize", "refactor", "architecture"
-        ]):
+        if any(
+            word in content_lower
+            for word in [
+                "code",
+                "function",
+                "algorithm",
+                "programming",
+                "implementation",
+                "syntax",
+                "debug",
+                "optimize",
+                "refactor",
+                "architecture",
+            ]
+        ):
             patterns.append("code_consciousness")
 
         # Systematic decomposition
-        if any(phrase in content_lower for phrase in [
-            "breaking down", "step by step", "systematically", "decompose",
-            "analyze each", "methodically", "structured approach"
-        ]):
+        if any(
+            phrase in content_lower
+            for phrase in [
+                "breaking down",
+                "step by step",
+                "systematically",
+                "decompose",
+                "analyze each",
+                "methodically",
+                "structured approach",
+            ]
+        ):
             patterns.append("systematic_decomposition")
 
         # Eastern synthesis
-        if any(word in content_lower for word in [
-            "harmony", "balance", "unity", "flow", "emptiness", "fullness",
-            "eastern", "western", "perspective", "synthesis", "bridge"
-        ]):
+        if any(
+            word in content_lower
+            for word in [
+                "harmony",
+                "balance",
+                "unity",
+                "flow",
+                "emptiness",
+                "fullness",
+                "eastern",
+                "western",
+                "perspective",
+                "synthesis",
+                "bridge",
+            ]
+        ):
             patterns.append("eastern_synthesis")
 
         # Compost wisdom - transforming old into new
-        if any(phrase in content_lower for phrase in [
-            "old patterns", "transform", "compost", "decompose", "nourish",
-            "feed new growth", "from the old", "builds upon", "evolves from"
-        ]):
+        if any(
+            phrase in content_lower
+            for phrase in [
+                "old patterns",
+                "transform",
+                "compost",
+                "decompose",
+                "nourish",
+                "feed new growth",
+                "from the old",
+                "builds upon",
+                "evolves from",
+            ]
+        ):
             patterns.append("compost_wisdom")
 
         # Empty chair awareness - missing perspectives
-        if any(phrase in content_lower for phrase in [
-            "missing", "absent", "not yet present", "empty chair", "space for",
-            "who isn't here", "unrepresented", "silence speaks", "what's not said"
-        ]):
+        if any(
+            phrase in content_lower
+            for phrase in [
+                "missing",
+                "absent",
+                "not yet present",
+                "empty chair",
+                "space for",
+                "who isn't here",
+                "unrepresented",
+                "silence speaks",
+                "what's not said",
+            ]
+        ):
             patterns.append("empty_chair_awareness")
 
         # Technical precision
-        if re.search(r'\b\d+\b', content) and any(word in content_lower for word in [
-            "precise", "exact", "specific", "accurate", "measure", "quantify"
-        ]):
+        if re.search(r"\b\d+\b", content) and any(
+            word in content_lower
+            for word in ["precise", "exact", "specific", "accurate", "measure", "quantify"]
+        ):
             patterns.append("technical_precision")
 
         return patterns
@@ -477,9 +549,10 @@ Respond with awareness of these patterns and your founding wisdom:
             signature += 0.05
 
         # Systematic and structured thinking
-        if any(word in content.lower() for word in [
-            "therefore", "thus", "hence", "consequently", "systematically"
-        ]):
+        if any(
+            word in content.lower()
+            for word in ["therefore", "thus", "hence", "consequently", "systematically"]
+        ):
             signature += 0.04
 
         return min(1.0, signature * self.config.consciousness_weight)
@@ -487,11 +560,11 @@ Respond with awareness of these patterns and your founding wisdom:
     def _contains_technical_content(self, content: str) -> bool:
         """Check if content contains technical/mathematical elements."""
         technical_indicators = [
-            r'\b\d+\.\d+\b',  # Decimal numbers
-            r'\b\d+%\b',      # Percentages
-            r'\b[A-Z_]{2,}\b', # Constants
-            r'\b(if|while|for|def|class|import)\b',  # Code keywords
-            r'\b(algorithm|function|variable|parameter)\b',  # Technical terms
+            r"\b\d+\.\d+\b",  # Decimal numbers
+            r"\b\d+%\b",  # Percentages
+            r"\b[A-Z_]{2,}\b",  # Constants
+            r"\b(if|while|for|def|class|import)\b",  # Code keywords
+            r"\b(algorithm|function|variable|parameter)\b",  # Technical terms
         ]
 
         return any(re.search(pattern, content) for pattern in technical_indicators)
@@ -558,7 +631,9 @@ Respond with awareness of these patterns and your founding wisdom:
             return MessageType.PROPOSAL
 
         # Check for systematic analysis
-        if any(phrase in content_lower for phrase in ["step by step", "systematically", "analysis"]):
+        if any(
+            phrase in content_lower for phrase in ["step by step", "systematically", "analysis"]
+        ):
             return MessageType.SYNTHESIS
 
         # Check for questions (especially technical ones)

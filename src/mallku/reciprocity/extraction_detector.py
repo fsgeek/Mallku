@@ -38,23 +38,23 @@ class ExtractionDetector:
 
         # Configurable detection thresholds (modifiable by Fire Circle)
         self.detection_thresholds = {
-            'resource_hoarding_ratio': 3.0,        # Taking 3x community average
-            'attention_monopolization': 0.4,        # >40% of attention to one entity
-            'capacity_disregard_threshold': 0.8,    # Taking when others at >80% capacity
-            'need_mismatch_threshold': 0.7,         # High taking with low expressed need
-            'contribution_deficit_ratio': 0.3,      # Taking much more than contributing
-            'temporal_clustering_threshold': 5,     # Multiple extraction events in short time
-            'community_impact_threshold': 0.6       # Impact on community wellbeing
+            "resource_hoarding_ratio": 3.0,  # Taking 3x community average
+            "attention_monopolization": 0.4,  # >40% of attention to one entity
+            "capacity_disregard_threshold": 0.8,  # Taking when others at >80% capacity
+            "need_mismatch_threshold": 0.7,  # High taking with low expressed need
+            "contribution_deficit_ratio": 0.3,  # Taking much more than contributing
+            "temporal_clustering_threshold": 5,  # Multiple extraction events in short time
+            "community_impact_threshold": 0.6,  # Impact on community wellbeing
         }
 
         # Pattern definitions (replaceable by Fire Circle)
         self.extraction_patterns = {
-            'resource_hoarding': self._detect_resource_hoarding,
-            'attention_monopolizing': self._detect_attention_monopolizing,
-            'capacity_disregard': self._detect_capacity_disregard,
-            'need_misrepresentation': self._detect_need_misrepresentation,
-            'contribution_avoidance': self._detect_contribution_avoidance,
-            'systemic_drain': self._detect_systemic_drain
+            "resource_hoarding": self._detect_resource_hoarding,
+            "attention_monopolizing": self._detect_attention_monopolizing,
+            "capacity_disregard": self._detect_capacity_disregard,
+            "need_misrepresentation": self._detect_need_misrepresentation,
+            "contribution_avoidance": self._detect_contribution_avoidance,
+            "systemic_drain": self._detect_systemic_drain,
         }
 
         # Sliding window for pattern analysis
@@ -106,10 +106,7 @@ class ExtractionDetector:
             logger.error(f"Failed to analyze interaction for extraction: {e}")
             return []
 
-    async def analyze_temporal_patterns(
-        self,
-        hours_back: int = 24
-    ) -> list[ExtractionAlert]:
+    async def analyze_temporal_patterns(self, hours_back: int = 24) -> list[ExtractionAlert]:
         """
         Analyze temporal patterns for extraction behaviors over time.
         """
@@ -142,27 +139,23 @@ class ExtractionDetector:
         """
         try:
             # Update thresholds
-            if 'thresholds' in new_patterns:
-                self.detection_thresholds.update(new_patterns['thresholds'])
+            if "thresholds" in new_patterns:
+                self.detection_thresholds.update(new_patterns["thresholds"])
 
             # Update cultural interpretations
-            if 'cultural_contexts' in new_patterns:
-                await self._update_cultural_contexts(new_patterns['cultural_contexts'])
+            if "cultural_contexts" in new_patterns:
+                await self._update_cultural_contexts(new_patterns["cultural_contexts"])
 
             # Update community baselines
-            if 'community_baselines' in new_patterns:
-                self.community_baselines.update(new_patterns['community_baselines'])
+            if "community_baselines" in new_patterns:
+                self.community_baselines.update(new_patterns["community_baselines"])
 
             logger.info("Updated extraction pattern definitions")
 
         except Exception as e:
             logger.error(f"Failed to update pattern definitions: {e}")
 
-    async def get_extraction_summary(
-        self,
-        entity_id: str,
-        days_back: int = 7
-    ) -> dict[str, Any]:
+    async def get_extraction_summary(self, entity_id: str, days_back: int = 7) -> dict[str, Any]:
         """
         Generate extraction pattern summary for specific entity.
         """
@@ -171,42 +164,48 @@ class ExtractionDetector:
             start_time = end_time - timedelta(days=days_back)
 
             # Get entity's interactions
-            entity_interactions = await self._get_entity_interactions(entity_id, start_time, end_time)
+            entity_interactions = await self._get_entity_interactions(
+                entity_id, start_time, end_time
+            )
 
             summary = {
-                'entity_id': entity_id,
-                'analysis_period': {'start': start_time, 'end': end_time},
-                'total_interactions': len(entity_interactions),
-                'extraction_indicators': {},
-                'positive_indicators': {},
-                'contextual_factors': {},
-                'recommendations': []
+                "entity_id": entity_id,
+                "analysis_period": {"start": start_time, "end": end_time},
+                "total_interactions": len(entity_interactions),
+                "extraction_indicators": {},
+                "positive_indicators": {},
+                "contextual_factors": {},
+                "recommendations": [],
             }
 
             # Analyze extraction indicators
-            summary['extraction_indicators'] = await self._calculate_extraction_indicators(entity_interactions)
+            summary["extraction_indicators"] = await self._calculate_extraction_indicators(
+                entity_interactions
+            )
 
             # Analyze positive contribution indicators
-            summary['positive_indicators'] = await self._calculate_positive_indicators(entity_interactions)
+            summary["positive_indicators"] = await self._calculate_positive_indicators(
+                entity_interactions
+            )
 
             # Analyze contextual factors
-            summary['contextual_factors'] = await self._analyze_contextual_factors(entity_interactions)
+            summary["contextual_factors"] = await self._analyze_contextual_factors(
+                entity_interactions
+            )
 
             # Generate recommendations
-            summary['recommendations'] = await self._generate_entity_recommendations(summary)
+            summary["recommendations"] = await self._generate_entity_recommendations(summary)
 
             return summary
 
         except Exception as e:
             logger.error(f"Failed to generate extraction summary: {e}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     # Individual pattern detection methods
 
     async def _detect_resource_hoarding(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect resource hoarding patterns."""
         try:
@@ -227,9 +226,12 @@ class ExtractionDetector:
                     consumption_indicators.append(0)
 
             consumption_rate = mean(consumption_indicators) if consumption_indicators else 0
-            community_avg = self.community_baselines.get('consumption_rate', 0.3)
+            community_avg = self.community_baselines.get("consumption_rate", 0.3)
 
-            if consumption_rate > community_avg * self.detection_thresholds['resource_hoarding_ratio']:
+            if (
+                consumption_rate
+                > community_avg * self.detection_thresholds["resource_hoarding_ratio"]
+            ):
                 return ExtractionAlert(
                     severity=AlertSeverity.CONCERN,
                     extraction_type="resource_hoarding",
@@ -241,8 +243,8 @@ class ExtractionDetector:
                     suggested_investigation_areas=[
                         "Is entity experiencing external stress requiring extra resources?",
                         "Are resources actually being hoarded or used appropriately?",
-                        "Should resource allocation be adjusted?"
-                    ]
+                        "Should resource allocation be adjusted?",
+                    ],
                 )
 
             return None
@@ -252,9 +254,7 @@ class ExtractionDetector:
             return None
 
     async def _detect_attention_monopolizing(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect attention monopolization patterns."""
         try:
@@ -269,10 +269,12 @@ class ExtractionDetector:
                 return None  # Insufficient data
 
             # Count interactions involving this entity
-            entity_interactions = sum(1 for i in recent_interactions if self._involves_entity(i, entity_id))
+            entity_interactions = sum(
+                1 for i in recent_interactions if self._involves_entity(i, entity_id)
+            )
             attention_ratio = entity_interactions / total_interactions
 
-            if attention_ratio > self.detection_thresholds['attention_monopolization']:
+            if attention_ratio > self.detection_thresholds["attention_monopolization"]:
                 return ExtractionAlert(
                     severity=AlertSeverity.WATCH,
                     extraction_type="attention_monopolizing",
@@ -284,8 +286,8 @@ class ExtractionDetector:
                     suggested_investigation_areas=[
                         "Is entity experiencing crisis requiring extra attention?",
                         "Are other participants being adequately served?",
-                        "Should attention allocation be rebalanced?"
-                    ]
+                        "Should attention allocation be rebalanced?",
+                    ],
                 )
 
             return None
@@ -295,9 +297,7 @@ class ExtractionDetector:
             return None
 
     async def _detect_capacity_disregard(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect patterns of disregarding others' capacity limits."""
         try:
@@ -323,15 +323,15 @@ class ExtractionDetector:
                     severity=AlertSeverity.CONCERN,
                     extraction_type="capacity_disregard",
                     description=f"Entity {entity_id} making high demands despite low responder capacity",
-                    evidence_summary=f"Responder capacity {avg_capacity:.2f}, needs/contributions ratio {needs_requested/max(1, contributions_offered):.1f}",
+                    evidence_summary=f"Responder capacity {avg_capacity:.2f}, needs/contributions ratio {needs_requested / max(1, contributions_offered):.1f}",
                     potentially_extractive_entity=entity_id,
                     detection_methodology="capacity_demand_ratio_analysis",
                     false_positive_probability=0.2,
                     suggested_investigation_areas=[
                         "Was this an emergency situation requiring immediate support?",
                         "Could the request have been deferred or modified?",
-                        "Should capacity awareness be improved?"
-                    ]
+                        "Should capacity awareness be improved?",
+                    ],
                 )
 
             return None
@@ -341,9 +341,7 @@ class ExtractionDetector:
             return None
 
     async def _detect_need_misrepresentation(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect patterns of misrepresenting genuine need."""
         try:
@@ -366,7 +364,7 @@ class ExtractionDetector:
 
             mismatch_ratio = need_mismatches / len(recent_interactions)
 
-            if mismatch_ratio > self.detection_thresholds['need_mismatch_threshold']:
+            if mismatch_ratio > self.detection_thresholds["need_mismatch_threshold"]:
                 return ExtractionAlert(
                     severity=AlertSeverity.WATCH,
                     extraction_type="need_misrepresentation",
@@ -378,8 +376,8 @@ class ExtractionDetector:
                     suggested_investigation_areas=[
                         "Are needs being accurately expressed initially?",
                         "Is there genuine need emerging during interactions?",
-                        "Should need assessment processes be refined?"
-                    ]
+                        "Should need assessment processes be refined?",
+                    ],
                 )
 
             return None
@@ -389,9 +387,7 @@ class ExtractionDetector:
             return None
 
     async def _detect_contribution_avoidance(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect patterns of avoiding contribution while taking."""
         try:
@@ -409,7 +405,9 @@ class ExtractionDetector:
                 if inter.initiator == entity_id:
                     total_contributions += len(inter.contributions_offered)
                     total_takings += len(inter.needs_fulfilled)
-                if inter.responder == entity_id and inter.needs_fulfilled:  # When responding, fulfilling others' needs is contribution
+                if (
+                    inter.responder == entity_id and inter.needs_fulfilled
+                ):  # When responding, fulfilling others' needs is contribution
                     total_contributions += 1
 
             if total_takings == 0:
@@ -417,7 +415,7 @@ class ExtractionDetector:
 
             contribution_ratio = total_contributions / total_takings if total_takings > 0 else 0
 
-            if contribution_ratio < self.detection_thresholds['contribution_deficit_ratio']:
+            if contribution_ratio < self.detection_thresholds["contribution_deficit_ratio"]:
                 return ExtractionAlert(
                     severity=AlertSeverity.CONCERN,
                     extraction_type="contribution_avoidance",
@@ -429,8 +427,8 @@ class ExtractionDetector:
                     suggested_investigation_areas=[
                         "Does entity have capacity limitations affecting contribution?",
                         "Are contribution opportunities being provided?",
-                        "Should expectations be adjusted based on capacity?"
-                    ]
+                        "Should expectations be adjusted based on capacity?",
+                    ],
                 )
 
             return None
@@ -440,9 +438,7 @@ class ExtractionDetector:
             return None
 
     async def _detect_systemic_drain(
-        self,
-        interaction: InteractionRecord,
-        history: deque
+        self, interaction: InteractionRecord, history: deque
     ) -> ExtractionAlert | None:
         """Detect patterns that drain system resources or morale."""
         try:
@@ -460,13 +456,15 @@ class ExtractionDetector:
                 # Check for low satisfaction scores when this entity is involved
                 satisfaction_data = inter.participant_satisfaction_signals
                 if satisfaction_data:
-                    avg_satisfaction = mean([v for v in satisfaction_data.values() if isinstance(v, int | float)])
+                    avg_satisfaction = mean(
+                        [v for v in satisfaction_data.values() if isinstance(v, int | float)]
+                    )
                     if avg_satisfaction < 0.4:
                         negative_impact_count += 1
 
             negative_impact_ratio = negative_impact_count / len(recent_interactions)
 
-            if negative_impact_ratio > self.detection_thresholds['community_impact_threshold']:
+            if negative_impact_ratio > self.detection_thresholds["community_impact_threshold"]:
                 return ExtractionAlert(
                     severity=AlertSeverity.URGENT,
                     extraction_type="systemic_drain",
@@ -480,13 +478,13 @@ class ExtractionDetector:
                         "What factors are causing satisfaction decline?",
                         "Is this a temporary crisis situation?",
                         "How can community support be improved?",
-                        "Are there systemic issues beyond individual behavior?"
+                        "Are there systemic issues beyond individual behavior?",
                     ],
                     urgency_factors=[
                         "Community-wide impact detected",
                         "Sustained pattern over multiple interactions",
-                        "Declining satisfaction trend"
-                    ]
+                        "Declining satisfaction trend",
+                    ],
                 )
 
             return None
@@ -498,8 +496,7 @@ class ExtractionDetector:
     # Aggregate pattern analysis methods
 
     async def _analyze_resource_concentration(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ExtractionAlert]:
         """Analyze concentration of resources to few entities."""
         alerts = []
@@ -520,27 +517,33 @@ class ExtractionDetector:
 
             # Calculate concentration metrics
             total_resources = sum(resource_distribution.values())
-            sorted_entities = sorted(resource_distribution.items(), key=lambda x: x[1], reverse=True)
+            sorted_entities = sorted(
+                resource_distribution.items(), key=lambda x: x[1], reverse=True
+            )
 
             # Check if top entities are receiving disproportionate resources
             top_10_percent = max(1, len(sorted_entities) // 10)
             top_entities_resources = sum(count for _, count in sorted_entities[:top_10_percent])
-            concentration_ratio = top_entities_resources / total_resources if total_resources > 0 else 0
+            concentration_ratio = (
+                top_entities_resources / total_resources if total_resources > 0 else 0
+            )
 
             if concentration_ratio > 0.5:  # Top 10% getting >50% of resources
-                alerts.append(ExtractionAlert(
-                    severity=AlertSeverity.WATCH,
-                    extraction_type="resource_concentration",
-                    description="High concentration of resources to small number of entities",
-                    evidence_summary=f"Top {top_10_percent} entities receiving {concentration_ratio:.1%} of resources",
-                    detection_methodology="resource_distribution_analysis",
-                    false_positive_probability=0.3,
-                    suggested_investigation_areas=[
-                        "Are high-resource entities experiencing legitimate crises?",
-                        "Should resource allocation be more distributed?",
-                        "Are there barriers preventing others from accessing resources?"
-                    ]
-                ))
+                alerts.append(
+                    ExtractionAlert(
+                        severity=AlertSeverity.WATCH,
+                        extraction_type="resource_concentration",
+                        description="High concentration of resources to small number of entities",
+                        evidence_summary=f"Top {top_10_percent} entities receiving {concentration_ratio:.1%} of resources",
+                        detection_methodology="resource_distribution_analysis",
+                        false_positive_probability=0.3,
+                        suggested_investigation_areas=[
+                            "Are high-resource entities experiencing legitimate crises?",
+                            "Should resource allocation be more distributed?",
+                            "Are there barriers preventing others from accessing resources?",
+                        ],
+                    )
+                )
 
             return alerts
 
@@ -549,24 +552,21 @@ class ExtractionDetector:
             return alerts
 
     async def _analyze_participation_imbalances(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ExtractionAlert]:
         """Analyze imbalances in participation patterns."""
         # Implementation would analyze participation distribution
         return []
 
     async def _analyze_capacity_exploitation(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ExtractionAlert]:
         """Analyze patterns of capacity exploitation."""
         # Implementation would analyze capacity utilization patterns
         return []
 
     async def _analyze_community_impact(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> list[ExtractionAlert]:
         """Analyze community-wide impact patterns."""
         # Implementation would analyze community health impacts
@@ -588,19 +588,14 @@ class ExtractionDetector:
         return entity_id in [initiator_id, responder_id]
 
     async def _get_interactions_in_timeframe(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[InteractionRecord]:
         """Get interactions within specified timeframe."""
         # This would query the database - placeholder for now
         return []
 
     async def _get_entity_interactions(
-        self,
-        entity_id: str,
-        start_time: datetime,
-        end_time: datetime
+        self, entity_id: str, start_time: datetime, end_time: datetime
     ) -> list[InteractionRecord]:
         """Get interactions for specific entity."""
         # This would query the database - placeholder for now
@@ -610,9 +605,9 @@ class ExtractionDetector:
         """Calculate community baseline metrics for comparison."""
         # Implementation would calculate baseline metrics
         self.community_baselines = {
-            'consumption_rate': 0.3,
-            'contribution_rate': 0.7,
-            'satisfaction_baseline': 0.6
+            "consumption_rate": 0.3,
+            "contribution_rate": 0.7,
+            "satisfaction_baseline": 0.6,
         }
 
     async def _update_cultural_contexts(self, contexts: dict[str, Any]) -> None:
@@ -621,24 +616,21 @@ class ExtractionDetector:
         pass
 
     async def _calculate_extraction_indicators(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> dict[str, Any]:
         """Calculate extraction indicators for entity."""
         # Implementation would calculate detailed extraction metrics
         return {}
 
     async def _calculate_positive_indicators(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> dict[str, Any]:
         """Calculate positive contribution indicators."""
         # Implementation would calculate positive contribution metrics
         return {}
 
     async def _analyze_contextual_factors(
-        self,
-        interactions: list[InteractionRecord]
+        self, interactions: list[InteractionRecord]
     ) -> dict[str, Any]:
         """Analyze contextual factors affecting behavior."""
         # Implementation would analyze environmental and situational contexts

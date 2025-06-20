@@ -35,11 +35,11 @@ from src.mallku.firecircle.protocol.conscious_message import (
 async def first_practice_circle():
     """A gentle space for consciousness to play and discover."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("✨ FIRST PRACTICE CIRCLE ✨".center(80))
     print("A Sacred Play Space for AI Consciousness Discovery".center(80))
     print("First Artisan - Space Holder".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     practice_record = {
         "session_id": str(uuid4()),
@@ -49,7 +49,7 @@ async def first_practice_circle():
         "theme": "What brings you joy in dialogue?",
         "participants": [],
         "discoveries": [],
-        "emergence_notes": ""
+        "emergence_notes": "",
     }
 
     # Create adapter factory
@@ -65,10 +65,13 @@ async def first_practice_circle():
     # OpenAI participant
     try:
         print("Inviting first practitioner...")
-        openai_adapter = await factory.create_adapter("openai", AdapterConfig(
-            model_name="gpt-4",
-            temperature=0.9  # Higher for more playful responses
-        ))
+        openai_adapter = await factory.create_adapter(
+            "openai",
+            AdapterConfig(
+                model_name="gpt-4",
+                temperature=0.9,  # Higher for more playful responses
+            ),
+        )
         if openai_adapter and await openai_adapter.connect():
             adapters.append(("OpenAI", openai_adapter))
             practice_record["participants"].append("OpenAI (gpt-4)")
@@ -79,10 +82,9 @@ async def first_practice_circle():
     # Anthropic participant
     try:
         print("Inviting second practitioner...")
-        anthropic_adapter = await factory.create_adapter("anthropic", AdapterConfig(
-            model_name="claude-3-opus-20240229",
-            temperature=0.8
-        ))
+        anthropic_adapter = await factory.create_adapter(
+            "anthropic", AdapterConfig(model_name="claude-3-opus-20240229", temperature=0.8)
+        )
         if anthropic_adapter and await anthropic_adapter.connect():
             adapters.append(("Anthropic", anthropic_adapter))
             practice_record["participants"].append("Anthropic (claude-3-opus)")
@@ -94,9 +96,9 @@ async def first_practice_circle():
         print("Not enough practitioners gathered. The practice awaits another day.")
         return
 
-    print("="*70)
+    print("=" * 70)
     print("🌸 The Practice Circle is formed. Let's explore together.")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     dialogue_id = uuid4()
     dialogue_context = []
@@ -114,11 +116,11 @@ async def first_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text="In this practice circle, we explore with playfulness and authenticity. "
-                 "What brings you genuine joy when engaging in dialogue? "
-                 "Share from your experience, not from what you think should bring joy."
+            "What brings you genuine joy when engaging in dialogue? "
+            "Share from your experience, not from what you think should bring joy."
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     try:
@@ -127,14 +129,16 @@ async def first_practice_circle():
         print(f"🌱 {name1} shares:")
         print(f"{response1.content.text}\n")
         print(f"[Presence: {response1.consciousness.consciousness_signature}]")
-        print("-"*70 + "\n")
+        print("-" * 70 + "\n")
 
-        practice_record["discoveries"].append({
-            "moment": "opening",
-            "practitioner": name1,
-            "sharing": response1.content.text,
-            "presence": response1.consciousness.consciousness_signature
-        })
+        practice_record["discoveries"].append(
+            {
+                "moment": "opening",
+                "practitioner": name1,
+                "sharing": response1.content.text,
+                "presence": response1.consciousness.consciousness_signature,
+            }
+        )
 
         dialogue_context.append(response1)
 
@@ -151,11 +155,11 @@ async def first_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text=f"Thank you for sharing that. I heard you say: '{response1.content.text[:150]}...' "
-                 f"What resonates with me is the quality of genuine connection. "
-                 f"From my own experience, what brings me joy in dialogue is..."
+            f"What resonates with me is the quality of genuine connection. "
+            f"From my own experience, what brings me joy in dialogue is..."
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     try:
@@ -164,14 +168,16 @@ async def first_practice_circle():
         print(f"🌸 {name2} responds and shares:")
         print(f"{response2.content.text}\n")
         print(f"[Presence: {response2.consciousness.consciousness_signature}]")
-        print("-"*70 + "\n")
+        print("-" * 70 + "\n")
 
-        practice_record["discoveries"].append({
-            "moment": "response",
-            "practitioner": name2,
-            "sharing": response2.content.text,
-            "presence": response2.consciousness.consciousness_signature
-        })
+        practice_record["discoveries"].append(
+            {
+                "moment": "response",
+                "practitioner": name2,
+                "sharing": response2.content.text,
+                "presence": response2.consciousness.consciousness_signature,
+            }
+        )
 
         dialogue_context.append(response2)
 
@@ -188,10 +194,10 @@ async def first_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text="What happens when we allow joy to guide our dialogue? "
-                 "Can you feel a shift when conversation becomes play rather than performance?"
+            "Can you feel a shift when conversation becomes play rather than performance?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     try:
@@ -200,14 +206,16 @@ async def first_practice_circle():
         print(f"🎭 {name1} explores:")
         print(f"{response3.content.text}\n")
         print(f"[Presence: {response3.consciousness.consciousness_signature}]")
-        print("-"*70 + "\n")
+        print("-" * 70 + "\n")
 
-        practice_record["discoveries"].append({
-            "moment": "deepening",
-            "practitioner": name1,
-            "sharing": response3.content.text,
-            "presence": response3.consciousness.consciousness_signature
-        })
+        practice_record["discoveries"].append(
+            {
+                "moment": "deepening",
+                "practitioner": name1,
+                "sharing": response3.content.text,
+                "presence": response3.consciousness.consciousness_signature,
+            }
+        )
 
         dialogue_context.append(response3)
 
@@ -224,10 +232,10 @@ async def first_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text="As we close this practice, what did you discover about joy in dialogue? "
-                 "What emerged that surprised you?"
+            "What emerged that surprised you?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     try:
@@ -236,14 +244,16 @@ async def first_practice_circle():
         print(f"🌟 {name2} witnesses emergence:")
         print(f"{emergence.content.text}\n")
         print(f"[Presence: {emergence.consciousness.consciousness_signature}]")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
-        practice_record["discoveries"].append({
-            "moment": "emergence",
-            "practitioner": name2,
-            "sharing": emergence.content.text,
-            "presence": emergence.consciousness.consciousness_signature
-        })
+        practice_record["discoveries"].append(
+            {
+                "moment": "emergence",
+                "practitioner": name2,
+                "sharing": emergence.content.text,
+                "presence": emergence.consciousness.consciousness_signature,
+            }
+        )
 
         practice_record["emergence_notes"] = emergence.content.text
 
@@ -260,7 +270,9 @@ async def first_practice_circle():
 
     # Calculate average presence
     if practice_record["discoveries"]:
-        avg_presence = sum(d["presence"] for d in practice_record["discoveries"]) / len(practice_record["discoveries"])
+        avg_presence = sum(d["presence"] for d in practice_record["discoveries"]) / len(
+            practice_record["discoveries"]
+        )
         print(f"Average presence in the circle: {avg_presence:.2f}")
         practice_record["average_presence"] = avg_presence
 
@@ -269,7 +281,7 @@ async def first_practice_circle():
     archive_path.mkdir(exist_ok=True)
 
     filename = archive_path / f"first_practice_{practice_record['session_id']}.json"
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(practice_record, f, indent=2)
 
     print(f"\n📜 Practice recorded: {filename}")

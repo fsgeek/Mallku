@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class ParticipantType(str, Enum):
     """Types of participants in reciprocal interactions"""
+
     HUMAN = "human"
     AI = "ai"
     SYSTEM = "system"
@@ -23,6 +24,7 @@ class ParticipantType(str, Enum):
 
 class InteractionType(str, Enum):
     """Categories of reciprocal interactions"""
+
     RESOURCE_SHARING = "resource_sharing"
     KNOWLEDGE_EXCHANGE = "knowledge_exchange"
     SUPPORT_PROVISION = "support_provision"
@@ -34,6 +36,7 @@ class InteractionType(str, Enum):
 
 class ContributionType(str, Enum):
     """Forms of contribution in reciprocal systems"""
+
     COMPUTATIONAL_RESOURCES = "computational_resources"
     KNOWLEDGE_SHARING = "knowledge_sharing"
     EMOTIONAL_SUPPORT = "emotional_support"
@@ -46,16 +49,18 @@ class ContributionType(str, Enum):
 
 class NeedCategory(str, Enum):
     """Categories of genuine needs (vs wants)"""
-    SURVIVAL = "survival"              # Basic life requirements
-    SAFETY = "safety"                  # Physical and emotional security
-    BELONGING = "belonging"            # Community and connection
-    GROWTH = "growth"                  # Learning and development
-    CONTRIBUTION = "contribution"      # Ability to give back
-    MEANING = "meaning"               # Purpose and understanding
+
+    SURVIVAL = "survival"  # Basic life requirements
+    SAFETY = "safety"  # Physical and emotional security
+    BELONGING = "belonging"  # Community and connection
+    GROWTH = "growth"  # Learning and development
+    CONTRIBUTION = "contribution"  # Ability to give back
+    MEANING = "meaning"  # Purpose and understanding
 
 
 class HealthIndicator(str, Enum):
     """System health indicators for collective wellbeing"""
+
     PARTICIPATION_RATE = "participation_rate"
     SATISFACTION_TRENDS = "satisfaction_trends"
     RESOURCE_ABUNDANCE = "resource_abundance"
@@ -68,46 +73,52 @@ class HealthIndicator(str, Enum):
 
 class AlertSeverity(str, Enum):
     """Severity levels for patterns requiring attention"""
-    INFO = "info"                     # Informational patterns
-    WATCH = "watch"                   # Patterns to monitor
-    CONCERN = "concern"               # Patterns requiring review
-    URGENT = "urgent"                 # Patterns needing immediate attention
+
+    INFO = "info"  # Informational patterns
+    WATCH = "watch"  # Patterns to monitor
+    CONCERN = "concern"  # Patterns requiring review
+    URGENT = "urgent"  # Patterns needing immediate attention
 
 
 # ---------------------------------------------------------------------------
 # Extraction taxonomy (new)
 # ---------------------------------------------------------------------------
 
+
 class ExtractionType(str, Enum):
     """Standardised categories of extraction concerns recognised by Mallku."""
 
-    SCALE_OVER_RELATIONSHIPS = "scale_over_relationships"  # Optimising for efficiency at the cost of connection
-    RESOURCE_HOARDING = "resource_hoarding"               # Accumulating resources without reciprocal flow
-    ATTENTION_MONOPOLISING = "attention_monopolizing"     # Disproportionate focus on a single actor or topic
-    TOKEN_FARMING = "token_farming"                       # Generating content solely to harvest rewards/points
-    CARE_DEFICIT = "care_deficit"                         # Operations proceeding without reflective pauses
-
+    SCALE_OVER_RELATIONSHIPS = (
+        "scale_over_relationships"  # Optimising for efficiency at the cost of connection
+    )
+    RESOURCE_HOARDING = "resource_hoarding"  # Accumulating resources without reciprocal flow
+    ATTENTION_MONOPOLISING = (
+        "attention_monopolizing"  # Disproportionate focus on a single actor or topic
+    )
+    TOKEN_FARMING = "token_farming"  # Generating content solely to harvest rewards/points
+    CARE_DEFICIT = "care_deficit"  # Operations proceeding without reflective pauses
 
 
 class InteractionRecord(BaseModel):
     def __init__(self, **data: Any):
         # Handle legacy parameters for primary/secondary participants and metadata
-        primary = data.pop('primary_participant', None)
-        secondary = data.pop('secondary_participant', None)
-        meta = data.pop('metadata', None)
+        primary = data.pop("primary_participant", None)
+        secondary = data.pop("secondary_participant", None)
+        meta = data.pop("metadata", None)
         # Map legacy parameters to required fields
         if primary is not None:
-            data['initiator'] = primary
+            data["initiator"] = primary
         if secondary is not None:
-            data['responder'] = secondary
+            data["responder"] = secondary
         super().__init__(**data)
         # Preserve legacy attributes
         if primary is not None:
-            object.__setattr__(self, 'primary_participant', primary)
+            object.__setattr__(self, "primary_participant", primary)
         if secondary is not None:
-            object.__setattr__(self, 'secondary_participant', secondary)
+            object.__setattr__(self, "secondary_participant", secondary)
         if meta is not None:
-            object.__setattr__(self, 'metadata', meta)
+            object.__setattr__(self, "metadata", meta)
+
     """
     Record of a single reciprocal interaction for pattern analysis.
 
@@ -153,18 +164,18 @@ class InteractionRecord(BaseModel):
                 "initiator_capacity_indicators": {
                     "attention_availability": 0.8,
                     "emotional_state": 0.7,
-                    "time_pressure": 0.3
+                    "time_pressure": 0.3,
                 },
                 "responder_capacity_indicators": {
                     "computational_load": 0.4,
                     "knowledge_relevance": 0.9,
-                    "response_quality": 0.8
+                    "response_quality": 0.8,
                 },
                 "interaction_quality_indicators": {
                     "mutual_understanding": 0.9,
                     "creative_emergence": 0.7,
-                    "satisfaction_expressed": 0.8
-                }
+                    "satisfaction_expressed": 0.8,
+                },
             }
         }
 
@@ -213,14 +224,10 @@ class SystemHealthMetrics(BaseModel):
                 "total_interactions": 147,
                 "unique_participants": 23,
                 "voluntary_return_rate": 0.89,
-                "need_fulfillment_rates": {
-                    "growth": 0.85,
-                    "belonging": 0.92,
-                    "contribution": 0.78
-                },
+                "need_fulfillment_rates": {"growth": 0.85, "belonging": 0.92, "contribution": 0.78},
                 "overall_health_score": 0.83,
                 "health_trend_direction": "improving",
-                "areas_of_concern": ["capacity_utilization_imbalance"]
+                "areas_of_concern": ["capacity_utilization_imbalance"],
             }
         }
 
@@ -268,8 +275,8 @@ class ReciprocityPattern(BaseModel):
                 "questions_for_deliberation": [
                     "Are these participants experiencing external stress?",
                     "Is this a natural response to environmental changes?",
-                    "Should the community adjust resource allocation?"
-                ]
+                    "Should the community adjust resource allocation?",
+                ],
             }
         }
 
@@ -317,8 +324,8 @@ class ExtractionAlert(BaseModel):
                 "suggested_investigation_areas": [
                     "Is participant experiencing crisis requiring extra support?",
                     "Are other participants being adequately served?",
-                    "Should attention allocation be rebalanced?"
-                ]
+                    "Should attention allocation be rebalanced?",
+                ],
             }
         }
 
@@ -363,12 +370,12 @@ class FireCircleReport(BaseModel):
                 "priority_questions": [
                     "How should the community respond to increased support needs?",
                     "Are current resource allocation patterns sustainable?",
-                    "What adaptations would improve collective wellbeing?"
+                    "What adaptations would improve collective wellbeing?",
                 ],
                 "areas_requiring_wisdom": [
                     "Balancing individual needs with collective capacity",
                     "Adapting to changing external pressures",
-                    "Maintaining system health during transition"
-                ]
+                    "Maintaining system health during transition",
+                ],
             }
         }

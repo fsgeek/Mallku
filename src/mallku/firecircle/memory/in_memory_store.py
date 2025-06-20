@@ -27,9 +27,11 @@ class InMemoryMemoryStore(BaseMemoryStore):
 
     async def get_dialogue_history(self, dialogue_id: uuid.UUID) -> list[ConsciousMessage]:
         """Retrieves the full dialogue history for a given dialogue_id."""
-        return list(self._messages.get(dialogue_id, [])) # Return a copy
+        return list(self._messages.get(dialogue_id, []))  # Return a copy
 
-    async def save_ceremony_data(self, dialogue_id: uuid.UUID, data_key: str, data_value: Any) -> None:
+    async def save_ceremony_data(
+        self, dialogue_id: uuid.UUID, data_key: str, data_value: Any
+    ) -> None:
         """Saves a piece of ceremony-specific data to the in-memory store."""
         if dialogue_id not in self._ceremony_data:
             self._ceremony_data[dialogue_id] = {}

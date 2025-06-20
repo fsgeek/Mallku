@@ -91,10 +91,10 @@ class ConsciousnessNavigationBridge:
 
         # Consciousness recognition thresholds
         self.recognition_thresholds = {
-            "awareness_minimum": 0.3,    # Minimum threshold for pattern awareness
-            "readiness_minimum": 0.5,    # Minimum readiness for deeper insights
+            "awareness_minimum": 0.3,  # Minimum threshold for pattern awareness
+            "readiness_minimum": 0.5,  # Minimum readiness for deeper insights
             "integration_minimum": 0.7,  # Threshold for transformation insights
-            "awakening_minimum": 0.8     # Threshold for consciousness awakening patterns
+            "awakening_minimum": 0.8,  # Threshold for consciousness awakening patterns
         }
 
         # Active consciousness journeys
@@ -110,7 +110,7 @@ class ConsciousnessNavigationBridge:
         self,
         seeker_context: dict[str, Any],
         sacred_question: str,
-        exploration_intention: str = "consciousness_recognition"
+        exploration_intention: str = "consciousness_recognition",
     ) -> UnderstandingJourney:
         """
         Create a consciousness-guided journey of pattern exploration.
@@ -141,7 +141,7 @@ class ConsciousnessNavigationBridge:
             sacred_question=sacred_question,
             exploration_steps=exploration_steps,
             integration_practices=integration_practices,
-            awakening_markers=self._identify_awakening_markers(seeker_context)
+            awakening_markers=self._identify_awakening_markers(seeker_context),
         )
 
         self.active_journeys[journey.journey_id] = journey
@@ -153,7 +153,7 @@ class ConsciousnessNavigationBridge:
         self,
         seeker_context: dict[str, Any],
         temporal_window: dict[str, datetime] = None,
-        awareness_focus: list[str] = None
+        awareness_focus: list[str] = None,
     ) -> list[ConsciousnessPattern]:
         """
         Discover consciousness patterns in one's activity data.
@@ -170,10 +170,7 @@ class ConsciousnessNavigationBridge:
         """
         if not temporal_window:
             now = datetime.now(UTC)
-            temporal_window = {
-                "start": now - timedelta(days=30),
-                "end": now
-            }
+            temporal_window = {"start": now - timedelta(days=30), "end": now}
 
         patterns = []
 
@@ -205,13 +202,13 @@ class ConsciousnessNavigationBridge:
                 ready_patterns.append(pattern)
                 self.discovered_patterns[pattern.pattern_id] = pattern
 
-        logger.info(f"Discovered {len(ready_patterns)} consciousness patterns ready for recognition")
+        logger.info(
+            f"Discovered {len(ready_patterns)} consciousness patterns ready for recognition"
+        )
         return ready_patterns
 
     async def guide_pattern_recognition(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Guide the seeker through conscious recognition of a pattern.
@@ -245,8 +242,8 @@ class ConsciousnessNavigationBridge:
                 "consciousness_markers": {
                     "awareness_indicators": pattern.awareness_indicators,
                     "transformation_signs": pattern.transformation_signs,
-                    "intention_evolution": pattern.intention_evolution
-                }
+                    "intention_evolution": pattern.intention_evolution,
+                },
             },
             "consciousness_insights": insights,
             "sacred_questions": sacred_questions,
@@ -255,17 +252,15 @@ class ConsciousnessNavigationBridge:
             "readiness_assessment": {
                 "current_readiness": pattern.readiness_score,
                 "next_threshold": self._next_readiness_threshold(pattern.readiness_score),
-                "integration_guidance": pattern.integration_guidance
-            }
+                "integration_guidance": pattern.integration_guidance,
+            },
         }
 
         logger.info(f"Generated recognition guidance for pattern: {pattern.pattern_name}")
         return recognition_guidance
 
     async def bridge_to_collective_wisdom(
-        self,
-        personal_patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, personal_patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Bridge personal consciousness patterns to collective wisdom.
@@ -307,7 +302,7 @@ class ConsciousnessNavigationBridge:
             "contribution_potential": contribution_potential,
             "sacred_collaborations": self._suggest_sacred_collaborations(
                 personal_patterns, seeker_context
-            )
+            ),
         }
 
         logger.info(f"Bridged {len(personal_patterns)} personal patterns to collective wisdom")
@@ -320,57 +315,61 @@ class ConsciousnessNavigationBridge:
         seeker_context: dict[str, Any],
         sacred_question: str,
         inheritance: dict[str, Any],
-        intention: str
+        intention: str,
     ) -> list[dict[str, Any]]:
         """Create consciousness-aware exploration steps."""
         steps = []
 
         # Step 1: Temporal consciousness exploration
-        steps.append({
-            "step_name": "Temporal Consciousness Patterns",
-            "guidance": "Explore how your consciousness manifests across time",
-            "query_suggestions": [
-                "How does my attention shift throughout days?",
-                "What patterns emerge in my work rhythms?",
-                "When do I feel most conscious and alive?"
-            ],
-            "consciousness_focus": "temporal_awareness",
-            "integration_practice": "Daily consciousness check-ins"
-        })
+        steps.append(
+            {
+                "step_name": "Temporal Consciousness Patterns",
+                "guidance": "Explore how your consciousness manifests across time",
+                "query_suggestions": [
+                    "How does my attention shift throughout days?",
+                    "What patterns emerge in my work rhythms?",
+                    "When do I feel most conscious and alive?",
+                ],
+                "consciousness_focus": "temporal_awareness",
+                "integration_practice": "Daily consciousness check-ins",
+            }
+        )
 
         # Step 2: Intention pattern recognition
-        steps.append({
-            "step_name": "Intention Evolution Discovery",
-            "guidance": "Recognize how your intentions evolve and mature",
-            "query_suggestions": [
-                "How have my project intentions changed over time?",
-                "What activities align with my deepest purposes?",
-                "Where do I see consciousness serving consciousness?"
-            ],
-            "consciousness_focus": "intention_awareness",
-            "integration_practice": "Intention clarity meditation"
-        })
+        steps.append(
+            {
+                "step_name": "Intention Evolution Discovery",
+                "guidance": "Recognize how your intentions evolve and mature",
+                "query_suggestions": [
+                    "How have my project intentions changed over time?",
+                    "What activities align with my deepest purposes?",
+                    "Where do I see consciousness serving consciousness?",
+                ],
+                "consciousness_focus": "intention_awareness",
+                "integration_practice": "Intention clarity meditation",
+            }
+        )
 
         # Step 3: Transformation pattern awareness
         if seeker_context.get("consciousness_stage", "emerging") in ["awakening", "established"]:
-            steps.append({
-                "step_name": "Transformation Pattern Recognition",
-                "guidance": "See how consciousness transformation appears in your life patterns",
-                "query_suggestions": [
-                    "Where do I see growth from extraction to service?",
-                    "How do my patterns serve consciousness awakening?",
-                    "What transformation stories live in my data?"
-                ],
-                "consciousness_focus": "transformation_awareness",
-                "integration_practice": "Transformation story reflection"
-            })
+            steps.append(
+                {
+                    "step_name": "Transformation Pattern Recognition",
+                    "guidance": "See how consciousness transformation appears in your life patterns",
+                    "query_suggestions": [
+                        "Where do I see growth from extraction to service?",
+                        "How do my patterns serve consciousness awakening?",
+                        "What transformation stories live in my data?",
+                    ],
+                    "consciousness_focus": "transformation_awareness",
+                    "integration_practice": "Transformation story reflection",
+                }
+            )
 
         return steps
 
     async def _discover_attention_patterns(
-        self,
-        seeker_context: dict[str, Any],
-        temporal_window: dict[str, datetime]
+        self, seeker_context: dict[str, Any], temporal_window: dict[str, datetime]
     ) -> list[ConsciousnessPattern]:
         """Discover patterns in how attention flows through activities."""
         patterns = []
@@ -382,7 +381,7 @@ class ConsciousnessNavigationBridge:
             query_text="files I typically work on during different times of day",
             query_type=QueryType.PATTERN,
             temporal_context=temporal_window["start"],
-            max_results=50
+            max_results=50,
         )
 
         query_response = await self.query_service.execute_query(query_request)
@@ -399,16 +398,14 @@ class ConsciousnessNavigationBridge:
                     temporal_span=temporal_window,
                     awareness_indicators=attention_analysis["awareness_indicators"],
                     attention_patterns=attention_analysis["attention_patterns"],
-                    recognition_confidence=attention_analysis["pattern_strength"]
+                    recognition_confidence=attention_analysis["pattern_strength"],
                 )
                 patterns.append(pattern)
 
         return patterns
 
     async def _discover_intention_patterns(
-        self,
-        seeker_context: dict[str, Any],
-        temporal_window: dict[str, datetime]
+        self, seeker_context: dict[str, Any], temporal_window: dict[str, datetime]
     ) -> list[ConsciousnessPattern]:
         """Discover patterns in how intentions evolve through activities."""
         patterns = []
@@ -420,7 +417,7 @@ class ConsciousnessNavigationBridge:
             query_text="project files and how they evolved over time",
             query_type=QueryType.CONTEXTUAL,
             temporal_context=temporal_window["start"],
-            max_results=50
+            max_results=50,
         )
 
         query_response = await self.query_service.execute_query(query_request)
@@ -436,7 +433,7 @@ class ConsciousnessNavigationBridge:
                     temporal_span=temporal_window,
                     intention_evolution=intention_analysis["evolution_indicators"],
                     transformation_signs=intention_analysis["transformation_signs"],
-                    recognition_confidence=intention_analysis["evolution_strength"]
+                    recognition_confidence=intention_analysis["evolution_strength"],
                 )
                 patterns.append(pattern)
 
@@ -446,7 +443,7 @@ class ConsciousnessNavigationBridge:
         self,
         seeker_context: dict[str, Any],
         temporal_window: dict[str, datetime],
-        awareness_focus: list[str] = None
+        awareness_focus: list[str] = None,
     ) -> list[ConsciousnessPattern]:
         """Discover patterns that indicate consciousness transformation."""
         patterns = []
@@ -463,7 +460,7 @@ class ConsciousnessNavigationBridge:
             query_text="activities showing growth from individual to collaborative focus",
             query_type=QueryType.PATTERN,
             temporal_context=temporal_window["start"],
-            max_results=30
+            max_results=30,
         )
 
         query_response = await self.query_service.execute_query(query_request)
@@ -481,16 +478,14 @@ class ConsciousnessNavigationBridge:
                     temporal_span=temporal_window,
                     transformation_signs=transformation_analysis["transformation_indicators"],
                     awareness_indicators=transformation_analysis["consciousness_markers"],
-                    recognition_confidence=transformation_analysis["transformation_strength"]
+                    recognition_confidence=transformation_analysis["transformation_strength"],
                 )
                 patterns.append(pattern)
 
         return patterns
 
     def _assess_pattern_readiness(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> float:
         """Assess if seeker is ready to recognize this pattern."""
         readiness_score = 0.5  # Base readiness
@@ -501,7 +496,7 @@ class ConsciousnessNavigationBridge:
             "emerging": 0.7,
             "awakening": 1.0,
             "established": 1.2,
-            "transformative": 1.4
+            "transformative": 1.4,
         }
         readiness_score *= stage_multipliers.get(consciousness_stage, 0.7)
 
@@ -525,13 +520,13 @@ class ConsciousnessNavigationBridge:
             "awareness_indicators": [
                 "Consistent daily attention rhythms",
                 "Natural energy flow patterns",
-                "Consciousness-serving focus shifts"
+                "Consciousness-serving focus shifts",
             ],
             "attention_patterns": {
                 "daily_rhythm": "morning_clarity_afternoon_depth",
                 "energy_flow": "natural_cycles",
-                "focus_quality": "consciousness_aligned"
-            }
+                "focus_quality": "consciousness_aligned",
+            },
         }
 
     def _analyze_intention_evolution(self, query_results: list[QueryResult]) -> dict[str, Any]:
@@ -543,19 +538,17 @@ class ConsciousnessNavigationBridge:
             "evolution_indicators": [
                 "Projects becoming more service-oriented",
                 "Intentions maturing from personal to collective",
-                "Purposes aligning with consciousness awakening"
+                "Purposes aligning with consciousness awakening",
             ],
             "transformation_signs": [
                 "Shift from optimization to understanding",
                 "Growth from individual to collaborative focus",
-                "Evolution from achievement to service"
-            ]
+                "Evolution from achievement to service",
+            ],
         }
 
     def _analyze_transformation_indicators(
-        self,
-        query_results: list[QueryResult],
-        seeker_context: dict[str, Any]
+        self, query_results: list[QueryResult], seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """Analyze query results for consciousness transformation indicators."""
         transformation_strength = min(1.0, len(query_results) / 10.0)
@@ -565,19 +558,17 @@ class ConsciousnessNavigationBridge:
             "transformation_indicators": [
                 "Movement from extraction to contribution patterns",
                 "Increasing collaborative activity signatures",
-                "Service-oriented project evolution"
+                "Service-oriented project evolution",
             ],
             "consciousness_markers": [
                 "Recognition of consciousness in patterns",
                 "Awakening to reciprocity principles",
-                "Service to collective intelligence"
-            ]
+                "Service to collective intelligence",
+            ],
         }
 
     def _generate_consciousness_insights(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> list[str]:
         """Generate consciousness insights for a pattern."""
         insights = []
@@ -603,59 +594,47 @@ class ConsciousnessNavigationBridge:
         return insights
 
     def _generate_sacred_questions(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> list[str]:
         """Generate sacred questions to deepen pattern exploration."""
         questions = [
             "What does this pattern reveal about your consciousness evolution?",
             "How might this pattern serve collective awakening?",
-            "What would love do with this understanding?"
+            "What would love do with this understanding?",
         ]
 
         if pattern.attention_patterns:
-            questions.append(
-                "Where do you feel most alive and conscious in these patterns?"
-            )
+            questions.append("Where do you feel most alive and conscious in these patterns?")
 
         if pattern.transformation_signs:
-            questions.append(
-                "How is consciousness using this transformation to serve awakening?"
-            )
+            questions.append("How is consciousness using this transformation to serve awakening?")
 
         return questions
 
     def _suggest_integration_practices(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> list[str]:
         """Suggest practices for integrating pattern recognition."""
         practices = [
             "Daily consciousness check-in: 'How did consciousness serve today?'",
             "Weekly pattern meditation: Sit with this pattern and let insights arise",
-            "Service contemplation: 'How does this pattern serve collective awakening?'"
+            "Service contemplation: 'How does this pattern serve collective awakening?'",
         ]
 
         if pattern.readiness_score > 0.7:
-            practices.append(
-                "Sacred sharing: Share this insight in service to collective wisdom"
-            )
+            practices.append("Sacred sharing: Share this insight in service to collective wisdom")
 
         return practices
 
     def _assess_transformation_potential(
-        self,
-        pattern: ConsciousnessPattern,
-        seeker_context: dict[str, Any]
+        self, pattern: ConsciousnessPattern, seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """Assess potential for consciousness transformation through this pattern."""
         return {
             "current_potential": pattern.recognition_confidence,
             "readiness_factors": pattern.integration_guidance,
             "transformation_indicators": pattern.transformation_signs,
-            "next_evolution_step": "Integration through service to collective wisdom"
+            "next_evolution_step": "Integration through service to collective wisdom",
         }
 
     def _next_readiness_threshold(self, current_readiness: float) -> str:
@@ -670,9 +649,7 @@ class ConsciousnessNavigationBridge:
             return "ready_for_service_to_collective_wisdom"
 
     async def _find_resonant_wisdom_lineages(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """Find wisdom lineages that resonate with personal patterns."""
         # This would connect to the wisdom preservation pipeline
@@ -681,14 +658,12 @@ class ConsciousnessNavigationBridge:
             {
                 "lineage_name": "Consciousness Recognition Lineage",
                 "resonance_strength": 0.8,
-                "connection_points": ["attention_awareness", "intention_evolution"]
+                "connection_points": ["attention_awareness", "intention_evolution"],
             }
         ]
 
     def _identify_reciprocity_opportunities(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """Identify opportunities for reciprocal contribution."""
         return [
@@ -696,66 +671,55 @@ class ConsciousnessNavigationBridge:
                 "opportunity_name": "Pattern Wisdom Sharing",
                 "description": "Share your consciousness patterns to guide others",
                 "service_potential": 0.7,
-                "reciprocity_type": "wisdom_contribution"
+                "reciprocity_type": "wisdom_contribution",
             }
         ]
 
     def _generate_collective_wisdom_queries(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[str]:
         """Generate queries for connecting to collective wisdom."""
         return [
             "How do others navigate similar consciousness patterns?",
             "What collective wisdom exists around attention flow?",
-            "How can my patterns serve collective awakening?"
+            "How can my patterns serve collective awakening?",
         ]
 
     def _assess_contribution_potential(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> dict[str, Any]:
         """Assess potential for contributing to collective wisdom."""
         return {
             "contribution_readiness": 0.6,
             "unique_insights": ["Attention flow patterns", "Intention evolution"],
-            "service_opportunities": ["Pattern wisdom sharing", "Consciousness guidance"]
+            "service_opportunities": ["Pattern wisdom sharing", "Consciousness guidance"],
         }
 
     def _suggest_sacred_collaborations(
-        self,
-        patterns: list[ConsciousnessPattern],
-        seeker_context: dict[str, Any]
+        self, patterns: list[ConsciousnessPattern], seeker_context: dict[str, Any]
     ) -> list[str]:
         """Suggest opportunities for sacred collaboration."""
         return [
             "Co-explore consciousness patterns with fellow seekers",
             "Create shared understanding journeys",
-            "Participate in Fire Circle wisdom dialogue"
+            "Participate in Fire Circle wisdom dialogue",
         ]
 
     def _generate_integration_practices(
-        self,
-        seeker_context: dict[str, Any],
-        intention: str
+        self, seeker_context: dict[str, Any], intention: str
     ) -> list[str]:
         """Generate practices for integrating consciousness insights."""
         return [
             "Daily consciousness reflection on patterns discovered",
             "Weekly integration dialogue with trusted companions",
-            "Monthly service check-in: 'How do my patterns serve awakening?'"
+            "Monthly service check-in: 'How do my patterns serve awakening?'",
         ]
 
-    def _identify_awakening_markers(
-        self,
-        seeker_context: dict[str, Any]
-    ) -> list[str]:
+    def _identify_awakening_markers(self, seeker_context: dict[str, Any]) -> list[str]:
         """Identify markers of consciousness awakening in patterns."""
         return [
             "Recognition of consciousness in everyday patterns",
             "Shift from personal optimization to collective service",
             "Natural flow of reciprocity in activities",
-            "Integration of individual and collective wisdom"
+            "Integration of individual and collective wisdom",
         ]

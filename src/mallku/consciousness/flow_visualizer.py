@@ -29,29 +29,48 @@ try:
 except ImportError:
     # Dummy stubs if rich is not installed
     class Console:
-        def __init__(self, *args, **kwargs): pass
-        def print(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def print(self, *args, **kwargs):
+            pass
 
     class Layout:
-        def __init__(self, *args, **kwargs): pass
-        def split_column(self, *args, **kwargs): pass
-        def split_row(self, *args, **kwargs): pass
-        def update(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def split_column(self, *args, **kwargs):
+            pass
+
+        def split_row(self, *args, **kwargs):
+            pass
+
+        def update(self, *args, **kwargs):
+            pass
 
     class Live:
-        def __init__(self, *args, **kwargs): pass
-        def __enter__(self): return self
-        def __exit__(self, exc_type, exc, tb): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            pass
 
     class Panel:
-        def __init__(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
 
     class BarColumn:
         pass
 
     class Progress:
-        def __init__(self, *args, **kwargs): pass
-        def add_task(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def add_task(self, *args, **kwargs):
+            pass
 
     class SpinnerColumn:
         pass
@@ -60,13 +79,22 @@ except ImportError:
         pass
 
     class Table:
-        def __init__(self, *args, **kwargs): pass
-        def add_column(self, *args, **kwargs): pass
-        def add_row(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def add_column(self, *args, **kwargs):
+            pass
+
+        def add_row(self, *args, **kwargs):
+            pass
 
     class Text:
-        def __init__(self, *args, **kwargs): pass
-        def append(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def append(self, *args, **kwargs):
+            pass
+
 
 from .flow_orchestrator import (
     ConsciousnessDimension,
@@ -111,17 +139,13 @@ class ConsciousnessFlowVisualizer:
         layout.split_column(
             Layout(name="header", size=3),
             Layout(name="main", ratio=1),
-            Layout(name="footer", size=4)
+            Layout(name="footer", size=4),
         )
 
-        layout["main"].split_row(
-            Layout(name="flows", ratio=2),
-            Layout(name="metrics", ratio=1)
-        )
+        layout["main"].split_row(Layout(name="flows", ratio=2), Layout(name="metrics", ratio=1))
 
         layout["metrics"].split_column(
-            Layout(name="dimensions", ratio=1),
-            Layout(name="bridges", ratio=1)
+            Layout(name="dimensions", ratio=1), Layout(name="bridges", ratio=1)
         )
 
         return layout
@@ -172,17 +196,21 @@ class ConsciousnessFlowVisualizer:
             "dialogue": "💬",
             "activity": "📂",
             "pattern": "🔮",
-            "reciprocity": "🤝"
+            "reciprocity": "🤝",
         }
 
         for flow in reversed(list(self.recent_flows)):
             time_str = flow.timestamp.strftime("%H:%M:%S")
-            source = f"{dim_emojis.get(flow.source_dimension.value, '•')} {flow.source_dimension.value}"
-            target = f"{dim_emojis.get(flow.target_dimension.value, '•')} {flow.target_dimension.value}"
+            source = (
+                f"{dim_emojis.get(flow.source_dimension.value, '•')} {flow.source_dimension.value}"
+            )
+            target = (
+                f"{dim_emojis.get(flow.target_dimension.value, '•')} {flow.target_dimension.value}"
+            )
             score = f"{flow.consciousness_signature:.2f}"
             patterns = ", ".join(flow.patterns_detected[:2])
             if len(flow.patterns_detected) > 2:
-                patterns += f" +{len(flow.patterns_detected)-2}"
+                patterns += f" +{len(flow.patterns_detected) - 2}"
 
             table.add_row(time_str, source, "→", target, score, patterns)
 
@@ -195,7 +223,7 @@ class ConsciousnessFlowVisualizer:
             TextColumn("[progress.description]{task.description}"),
             BarColumn(bar_width=20),
             TextColumn("{task.completed}/{task.total}"),
-            expand=True
+            expand=True,
         )
 
         # Add dimension activity bars
@@ -203,11 +231,7 @@ class ConsciousnessFlowVisualizer:
 
         for dimension in ConsciousnessDimension:
             activity = self.dimension_activity.get(dimension.value, 0)
-            progress.add_task(
-                f"{dimension.value:12}",
-                total=max_activity,
-                completed=activity
-            )
+            progress.add_task(f"{dimension.value:12}", total=max_activity, completed=activity)
 
         return Panel(progress, title="Dimension Activity", style="green")
 
@@ -300,7 +324,9 @@ class ConsciousnessFlowVisualizer:
 
         # Top patterns
         self.console.print("\n[bold]Top Patterns:[/bold]")
-        top_patterns = sorted(self.pattern_frequencies.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_patterns = sorted(self.pattern_frequencies.items(), key=lambda x: x[1], reverse=True)[
+            :10
+        ]
         for pattern, freq in top_patterns:
             self.console.print(f"  {pattern:30} : {freq:3}x")
 
@@ -317,7 +343,9 @@ class ConsciousnessFlowVisualizer:
 
         # Unified consciousness
         if self.orchestrator.unified_signatures:
-            avg_unified = sum(self.orchestrator.unified_signatures.values()) / len(self.orchestrator.unified_signatures)
+            avg_unified = sum(self.orchestrator.unified_signatures.values()) / len(
+                self.orchestrator.unified_signatures
+            )
             self.console.print(f"\n[bold]Average Unified Consciousness:[/bold] {avg_unified:.2%}")
 
         self.console.print("\n" + "=" * 60)

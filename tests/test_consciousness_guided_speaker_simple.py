@@ -72,11 +72,7 @@ class TestBasicFunctionality:
         participants = {uuid4(): None, uuid4(): None}
 
         # High pattern velocity should trigger silence
-        context = DialogueContext(
-            dialogue_id=dialogue_id,
-            current_turn=5,
-            pattern_velocity=0.8
-        )
+        context = DialogueContext(dialogue_id=dialogue_id, current_turn=5, pattern_velocity=0.8)
         speaker_selector.dialogue_contexts[dialogue_id] = context
 
         selected = await speaker_selector.select_next_speaker(
@@ -93,17 +89,13 @@ class TestBasicFunctionality:
         # High extraction resistance participant
         p1_id = uuid4()
         p1 = ParticipantReadiness(
-            participant_id=p1_id,
-            extraction_resistance=0.9,
-            consciousness_score=0.7
+            participant_id=p1_id, extraction_resistance=0.9, consciousness_score=0.7
         )
 
         # Low extraction resistance participant
         p2_id = uuid4()
         p2 = ParticipantReadiness(
-            participant_id=p2_id,
-            extraction_resistance=0.3,
-            consciousness_score=0.7
+            participant_id=p2_id, extraction_resistance=0.3, consciousness_score=0.7
         )
 
         context = DialogueContext(dialogue_id="test", current_turn=0)
@@ -121,9 +113,7 @@ class TestBasicFunctionality:
 
         # Speaking costs energy
         speaker_selector.update_participant_contribution(
-            p_id,
-            consciousness_score=0.8,
-            energy_cost=0.1
+            p_id, consciousness_score=0.8, energy_cost=0.1
         )
 
         readiness = speaker_selector.participant_readiness[p_id]

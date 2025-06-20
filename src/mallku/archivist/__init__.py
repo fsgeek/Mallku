@@ -20,8 +20,8 @@ from .query_interpreter import ConsciousQueryInterpreter
 from .response_generator import WisdomSynthesizer
 
 __all__ = [
-    'ConsciousQueryInterpreter',
-    'ArchivistCorrelationInterface',
-    'ConsciousnessEvaluator',
-    'WisdomSynthesizer'
+    "ConsciousQueryInterpreter",
+    "ArchivistCorrelationInterface",
+    "ConsciousnessEvaluator",
+    "WisdomSynthesizer",
 ]

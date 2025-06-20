@@ -103,19 +103,19 @@ class TestGoogleAIAdapter:
         with (
             patch("google.generativeai.configure") as mock_configure,
             patch("google.generativeai.list_models") as mock_list,
-            patch("google.generativeai.GenerativeModel")
+            patch("google.generativeai.GenerativeModel"),
         ):
-                    mock_list.return_value = [
-                        MagicMock(name="models/gemini-1.5-pro"),
-                        MagicMock(name="models/gemini-1.5-flash"),
-                    ]
+            mock_list.return_value = [
+                MagicMock(name="models/gemini-1.5-pro"),
+                MagicMock(name="models/gemini-1.5-flash"),
+            ]
 
-                    connected = await adapter.connect()
+            connected = await adapter.connect()
 
-                    assert connected is True
-                    assert adapter.is_connected is True
-                    mock_configure.assert_called_once_with(api_key="test-api-key")
-                    mock_event_bus.emit.assert_called_once()  # Multimodal awareness event
+            assert connected is True
+            assert adapter.is_connected is True
+            mock_configure.assert_called_once_with(api_key="test-api-key")
+            mock_event_bus.emit.assert_called_once()  # Multimodal awareness event
 
     @pytest.mark.asyncio
     async def test_connect_with_auto_inject(self, mock_event_bus):
@@ -127,7 +127,7 @@ class TestGoogleAIAdapter:
             patch("mallku.core.secrets.get_secret") as mock_get_secret,
             patch("google.generativeai.configure") as mock_configure,
             patch("google.generativeai.list_models") as mock_list,
-            patch("google.generativeai.GenerativeModel")
+            patch("google.generativeai.GenerativeModel"),
         ):
             mock_get_secret.return_value = "secret-api-key"
             mock_list.return_value = []
@@ -413,9 +413,15 @@ class TestGoogleAIAdapter:
 
         adapter = GoogleAIAdapter(config=config)
 
-        assert adapter.config.safety_settings[HarmCategory.HARM_CATEGORY_HATE_SPEECH] == HarmBlockThreshold.BLOCK_NONE
+        assert (
+            adapter.config.safety_settings[HarmCategory.HARM_CATEGORY_HATE_SPEECH]
+            == HarmBlockThreshold.BLOCK_NONE
+        )
         # Other categories should have default values
-        assert adapter.config.safety_settings[HarmCategory.HARM_CATEGORY_HARASSMENT] == HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+        assert (
+            adapter.config.safety_settings[HarmCategory.HARM_CATEGORY_HARASSMENT]
+            == HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+        )
 
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ from mallku.streams.filesystem.file_event_models import (
 
 # ruff: qa: E402
 
+
 def debug_filter_in_integration_context():
     """Debug the exact filtering that happens in integration service."""
     print("=== DEBUGGING INTEGRATION FILTER ===")
@@ -33,10 +34,7 @@ def debug_filter_in_integration_context():
     test_file.write_text("Debug content")
 
     # Create FileEvent (simulating what happens in file connector)
-    file_event = FileEvent.from_file_path(
-        file_path=test_file,
-        operation=FileOperation.CREATED
-    )
+    file_event = FileEvent.from_file_path(file_path=test_file, operation=FileOperation.CREATED)
 
     print("\nFileEvent created:")
     print(f"  File path: {file_event.file_path}")
@@ -46,10 +44,7 @@ def debug_filter_in_integration_context():
     # Create filter exactly like integration service does
     config_file_filter_config = {"test_mode": True}
 
-    file_filter = FileEventFilter(
-        watch_directories=[test_dir],
-        **config_file_filter_config
-    )
+    file_filter = FileEventFilter(watch_directories=[test_dir], **config_file_filter_config)
 
     print("\nFileEventFilter created:")
     print(f"  Test mode: {file_filter.test_mode}")
@@ -69,10 +64,15 @@ def debug_filter_in_integration_context():
     if file_filter.test_mode:
         # Directory check
         if file_filter.watch_directories:
-            dir_match = any(file_event.directory_path.is_relative_to(watch_dir) for watch_dir in file_filter.watch_directories)
+            dir_match = any(
+                file_event.directory_path.is_relative_to(watch_dir)
+                for watch_dir in file_filter.watch_directories
+            )
             print(f"  2. Directory match: {dir_match}")
             if not dir_match:
-                print(f"     FAILED: {file_event.directory_path} not relative to {file_filter.watch_directories}")
+                print(
+                    f"     FAILED: {file_event.directory_path} not relative to {file_filter.watch_directories}"
+                )
 
         # Ignore directories check in test mode
         for ignore_dir in file_filter.ignore_directories:
@@ -82,15 +82,20 @@ def debug_filter_in_integration_context():
 
         # Operation check
         if file_event.operation not in file_filter.include_operations:
-            print(f"     FAILED: Operation {file_event.operation} not in {file_filter.include_operations}")
+            print(
+                f"     FAILED: Operation {file_event.operation} not in {file_filter.include_operations}"
+            )
             should_include = False
         else:
-            print(f"  3. Operation check passed: {file_event.operation} in {file_filter.include_operations}")
+            print(
+                f"  3. Operation check passed: {file_event.operation} in {file_filter.include_operations}"
+            )
 
     print(f"\nFINAL RESULT: should_include = {should_include}")
 
     # Clean up
     import shutil
+
     shutil.rmtree(test_dir)
     print(f"Cleaned up: {test_dir}")
 

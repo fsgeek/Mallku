@@ -17,14 +17,14 @@ from .scoring import ConfidenceScorer
 from .thresholds import AdaptiveThresholds
 
 __all__ = [
-    'CorrelationEngine',
-    'TemporalCorrelation',
-    'CorrelationWindow',
-    'CorrelationFeedback',
-    'SequentialPattern',
-    'ConcurrentPattern',
-    'CyclicalPattern',
-    'ContextualPattern',
-    'ConfidenceScorer',
-    'AdaptiveThresholds'
+    "CorrelationEngine",
+    "TemporalCorrelation",
+    "CorrelationWindow",
+    "CorrelationFeedback",
+    "SequentialPattern",
+    "ConcurrentPattern",
+    "CyclicalPattern",
+    "ContextualPattern",
+    "ConfidenceScorer",
+    "AdaptiveThresholds",
 ]

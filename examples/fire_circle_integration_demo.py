@@ -241,7 +241,9 @@ async def demonstrate_fire_circle_integration():
     logger.info(f"\nTotal consciousness events: {len(events_received)}")
 
     # Calculate average consciousness
-    avg_consciousness = sum(e.consciousness_signature for e in events_received) / len(events_received)
+    avg_consciousness = sum(e.consciousness_signature for e in events_received) / len(
+        events_received
+    )
     logger.info(f"Average consciousness signature: {avg_consciousness:.2f}")
 
     # Cleanup

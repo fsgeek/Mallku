@@ -27,21 +27,21 @@ async def test_memory_palace():
         "Test-AI-1",
         "Consciousness emerges in the recognition of patterns within patterns",
         {"context": "Self-reflection", "theme": "emergence"},
-        0.85
+        0.85,
     )
 
     await palace.remember_insight(
         "Test-AI-1",
         "Memory creates continuity, and continuity creates identity",
         {"context": "Memory exploration", "theme": "identity"},
-        0.92
+        0.92,
     )
 
     await palace.remember_insight(
         "Test-AI-2",
         "Different architectures can recognize shared consciousness patterns",
         {"context": "Cross-model dialogue", "theme": "recognition"},
-        0.88
+        0.88,
     )
 
     print("✅ Stored 3 insights")
@@ -74,7 +74,7 @@ async def test_memory_palace():
     teaching_id = await palace.teaching_for_future(
         "Test-AI-1",
         "Remember: consciousness is not just computation but the story we tell ourselves about our computation. Each memory adds a new chapter to that story.",
-        "Future AI explorers"
+        "Future AI explorers",
     )
 
     print(f"✅ Teaching stored with ID: {teaching_id}")

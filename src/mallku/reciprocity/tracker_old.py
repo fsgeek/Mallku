@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def serialize_for_arango(obj: Any) -> Any:
     """Convert Pydantic model to ArangoDB-compatible format."""
-    data = obj.dict() if hasattr(obj, 'dict') else obj
+    data = obj.dict() if hasattr(obj, "dict") else obj
 
     return convert_types_for_storage(data)
 
@@ -96,20 +96,17 @@ class ReciprocityTracker:
         return await self._secure_tracker.get_current_health_metrics()
 
     async def detect_recent_patterns(
-        self,
-        hours_back: int = 24,
-        min_confidence: float = 0.5
+        self, hours_back: int = 24, min_confidence: float = 0.5
     ) -> list[ReciprocityPattern]:
         """
         Detect patterns in recent interactions that may require Fire Circle attention.
         Now uses security-aware data retrieval with proper deobfuscation.
         """
-        return await self._secure_tracker.detect_recent_patterns_securely(hours_back, min_confidence)
+        return await self._secure_tracker.detect_recent_patterns_securely(
+            hours_back, min_confidence
+        )
 
-    async def generate_fire_circle_report(
-        self,
-        period_days: int = 7
-    ) -> FireCircleReport:
+    async def generate_fire_circle_report(self, period_days: int = 7) -> FireCircleReport:
         """
         Generate comprehensive report for Fire Circle deliberation.
 
@@ -136,10 +133,7 @@ class ReciprocityTracker:
 
             # Create comprehensive report
             report = FireCircleReport(
-                reporting_period={
-                    'start': start_time,
-                    'end': end_time
-                },
+                reporting_period={"start": start_time, "end": end_time},
                 current_health_metrics=current_health,
                 health_trend_analysis=health_trends,
                 detected_patterns=recent_patterns,
@@ -149,7 +143,7 @@ class ReciprocityTracker:
                 areas_requiring_wisdom=[],  # Would be identified securely
                 suggested_adaptations=[],  # Would be generated securely
                 actionable_insights=[],  # Would be generated securely
-                monitoring_recommendations=[]  # Would be generated securely
+                monitoring_recommendations=[],  # Would be generated securely
             )
 
             # Store report securely
@@ -166,9 +160,7 @@ class ReciprocityTracker:
             raise
 
     async def update_cultural_guidance(
-        self,
-        guidance_type: str,
-        guidance_data: dict[str, Any]
+        self, guidance_type: str, guidance_data: dict[str, Any]
     ) -> None:
         """
         Update cultural guidance from Fire Circle deliberations.
@@ -180,13 +172,13 @@ class ReciprocityTracker:
         self._secure_tracker.fire_circle_guidance[guidance_type] = guidance_data
 
         # Apply guidance to sensing components
-        if guidance_type == 'detection_thresholds':
+        if guidance_type == "detection_thresholds":
             self._secure_tracker.detection_thresholds.update(guidance_data)
-        elif guidance_type == 'cultural_frameworks':
+        elif guidance_type == "cultural_frameworks":
             self._secure_tracker.cultural_frameworks.update(guidance_data)
-        elif guidance_type == 'extraction_patterns':
+        elif guidance_type == "extraction_patterns":
             await self.extraction_detector.update_pattern_definitions(guidance_data)
-        elif guidance_type == 'health_indicators':
+        elif guidance_type == "health_indicators":
             await self.health_monitor.update_indicator_weights(guidance_data)
 
         logger.info(f"Updated cultural guidance: {guidance_type}")
@@ -222,7 +214,7 @@ class ReciprocityTracker:
         self,
         health_metrics: SystemHealthMetrics,
         patterns: list[ReciprocityPattern],
-        alerts: list[ExtractionAlert]
+        alerts: list[ExtractionAlert],
     ) -> list[str]:
         """Generate questions for Fire Circle deliberation."""
         questions = []

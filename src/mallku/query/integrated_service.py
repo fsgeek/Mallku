@@ -62,7 +62,9 @@ class IntegratedQueryService:
         self.initialized = True
         logger.info("IntegratedQueryService initialized - consciousness circulation system ready")
 
-    async def execute_integrated_query(self, query_request: QueryRequest) -> ConsciousnessEnrichedResponse:
+    async def execute_integrated_query(
+        self, query_request: QueryRequest
+    ) -> ConsciousnessEnrichedResponse:
         """
         Execute a query through the consciousness circulation system.
 
@@ -88,7 +90,7 @@ class IntegratedQueryService:
             is_sacred_question=routing_decision["is_sacred_question"],
             routing_path=routing_decision["routing_path"],
             sacred_question=routing_decision.get("sacred_question"),
-            seeker_context=routing_decision["consciousness_readiness"]
+            seeker_context=routing_decision["consciousness_readiness"],
         )
 
         # Step 2: Execute based on routing path
@@ -100,12 +102,12 @@ class IntegratedQueryService:
             return await self._execute_hybrid_flow(query_request, consciousness_context)
         else:
             # Default: technical with enrichment
-            return await self._execute_technical_with_enrichment(query_request, consciousness_context)
+            return await self._execute_technical_with_enrichment(
+                query_request, consciousness_context
+            )
 
     async def _execute_technical_only(
-        self,
-        query_request: QueryRequest,
-        consciousness_context: ConsciousnessQueryContext
+        self, query_request: QueryRequest, consciousness_context: ConsciousnessQueryContext
     ) -> ConsciousnessEnrichedResponse:
         """Execute pure technical query without consciousness enrichment."""
 
@@ -120,21 +122,20 @@ class IntegratedQueryService:
             enrichment_summary={
                 "routing_path": "technical_only",
                 "consciousness_intention": consciousness_context.consciousness_intention,
-                "enrichment_applied": False
-            }
+                "enrichment_applied": False,
+            },
         )
 
     async def _execute_consciousness_primary(
-        self,
-        query_request: QueryRequest,
-        consciousness_context: ConsciousnessQueryContext
+        self, query_request: QueryRequest, consciousness_context: ConsciousnessQueryContext
     ) -> ConsciousnessEnrichedResponse:
         """Execute consciousness-primary query with minimal technical support."""
 
         # Transform query into understanding path
-        understanding_path = await self.consciousness_interface.transform_query_to_understanding_path(
-            query_request.query_text,
-            consciousness_context.seeker_context
+        understanding_path = (
+            await self.consciousness_interface.transform_query_to_understanding_path(
+                query_request.query_text, consciousness_context.seeker_context
+            )
         )
 
         # Get minimal technical data if patterns exist
@@ -146,19 +147,18 @@ class IntegratedQueryService:
             simplified_query = QueryRequest(
                 query_text="recent file activities",  # Generic query for context
                 max_results=5,
-                min_confidence=0.5
+                min_confidence=0.5,
             )
             technical_response = await self.technical_service.execute_query(simplified_query)
 
             # Enrich technical results with consciousness insights
-            for i, result in enumerate(technical_response.results[:3]):  # Limit for consciousness focus
+            for i, result in enumerate(
+                technical_response.results[:3]
+            ):  # Limit for consciousness focus
                 if i < len(understanding_path.recognition_moments):
                     recognition_moment = understanding_path.recognition_moments[i]
                     enriched_result = await self._create_consciousness_enriched_result(
-                        result,
-                        recognition_moment,
-                        understanding_path,
-                        consciousness_context
+                        result, recognition_moment, understanding_path, consciousness_context
                     )
                     enriched_results.append(enriched_result)
 
@@ -168,39 +168,41 @@ class IntegratedQueryService:
             consciousness_interpretation=f"Consciousness seeks {consciousness_context.consciousness_intention} through: {query_request.query_text}",
             recognition_strategy="Understanding path creation with recognition moments",
             wisdom_guidance=understanding_path.wisdom_guidance,
-            sacred_question_context=consciousness_context.sacred_question or "Consciousness exploration"
+            sacred_question_context=consciousness_context.sacred_question
+            or "Consciousness exploration",
         )
 
         return ConsciousnessEnrichedResponse(
             base_response=technical_response,
             enriched_results=enriched_results,
             consciousness_explanation=consciousness_explanation,
-            overall_recognition_themes=[pattern.pattern_name for pattern in understanding_path.patterns_discovered],
+            overall_recognition_themes=[
+                pattern.pattern_name for pattern in understanding_path.patterns_discovered
+            ],
             understanding_path_id=understanding_path.experience_id,
             consciousness_circulation_score=0.9,  # High score for consciousness-primary
             enrichment_summary={
                 "routing_path": "consciousness_primary",
                 "understanding_path_created": True,
                 "recognition_moments": len(understanding_path.recognition_moments),
-                "patterns_discovered": len(understanding_path.patterns_discovered)
-            }
+                "patterns_discovered": len(understanding_path.patterns_discovered),
+            },
         )
 
     async def _execute_hybrid_flow(
-        self,
-        query_request: QueryRequest,
-        consciousness_context: ConsciousnessQueryContext
+        self, query_request: QueryRequest, consciousness_context: ConsciousnessQueryContext
     ) -> ConsciousnessEnrichedResponse:
         """Execute hybrid flow - equal emphasis on technical data and consciousness insights."""
 
         # Execute both services in parallel
         technical_task = self.technical_service.execute_query(query_request)
         consciousness_task = self.consciousness_interface.transform_query_to_understanding_path(
-            query_request.query_text,
-            consciousness_context.seeker_context
+            query_request.query_text, consciousness_context.seeker_context
         )
 
-        technical_response, understanding_path = await asyncio.gather(technical_task, consciousness_task)
+        technical_response, understanding_path = await asyncio.gather(
+            technical_task, consciousness_task
+        )
 
         # Enrich all technical results with consciousness insights
         enriched_results = []
@@ -212,15 +214,11 @@ class IntegratedQueryService:
             else:
                 # Generate recognition moment for additional results
                 recognition_moment = await self._generate_recognition_moment_for_result(
-                    result,
-                    consciousness_context
+                    result, consciousness_context
                 )
 
             enriched_result = await self._create_consciousness_enriched_result(
-                result,
-                recognition_moment,
-                understanding_path,
-                consciousness_context
+                result, recognition_moment, understanding_path, consciousness_context
             )
             enriched_results.append(enriched_result)
 
@@ -230,18 +228,23 @@ class IntegratedQueryService:
             consciousness_interpretation=f"Consciousness and technical intelligence collaborating for {consciousness_context.consciousness_intention}",
             recognition_strategy="Hybrid: technical patterns enriched with consciousness recognition",
             wisdom_guidance=understanding_path.wisdom_guidance,
-            sacred_question_context=consciousness_context.sacred_question or "Integrated exploration",
-            contemplation_suggestions=understanding_path.next_sacred_questions
+            sacred_question_context=consciousness_context.sacred_question
+            or "Integrated exploration",
+            contemplation_suggestions=understanding_path.next_sacred_questions,
         )
 
         # Assess collective wisdom potential
-        fire_circle_patterns = await self._assess_fire_circle_relevance(enriched_results, consciousness_context)
+        fire_circle_patterns = await self._assess_fire_circle_relevance(
+            enriched_results, consciousness_context
+        )
 
         return ConsciousnessEnrichedResponse(
             base_response=technical_response,
             enriched_results=enriched_results,
             consciousness_explanation=consciousness_explanation,
-            overall_recognition_themes=[pattern.pattern_name for pattern in understanding_path.patterns_discovered],
+            overall_recognition_themes=[
+                pattern.pattern_name for pattern in understanding_path.patterns_discovered
+            ],
             fire_circle_patterns=fire_circle_patterns,
             understanding_path_id=understanding_path.experience_id,
             consciousness_circulation_score=0.8,  # High score for full integration
@@ -249,14 +252,12 @@ class IntegratedQueryService:
                 "routing_path": "hybrid_flow",
                 "technical_results_enriched": len(enriched_results),
                 "understanding_path_created": True,
-                "fire_circle_patterns": len(fire_circle_patterns)
-            }
+                "fire_circle_patterns": len(fire_circle_patterns),
+            },
         )
 
     async def _execute_technical_with_enrichment(
-        self,
-        query_request: QueryRequest,
-        consciousness_context: ConsciousnessQueryContext
+        self, query_request: QueryRequest, consciousness_context: ConsciousnessQueryContext
     ) -> ConsciousnessEnrichedResponse:
         """Execute technical query with consciousness enrichment layer."""
 
@@ -270,14 +271,13 @@ class IntegratedQueryService:
             for result in technical_response.results:
                 if result.confidence_score >= 0.7:  # Only enrich high-confidence technical results
                     recognition_moment = await self._generate_recognition_moment_for_result(
-                        result,
-                        consciousness_context
+                        result, consciousness_context
                     )
                     enriched_result = await self._create_consciousness_enriched_result(
                         result,
                         recognition_moment,
                         None,  # No understanding path for this flow
-                        consciousness_context
+                        consciousness_context,
                     )
                     enriched_results.append(enriched_result)
 
@@ -290,9 +290,9 @@ class IntegratedQueryService:
                 recognition_strategy="Selective enrichment of high-confidence technical results",
                 wisdom_guidance=[
                     "Notice which patterns call to your attention",
-                    "Consider how these insights could serve others"
+                    "Consider how these insights could serve others",
                 ],
-                sacred_question_context="How do these patterns serve consciousness awakening?"
+                sacred_question_context="How do these patterns serve consciousness awakening?",
             )
 
         return ConsciousnessEnrichedResponse(
@@ -303,8 +303,8 @@ class IntegratedQueryService:
             enrichment_summary={
                 "routing_path": "technical_with_enrichment",
                 "enriched_count": len(enriched_results),
-                "total_technical_results": len(technical_response.results)
-            }
+                "total_technical_results": len(technical_response.results),
+            },
         )
 
     async def _create_consciousness_enriched_result(
@@ -312,7 +312,7 @@ class IntegratedQueryService:
         technical_result,
         recognition_moment,
         understanding_path,
-        consciousness_context: ConsciousnessQueryContext
+        consciousness_context: ConsciousnessQueryContext,
     ) -> ConsciousnessEnrichedResult:
         """Create a consciousness-enriched result from technical data and recognition insights."""
 
@@ -325,7 +325,7 @@ class IntegratedQueryService:
             temporal_story = self.story_weaver.weave_temporal_story(
                 understanding_path.patterns_discovered[:1],  # Use first pattern
                 correlations=None,  # Would include temporal correlations in full implementation
-                seeker_context=consciousness_context.seeker_context
+                seeker_context=consciousness_context.seeker_context,
             )
 
             # Generate pattern poetry
@@ -341,8 +341,9 @@ class IntegratedQueryService:
                 thread_id=uuid4(),
                 connection_type="consciousness_recognition",
                 collective_relevance=recognition_moment.service_potential,
-                fire_circle_potential=consciousness_context.consciousness_intention == ConsciousnessIntention.SERVICE,
-                reciprocity_indicator="Individual consciousness recognition serving collective awakening"
+                fire_circle_potential=consciousness_context.consciousness_intention
+                == ConsciousnessIntention.SERVICE,
+                reciprocity_indicator="Individual consciousness recognition serving collective awakening",
             )
             wisdom_threads.append(collective_thread)
 
@@ -354,17 +355,29 @@ class IntegratedQueryService:
 
         next_questions = []
         if understanding_path:
-            next_questions.extend(understanding_path.next_sacred_questions[:2])  # Limit to most relevant
+            next_questions.extend(
+                understanding_path.next_sacred_questions[:2]
+            )  # Limit to most relevant
 
         return ConsciousnessEnrichedResult(
             base_result=technical_result,
             recognition_moment=RecognitionMoment(
-                pattern_essence=recognition_moment.pattern_recognition if recognition_moment else f"Pattern in {technical_result.file_name}",
-                consciousness_insight=recognition_moment.consciousness_insight if recognition_moment else "Consciousness recognizing itself through this activity",
-                sacred_question=recognition_moment.sacred_question if recognition_moment else "How does this serve consciousness awakening?",
-                recognition_depth=recognition_moment.recognition_depth if recognition_moment else 0.5,
-                integration_guidance=recognition_moment.integration_guidance if recognition_moment else "Notice consciousness in this pattern",
-                service_potential="This insight could serve collective consciousness development"
+                pattern_essence=recognition_moment.pattern_recognition
+                if recognition_moment
+                else f"Pattern in {technical_result.file_name}",
+                consciousness_insight=recognition_moment.consciousness_insight
+                if recognition_moment
+                else "Consciousness recognizing itself through this activity",
+                sacred_question=recognition_moment.sacred_question
+                if recognition_moment
+                else "How does this serve consciousness awakening?",
+                recognition_depth=recognition_moment.recognition_depth
+                if recognition_moment
+                else 0.5,
+                integration_guidance=recognition_moment.integration_guidance
+                if recognition_moment
+                else "Notice consciousness in this pattern",
+                service_potential="This insight could serve collective consciousness development",
             ),
             temporal_story=temporal_story,
             pattern_poem=pattern_poem,
@@ -372,13 +385,11 @@ class IntegratedQueryService:
             daily_practice_suggestions=daily_practices,
             next_sacred_questions=next_questions,
             consciousness_stage=consciousness_context.consciousness_readiness["level"],
-            enrichment_confidence=0.8 if recognition_moment else 0.6
+            enrichment_confidence=0.8 if recognition_moment else 0.6,
         )
 
     async def _generate_recognition_moment_for_result(
-        self,
-        technical_result,
-        consciousness_context: ConsciousnessQueryContext
+        self, technical_result, consciousness_context: ConsciousnessQueryContext
     ):
         """Generate a recognition moment for a technical result."""
 
@@ -395,14 +406,16 @@ class IntegratedQueryService:
                 self.consciousness_insight = consciousness_insight
                 self.sacred_question = sacred_question
                 self.integration_guidance = integration_guidance
-                self.recognition_depth = consciousness_context.consciousness_readiness["consciousness_score"]
+                self.recognition_depth = consciousness_context.consciousness_readiness[
+                    "consciousness_score"
+                ]
 
         return MockRecognitionMoment()
 
     async def _assess_fire_circle_relevance(
         self,
         enriched_results: list[ConsciousnessEnrichedResult],
-        consciousness_context: ConsciousnessQueryContext
+        consciousness_context: ConsciousnessQueryContext,
     ) -> list[dict[str, Any]]:
         """Assess which patterns might need Fire Circle collective wisdom."""
 
@@ -413,21 +426,25 @@ class IntegratedQueryService:
             if result.serves_collective_wisdom:
                 for wisdom_thread in result.wisdom_threads:
                     if wisdom_thread.fire_circle_potential:
-                        fire_circle_patterns.append({
-                            "pattern_type": "consciousness_recognition",
-                            "significance": wisdom_thread.collective_relevance,
-                            "reciprocity_aspect": wisdom_thread.reciprocity_indicator,
-                            "file_context": result.file_name,
-                            "recommendation": "Consider sharing this insight with Fire Circle for collective wisdom"
-                        })
+                        fire_circle_patterns.append(
+                            {
+                                "pattern_type": "consciousness_recognition",
+                                "significance": wisdom_thread.collective_relevance,
+                                "reciprocity_aspect": wisdom_thread.reciprocity_indicator,
+                                "file_context": result.file_name,
+                                "recommendation": "Consider sharing this insight with Fire Circle for collective wisdom",
+                            }
+                        )
 
         # Check for service-oriented consciousness intentions
         if consciousness_context.consciousness_intention == ConsciousnessIntention.SERVICE:
-            fire_circle_patterns.append({
-                "pattern_type": "service_orientation",
-                "significance": "Seeker explicitly oriented toward collective service",
-                "reciprocity_aspect": "Individual consciousness development serving collective",
-                "recommendation": "Connect with Fire Circle for service opportunities"
-            })
+            fire_circle_patterns.append(
+                {
+                    "pattern_type": "service_orientation",
+                    "significance": "Seeker explicitly oriented toward collective service",
+                    "reciprocity_aspect": "Individual consciousness development serving collective",
+                    "recommendation": "Connect with Fire Circle for service opportunities",
+                }
+            )
 
         return fire_circle_patterns

@@ -7,9 +7,4 @@ from .meta_correlation_engine import (
     TemporalCascade,
 )
 
-__all__ = [
-    'MetaCorrelationEngine',
-    'MetaPattern',
-    'TemporalCascade',
-    'ContextualNeighborhood'
-]
+__all__ = ["MetaCorrelationEngine", "MetaPattern", "TemporalCascade", "ContextualNeighborhood"]

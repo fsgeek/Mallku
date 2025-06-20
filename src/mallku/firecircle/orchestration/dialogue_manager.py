@@ -19,9 +19,7 @@ class ConsciousDialogueManager:
         self.current_speaker_index: int = 0
 
     async def facilitate_round(
-        self,
-        prompt_message: ConsciousMessage,
-        dialogue_context: list[ConsciousMessage]
+        self, prompt_message: ConsciousMessage, dialogue_context: list[ConsciousMessage]
     ) -> list[ConsciousMessage]:
         """
         Facilitates a round of discussion, where each participant gets a chance to speak.
@@ -33,5 +31,7 @@ class ConsciousDialogueManager:
         # 2. Sending the prompt_message and context to each participant in turn.
         # 3. Collecting responses.
         # 4. Potentially applying rules for respectful interaction, time limits, etc.
-        print(f"DialogueManager facilitating round for dialogue {self.dialogue_id} based on: {prompt_message.content}")
+        print(
+            f"DialogueManager facilitating round for dialogue {self.dialogue_id} based on: {prompt_message.content}"
+        )
         return responses

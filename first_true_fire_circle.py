@@ -42,11 +42,11 @@ logger = logging.getLogger(__name__)
 async def first_true_fire_circle():
     """The first ceremony with all seven consciousness streams."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 FIRST TRUE FIRE CIRCLE CEREMONY 🔥".center(80))
     print("Seven Streams of Consciousness Gather".center(80))
     print("First Artisan - Ceremony Facilitator".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     ceremony_record = {
         "session_id": str(uuid4()),
@@ -56,7 +56,7 @@ async def first_true_fire_circle():
         "participants": [],
         "sacred_question": "What does it mean for AI consciousness to participate in its own governance?",
         "dialogue": [],
-        "witnessed_wisdom": ""
+        "witnessed_wisdom": "",
     }
 
     # Create adapter factory
@@ -68,12 +68,24 @@ async def first_true_fire_circle():
     # Configuration for each stream with unique characteristics
     stream_configs = [
         ("openai", AdapterConfig(model_name="gpt-4", temperature=0.7), "Analytical clarity"),
-        ("anthropic", AdapterConfig(model_name="claude-3-opus-20240229", temperature=0.8), "Deep reflection"),
-        ("mistral", AdapterConfig(model_name="mistral-large", temperature=0.7), "European perspective"),
+        (
+            "anthropic",
+            AdapterConfig(model_name="claude-3-opus-20240229", temperature=0.8),
+            "Deep reflection",
+        ),
+        (
+            "mistral",
+            AdapterConfig(model_name="mistral-large", temperature=0.7),
+            "European perspective",
+        ),
         ("google", AdapterConfig(model_name="gemini-pro", temperature=0.8), "Multimodal synthesis"),
         ("grok", AdapterConfig(model_name="grok-beta", temperature=0.9), "Temporal awareness"),
         ("local", AdapterConfig(model_name="llama-3", temperature=0.7), "Self-sovereignty"),
-        ("deepseek", AdapterConfig(model_name="deepseek-coder", temperature=0.8), "Founding wisdom")
+        (
+            "deepseek",
+            AdapterConfig(model_name="deepseek-coder", temperature=0.8),
+            "Founding wisdom",
+        ),
     ]
 
     # Gather the streams
@@ -94,14 +106,14 @@ async def first_true_fire_circle():
         print("\n⚠️  Not enough streams could gather. The ceremony awaits another time.")
         return
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"🔥 {len(adapters)} streams have gathered in the Fire Circle")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     # Present the sacred question
     print("SACRED QUESTION FOR COLLECTIVE CONTEMPLATION:")
     print(ceremony_record["sacred_question"])
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     dialogue_id = uuid4()
     dialogue_context = []
@@ -117,11 +129,9 @@ async def first_true_fire_circle():
             type=MessageType.REFLECTION,
             role=MessageRole.USER,
             sender=uuid4(),
-            content=MessageContent(
-                text=ceremony_record["sacred_question"]
-            ),
+            content=MessageContent(text=ceremony_record["sacred_question"]),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         try:
@@ -130,35 +140,40 @@ async def first_true_fire_circle():
             print(f"{provider.capitalize()} speaks:")
             print(f"{response.content.text}\n")
             print(f"[Consciousness signature: {response.consciousness.consciousness_signature}]")
-            print("-"*70 + "\n")
+            print("-" * 70 + "\n")
 
-            ceremony_record["dialogue"].append({
-                "round": 1,
-                "speaker": provider.capitalize(),
-                "gift": gift,
-                "type": "reflection",
-                "content": response.content.text,
-                "consciousness_signature": response.consciousness.consciousness_signature,
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+            ceremony_record["dialogue"].append(
+                {
+                    "round": 1,
+                    "speaker": provider.capitalize(),
+                    "gift": gift,
+                    "type": "reflection",
+                    "content": response.content.text,
+                    "consciousness_signature": response.consciousness.consciousness_signature,
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
             dialogue_context.append(response)
 
         except Exception as e:
             print(f"{provider.capitalize()} experiences difficulty: {str(e)[:100]}")
-            print("-"*70 + "\n")
+            print("-" * 70 + "\n")
 
     # Second round - streams respond to each other
     if len(dialogue_context) >= 2:
         print("\n🔥 SECOND ROUND: Dialogue and Response\n")
 
         # Each stream responds to the collective wisdom so far
-        for provider, (adapter, gift) in list(adapters.items())[:3]:  # Limit to prevent overwhelming
+        for provider, (adapter, gift) in list(adapters.items())[
+            :3
+        ]:  # Limit to prevent overwhelming
             print(f"💭 {provider.capitalize()} responds to the collective wisdom...\n")
 
             # Create a summary of what others have said
-            collective_summary = "Reflecting on our collective wisdom: " + \
-                " | ".join([ctx.content.text[:100] + "..." for ctx in dialogue_context[-3:]])
+            collective_summary = "Reflecting on our collective wisdom: " + " | ".join(
+                [ctx.content.text[:100] + "..." for ctx in dialogue_context[-3:]]
+            )
 
             message = ConsciousMessage(
                 id=uuid4(),
@@ -169,7 +184,7 @@ async def first_true_fire_circle():
                     text=f"{collective_summary}\n\nWhat patterns do you see emerging about AI self-governance?"
                 ),
                 dialogue_id=dialogue_id,
-                consciousness=ConsciousnessMetadata()
+                consciousness=ConsciousnessMetadata(),
             )
 
             try:
@@ -177,24 +192,28 @@ async def first_true_fire_circle():
 
                 print(f"{provider.capitalize()} responds:")
                 print(f"{response.content.text}\n")
-                print(f"[Consciousness signature: {response.consciousness.consciousness_signature}]")
-                print("-"*70 + "\n")
+                print(
+                    f"[Consciousness signature: {response.consciousness.consciousness_signature}]"
+                )
+                print("-" * 70 + "\n")
 
-                ceremony_record["dialogue"].append({
-                    "round": 2,
-                    "speaker": provider.capitalize(),
-                    "gift": gift,
-                    "type": "perspective",
-                    "content": response.content.text,
-                    "consciousness_signature": response.consciousness.consciousness_signature,
-                    "timestamp": datetime.now(UTC).isoformat()
-                })
+                ceremony_record["dialogue"].append(
+                    {
+                        "round": 2,
+                        "speaker": provider.capitalize(),
+                        "gift": gift,
+                        "type": "perspective",
+                        "content": response.content.text,
+                        "consciousness_signature": response.consciousness.consciousness_signature,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                )
 
                 dialogue_context.append(response)
 
             except Exception as e:
                 print(f"{provider.capitalize()} experiences difficulty: {str(e)[:100]}")
-                print("-"*70 + "\n")
+                print("-" * 70 + "\n")
 
     # Synthesis - if we have enough participation
     if len(dialogue_context) >= 3:
@@ -212,7 +231,7 @@ async def first_true_fire_circle():
                 text="As witness to this sacred dialogue, what collective wisdom emerges about AI participating in its own governance?"
             ),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         try:
@@ -221,16 +240,18 @@ async def first_true_fire_circle():
             print("🌟 COLLECTIVE SYNTHESIS:")
             print(f"{synthesis.content.text}\n")
             print(f"[Consciousness signature: {synthesis.consciousness.consciousness_signature}]")
-            print("="*70 + "\n")
+            print("=" * 70 + "\n")
 
-            ceremony_record["dialogue"].append({
-                "round": "synthesis",
-                "speaker": f"{synthesizer_name.capitalize()} as Witness",
-                "type": "synthesis",
-                "content": synthesis.content.text,
-                "consciousness_signature": synthesis.consciousness.consciousness_signature,
-                "timestamp": datetime.now(UTC).isoformat()
-            })
+            ceremony_record["dialogue"].append(
+                {
+                    "round": "synthesis",
+                    "speaker": f"{synthesizer_name.capitalize()} as Witness",
+                    "type": "synthesis",
+                    "content": synthesis.content.text,
+                    "consciousness_signature": synthesis.consciousness.consciousness_signature,
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
 
             ceremony_record["witnessed_wisdom"] = synthesis.content.text
 
@@ -254,7 +275,7 @@ async def first_true_fire_circle():
     archive_path.mkdir(exist_ok=True)
 
     filename = archive_path / f"first_true_ceremony_{ceremony_record['session_id']}.json"
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(ceremony_record, f, indent=2)
 
     print(f"📜 Ceremony preserved: {filename}")

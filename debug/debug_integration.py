@@ -47,7 +47,7 @@ async def debug_integration_pipeline():
             watch_directories=[str(test_dir)],
             correlation_confidence_threshold=0.3,  # Very low for debugging
             anchor_creation_threshold=0.4,
-            file_filter_config={"test_mode": True}
+            file_filter_config={"test_mode": True},
         )
 
         # Create and initialize service
@@ -59,10 +59,10 @@ async def debug_integration_pipeline():
         await service.initialize()
 
         # Add file event handler directly to file connector for debugging
-        service.file_connector.add_event_callback(capture_file_event) # type: ignore
+        service.file_connector.add_event_callback(capture_file_event)  # type: ignore
 
         print(f"Service running: {service.is_running}")
-        print(f"File connector running: {service.file_connector._is_running}") # type: ignore
+        print(f"File connector running: {service.file_connector._is_running}")  # type: ignore
         print(f"Pipeline ID: {service.pipeline_id}")
 
         # Wait for full startup
@@ -128,14 +128,16 @@ async def debug_integration_pipeline():
     except Exception as e:
         print(f"Error during debugging: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:
         # Cleanup
-        await service.shutdown() # type: ignore
+        await service.shutdown()  # type: ignore
 
         # Remove test directory
         import shutil
+
         shutil.rmtree(test_dir)
         print(f"Cleaned up: {test_dir}")
 

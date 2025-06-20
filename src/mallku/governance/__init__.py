@@ -22,11 +22,12 @@ from .protocol import (
 )
 
 if (
-    importlib.util.find_spec("mallku.governance.consciousness_transport") is not None and
-    importlib.util.find_spec("mallku.governance.fire_circle_bridge") is not None
+    importlib.util.find_spec("mallku.governance.consciousness_transport") is not None
+    and importlib.util.find_spec("mallku.governance.fire_circle_bridge") is not None
 ):
     from .consciousness_transport import ConsciousnessCirculationTransport, GovernanceParticipant
     from .fire_circle_bridge import ConsciousFireCircleInterface, ConsciousGovernanceInitiator
+
     CONSCIOUSNESS_INTEGRATION = True
 else:
     CONSCIOUSNESS_INTEGRATION = False
@@ -37,6 +38,7 @@ if importlib.util.find_spec("mallku.governance.firecircle_consciousness_adapter"
         ConsciousnessAwareDialogueManager,
         FireCircleConsciousnessAdapter,
     )
+
     FIRECIRCLE_ADAPTER = True
 else:
     FIRECIRCLE_ADAPTER = False
@@ -45,22 +47,18 @@ __all__ = [
     # Message structures
     "GovernanceMessage",
     "MessageType",
-
     # Consensus mechanisms
     "ConsensusState",
     "ConsensusTracker",
-
     # Participant management
     "ParticipantRole",
     "Participant",
     "ParticipantRegistry",
-
     # Consciousness integration components
     "ConsciousnessCirculationTransport",
     "GovernanceParticipant",
     "ConsciousFireCircleInterface",
     "ConsciousGovernanceInitiator",
-
     # Fire Circle adapter components
     "FireCircleConsciousnessAdapter",
     "ConsciousnessAwareDialogueManager",
@@ -68,18 +66,17 @@ __all__ = [
 
 # Add consciousness integration exports if available
 if CONSCIOUSNESS_INTEGRATION:
-    __all__.extend([
-        "ConsciousnessCirculationTransport",
-        "GovernanceParticipant",
-        "ConsciousFireCircleInterface",
-        "ConsciousGovernanceInitiator"
-    ])
+    __all__.extend(
+        [
+            "ConsciousnessCirculationTransport",
+            "GovernanceParticipant",
+            "ConsciousFireCircleInterface",
+            "ConsciousGovernanceInitiator",
+        ]
+    )
 
 # Add Fire Circle adapter exports if available
 if FIRECIRCLE_ADAPTER:
-    __all__.extend([
-        "FireCircleConsciousnessAdapter",
-        "ConsciousnessAwareDialogueManager"
-    ])
+    __all__.extend(["FireCircleConsciousnessAdapter", "ConsciousnessAwareDialogueManager"])
 
 __version__ = "0.1.2"  # Incremented for Fire Circle adapter integration

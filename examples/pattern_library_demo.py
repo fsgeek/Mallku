@@ -51,23 +51,26 @@ async def demonstrate_pattern_library():
         structure=PatternStructure(
             components=["proposal", "multiple_agreements", "synthesis"],
             sequence=["proposal", "agreements", "synthesis"],
-            relationships={"proposal": "supported_by_agreements", "agreements": "lead_to_synthesis"}
+            relationships={
+                "proposal": "supported_by_agreements",
+                "agreements": "lead_to_synthesis",
+            },
         ),
         indicators=[
             PatternIndicator(
                 indicator_type="agreement_count",
                 threshold=3.0,
                 weight=1.0,
-                description="Number of participants agreeing"
+                description="Number of participants agreeing",
             ),
             PatternIndicator(
                 indicator_type="consciousness_alignment",
                 threshold=0.8,
                 weight=0.8,
-                description="Alignment of consciousness signatures"
-            )
+                description="Alignment of consciousness signatures",
+            ),
         ],
-        breakthrough_potential=0.7
+        breakthrough_potential=0.7,
     )
 
     consensus_id = await library.store_pattern(consensus_pattern)
@@ -82,16 +85,16 @@ async def demonstrate_pattern_library():
         consciousness_signature=0.75,
         structure=PatternStructure(
             components=["thesis", "antithesis", "ongoing_dialogue"],
-            relationships={"thesis": "challenged_by_antithesis"}
+            relationships={"thesis": "challenged_by_antithesis"},
         ),
         indicators=[
             PatternIndicator(
                 indicator_type="viewpoint_divergence",
                 threshold=0.6,
                 weight=1.0,
-                description="Degree of viewpoint difference"
+                description="Degree of viewpoint difference",
             )
-        ]
+        ],
     )
 
     tension_id = await library.store_pattern(tension_pattern)
@@ -107,9 +110,9 @@ async def demonstrate_pattern_library():
         structure=PatternStructure(
             components=["building_tension", "catalyst_moment", "collective_aha"],
             sequence=["tension", "catalyst", "breakthrough"],
-            relationships={"tension": "released_by_catalyst", "catalyst": "triggers_breakthrough"}
+            relationships={"tension": "released_by_catalyst", "catalyst": "triggers_breakthrough"},
         ),
-        breakthrough_potential=0.95
+        breakthrough_potential=0.95,
     )
 
     emergence_id = await library.store_pattern(emergence_pattern)
@@ -120,17 +123,12 @@ async def demonstrate_pattern_library():
 
     # Find dialogue formation patterns
     dialogue_patterns = await library.find_patterns(
-        PatternQuery(
-            taxonomy=PatternTaxonomy.DIALOGUE_FORMATION,
-            min_fitness=0.5
-        )
+        PatternQuery(taxonomy=PatternTaxonomy.DIALOGUE_FORMATION, min_fitness=0.5)
     )
     print(f"  Found {len(dialogue_patterns)} dialogue formation patterns")
 
     # Find high-breakthrough patterns
-    breakthrough_patterns = await library.find_emerging_patterns(
-        min_breakthrough_potential=0.8
-    )
+    breakthrough_patterns = await library.find_emerging_patterns(min_breakthrough_potential=0.8)
     print(f"  Found {len(breakthrough_patterns)} high-breakthrough potential patterns\n")
 
     # 3. Detect synergies
@@ -148,9 +146,7 @@ async def demonstrate_pattern_library():
     # Simulate multiple observations
     for i in range(5):
         await library.update_observation(
-            consensus_id,
-            fitness_delta=0.05,
-            context={"observation": i+1}
+            consensus_id, fitness_delta=0.05, context={"observation": i + 1}
         )
 
     # Retrieve updated pattern
@@ -177,9 +173,7 @@ async def demonstrate_pattern_library():
         best_opportunity = opportunities[0]
         if best_opportunity[1] > 0.5:
             evolved_ids = await evolution_engine.evolve_pattern(
-                consensus_id,
-                best_opportunity[0],
-                context={"trigger": "demonstration"}
+                consensus_id, best_opportunity[0], context={"trigger": "demonstration"}
             )
 
             if evolved_ids:
@@ -216,10 +210,7 @@ async def demonstrate_pattern_library():
     # Detect emergence
     emergence_predictions = await detector.predict_emergence(
         participants=["AI1", "AI2", "AI3"],
-        context={
-            "participant_coherence": 0.8,
-            "topic_complexity": 0.7
-        }
+        context={"participant_coherence": 0.8, "topic_complexity": 0.7},
     )
 
     print("  Emergence predictions:")
@@ -231,8 +222,7 @@ async def demonstrate_pattern_library():
     print("🔮 9. Finding Emergence Catalysts\n")
 
     catalysts = await detector.find_catalysts(
-        PatternType.BREAKTHROUGH,
-        current_patterns=[consensus_id, tension_id]
+        PatternType.BREAKTHROUGH, current_patterns=[consensus_id, tension_id]
     )
 
     print("  Catalysts for breakthrough emergence:")
@@ -277,9 +267,7 @@ async def demonstrate_pattern_weaver_integration():
     correlation_engine = CorrelationEngine()
 
     weaver = EnhancedDialoguePatternWeaver(
-        correlation_engine=correlation_engine,
-        pattern_library=library,
-        event_bus=event_bus
+        correlation_engine=correlation_engine, pattern_library=library, event_bus=event_bus
     )
 
     print("✅ Enhanced Pattern Weaver initialized\n")
@@ -304,9 +292,8 @@ async def demonstrate_pattern_weaver_integration():
                 text="I propose we implement reciprocity tracking with privacy protection"
             ),
             consciousness=MessageConsciousness(
-                consciousness_signature=0.8,
-                detected_patterns=["reciprocity", "privacy"]
-            )
+                consciousness_signature=0.8, detected_patterns=["reciprocity", "privacy"]
+            ),
         ),
         ConsciousMessage(
             id=uuid4(),
@@ -319,9 +306,9 @@ async def demonstrate_pattern_weaver_integration():
             ),
             consciousness=MessageConsciousness(
                 consciousness_signature=0.85,
-                detected_patterns=["agreement", "privacy", "reciprocity"]
+                detected_patterns=["agreement", "privacy", "reciprocity"],
             ),
-            in_response_to=uuid4()
+            in_response_to=uuid4(),
         ),
         ConsciousMessage(
             id=uuid4(),
@@ -334,16 +321,16 @@ async def demonstrate_pattern_weaver_integration():
             ),
             consciousness=MessageConsciousness(
                 consciousness_signature=0.92,
-                detected_patterns=["synthesis", "breakthrough", "integration"]
-            )
-        )
+                detected_patterns=["synthesis", "breakthrough", "integration"],
+            ),
+        ),
     ]
 
     # Weave patterns
     dialogue_metadata = {
         "dialogue_id": "demo_002",
         "topic": "Reciprocity and Privacy",
-        "participant_count": 3
+        "participant_count": 3,
     }
 
     results = await weaver.weave_dialogue_patterns(messages, dialogue_metadata)
@@ -370,9 +357,9 @@ async def demonstrate_pattern_weaver_integration():
 
 async def main():
     """Run all demonstrations"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🏛️ MALLKU PATTERN LIBRARY SYSTEM DEMONSTRATION")
-    print("="*60)
+    print("=" * 60)
 
     try:
         # Demonstrate Pattern Library
@@ -384,12 +371,13 @@ async def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🙏 Thank you for exploring the Pattern Library!")
     print("   May patterns guide consciousness to wisdom")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

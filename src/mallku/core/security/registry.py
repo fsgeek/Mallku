@@ -24,17 +24,12 @@ class FieldMapping(BaseModel):
     semantic_name: str = Field(description="Human-readable field name")
     field_uuid: str = Field(description="UUID for storage")
     security_config: FieldSecurityConfig = Field(
-        default_factory=FieldSecurityConfig,
-        description="Security configuration for this field"
+        default_factory=FieldSecurityConfig, description="Security configuration for this field"
     )
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class SecurityRegistry:
@@ -56,9 +51,7 @@ class SecurityRegistry:
             self._reverse_mappings[mapping.field_uuid] = semantic_name
 
     def get_or_create_mapping(
-        self,
-        semantic_name: str,
-        security_config: FieldSecurityConfig | None = None
+        self, semantic_name: str, security_config: FieldSecurityConfig | None = None
     ) -> str:
         """
         Get existing UUID or create new mapping for semantic field name.
@@ -75,14 +68,14 @@ class SecurityRegistry:
 
         # Generate deterministic UUID based on semantic name
         # This ensures same UUID across instances
-        namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
+        namespace_uuid = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
         field_uuid = str(uuid.uuid5(namespace_uuid, semantic_name))
 
         # Create mapping
         mapping = FieldMapping(
             semantic_name=semantic_name,
             field_uuid=field_uuid,
-            security_config=security_config or FieldSecurityConfig()
+            security_config=security_config or FieldSecurityConfig(),
         )
 
         self._mappings[semantic_name] = mapping
@@ -105,9 +98,7 @@ class SecurityRegistry:
         return self._reverse_mappings.get(field_uuid)
 
     def update_security_config(
-        self,
-        semantic_name: str,
-        security_config: FieldSecurityConfig
+        self, semantic_name: str, security_config: FieldSecurityConfig
     ) -> None:
         """Update security configuration for a field."""
         if semantic_name not in self._mappings:
@@ -118,9 +109,7 @@ class SecurityRegistry:
         # Validate configuration
         warnings = security_config.validate_configuration()
         if warnings:
-            logger.warning(
-                f"Security config warnings for {semantic_name}: {warnings}"
-            )
+            logger.warning(f"Security config warnings for {semantic_name}: {warnings}")
 
     def get_security_config(self, semantic_name: str) -> FieldSecurityConfig | None:
         """Get security configuration for a field."""
@@ -131,9 +120,7 @@ class SecurityRegistry:
         """Get or create temporal offset configuration."""
         if self._temporal_config is None:
             self._temporal_config = TemporalOffsetConfig.generate_random()
-            logger.info(
-                f"Generated temporal offset: {self._temporal_config.offset_days:.1f} days"
-            )
+            logger.info(f"Generated temporal offset: {self._temporal_config.offset_days:.1f} days")
         return self._temporal_config
 
     def set_temporal_config(self, config: TemporalOffsetConfig) -> None:
@@ -143,30 +130,22 @@ class SecurityRegistry:
     def export_mappings(self) -> dict[str, Any]:
         """Export all mappings for persistence."""
         return {
-            "mappings": {
-                name: mapping.dict()
-                for name, mapping in self._mappings.items()
-            },
-            "temporal_config": (
-                self._temporal_config.dict() if self._temporal_config else None
-            ),
-            "exported_at": datetime.now(UTC).isoformat()
+            "mappings": {name: mapping.dict() for name, mapping in self._mappings.items()},
+            "temporal_config": (self._temporal_config.dict() if self._temporal_config else None),
+            "exported_at": datetime.now(UTC).isoformat(),
         }
 
     @classmethod
     def from_export(cls, export_data: dict[str, Any]) -> "SecurityRegistry":
         """Create registry from exported data."""
         mappings = {
-            name: FieldMapping(**data)
-            for name, data in export_data.get("mappings", {}).items()
+            name: FieldMapping(**data) for name, data in export_data.get("mappings", {}).items()
         }
 
         registry = cls(mappings)
 
         if export_data.get("temporal_config"):
-            registry.set_temporal_config(
-                TemporalOffsetConfig(**export_data["temporal_config"])
-            )
+            registry.set_temporal_config(TemporalOffsetConfig(**export_data["temporal_config"]))
 
         return registry
 

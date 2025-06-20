@@ -31,20 +31,19 @@ async def debug_filesystem_monitoring():
     # Create event filter
     event_filter = FileEventFilter(
         watch_directories=[test_dir],
-        ignore_directories=[]  # Don't ignore anything for debugging
+        ignore_directories=[],  # Don't ignore anything for debugging
     )
 
     # Create connector
-    connector = FileSystemConnector(
-        event_filter=event_filter,
-        stream_id="debug_filesystem"
-    )
+    connector = FileSystemConnector(event_filter=event_filter, stream_id="debug_filesystem")
 
     # Track events
     captured_events = []
 
     def capture_event(event):
-        print(f"CAPTURED EVENT: {event.content.get('operation')} - {event.content.get('file_name')}")
+        print(
+            f"CAPTURED EVENT: {event.content.get('operation')} - {event.content.get('file_name')}"
+        )
         captured_events.append(event)
 
     connector.add_event_callback(capture_event)
@@ -55,7 +54,9 @@ async def debug_filesystem_monitoring():
         await connector.initialize()
 
         print(f"Connector running: {connector._is_running}")
-        print(f"Observer running: {connector.observer.is_alive() if connector.observer else 'None'}")
+        print(
+            f"Observer running: {connector.observer.is_alive() if connector.observer else 'None'}"
+        )
         print(f"Watch handlers: {len(connector.watch_handlers)}")
         print(f"Event callbacks: {len(connector.event_callbacks)}")
 
@@ -96,6 +97,7 @@ async def debug_filesystem_monitoring():
     except Exception as e:
         print(f"Error during debugging: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:
@@ -104,6 +106,7 @@ async def debug_filesystem_monitoring():
 
         # Remove test directory
         import shutil
+
         shutil.rmtree(test_dir)
         print(f"Cleaned up: {test_dir}")
 

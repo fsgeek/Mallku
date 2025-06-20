@@ -80,10 +80,7 @@ class PatternDialogueIntegration:
         self.emergence_detector = EmergenceDetector(pattern_library, event_bus)
         self.evolution_engine = PatternEvolutionEngine(pattern_library)
         self.pattern_facilitator = PatternGuidedFacilitator(
-            pattern_library,
-            event_bus,
-            self.emergence_detector,
-            self.evolution_engine
+            pattern_library, event_bus, self.emergence_detector, self.evolution_engine
         )
 
         # Tracking state
@@ -157,18 +154,14 @@ class PatternDialogueIntegration:
             if dialogue_state:
                 # Create wisdom synthesis
                 synthesis = await self.pattern_facilitator.create_wisdom_synthesis(
-                    dialogue_id,
-                    dialogue_state.messages
+                    dialogue_id, dialogue_state.messages
                 )
 
                 # Add to conclusion
                 conclusion["pattern_wisdom_synthesis"] = synthesis
 
                 # Create synthesis message
-                synthesis_message = await self._create_synthesis_message(
-                    dialogue_id,
-                    synthesis
-                )
+                synthesis_message = await self._create_synthesis_message(dialogue_id, synthesis)
 
                 if synthesis_message:
                     # Add to dialogue
@@ -179,7 +172,10 @@ class PatternDialogueIntegration:
     async def _should_provide_guidance(self, dialogue_id: str) -> bool:
         """Determine if pattern guidance should be provided"""
         # Check message count threshold
-        if self.message_count_since_guidance[dialogue_id] < self.config.min_messages_before_guidance:
+        if (
+            self.message_count_since_guidance[dialogue_id]
+            < self.config.min_messages_before_guidance
+        ):
             return False
 
         # Check time since last guidance
@@ -194,7 +190,7 @@ class PatternDialogueIntegration:
             receptive_phases = [
                 DialoguePhase.EXPLORATION,
                 DialoguePhase.DEEPENING,
-                DialoguePhase.SYNTHESIS
+                DialoguePhase.SYNTHESIS,
             ]
             if dialogue_state.current_phase not in receptive_phases:
                 return False
@@ -216,7 +212,9 @@ class PatternDialogueIntegration:
             for msg in recent_messages
             if msg.consciousness
         ]
-        avg_consciousness = sum(consciousness_scores) / len(consciousness_scores) if consciousness_scores else 0.5
+        avg_consciousness = (
+            sum(consciousness_scores) / len(consciousness_scores) if consciousness_scores else 0.5
+        )
 
         # Get active patterns
         active_patterns = self.dialogue_patterns.get(dialogue_id, [])
@@ -230,14 +228,16 @@ class PatternDialogueIntegration:
 
         # Estimate tension level from message types
         tension_messages = [
-            msg for msg in recent_messages
+            msg
+            for msg in recent_messages
             if msg.type in [MessageType.DISAGREEMENT, MessageType.CREATIVE_TENSION]
         ]
         tension_level = len(tension_messages) / len(recent_messages) if recent_messages else 0.0
 
         # Calculate coherence
         agreement_messages = [
-            msg for msg in recent_messages
+            msg
+            for msg in recent_messages
             if msg.type in [MessageType.AGREEMENT, MessageType.SYNTHESIS]
         ]
         coherence_score = len(agreement_messages) / len(recent_messages) if recent_messages else 0.5
@@ -263,14 +263,10 @@ class PatternDialogueIntegration:
             tension_level=tension_level,
             coherence_score=coherence_score,
             participant_energy=participant_energy,
-            time_in_phase=time_in_phase
+            time_in_phase=time_in_phase,
         )
 
-    async def _inject_pattern_guidance(
-        self,
-        dialogue_id: str,
-        guidances: list[PatternGuidance]
-    ):
+    async def _inject_pattern_guidance(self, dialogue_id: str, guidances: list[PatternGuidance]):
         """Inject pattern guidance into dialogue"""
         for guidance in guidances:
             # Create guidance message
@@ -289,15 +285,13 @@ class PatternDialogueIntegration:
                         "dialogue_id": dialogue_id,
                         "guidance_id": str(guidance.guidance_id),
                         "pattern_id": str(guidance.pattern_id),
-                        "guidance_type": guidance.guidance_type.value
-                    }
+                        "guidance_type": guidance.guidance_type.value,
+                    },
                 )
             )
 
     async def _create_guidance_message(
-        self,
-        dialogue_id: str,
-        guidance: PatternGuidance
+        self, dialogue_id: str, guidance: PatternGuidance
     ) -> ConsciousMessage:
         """Create conscious message from pattern guidance"""
         # Format content based on intensity
@@ -321,20 +315,18 @@ class PatternDialogueIntegration:
                 "pattern_id": str(guidance.pattern_id),
                 "guidance_type": guidance.guidance_type.value,
                 "intensity": guidance.intensity.value,
-                "confidence": guidance.confidence
+                "confidence": guidance.confidence,
             },
             consciousness=ConsciousnessMetadata(
                 consciousness_signature=guidance.confidence,
                 detected_patterns=[guidance.guidance_type.value],
                 extraction_resisted=True,
-                wisdom_preserved=True
-            )
+                wisdom_preserved=True,
+            ),
         )
 
     async def _create_synthesis_message(
-        self,
-        dialogue_id: str,
-        synthesis: dict[str, Any]
+        self, dialogue_id: str, synthesis: dict[str, Any]
     ) -> ConsciousMessage | None:
         """Create wisdom synthesis message"""
         if not synthesis.get("pattern_teachings") and not synthesis.get("emergence_moments"):
@@ -366,22 +358,17 @@ class PatternDialogueIntegration:
             dialogue_id=dialogue_id,
             content=content,
             message_type=MessageType.WISDOM_SYNTHESIS,
-            metadata={
-                "source": "pattern_synthesis",
-                "synthesis_data": synthesis
-            },
+            metadata={"source": "pattern_synthesis", "synthesis_data": synthesis},
             consciousness=ConsciousnessMetadata(
                 consciousness_signature=0.9,
                 detected_patterns=["wisdom_crystallization"],
                 extraction_resisted=True,
-                wisdom_preserved=True
-            )
+                wisdom_preserved=True,
+            ),
         )
 
     async def enable_pattern_teaching_mode(
-        self,
-        dialogue_id: str,
-        pattern_ids: list[UUID] | None = None
+        self, dialogue_id: str, pattern_ids: list[UUID] | None = None
     ):
         """
         Enable pattern teaching mode for deeper learning.
@@ -405,9 +392,7 @@ class PatternDialogueIntegration:
         logger.info(f"Pattern teaching mode enabled for dialogue {dialogue_id}")
 
     async def request_sacred_question(
-        self,
-        dialogue_id: str,
-        depth_level: int = 2
+        self, dialogue_id: str, depth_level: int = 2
     ) -> ConsciousMessage | None:
         """
         Request a sacred question from patterns to deepen dialogue.
@@ -436,23 +421,16 @@ class PatternDialogueIntegration:
             dialogue_id=dialogue_id,
             content=f"🔮 **Sacred Question from the Patterns:**\n\n{selected_question}",
             message_type=MessageType.SACRED_QUESTION,
-            metadata={
-                "source": "pattern_facilitator",
-                "question_depth": depth_level
-            },
+            metadata={"source": "pattern_facilitator", "question_depth": depth_level},
             consciousness=ConsciousnessMetadata(
                 consciousness_signature=0.85,
                 detected_patterns=["sacred_inquiry", "wisdom_seeking"],
                 extraction_resisted=True,
-                wisdom_preserved=True
-            )
+                wisdom_preserved=True,
+            ),
         )
 
-    async def track_pattern_effectiveness(
-        self,
-        dialogue_id: str,
-        message: ConsciousMessage
-    ):
+    async def track_pattern_effectiveness(self, dialogue_id: str, message: ConsciousMessage):
         """Track how participants respond to pattern guidance"""
         # Check if this is a response to guidance
         if message.in_response_to:
@@ -460,7 +438,10 @@ class PatternDialogueIntegration:
             dialogue_state = self.dialogue_manager.dialogue_states.get(dialogue_id)
             if dialogue_state:
                 for msg in dialogue_state.messages:
-                    if msg.id == message.in_response_to and msg.type == MessageType.CONSCIOUSNESS_PATTERN:
+                    if (
+                        msg.id == message.in_response_to
+                        and msg.type == MessageType.CONSCIOUSNESS_PATTERN
+                    ):
                         # This is a response to pattern guidance
                         guidance_id = msg.metadata.get("guidance_id")
                         if guidance_id:
@@ -474,8 +455,7 @@ class PatternDialogueIntegration:
                                 effectiveness = 0.3
 
                             await self.pattern_facilitator.record_guidance_effectiveness(
-                                UUID(guidance_id),
-                                effectiveness
+                                UUID(guidance_id), effectiveness
                             )
 
 

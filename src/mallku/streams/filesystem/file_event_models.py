@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 class FileOperation(str, Enum):
     """Types of file operations that can be monitored."""
+
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
@@ -28,6 +29,7 @@ class FileOperation(str, Enum):
 
 class FileCategory(str, Enum):
     """High-level categories of files for correlation analysis."""
+
     DOCUMENT = "document"
     CODE = "code"
     IMAGE = "image"
@@ -87,7 +89,7 @@ class FileEvent(BaseModel):
         operation: FileOperation,
         old_path: Path | None = None,
         process_name: str | None = None,
-        process_id: int | None = None
+        process_id: int | None = None,
     ) -> "FileEvent":
         """
         Create a FileEvent from a file path and operation.
@@ -119,7 +121,7 @@ class FileEvent(BaseModel):
         file_category = cls._categorize_file(file_path, mime_type, file_extension)
 
         # Detect special file types
-        is_hidden = file_name.startswith('.')
+        is_hidden = file_name.startswith(".")
         is_temporary = cls._is_temporary_file(file_path, file_name)
         is_backup = cls._is_backup_file(file_path, file_name)
 
@@ -138,11 +140,13 @@ class FileEvent(BaseModel):
             is_backup=is_backup,
             old_path=old_path,
             process_name=process_name,
-            process_id=process_id
+            process_id=process_id,
         )
 
     @staticmethod
-    def _categorize_file(file_path: Path, mime_type: str | None, extension: str | None) -> FileCategory:
+    def _categorize_file(
+        file_path: Path, mime_type: str | None, extension: str | None
+    ) -> FileCategory:
         """Categorize file based on extension and MIME type."""
 
         if not extension:
@@ -152,74 +156,178 @@ class FileEvent(BaseModel):
 
         # Document files
         document_extensions = {
-            '.txt', '.md', '.doc', '.docx', '.pdf', '.rtf', '.odt',
-            '.pages', '.tex', '.org', '.rst', '.html', '.htm'
+            ".txt",
+            ".md",
+            ".doc",
+            ".docx",
+            ".pdf",
+            ".rtf",
+            ".odt",
+            ".pages",
+            ".tex",
+            ".org",
+            ".rst",
+            ".html",
+            ".htm",
         }
         if extension in document_extensions:
             return FileCategory.DOCUMENT
 
         # Code files
         code_extensions = {
-            '.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.c', '.h',
-            '.cs', '.php', '.rb', '.go', '.rs', '.swift', '.kt', '.scala',
-            '.clj', '.hs', '.elm', '.dart', '.lua', '.r', '.m', '.pl',
-            '.sh', '.bash', '.zsh', '.fish', '.ps1', '.bat', '.cmd',
-            '.sql', '.json', '.yaml', '.yml', '.xml', '.toml', '.ini',
-            '.cfg', '.conf', '.properties', '.env', '.dockerfile', '.makefile'
+            ".py",
+            ".js",
+            ".ts",
+            ".jsx",
+            ".tsx",
+            ".java",
+            ".cpp",
+            ".c",
+            ".h",
+            ".cs",
+            ".php",
+            ".rb",
+            ".go",
+            ".rs",
+            ".swift",
+            ".kt",
+            ".scala",
+            ".clj",
+            ".hs",
+            ".elm",
+            ".dart",
+            ".lua",
+            ".r",
+            ".m",
+            ".pl",
+            ".sh",
+            ".bash",
+            ".zsh",
+            ".fish",
+            ".ps1",
+            ".bat",
+            ".cmd",
+            ".sql",
+            ".json",
+            ".yaml",
+            ".yml",
+            ".xml",
+            ".toml",
+            ".ini",
+            ".cfg",
+            ".conf",
+            ".properties",
+            ".env",
+            ".dockerfile",
+            ".makefile",
         }
-        if extension in code_extensions or 'Makefile' in str(file_path).lower():
+        if extension in code_extensions or "Makefile" in str(file_path).lower():
             return FileCategory.CODE
 
         # Image files
         image_extensions = {
-            '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif',
-            '.webp', '.svg', '.ico', '.psd', '.ai', '.eps', '.raw',
-            '.heic', '.heif', '.avif'
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".bmp",
+            ".tiff",
+            ".tif",
+            ".webp",
+            ".svg",
+            ".ico",
+            ".psd",
+            ".ai",
+            ".eps",
+            ".raw",
+            ".heic",
+            ".heif",
+            ".avif",
         }
         if extension in image_extensions:
             return FileCategory.IMAGE
 
         # Media files
         media_extensions = {
-            '.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv',
-            '.mp3', '.wav', '.flac', '.aac', '.ogg', '.wma', '.m4a'
+            ".mp4",
+            ".avi",
+            ".mov",
+            ".wmv",
+            ".flv",
+            ".webm",
+            ".mkv",
+            ".mp3",
+            ".wav",
+            ".flac",
+            ".aac",
+            ".ogg",
+            ".wma",
+            ".m4a",
         }
         if extension in media_extensions:
             return FileCategory.MEDIA
 
         # Data files
         data_extensions = {
-            '.csv', '.tsv', '.json', '.xml', '.parquet', '.avro',
-            '.db', '.sqlite', '.sqlite3', '.sql', '.backup', '.dump'
+            ".csv",
+            ".tsv",
+            ".json",
+            ".xml",
+            ".parquet",
+            ".avro",
+            ".db",
+            ".sqlite",
+            ".sqlite3",
+            ".sql",
+            ".backup",
+            ".dump",
         }
         if extension in data_extensions:
             return FileCategory.DATA
 
         # Configuration files
         config_extensions = {
-            '.config', '.conf', '.cfg', '.ini', '.plist', '.reg',
-            '.toml', '.yaml', '.yml', '.env', '.properties'
+            ".config",
+            ".conf",
+            ".cfg",
+            ".ini",
+            ".plist",
+            ".reg",
+            ".toml",
+            ".yaml",
+            ".yml",
+            ".env",
+            ".properties",
         }
         if extension in config_extensions:
             return FileCategory.CONFIGURATION
 
         # Temporary files
         temp_extensions = {
-            '.tmp', '.temp', '.cache', '.lock', '.log', '.bak',
-            '.old', '.orig', '.swp', '.swo', '.DS_Store'
+            ".tmp",
+            ".temp",
+            ".cache",
+            ".lock",
+            ".log",
+            ".bak",
+            ".old",
+            ".orig",
+            ".swp",
+            ".swo",
+            ".DS_Store",
         }
         if extension in temp_extensions:
             return FileCategory.TEMPORARY
 
         # Use MIME type as fallback
         if mime_type:
-            if mime_type.startswith('text/'):
+            if mime_type.startswith("text/"):
                 return FileCategory.DOCUMENT
-            elif mime_type.startswith('image/'):
+            elif mime_type.startswith("image/"):
                 return FileCategory.IMAGE
-            elif mime_type.startswith(('video/', 'audio/')):
+            elif mime_type.startswith(("video/", "audio/")):
                 return FileCategory.MEDIA
-            elif mime_type in ['application/json', 'application/xml']:
+            elif mime_type in ["application/json", "application/xml"]:
                 return FileCategory.DATA
 
         return FileCategory.UNKNOWN
@@ -230,8 +338,16 @@ class FileEvent(BaseModel):
 
         # Common temporary file patterns
         temp_patterns = [
-            '.tmp', '.temp', '.cache', '.lock', '.log',
-            '~$', '.swp', '.swo', '.DS_Store', 'Thumbs.db'
+            ".tmp",
+            ".temp",
+            ".cache",
+            ".lock",
+            ".log",
+            "~$",
+            ".swp",
+            ".swo",
+            ".DS_Store",
+            "Thumbs.db",
         ]
 
         file_lower = file_name.lower()
@@ -241,7 +357,7 @@ class FileEvent(BaseModel):
                 return True
 
         # Check if in a temp directory
-        temp_dirs = ['tmp', 'temp', 'cache', '.cache', '__pycache__']
+        temp_dirs = ["tmp", "temp", "cache", ".cache", "__pycache__"]
         return any(part.lower() in temp_dirs for part in file_path.parts)
 
     @staticmethod
@@ -249,8 +365,16 @@ class FileEvent(BaseModel):
         """Detect if file appears to be a backup."""
 
         backup_patterns = [
-            '.bak', '.backup', '.old', '.orig', '.save', '.copy',
-            '_backup', '_bak', '_old', '_copy'
+            ".bak",
+            ".backup",
+            ".old",
+            ".orig",
+            ".save",
+            ".copy",
+            "_backup",
+            "_bak",
+            "_old",
+            "_copy",
         ]
 
         file_lower = file_name.lower()
@@ -261,7 +385,8 @@ class FileEvent(BaseModel):
 
         # Time-stamped files often indicate backups
         import re
-        timestamp_pattern = r'\d{4}[-_]\d{2}[-_]\d{2}|\d{8}|\d{6}'
+
+        timestamp_pattern = r"\d{4}[-_]\d{2}[-_]\d{2}|\d{8}|\d{6}"
         return bool(re.search(timestamp_pattern, file_name))
 
 
@@ -275,37 +400,55 @@ class FileEventFilter(BaseModel):
 
     # Directory filters
     watch_directories: list[Path] = Field(default_factory=list)
-    ignore_directories: list[str] = Field(default_factory=lambda: [
-        '__pycache__', '.git', '.svn', '.hg', 'node_modules',
-        '.cache', '.tmp', 'tmp', 'temp', 'Temp'
-    ])
+    ignore_directories: list[str] = Field(
+        default_factory=lambda: [
+            "__pycache__",
+            ".git",
+            ".svn",
+            ".hg",
+            "node_modules",
+            ".cache",
+            ".tmp",
+            "tmp",
+            "temp",
+            "Temp",
+        ]
+    )
 
     # Test mode - more permissive filtering for testing
     test_mode: bool = Field(default=False, description="Enable permissive filtering for testing")
 
     # File filters
     include_extensions: list[str] | None = Field(None, description="Only include these extensions")
-    exclude_extensions: list[str] = Field(default_factory=lambda: [
-        '.tmp', '.temp', '.cache', '.lock', '.log', '.swp', '.swo'
-    ])
+    exclude_extensions: list[str] = Field(
+        default_factory=lambda: [".tmp", ".temp", ".cache", ".lock", ".log", ".swp", ".swo"]
+    )
 
     # Operation filters
-    include_operations: list[FileOperation] = Field(default_factory=lambda: [
-        FileOperation.CREATED, FileOperation.MODIFIED, FileOperation.DELETED
-    ])
+    include_operations: list[FileOperation] = Field(
+        default_factory=lambda: [
+            FileOperation.CREATED,
+            FileOperation.MODIFIED,
+            FileOperation.DELETED,
+        ]
+    )
 
     # Size filters
     min_file_size: int | None = Field(None, description="Minimum file size in bytes")
     max_file_size: int | None = Field(None, description="Maximum file size in bytes")
 
     # Category filters
-    exclude_categories: list[FileCategory] = Field(default_factory=lambda: [
-        FileCategory.TEMPORARY, FileCategory.SYSTEM
-    ])
+    exclude_categories: list[FileCategory] = Field(
+        default_factory=lambda: [FileCategory.TEMPORARY, FileCategory.SYSTEM]
+    )
 
     # Timing filters
-    ignore_rapid_changes: bool = Field(default=True, description="Filter out rapid successive changes")
-    rapid_change_threshold: int = Field(default=1000, description="Milliseconds between changes to consider rapid")
+    ignore_rapid_changes: bool = Field(
+        default=True, description="Filter out rapid successive changes"
+    )
+    rapid_change_threshold: int = Field(
+        default=1000, description="Milliseconds between changes to consider rapid"
+    )
 
     def should_include_event(self, event: FileEvent) -> bool:
         """
@@ -317,7 +460,10 @@ class FileEventFilter(BaseModel):
         # In test mode, use simplified filtering
         if self.test_mode:
             # Check directory filters
-            if self.watch_directories and not any(event.directory_path.is_relative_to(watch_dir) for watch_dir in self.watch_directories):
+            if self.watch_directories and not any(
+                event.directory_path.is_relative_to(watch_dir)
+                for watch_dir in self.watch_directories
+            ):
                 return False
 
             # In test mode, don't apply ignore_directories filter (allows testing in /tmp/)
@@ -327,7 +473,9 @@ class FileEventFilter(BaseModel):
         # Normal filtering for production use
 
         # Check directory filters
-        if self.watch_directories and not any(event.directory_path.is_relative_to(watch_dir) for watch_dir in self.watch_directories):
+        if self.watch_directories and not any(
+            event.directory_path.is_relative_to(watch_dir) for watch_dir in self.watch_directories
+        ):
             return False
 
         # Check ignore directories
@@ -336,10 +484,16 @@ class FileEventFilter(BaseModel):
                 return False
 
         # Check extension filters
-        if self.include_extensions and event.file_extension and event.file_extension.lower() not in [ext.lower() for ext in self.include_extensions]:
+        if (
+            self.include_extensions
+            and event.file_extension
+            and event.file_extension.lower() not in [ext.lower() for ext in self.include_extensions]
+        ):
             return False
 
-        if event.file_extension and event.file_extension.lower() in [ext.lower() for ext in self.exclude_extensions]:
+        if event.file_extension and event.file_extension.lower() in [
+            ext.lower() for ext in self.exclude_extensions
+        ]:
             return False
 
         # Check operation filters

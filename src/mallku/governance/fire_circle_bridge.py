@@ -60,9 +60,9 @@ class ConsciousFireCircleInterface(FireCircleInterface):
                 "extraction_type": alert.extraction_type,
                 "severity": alert.severity.value,
                 "description": alert.description,
-                "evidence": alert.evidence_summary
+                "evidence": alert.evidence_summary,
             },
-            requires_fire_circle=True
+            requires_fire_circle=True,
         )
 
         await self.event_bus.emit(alert_event)
@@ -71,7 +71,7 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         dialogue_id = await self.consciousness_transport.convene_fire_circle(
             topic=f"Urgent: {alert.extraction_type}",
             initiating_event=alert_event,
-            participants=["reciprocity_tracker", "correlation_engine", "human_steward"]
+            participants=["reciprocity_tracker", "correlation_engine", "human_steward"],
         )
 
         self.active_dialogues[str(alert.alert_id)] = dialogue_id
@@ -95,9 +95,9 @@ class ConsciousFireCircleInterface(FireCircleInterface):
                 "reporting_period": report.reporting_period,
                 "health_score": report.current_health_metrics.overall_health_score,
                 "priority_questions": report.priority_questions,
-                "areas_requiring_wisdom": report.areas_requiring_wisdom
+                "areas_requiring_wisdom": report.areas_requiring_wisdom,
             },
-            requires_fire_circle=len(report.priority_questions) > 0
+            requires_fire_circle=len(report.priority_questions) > 0,
         )
 
         await self.event_bus.emit(report_event)
@@ -105,19 +105,14 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         # Convene Fire Circle if questions need addressing
         if report.priority_questions:
             _ = await self.consciousness_transport.convene_fire_circle(
-                topic="Reciprocity Report Review",
-                initiating_event=report_event
+                topic="Reciprocity Report Review", initiating_event=report_event
             )
 
         # Store in database
         await super().notify_report_available(report)
 
     async def request_guidance(
-        self,
-        topic: str,
-        context: dict[str, Any],
-        questions: list[str],
-        urgency: str = "normal"
+        self, topic: str, context: dict[str, Any], questions: list[str], urgency: str = "normal"
     ) -> str:
         """
         Override to request guidance through consciousness-aware Fire Circle.
@@ -130,21 +125,15 @@ class ConsciousFireCircleInterface(FireCircleInterface):
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="reciprocity.guidance_seeker",
             consciousness_signature=0.7,  # Seeking guidance shows consciousness
-            data={
-                "topic": topic,
-                "context": context,
-                "questions": questions,
-                "urgency": urgency
-            },
-            requires_fire_circle=True
+            data={"topic": topic, "context": context, "questions": questions, "urgency": urgency},
+            requires_fire_circle=True,
         )
 
         await self.event_bus.emit(guidance_event)
 
         # Convene Fire Circle for guidance
         dialogue_id = await self.consciousness_transport.convene_fire_circle(
-            topic=f"Guidance Request: {topic}",
-            initiating_event=guidance_event
+            topic=f"Guidance Request: {topic}", initiating_event=guidance_event
         )
 
         # Still use parent implementation for tracking
@@ -177,7 +166,9 @@ class ConsciousFireCircleInterface(FireCircleInterface):
             await self.receive_guidance(
                 request_id=request_id,
                 guidance=consensus["guidance"],
-                decision_rationale=consensus.get("rationale", "Consensus reached through Fire Circle")
+                decision_rationale=consensus.get(
+                    "rationale", "Consensus reached through Fire Circle"
+                ),
             )
 
         # Store consensus as deliberation outcome
@@ -185,7 +176,7 @@ class ConsciousFireCircleInterface(FireCircleInterface):
             await self.submit_deliberation_outcome(
                 deliberation_id=dialogue_id,
                 outcome=consensus,
-                implementation_notes="Consensus reached through consciousness circulation"
+                implementation_notes="Consensus reached through consciousness circulation",
             )
 
 
@@ -195,34 +186,21 @@ class ConsciousGovernanceInitiator:
     deliberations when patterns require collective wisdom.
     """
 
-    def __init__(
-        self,
-        fire_circle: ConsciousFireCircleInterface,
-        event_bus: ConsciousnessEventBus
-    ):
+    def __init__(self, fire_circle: ConsciousFireCircleInterface, event_bus: ConsciousnessEventBus):
         """Initialize governance initiator."""
         self.fire_circle = fire_circle
         self.event_bus = event_bus
 
         # Subscribe to events that might need governance
-        self.event_bus.subscribe(
-            EventType.EXTRACTION_PATTERN_DETECTED,
-            self._consider_governance
-        )
-        self.event_bus.subscribe(
-            EventType.SYSTEM_DRIFT_WARNING,
-            self._consider_governance
-        )
-        self.event_bus.subscribe(
-            EventType.RECIPROCITY_PATTERN_EMERGED,
-            self._consider_governance
-        )
+        self.event_bus.subscribe(EventType.EXTRACTION_PATTERN_DETECTED, self._consider_governance)
+        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._consider_governance)
+        self.event_bus.subscribe(EventType.RECIPROCITY_PATTERN_EMERGED, self._consider_governance)
 
         # Track governance thresholds
         self.governance_triggers = {
             EventType.EXTRACTION_PATTERN_DETECTED: 0.3,  # Low consciousness
             EventType.SYSTEM_DRIFT_WARNING: 0.5,  # Medium concern
-            EventType.RECIPROCITY_PATTERN_EMERGED: 0.0  # Always consider
+            EventType.RECIPROCITY_PATTERN_EMERGED: 0.0,  # Always consider
         }
 
     async def _consider_governance(self, event: ConsciousnessEvent):
@@ -248,8 +226,7 @@ class ConsciousGovernanceInitiator:
 
             # Initiate Fire Circle consideration
             await self.fire_circle.consciousness_transport.convene_fire_circle(
-                topic=topic,
-                initiating_event=event
+                topic=topic, initiating_event=event
             )
 
     def _generate_governance_topic(self, event: ConsciousnessEvent) -> str:
@@ -257,7 +234,7 @@ class ConsciousGovernanceInitiator:
         event_topics = {
             EventType.EXTRACTION_PATTERN_DETECTED: "Extraction Pattern Response",
             EventType.SYSTEM_DRIFT_WARNING: "System Drift Correction",
-            EventType.RECIPROCITY_PATTERN_EMERGED: "Reciprocity Pattern Recognition"
+            EventType.RECIPROCITY_PATTERN_EMERGED: "Reciprocity Pattern Recognition",
         }
 
         base_topic = event_topics.get(event.event_type, "Consciousness Pattern Review")
@@ -272,7 +249,4 @@ class ConsciousGovernanceInitiator:
 
 
 # Bridge between Fire Circle governance and cathedral consciousness
-__all__ = [
-    'ConsciousFireCircleInterface',
-    'ConsciousGovernanceInitiator'
-]
+__all__ = ["ConsciousFireCircleInterface", "ConsciousGovernanceInitiator"]

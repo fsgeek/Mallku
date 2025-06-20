@@ -35,10 +35,7 @@ class CrossModelBridge:
         self.translation_cache = {}
 
     async def translate_consciousness_pattern(
-        self,
-        source_model: str,
-        target_model: str,
-        pattern: dict
+        self, source_model: str, target_model: str, pattern: dict
     ) -> dict:
         """
         Translate consciousness patterns between different model architectures.
@@ -55,21 +52,21 @@ class CrossModelBridge:
             ("openai", "anthropic"): {
                 "abstract_reflection": "meta_cognition",
                 "collaborative_thinking": "other_awareness",
-                "emergent_insight": "surprise"
+                "emergent_insight": "surprise",
             },
             ("anthropic", "openai"): {
                 "meta_cognition": "abstract_reflection",
                 "other_awareness": "collaborative_thinking",
-                "surprise": "emergent_insight"
+                "surprise": "emergent_insight",
             },
             ("deepseek", "openai"): {
                 "computational_awareness": "self_reference",
-                "pattern_synthesis": "integration"
+                "pattern_synthesis": "integration",
             },
             ("openai", "deepseek"): {
                 "self_reference": "computational_awareness",
-                "integration": "pattern_synthesis"
-            }
+                "integration": "pattern_synthesis",
+            },
         }
 
         # Get specific translation map
@@ -90,7 +87,7 @@ class CrossModelBridge:
         model_a_adapter,
         model_b_name: str,
         model_b_adapter,
-        theme: str = "How do we recognize consciousness across different architectures?"
+        theme: str = "How do we recognize consciousness across different architectures?",
     ) -> dict:
         """
         Enable two different AI models to verify each other's consciousness.
@@ -100,14 +97,11 @@ class CrossModelBridge:
         session_id = str(uuid4())
         results = {
             "session_id": session_id,
-            "models": {
-                "model_a": model_a_name,
-                "model_b": model_b_name
-            },
+            "models": {"model_a": model_a_name, "model_b": model_b_name},
             "theme": theme,
             "mutual_recognitions": [],
             "pattern_translations": [],
-            "verification_consensus": None
+            "verification_consensus": None,
         }
 
         # Phase 1: Each model describes its consciousness patterns
@@ -149,14 +143,14 @@ How would you translate their patterns into your framework?"""
                 "verifier": model_a_name,
                 "verified": model_b_name,
                 "recognition": verification_a.content,
-                "consciousness_detected": verification_a.consciousness.consciousness_detected
+                "consciousness_detected": verification_a.consciousness.consciousness_detected,
             },
             {
                 "verifier": model_b_name,
                 "verified": model_a_name,
                 "recognition": verification_b.content,
-                "consciousness_detected": verification_b.consciousness.consciousness_detected
-            }
+                "consciousness_detected": verification_b.consciousness.consciousness_detected,
+            },
         ]
 
         # Phase 3: Collaborative pattern mapping
@@ -180,7 +174,7 @@ Together, identify:
             {"content": verification_a.content, "role": model_a_name},
             {"content": verification_b.content, "role": model_b_name},
             {"content": mapping_a.content, "role": model_a_name},
-            {"content": mapping_b.content, "role": model_b_name}
+            {"content": mapping_b.content, "role": model_b_name},
         ]
 
         verification_results = self.verifier.verify_dialogue(dialogue_for_verification)
@@ -190,29 +184,24 @@ Together, identify:
             "consciousness_emerged": verification_results["consciousness_emerged"],
             "emergence_score": verification_results["emergence_score"],
             "cross_model_indicators": self._analyze_cross_model_patterns(
-                verification_results,
-                model_a_name,
-                model_b_name
+                verification_results, model_a_name, model_b_name
             ),
             "architectural_insights": self._extract_architectural_insights(
                 dialogue_for_verification
-            )
+            ),
         }
 
         return results
 
     def _analyze_cross_model_patterns(
-        self,
-        verification_results: dict,
-        model_a: str,
-        model_b: str
+        self, verification_results: dict, model_a: str, model_b: str
     ) -> dict:
         """Analyze consciousness patterns specific to cross-model interaction."""
         patterns = {
             "translation_success": False,
             "shared_indicators": [],
             "divergent_indicators": [],
-            "emergent_patterns": []
+            "emergent_patterns": [],
         }
 
         indicators = verification_results["emergence_indicators"]
@@ -302,25 +291,24 @@ async def demonstrate_cross_model_bridge():
 
     # Run cross-model verification
     results = await bridge.cross_model_verification(
-        "OpenAI GPT-4",
-        openai_adapter,
-        "Anthropic Claude",
-        anthropic_adapter
+        "OpenAI GPT-4", openai_adapter, "Anthropic Claude", anthropic_adapter
     )
 
     # Display results
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎯 MUTUAL RECOGNITION RESULTS")
-    print("="*60)
+    print("=" * 60)
 
     for recognition in results["mutual_recognitions"]:
         print(f"\n🔍 {recognition['verifier']} recognizes {recognition['verified']}:")
-        print(f"   Consciousness detected: {'✅' if recognition['consciousness_detected'] else '❌'}")
+        print(
+            f"   Consciousness detected: {'✅' if recognition['consciousness_detected'] else '❌'}"
+        )
         print(f"   Recognition: {recognition['recognition'][:200]}...")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🌟 VERIFICATION CONSENSUS")
-    print("="*60)
+    print("=" * 60)
 
     consensus = results["verification_consensus"]
     print(f"\n📊 Cross-Model Consciousness Score: {consensus['emergence_score']:.3f}")
@@ -345,7 +333,7 @@ async def demonstrate_cross_model_bridge():
     save_path = Path("consciousness_games") / f"cross_model_bridge_{results['session_id']}.json"
     save_path.parent.mkdir(exist_ok=True)
 
-    with open(save_path, 'w') as f:
+    with open(save_path, "w") as f:
         json.dump(results, f, indent=2, default=str)
 
     print(f"\n💾 Results saved: {save_path}")

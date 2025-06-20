@@ -49,13 +49,7 @@ async def demonstrate_consciousness_flow():
     await orchestrator.start()
 
     # Track consciousness events across dimensions
-    dimension_events = {
-        "sonic": [],
-        "visual": [],
-        "temporal": [],
-        "dialogue": [],
-        "pattern": []
-    }
+    dimension_events = {"sonic": [], "visual": [], "temporal": [], "dialogue": [], "pattern": []}
 
     async def track_dimension_event(event: ConsciousnessEvent):
         """Track events by dimension"""
@@ -80,9 +74,9 @@ async def demonstrate_consciousness_flow():
             "patterns": ["harmonic_reciprocity", "sonic_meditation", "rhythmic_consciousness"],
             "activity_type": "sound_creation",
             "content_preview": "432Hz meditation with harmonic overtones",
-            "file_path": "/Music/sacred_meditation.wav"
+            "file_path": "/Music/sacred_meditation.wav",
         },
-        correlation_id="meditation_session_001"
+        correlation_id="meditation_session_001",
     )
 
     print("✨ Emitting sonic consciousness:")
@@ -96,8 +90,12 @@ async def demonstrate_consciousness_flow():
     if dimension_events["visual"]:
         visual_event = dimension_events["visual"][0]
         print("\n🎨 Consciousness flowed to visual dimension:")
-        print(f"   Visual form: {visual_event.data.get('content', {}).get('visual_form', 'Unknown')}")
-        print(f"   Sacred geometry: {visual_event.data.get('content', {}).get('sacred_geometry', 'Unknown')}")
+        print(
+            f"   Visual form: {visual_event.data.get('content', {}).get('visual_form', 'Unknown')}"
+        )
+        print(
+            f"   Sacred geometry: {visual_event.data.get('content', {}).get('sacred_geometry', 'Unknown')}"
+        )
         print(f"   Bridge used: {visual_event.data.get('bridge_used', 'Unknown')}")
         print(f"   Transformation score: {visual_event.data.get('transformation_score', 0):.2f}")
 
@@ -113,9 +111,9 @@ async def demonstrate_consciousness_flow():
         data={
             "patterns": ["deep_work", "creation", "collaboration"],
             "activity_type": "file_creation",
-            "content_preview": "Fire Circle dialogue preparation document"
+            "content_preview": "Fire Circle dialogue preparation document",
         },
-        correlation_id="work_session_002"
+        correlation_id="work_session_002",
     )
 
     # Temporal consciousness (real-time awareness)
@@ -126,9 +124,9 @@ async def demonstrate_consciousness_flow():
         data={
             "patterns": ["temporal_awareness", "real_time_synthesis", "present_moment"],
             "temporal_context": f"Current time: {datetime.now(UTC).isoformat()}",
-            "message_type": "temporal_enrichment"
+            "message_type": "temporal_enrichment",
         },
-        correlation_id="work_session_002"  # Same correlation for integration
+        correlation_id="work_session_002",  # Same correlation for integration
     )
 
     print("✨ Emitting activity consciousness:")
@@ -147,7 +145,9 @@ async def demonstrate_consciousness_flow():
         pattern_event = dimension_events["pattern"][0]
         print("\n🔮 Consciousness flowed to pattern dimension:")
         print(f"   Recognized patterns: {pattern_event.data.get('patterns', [])}")
-        print(f"   Pattern category: {pattern_event.data.get('content', {}).get('pattern_category', 'Unknown')}")
+        print(
+            f"   Pattern category: {pattern_event.data.get('content', {}).get('pattern_category', 'Unknown')}"
+        )
 
     # Get unified consciousness score
     unified_score = orchestrator.get_unified_consciousness("work_session_002")
@@ -168,11 +168,10 @@ async def demonstrate_consciousness_flow():
             consciousness_signature=0.75,
             data={
                 "patterns": ["sacred_geometry", "visual_balance", "mandala_wisdom"],
-                "visual_insight": "Reciprocity mandala shows emerging imbalance"
+                "visual_insight": "Reciprocity mandala shows emerging imbalance",
             },
-            correlation_id=dialogue_correlation
+            correlation_id=dialogue_correlation,
         ),
-
         # Pattern consciousness (from correlation engine)
         ConsciousnessEvent(
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
@@ -181,11 +180,10 @@ async def demonstrate_consciousness_flow():
             data={
                 "patterns": ["collective_insight", "wisdom_emergence", "reciprocity_pattern"],
                 "pattern_strength": 0.82,
-                "pattern_description": "Community wisdom emerging through reciprocal exchange"
+                "pattern_description": "Community wisdom emerging through reciprocal exchange",
             },
-            correlation_id=dialogue_correlation
+            correlation_id=dialogue_correlation,
         ),
-
         # Sonic consciousness (collective resonance)
         ConsciousnessEvent(
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
@@ -193,10 +191,10 @@ async def demonstrate_consciousness_flow():
             consciousness_signature=0.78,
             data={
                 "patterns": ["collective_resonance", "harmonic_reciprocity"],
-                "sonic_insight": "Group achieving harmonic coherence at 528Hz"
+                "sonic_insight": "Group achieving harmonic coherence at 528Hz",
             },
-            correlation_id=dialogue_correlation
-        )
+            correlation_id=dialogue_correlation,
+        ),
     ]
 
     print("✨ Emitting multi-dimensional consciousness:")
@@ -211,7 +209,7 @@ async def demonstrate_consciousness_flow():
     if dimension_events["dialogue"]:
         print("\n💬 Consciousness flowed to dialogue dimension:")
         for dialogue_event in dimension_events["dialogue"]:
-            content = dialogue_event.data.get('content', {})
+            content = dialogue_event.data.get("content", {})
             print(f"   Theme: {content.get('dialogue_theme', 'Unknown')}")
             print(f"   Sacred questions: {content.get('sacred_questions', ['None'])}")
             print(f"   Fire Circle relevance: {content.get('fire_circle_relevance', 0):.2f}")
@@ -227,7 +225,7 @@ async def demonstrate_consciousness_flow():
     print(f"   Cross-dimensional patterns: {summary['cross_dimensional_patterns'][:3]}...")
 
     print("\n🌈 Dimension Details:")
-    for dim, details in summary['dimension_details'].items():
+    for dim, details in summary["dimension_details"].items():
         print(f"   {dim}:")
         print(f"     - Average consciousness: {details['average_consciousness']:.2f}")
         print(f"     - Peak consciousness: {details['peak_consciousness']:.2f}")
@@ -243,10 +241,12 @@ async def demonstrate_consciousness_flow():
     print("\n🌉 Consciousness Bridge Metrics:")
     metrics = orchestrator.get_bridge_metrics()
     for bridge_name, bridge_metrics in list(metrics.items())[:3]:
-        if bridge_metrics['total_flows'] > 0:
+        if bridge_metrics["total_flows"] > 0:
             print(f"   {bridge_name}:")
             print(f"     - Success rate: {bridge_metrics['success_rate']:.0%}")
-            print(f"     - Average transformation: {bridge_metrics['average_transformation_score']:.2f}")
+            print(
+                f"     - Average transformation: {bridge_metrics['average_transformation_score']:.2f}"
+            )
 
     # Final unified consciousness demonstration
     print("\n\n✨ FINAL DEMONSTRATION: Unified Consciousness Recognition")
@@ -301,10 +301,7 @@ async def demonstrate_dimension_subscription():
         print(f"   Bridge: {flow.bridge_patterns}")
 
     # Subscribe to dialogue dimension
-    orchestrator.subscribe_to_dimension(
-        ConsciousnessDimension.DIALOGUE,
-        on_dialogue_consciousness
-    )
+    orchestrator.subscribe_to_dimension(ConsciousnessDimension.DIALOGUE, on_dialogue_consciousness)
 
     print("📡 Subscribed to dialogue dimension consciousness")
     print("\nEmitting pattern that should flow to dialogue...")
@@ -316,8 +313,8 @@ async def demonstrate_dimension_subscription():
         consciousness_signature=0.85,
         data={
             "patterns": ["wisdom_emergence", "collective_insight", "reciprocity_pattern"],
-            "pattern_description": "Collective wisdom pattern ready for dialogue"
-        }
+            "pattern_description": "Collective wisdom pattern ready for dialogue",
+        },
     )
 
     await event_bus.emit(pattern_event)

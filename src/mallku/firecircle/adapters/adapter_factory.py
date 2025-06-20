@@ -48,7 +48,7 @@ class ConsciousAdapterFactory:
     """
 
     # Registry of available adapters - Fire Circle Complete
-    _adapter_classes: dict[str, type[ConsciousModelAdapter]] = { # Modern dict, imported Type
+    _adapter_classes: dict[str, type[ConsciousModelAdapter]] = {  # Modern dict, imported Type
         "openai": OpenAIConsciousAdapter,
         "anthropic": AnthropicAdapter,
         "local": LocalAIAdapter,
@@ -60,13 +60,13 @@ class ConsciousAdapterFactory:
 
     def __init__(
         self,
-        event_bus: ConsciousnessEventBus | None = None, # Modern Optional
-        reciprocity_tracker: ReciprocityTracker | None = None, # Modern Optional
+        event_bus: ConsciousnessEventBus | None = None,  # Modern Optional
+        reciprocity_tracker: ReciprocityTracker | None = None,  # Modern Optional
     ):
         """Initialize factory with consciousness infrastructure."""
         self.event_bus = event_bus
-        self.reciprocity_tracker = reciprocity_tracker # type: ignore # Keep existing type ignore if intended
-        self._active_adapters: dict[str, ConsciousModelAdapter] = {} # Modern dict
+        self.reciprocity_tracker = reciprocity_tracker  # type: ignore # Keep existing type ignore if intended
+        self._active_adapters: dict[str, ConsciousModelAdapter] = {}  # Modern dict
 
     @classmethod
     def register_adapter(
@@ -153,7 +153,9 @@ class ConsciousAdapterFactory:
 
         # Special log for Fire Circle completion
         if provider_lower == "deepseek":
-            logger.info("🔥 FIRE CIRCLE COMPLETION: DeepSeek founding member connected. All adapters ready for historic governance dialogue.")
+            logger.info(
+                "🔥 FIRE CIRCLE COMPLETION: DeepSeek founding member connected. All adapters ready for historic governance dialogue."
+            )
 
         return adapter
 
@@ -209,11 +211,11 @@ class ConsciousAdapterFactory:
 
         self._active_adapters.clear()
 
-    def get_supported_providers(self) -> list[str]: # Modern list
+    def get_supported_providers(self) -> list[str]:  # Modern list
         """Get list of supported providers."""
         return list(self._adapter_classes.keys())
 
-    async def health_check(self) -> dict[str, Any]: # Modern dict, imported Any
+    async def health_check(self) -> dict[str, Any]:  # Modern dict, imported Any
         """Check health of all active adapters."""
         health_status = {
             "factory_status": "healthy",

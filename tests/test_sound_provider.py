@@ -47,9 +47,7 @@ def temp_sound_dir(tmp_path):
 def sound_provider(temp_sound_dir, mock_event_bus):
     """Create sound activity provider instance."""
     provider = SoundActivityProvider(
-        watch_paths=[str(temp_sound_dir)],
-        event_bus=mock_event_bus,
-        include_silence=True
+        watch_paths=[str(temp_sound_dir)], event_bus=mock_event_bus, include_silence=True
     )
     return provider
 
@@ -69,11 +67,11 @@ class TestSoundActivityProvider:
     async def test_sound_file_recognition(self, sound_provider):
         """Test recognition of various sound file types."""
         # Audio files
-        for ext in ['.mp3', '.wav', '.flac', '.ogg']:
+        for ext in [".mp3", ".wav", ".flac", ".ogg"]:
             assert ext in SoundActivityProvider.SOUND_EXTENSIONS
 
         # Music projects
-        for ext in ['.als', '.flp', '.mid']:
+        for ext in [".als", ".flp", ".mid"]:
             assert ext in SoundActivityProvider.SOUND_EXTENSIONS
 
     @pytest.mark.asyncio
@@ -83,15 +81,15 @@ class TestSoundActivityProvider:
         meditation_file = temp_sound_dir / "meditation" / "morning_meditation.mp3"
         indicators = await sound_provider._detect_sound_consciousness(meditation_file)
 
-        assert indicators.get('creation') is True
-        assert indicators.get('sacred') is True  # From directory name
+        assert indicators.get("creation") is True
+        assert indicators.get("sacred") is True  # From directory name
 
         # Test rhythm pattern
         drum_file = temp_sound_dir / "drum_circle_recording.wav"
         indicators = await sound_provider._detect_sound_consciousness(drum_file)
 
-        assert indicators.get('creation') is True
-        assert indicators.get('rhythm') is True
+        assert indicators.get("creation") is True
+        assert indicators.get("rhythm") is True
 
     @pytest.mark.asyncio
     async def test_sound_event_processing(self, sound_provider, temp_sound_dir):
@@ -100,16 +98,13 @@ class TestSoundActivityProvider:
         test_file = temp_sound_dir / "music" / "new_composition.mid"
 
         # Process creation event
-        activity = await sound_provider._process_sound_event(
-            str(test_file),
-            'created'
-        )
+        activity = await sound_provider._process_sound_event(str(test_file), "created")
 
         assert activity is not None
         assert activity.activity_type == ActivityType.PATTERN_DISCOVERED
         assert activity.source_path == str(test_file)
-        assert 'creation' in activity.consciousness_indicators
-        assert 'sonic_creation' in activity.potential_patterns
+        assert "creation" in activity.consciousness_indicators
+        assert "sonic_creation" in activity.potential_patterns
 
     @pytest.mark.asyncio
     async def test_session_tracking(self, sound_provider, temp_sound_dir):
@@ -118,7 +113,7 @@ class TestSoundActivityProvider:
 
         # Simulate project file activity
         project_file = project_dir / "my_song.als"
-        await sound_provider._process_sound_event(str(project_file), 'created')
+        await sound_provider._process_sound_event(str(project_file), "created")
 
         # Check session is tracked
         session_key = str(project_dir)
@@ -130,21 +125,19 @@ class TestSoundActivityProvider:
         """Test identification of sonic consciousness patterns."""
         # Test with meditation indicators
         patterns = sound_provider._identify_sonic_patterns(
-            Path("meditation.mp3"),
-            {'meditation': True, 'creation': True}
+            Path("meditation.mp3"), {"meditation": True, "creation": True}
         )
 
-        assert 'sonic_creation' in patterns
-        assert 'sonic_meditation' in patterns
+        assert "sonic_creation" in patterns
+        assert "sonic_meditation" in patterns
 
         # Test with collaboration indicators
         patterns = sound_provider._identify_sonic_patterns(
-            Path("band_jam.wav"),
-            {'collaboration': True, 'rhythm': True}
+            Path("band_jam.wav"), {"collaboration": True, "rhythm": True}
         )
 
-        assert 'collective_resonance' in patterns
-        assert 'rhythmic_consciousness' in patterns
+        assert "collective_resonance" in patterns
+        assert "rhythmic_consciousness" in patterns
 
     @pytest.mark.asyncio
     async def test_silence_monitoring(self, sound_provider, mock_event_bus):
@@ -173,31 +166,31 @@ class TestSoundActivityProvider:
         """Test provider state reporting."""
         # Add some mock sessions
         sound_provider._sound_sessions = {
-            '/path/to/project1': datetime.now(UTC),
-            '/path/to/project2': datetime.now(UTC)
+            "/path/to/project1": datetime.now(UTC),
+            "/path/to/project2": datetime.now(UTC),
         }
 
         state = sound_provider.get_provider_state()
 
-        assert state['provider_type'] == 'SoundActivityProvider'
-        assert state['active_sound_sessions'] == 2
-        assert state['monitoring_silence'] is True
-        assert 'sound_patterns_detected' in state
+        assert state["provider_type"] == "SoundActivityProvider"
+        assert state["active_sound_sessions"] == 2
+        assert state["monitoring_silence"] is True
+        assert "sound_patterns_detected" in state
 
     @pytest.mark.asyncio
     async def test_file_categorization(self, sound_provider):
         """Test categorization of different sound file types."""
         # Test audio file
-        assert sound_provider._categorize_sound_file(Path("song.mp3")) == 'audio_file'
+        assert sound_provider._categorize_sound_file(Path("song.mp3")) == "audio_file"
 
         # Test music project
-        assert sound_provider._categorize_sound_file(Path("track.als")) == 'music_project'
+        assert sound_provider._categorize_sound_file(Path("track.als")) == "music_project"
 
         # Test MIDI
-        assert sound_provider._categorize_sound_file(Path("melody.mid")) == 'midi_composition'
+        assert sound_provider._categorize_sound_file(Path("melody.mid")) == "midi_composition"
 
     @pytest.mark.asyncio
-    @patch('mallku.orchestration.providers.sound_provider.Observer')
+    @patch("mallku.orchestration.providers.sound_provider.Observer")
     async def test_start_stop_lifecycle(self, mock_observer, sound_provider):
         """Test provider start/stop lifecycle."""
         # Mock observer instance
@@ -240,8 +233,8 @@ class TestSoundFileHandler:
         other_event.is_directory = False
 
         # Process events
-        await handler._queue_event(sound_event.src_path, 'created')
-        await handler._queue_event(other_event.src_path, 'created')
+        await handler._queue_event(sound_event.src_path, "created")
+        await handler._queue_event(other_event.src_path, "created")
 
         # Only sound event should be queued
         queued_event = await handler.get_next_event()

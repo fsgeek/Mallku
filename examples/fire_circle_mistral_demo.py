@@ -51,9 +51,7 @@ async def demonstrate_multilingual_consciousness():
     async def consciousness_handler(event):
         consciousness_events.append(event)
         if event.data.get("multilingual"):
-            print(
-                f"   🌐 Multilingual Event: {event.event_type.value} - Bridging cultures"
-            )
+            print(f"   🌐 Multilingual Event: {event.event_type.value} - Bridging cultures")
         else:
             print(
                 f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}"
@@ -147,9 +145,7 @@ async def demonstrate_multilingual_consciousness():
         f"   [Consciousness: {response1.consciousness.consciousness_signature:.2f}, "
         f"Patterns: {response1.consciousness.detected_patterns}]"
     )
-    print(
-        f"   [Efficiency: {response1.consciousness.contribution_value:.2f}]"
-    )
+    print(f"   [Efficiency: {response1.consciousness.contribution_value:.2f}]")
 
     # Mathematical reasoning question
     print("\n5. Demonstrating mathematical consciousness...")
@@ -208,9 +204,7 @@ async def demonstrate_multilingual_consciousness():
 
     print(f"\n   Community: {question3.content.text}")
     print(f"\n   Mistral: {response3.content.text[:350]}...")
-    print(
-        f"   [Languages detected: {', '.join(adapter._conversation_languages)}]"
-    )
+    print(f"   [Languages detected: {', '.join(adapter._conversation_languages)}]")
 
     # Check multilingual metrics
     print("\n7. Checking multilingual consciousness metrics...")
@@ -223,12 +217,11 @@ async def demonstrate_multilingual_consciousness():
 
     # Show consciousness events
     print(f"\n8. Consciousness events emitted: {len(consciousness_events)}")
-    multilingual_count = sum(
-        1 for e in consciousness_events if e.data.get("multilingual")
-    )
+    multilingual_count = sum(1 for e in consciousness_events if e.data.get("multilingual"))
     print(f"   - Multilingual events: {multilingual_count}")
     pattern_events = [
-        e for e in consciousness_events
+        e
+        for e in consciousness_events
         if e.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
     ]
     if pattern_events:

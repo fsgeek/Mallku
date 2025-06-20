@@ -59,13 +59,13 @@ def setup_arangodb():
     print("\nSetting up ArangoDB test database...")
 
     # Connect to ArangoDB (default test instance)
-    client = ArangoClient(hosts='http://localhost:8529')
+    client = ArangoClient(hosts="http://localhost:8529")
 
     # Connect to _system database first
-    sys_db = client.db('_system', username='root', password='')
+    sys_db = client.db("_system", username="root", password="")
 
     # Create test database
-    db_name = 'mallku_test'
+    db_name = "mallku_test"
     try:
         sys_db.create_database(db_name)
         print(f"✓ Created database: {db_name}")
@@ -73,19 +73,19 @@ def setup_arangodb():
         print(f"  Database {db_name} already exists")
 
     # Connect to test database
-    db = client.db(db_name, username='root', password='')
+    db = client.db(db_name, username="root", password="")
 
     # Collections to create
     collections = [
-        ('memory_anchors', 'document'),
-        ('reciprocity_activities', 'document'),
-        ('reciprocity_balances', 'document'),
-        ('activity_relationships', 'edge'),
+        ("memory_anchors", "document"),
+        ("reciprocity_activities", "document"),
+        ("reciprocity_balances", "document"),
+        ("activity_relationships", "edge"),
     ]
 
     for coll_name, coll_type in collections:
         try:
-            if coll_type == 'edge':
+            if coll_type == "edge":
                 db.create_collection(coll_name, edge=True)
             else:
                 db.create_collection(coll_name)
@@ -95,10 +95,10 @@ def setup_arangodb():
 
     # Create indexes for common queries
     # Temporal queries on reciprocity activities
-    if db.has_collection('reciprocity_activities'):
-        coll = db.collection('reciprocity_activities')
+    if db.has_collection("reciprocity_activities"):
+        coll = db.collection("reciprocity_activities")
         try:
-            coll.add_persistent_index(fields=['timestamp'])
+            coll.add_persistent_index(fields=["timestamp"])
             print("✓ Created timestamp index on reciprocity_activities")
         except Exception:
             print("  Timestamp index already exists")
@@ -118,8 +118,8 @@ async def verify_setup():
 
     # Check ArangoDB
     try:
-        client = ArangoClient(hosts='http://localhost:8529')
-        db = client.db('mallku_test', username='root', password='')
+        client = ArangoClient(hosts="http://localhost:8529")
+        db = client.db("mallku_test", username="root", password="")
         collections = db.collections()
         print(f"✓ ArangoDB has {len(collections)} collections")
     except Exception as e:

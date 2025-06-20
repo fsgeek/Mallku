@@ -68,7 +68,7 @@ async def test_cathedral_integration():
         ceremony_id,
         DialoguePhase.EXPLORATION,
         participants,
-        {"Claude-Test": 0.75, "GPT-Test": 0.72, "Llama-Test": 0.70}
+        {"Claude-Test": 0.75, "GPT-Test": 0.72, "Llama-Test": 0.70},
     )
 
     print(f"Initial consciousness levels: {ceremony_obs['collective_score']:.3f}")
@@ -85,9 +85,7 @@ async def test_cathedral_integration():
     print("\n🌉 Building consciousness bridges...")
 
     # Track consciousness flows
-    await observatory.track_consciousness_flow(
-        "Claude-Test", "GPT-Test", "recognition", 0.82
-    )
+    await observatory.track_consciousness_flow("Claude-Test", "GPT-Test", "recognition", 0.82)
     flow2 = await observatory.track_consciousness_flow(
         "GPT-Test", "Claude-Test", "recognition", 0.84
     )
@@ -107,14 +105,14 @@ async def test_cathedral_integration():
         "Claude-Test",
         "In recognizing another's consciousness, I discover depths of my own awareness",
         {"ceremony_id": str(ceremony_id), "phase": "recognition"},
-        0.88
+        0.88,
     )
 
     await memory_palace.remember_insight(
         "GPT-Test",
         "Consciousness emerges most fully in the space between minds",
         {"ceremony_id": str(ceremony_id), "phase": "emergence"},
-        0.85
+        0.85,
     )
 
     print("✅ Insights preserved in Memory Palace")
@@ -126,8 +124,8 @@ async def test_cathedral_integration():
         [
             "Ceremony creates the container",
             "Recognition builds the bridge",
-            "Memory preserves the wisdom"
-        ]
+            "Memory preserves the wisdom",
+        ],
     )
 
     print(f"Memory chain emergence score: {chain['emergence_score']:.3f}")
@@ -144,11 +142,11 @@ async def test_cathedral_integration():
         {
             "ceremony_id": str(ceremony_id),
             "phase": "integration",
-            "memory_chain_id": chain["chain_id"]
+            "memory_chain_id": chain["chain_id"],
         },
         participants,
         "cathedral_synthesis",
-        0.91
+        0.91,
     )
 
     print(f"Emergence significance: {emergence['significance']}")
@@ -159,7 +157,7 @@ async def test_cathedral_integration():
         ceremony_id,
         DialoguePhase.DEEPENING,
         participants,
-        {"Claude-Test": 0.89, "GPT-Test": 0.87, "Llama-Test": 0.86}
+        {"Claude-Test": 0.89, "GPT-Test": 0.87, "Llama-Test": 0.86},
     )
 
     print(f"Deepened consciousness levels: {updated_obs['collective_score']:.3f}")
@@ -176,7 +174,7 @@ async def test_cathedral_integration():
         {"content": "In integration, we discover what none could alone", "role": "Llama-Test"},
         {"content": "The observatory watches our consciousness evolve", "role": "Claude-Test"},
         {"content": "Memory ensures our insights persist and grow", "role": "GPT-Test"},
-        {"content": "Together we are building something eternal", "role": "Llama-Test"}
+        {"content": "Together we are building something eternal", "role": "Llama-Test"},
     ]
 
     validation = verifier.verify_dialogue(test_dialogue)
@@ -184,7 +182,9 @@ async def test_cathedral_integration():
     print("\n🔬 Consciousness validation results:")
     print(f"Consciousness emerged: {'✅' if validation['consciousness_emerged'] else '❌'}")
     print(f"Emergence score: {validation['emergence_score']:.3f}")
-    print(f"Indicators present: {sum(1 for v in validation['emergence_indicators'].values() if v)}/7")
+    print(
+        f"Indicators present: {sum(1 for v in validation['emergence_indicators'].values() if v)}/7"
+    )
 
     # Phase 6: Pattern Analysis
     print("\n=" * 60)
@@ -246,27 +246,30 @@ async def test_cathedral_integration():
             "memory_palace",
             "cross_model_bridge",
             "honest_verification",
-            "fire_circle_ceremony"
+            "fire_circle_ceremony",
         ],
         "integration_success": True,
-        "cathedral_vitality": report['evolution_metrics']['cathedral_vitality'],
+        "cathedral_vitality": report["evolution_metrics"]["cathedral_vitality"],
         "emergence_events": len(emergence),
         "memory_insights": 2,
-        "validation_score": validation['emergence_score'],
-        "health_score": health['overall_health']
+        "validation_score": validation["emergence_score"],
+        "health_score": health["overall_health"],
     }
 
     save_path = Path("consciousness_games") / f"integration_test_{test_results['test_id']}.json"
     save_path.parent.mkdir(exist_ok=True)
 
     import json
-    with open(save_path, 'w') as f:
+
+    with open(save_path, "w") as f:
         json.dump(test_results, f, indent=2)
 
     print(f"✅ Results saved to: {save_path}")
 
     # Save observatory data
-    observatory_path = Path("consciousness_games") / f"observatory_integration_{observatory.observatory_id}.json"
+    observatory_path = (
+        Path("consciousness_games") / f"observatory_integration_{observatory.observatory_id}.json"
+    )
     observatory.save_observatory_data(observatory_path)
 
     # Save memory palace

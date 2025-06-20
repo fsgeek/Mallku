@@ -45,7 +45,7 @@ class SystemHealthMonitor:
             HealthIndicator.INNOVATION_EMERGENCE: 0.10,
             HealthIndicator.VOLUNTARY_RETURN: 0.15,
             HealthIndicator.CAPACITY_UTILIZATION: 0.10,
-            HealthIndicator.NEED_FULFILLMENT: 0.05
+            HealthIndicator.NEED_FULFILLMENT: 0.05,
         }
 
         # Baseline metrics for comparison
@@ -60,8 +60,8 @@ class SystemHealthMonitor:
         """Initialize health monitoring infrastructure."""
         try:
             # Ensure health snapshots collection exists
-            if not self.db.has_collection('system_health_snapshots'):
-                self.db.create_collection('system_health_snapshots')
+            if not self.db.has_collection("system_health_snapshots"):
+                self.db.create_collection("system_health_snapshots")
 
             # Load or establish baseline metrics
             await self._establish_baseline_metrics()
@@ -88,7 +88,7 @@ class SystemHealthMonitor:
             metrics = SystemHealthMetrics(
                 measurement_period_start=start_time,
                 measurement_period_end=end_time,
-                snapshot_timestamp=end_time
+                snapshot_timestamp=end_time,
             )
 
             # Populate participation and engagement metrics
@@ -123,7 +123,7 @@ class SystemHealthMonitor:
             return SystemHealthMetrics(
                 measurement_period_start=datetime.now(UTC) - timedelta(days=7),
                 measurement_period_end=datetime.now(UTC),
-                overall_health_score=0.5  # Neutral score on error
+                overall_health_score=0.5,  # Neutral score on error
             )
 
     async def update_interaction_metrics(self, interaction: InteractionRecord) -> None:
@@ -186,26 +186,28 @@ class SystemHealthMonitor:
             snapshots = await self._get_health_snapshots_in_timeframe(start_time, end_time)
 
             if len(snapshots) < 2:
-                return {'insufficient_data': True}
+                return {"insufficient_data": True}
 
             # Analyze trends in key metrics
             trends = {}
 
             # Overall health score trend
             health_scores = [s.overall_health_score for s in snapshots]
-            trends['overall_health'] = {
-                'current': health_scores[-1],
-                'average': mean(health_scores),
-                'trend': 'improving' if health_scores[-1] > health_scores[0] else 'declining',
-                'volatility': stdev(health_scores) if len(health_scores) > 1 else 0
+            trends["overall_health"] = {
+                "current": health_scores[-1],
+                "average": mean(health_scores),
+                "trend": "improving" if health_scores[-1] > health_scores[0] else "declining",
+                "volatility": stdev(health_scores) if len(health_scores) > 1 else 0,
             }
 
             # Participation trends
             participation_rates = [s.voluntary_return_rate for s in snapshots]
-            trends['participation'] = {
-                'current': participation_rates[-1],
-                'average': mean(participation_rates),
-                'trend': 'increasing' if participation_rates[-1] > participation_rates[0] else 'decreasing'
+            trends["participation"] = {
+                "current": participation_rates[-1],
+                "average": mean(participation_rates),
+                "trend": "increasing"
+                if participation_rates[-1] > participation_rates[0]
+                else "decreasing",
             }
 
             # Resource abundance trends
@@ -216,17 +218,19 @@ class SystemHealthMonitor:
                     abundance_indicators.append(avg_abundance)
 
             if abundance_indicators:
-                trends['resource_abundance'] = {
-                    'current': abundance_indicators[-1],
-                    'average': mean(abundance_indicators),
-                    'trend': 'increasing' if abundance_indicators[-1] > abundance_indicators[0] else 'decreasing'
+                trends["resource_abundance"] = {
+                    "current": abundance_indicators[-1],
+                    "average": mean(abundance_indicators),
+                    "trend": "increasing"
+                    if abundance_indicators[-1] > abundance_indicators[0]
+                    else "decreasing",
                 }
 
             return trends
 
         except Exception as e:
             logger.error(f"Failed to analyze health trends: {e}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     # Private implementation methods
 
@@ -238,9 +242,9 @@ class SystemHealthMonitor:
         """Update cached metrics for performance."""
         try:
             # Cache frequently used metrics
-            self.metric_cache['participant_count'] = await self._get_unique_participant_count()
-            self.metric_cache['recent_interactions'] = await self._get_recent_interaction_count()
-            self.metric_cache['satisfaction_trends'] = await self._get_satisfaction_trend_data()
+            self.metric_cache["participant_count"] = await self._get_unique_participant_count()
+            self.metric_cache["recent_interactions"] = await self._get_recent_interaction_count()
+            self.metric_cache["satisfaction_trends"] = await self._get_satisfaction_trend_data()
 
             self.last_cache_update = datetime.now(UTC)
 
@@ -248,10 +252,7 @@ class SystemHealthMonitor:
             logger.error(f"Failed to update metric cache: {e}")
 
     async def _calculate_participation_metrics(
-        self,
-        metrics: SystemHealthMetrics,
-        start_time: datetime,
-        end_time: datetime
+        self, metrics: SystemHealthMetrics, start_time: datetime, end_time: datetime
     ) -> None:
         """Calculate participation and engagement health metrics."""
         try:
@@ -264,8 +265,12 @@ class SystemHealthMonitor:
             # Unique participants
             participants = set()
             for interaction in interactions:
-                participants.add(f"{interaction.initiator}_{hash(str(interaction.participant_context))}")
-                participants.add(f"{interaction.responder}_{hash(str(interaction.participant_context))}")
+                participants.add(
+                    f"{interaction.initiator}_{hash(str(interaction.participant_context))}"
+                )
+                participants.add(
+                    f"{interaction.responder}_{hash(str(interaction.participant_context))}"
+                )
             metrics.unique_participants = len(participants)
 
             # Participation trends (compare to previous period)
@@ -273,8 +278,10 @@ class SystemHealthMonitor:
             prev_interactions = await self._get_interactions_in_timeframe(prev_start, start_time)
 
             if prev_interactions:
-                participation_change = (len(interactions) - len(prev_interactions)) / len(prev_interactions)
-                metrics.participation_trends['interaction_change'] = participation_change
+                participation_change = (len(interactions) - len(prev_interactions)) / len(
+                    prev_interactions
+                )
+                metrics.participation_trends["interaction_change"] = participation_change
 
             # Voluntary return rate (estimate based on repeat participation)
             returning_participants = await self._calculate_return_rate(interactions, start_time)
@@ -284,10 +291,7 @@ class SystemHealthMonitor:
             logger.error(f"Failed to calculate participation metrics: {e}")
 
     async def _calculate_capacity_metrics(
-        self,
-        metrics: SystemHealthMetrics,
-        start_time: datetime,
-        end_time: datetime
+        self, metrics: SystemHealthMetrics, start_time: datetime, end_time: datetime
     ) -> None:
         """Calculate capacity and resource health metrics."""
         try:
@@ -318,20 +322,23 @@ class SystemHealthMonitor:
             total_capacity_signals = resource_stress_count + resource_abundance_count
             if total_capacity_signals > 0:
                 abundance_ratio = resource_abundance_count / total_capacity_signals
-                metrics.resource_abundance_indicators['capacity_abundance_ratio'] = abundance_ratio
+                metrics.resource_abundance_indicators["capacity_abundance_ratio"] = abundance_ratio
 
             # Capacity utilization rates
             utilization_rates = []
             for interaction in interactions:
-                all_capacities = list(interaction.initiator_capacity_indicators.values()) + \
-                               list(interaction.responder_capacity_indicators.values())
+                all_capacities = list(interaction.initiator_capacity_indicators.values()) + list(
+                    interaction.responder_capacity_indicators.values()
+                )
                 if all_capacities:
                     avg_utilization = mean(all_capacities)
                     utilization_rates.append(avg_utilization)
 
             if utilization_rates:
-                metrics.capacity_utilization_rates['average'] = mean(utilization_rates)
-                metrics.capacity_utilization_rates['variance'] = stdev(utilization_rates) if len(utilization_rates) > 1 else 0
+                metrics.capacity_utilization_rates["average"] = mean(utilization_rates)
+                metrics.capacity_utilization_rates["variance"] = (
+                    stdev(utilization_rates) if len(utilization_rates) > 1 else 0
+                )
 
             # Need fulfillment rates
             need_fulfillment = {}
@@ -347,10 +354,7 @@ class SystemHealthMonitor:
             logger.error(f"Failed to calculate capacity metrics: {e}")
 
     async def _calculate_adaptation_metrics(
-        self,
-        metrics: SystemHealthMetrics,
-        start_time: datetime,
-        end_time: datetime
+        self, metrics: SystemHealthMetrics, start_time: datetime, end_time: datetime
     ) -> None:
         """Calculate system adaptation and resilience metrics."""
         try:
@@ -359,20 +363,21 @@ class SystemHealthMonitor:
 
             # Innovation emergence rate (new interaction patterns)
             innovation_signals = await self._detect_innovation_signals(start_time, end_time)
-            metrics.innovation_emergence_rate = len(innovation_signals) / max(1, metrics.total_interactions) * 100
+            metrics.innovation_emergence_rate = (
+                len(innovation_signals) / max(1, metrics.total_interactions) * 100
+            )
 
             # Adaptation indicators (changes in response to challenges)
-            adaptation_indicators = await self._calculate_adaptation_indicators(start_time, end_time)
+            adaptation_indicators = await self._calculate_adaptation_indicators(
+                start_time, end_time
+            )
             metrics.adaptation_to_change_indicators = adaptation_indicators
 
         except Exception as e:
             logger.error(f"Failed to calculate adaptation metrics: {e}")
 
     async def _calculate_quality_metrics(
-        self,
-        metrics: SystemHealthMetrics,
-        start_time: datetime,
-        end_time: datetime
+        self, metrics: SystemHealthMetrics, start_time: datetime, end_time: datetime
     ) -> None:
         """Calculate quality of life and satisfaction metrics."""
         try:
@@ -390,13 +395,17 @@ class SystemHealthMonitor:
 
                 if satisfaction_data:
                     # Aggregate satisfaction scores
-                    satisfaction_values = [v for v in satisfaction_data.values() if isinstance(v, int | float)]
+                    satisfaction_values = [
+                        v for v in satisfaction_data.values() if isinstance(v, int | float)
+                    ]
                     if satisfaction_values:
                         satisfaction_scores.extend(satisfaction_values)
 
                 if quality_data:
                     # Look for stress indicators (low quality scores)
-                    quality_values = [v for v in quality_data.values() if isinstance(v, int | float)]
+                    quality_values = [
+                        v for v in quality_data.values() if isinstance(v, int | float)
+                    ]
                     stress_indicators.extend([v for v in quality_values if v < 0.4])
 
                     # Look for flourishing signals (high quality + emergence)
@@ -405,12 +414,18 @@ class SystemHealthMonitor:
 
             # Calculate aggregated metrics
             if satisfaction_scores:
-                metrics.satisfaction_trends['average_satisfaction'] = mean(satisfaction_scores)
-                metrics.satisfaction_trends['satisfaction_variance'] = stdev(satisfaction_scores) if len(satisfaction_scores) > 1 else 0
+                metrics.satisfaction_trends["average_satisfaction"] = mean(satisfaction_scores)
+                metrics.satisfaction_trends["satisfaction_variance"] = (
+                    stdev(satisfaction_scores) if len(satisfaction_scores) > 1 else 0
+                )
 
             if interactions:
-                metrics.stress_indicators['stress_incident_rate'] = len(stress_indicators) / len(interactions)
-                metrics.flourishing_signals['flourishing_rate'] = len(flourishing_signals) / len(interactions)
+                metrics.stress_indicators["stress_incident_rate"] = len(stress_indicators) / len(
+                    interactions
+                )
+                metrics.flourishing_signals["flourishing_rate"] = len(flourishing_signals) / len(
+                    interactions
+                )
 
         except Exception as e:
             logger.error(f"Failed to calculate quality metrics: {e}")
@@ -425,29 +440,41 @@ class SystemHealthMonitor:
             score_components[HealthIndicator.PARTICIPATION_RATE] = participation_score
 
             # Satisfaction health component
-            satisfaction_avg = metrics.satisfaction_trends.get('average_satisfaction', 0.5)
+            satisfaction_avg = metrics.satisfaction_trends.get("average_satisfaction", 0.5)
             score_components[HealthIndicator.SATISFACTION_TRENDS] = satisfaction_avg
 
             # Resource abundance component
-            abundance_avg = mean(metrics.resource_abundance_indicators.values()) if metrics.resource_abundance_indicators else 0.5
+            abundance_avg = (
+                mean(metrics.resource_abundance_indicators.values())
+                if metrics.resource_abundance_indicators
+                else 0.5
+            )
             score_components[HealthIndicator.RESOURCE_ABUNDANCE] = abundance_avg
 
             # Conflict resolution component
-            score_components[HealthIndicator.CONFLICT_RESOLUTION] = metrics.conflict_resolution_success
+            score_components[HealthIndicator.CONFLICT_RESOLUTION] = (
+                metrics.conflict_resolution_success
+            )
 
             # Innovation emergence component
-            innovation_normalized = min(1.0, metrics.innovation_emergence_rate / 10.0)  # Normalize to 0-1
+            innovation_normalized = min(
+                1.0, metrics.innovation_emergence_rate / 10.0
+            )  # Normalize to 0-1
             score_components[HealthIndicator.INNOVATION_EMERGENCE] = innovation_normalized
 
             # Voluntary return component
             score_components[HealthIndicator.VOLUNTARY_RETURN] = metrics.voluntary_return_rate
 
             # Capacity utilization component
-            capacity_avg = metrics.capacity_utilization_rates.get('average', 0.5)
+            capacity_avg = metrics.capacity_utilization_rates.get("average", 0.5)
             score_components[HealthIndicator.CAPACITY_UTILIZATION] = capacity_avg
 
             # Need fulfillment component
-            need_fulfillment_avg = mean(metrics.need_fulfillment_rates.values()) if metrics.need_fulfillment_rates else 0.5
+            need_fulfillment_avg = (
+                mean(metrics.need_fulfillment_rates.values())
+                if metrics.need_fulfillment_rates
+                else 0.5
+            )
             score_components[HealthIndicator.NEED_FULFILLMENT] = need_fulfillment_avg
 
             # Calculate weighted score
@@ -471,7 +498,9 @@ class SystemHealthMonitor:
             if not previous_snapshot:
                 return "stable"  # No baseline for comparison
 
-            score_change = current_metrics.overall_health_score - previous_snapshot.overall_health_score
+            score_change = (
+                current_metrics.overall_health_score - previous_snapshot.overall_health_score
+            )
 
             if score_change > 0.05:
                 return "improving"
@@ -494,17 +523,21 @@ class SystemHealthMonitor:
                 concerns.append("low_voluntary_return_rate")
 
             # Check satisfaction concerns
-            avg_satisfaction = metrics.satisfaction_trends.get('average_satisfaction', 0.5)
+            avg_satisfaction = metrics.satisfaction_trends.get("average_satisfaction", 0.5)
             if avg_satisfaction < 0.6:
                 concerns.append("declining_satisfaction")
 
             # Check resource concerns
-            abundance_avg = mean(metrics.resource_abundance_indicators.values()) if metrics.resource_abundance_indicators else 0.5
+            abundance_avg = (
+                mean(metrics.resource_abundance_indicators.values())
+                if metrics.resource_abundance_indicators
+                else 0.5
+            )
             if abundance_avg < 0.4:
                 concerns.append("resource_scarcity")
 
             # Check capacity concerns
-            capacity_avg = metrics.capacity_utilization_rates.get('average', 0.5)
+            capacity_avg = metrics.capacity_utilization_rates.get("average", 0.5)
             if capacity_avg > 0.9:
                 concerns.append("capacity_overutilization")
             elif capacity_avg < 0.3:
@@ -524,9 +557,7 @@ class SystemHealthMonitor:
     # Database interaction methods
 
     async def _get_interactions_in_timeframe(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[InteractionRecord]:
         """Get interactions within specified timeframe."""
         # This would query the reciprocity_interactions collection
@@ -543,18 +574,16 @@ class SystemHealthMonitor:
                 if isinstance(value, datetime):
                     snapshot_doc[key] = value.isoformat()
 
-            snapshot_doc['_key'] = f"snapshot_{int(metrics.snapshot_timestamp.timestamp())}"
+            snapshot_doc["_key"] = f"snapshot_{int(metrics.snapshot_timestamp.timestamp())}"
 
-            collection = self.db.collection('system_health_snapshots')
+            collection = self.db.collection("system_health_snapshots")
             collection.insert(snapshot_doc)
 
         except Exception as e:
             logger.error(f"Failed to store health snapshot: {e}")
 
     async def _get_health_snapshots_in_timeframe(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[SystemHealthMetrics]:
         """Get historical health snapshots."""
         # Implementation would query health snapshots collection
@@ -606,27 +635,21 @@ class SystemHealthMonitor:
         return {}
 
     async def _calculate_return_rate(
-        self,
-        interactions: list[InteractionRecord],
-        start_time: datetime
+        self, interactions: list[InteractionRecord], start_time: datetime
     ) -> float:
         """Calculate participant return rate."""
         # Implementation would analyze repeat participation
         return 0.8  # Placeholder
 
     async def _detect_innovation_signals(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> list[dict[str, Any]]:
         """Detect innovation and emergence signals."""
         # Implementation would identify new patterns or behaviors
         return []
 
     async def _calculate_adaptation_indicators(
-        self,
-        start_time: datetime,
-        end_time: datetime
+        self, start_time: datetime, end_time: datetime
     ) -> dict[str, float]:
         """Calculate adaptation indicators."""
         # Implementation would measure system adaptation

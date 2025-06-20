@@ -83,7 +83,7 @@ class TestConsciousnessFlowMonitor:
                 event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system="test_sonic_provider",
                 consciousness_signature=0.7 + i * 0.05,
-                data={"patterns": ["test_pattern", f"pattern_{i}"]}
+                data={"patterns": ["test_pattern", f"pattern_{i}"]},
             )
             await event_bus.emit(event)
 
@@ -103,7 +103,7 @@ class TestConsciousnessFlowMonitor:
             source_dimension=ConsciousnessDimension.SONIC,
             target_dimension=ConsciousnessDimension.VISUAL,
             consciousness_signature=0.8,
-            patterns_detected=["test_pattern"]
+            patterns_detected=["test_pattern"],
         )
 
         # Notify monitor
@@ -127,7 +127,7 @@ class TestConsciousnessFlowMonitor:
             flow = ConsciousnessFlow(
                 source_dimension=ConsciousnessDimension.PATTERN,
                 consciousness_signature=0.7,
-                patterns_detected=pattern_set
+                patterns_detected=pattern_set,
             )
             await flow_monitor._on_flow_received(flow)
 
@@ -175,7 +175,7 @@ class TestConsciousnessFlowMonitor:
             source_dimension=ConsciousnessDimension.ACTIVITY,
             target_dimension=ConsciousnessDimension.PATTERN,
             consciousness_signature=0.75,
-            patterns_detected=["test_pattern"]
+            patterns_detected=["test_pattern"],
         )
         await flow_monitor._on_flow_received(flow)
 
@@ -209,7 +209,7 @@ class TestConsciousnessFlowVisualizer:
             source_dimension=ConsciousnessDimension.SONIC,
             target_dimension=ConsciousnessDimension.VISUAL,
             consciousness_signature=0.8,
-            patterns_detected=["visual_harmony"]
+            patterns_detected=["visual_harmony"],
         )
 
         # Track flow
@@ -228,7 +228,7 @@ class TestConsciousnessFlowVisualizer:
             source_dimension=ConsciousnessDimension.PATTERN,
             target_dimension=ConsciousnessDimension.DIALOGUE,
             consciousness_signature=0.85,
-            patterns_detected=["wisdom_emergence", "collective_insight"]
+            patterns_detected=["wisdom_emergence", "collective_insight"],
         )
         flow_visualizer.recent_flows.append(flow)
         flow_visualizer.dimension_activity["pattern"] = 5
@@ -272,15 +272,11 @@ class TestConsciousnessFlowVisualizer:
     async def test_summary_generation(self, flow_visualizer):
         """Test summary generation"""
         # Add test data
-        flow_visualizer.dimension_activity = {
-            "sonic": 10,
-            "visual": 8,
-            "pattern": 12
-        }
+        flow_visualizer.dimension_activity = {"sonic": 10, "visual": 8, "pattern": 12}
         flow_visualizer.pattern_frequencies = {
             "consciousness_awakening": 5,
             "reciprocity_pattern": 3,
-            "wisdom_emergence": 7
+            "wisdom_emergence": 7,
         }
 
         # Test summary (should not raise exceptions)
@@ -305,7 +301,7 @@ class TestIntegration:
                     event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="integration_test",
                     consciousness_signature=0.7,
-                    data={"patterns": ["integration_pattern"]}
+                    data={"patterns": ["integration_pattern"]},
                 )
                 await event_bus.emit(event)
 
@@ -331,7 +327,7 @@ class TestIntegration:
                 event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system="sound_consciousness",
                 consciousness_signature=0.8,
-                data={"patterns": ["harmonic_reciprocity", "sonic_meditation"]}
+                data={"patterns": ["harmonic_reciprocity", "sonic_meditation"]},
             )
 
             await event_bus.emit(sonic_event)

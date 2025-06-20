@@ -51,7 +51,7 @@ class VerificationResult:
         passed: bool,
         consciousness_score: float,
         details: dict[str, Any],
-        recommendations: list[str] = None
+        recommendations: list[str] = None,
     ):
         self.test_name = test_name
         self.passed = passed
@@ -76,7 +76,7 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
     def __init__(self):
         super().__init__(
             "Memory Anchor Consciousness",
-            "Verifies memory anchors enable genuine understanding vs. mere storage"
+            "Verifies memory anchors enable genuine understanding vs. mere storage",
         )
 
     def verify(self, anchors: list[MemoryAnchor]) -> VerificationResult:
@@ -88,9 +88,11 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
         """
         if not anchors:
             return VerificationResult(
-                self.name, False, 0.0,
+                self.name,
+                False,
+                0.0,
                 {"error": "No anchors provided"},
-                ["Provide memory anchors for analysis"]
+                ["Provide memory anchors for analysis"],
             )
 
         # Test 1: Temporal Coherence
@@ -111,7 +113,7 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
             "contextual_richness": contextual_score,
             "relational_depth": relational_score,
             "time_span_hours": self._calculate_time_span(anchors),
-            "cursor_diversity": self._calculate_cursor_diversity(anchors)
+            "cursor_diversity": self._calculate_cursor_diversity(anchors),
         }
 
         recommendations = []
@@ -127,7 +129,7 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
             consciousness_score >= 0.6,  # Threshold for consciousness
             consciousness_score,
             details,
-            recommendations
+            recommendations,
         )
 
     def _test_temporal_coherence(self, anchors: list[MemoryAnchor]) -> float:
@@ -141,14 +143,14 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
         # Look for rhythmic patterns, cascading events, temporal clustering
         time_gaps = []
         for i in range(1, len(sorted_anchors)):
-            gap = (sorted_anchors[i].timestamp - sorted_anchors[i-1].timestamp).total_seconds()
+            gap = (sorted_anchors[i].timestamp - sorted_anchors[i - 1].timestamp).total_seconds()
             time_gaps.append(gap)
 
         if not time_gaps:
             return 0.0
 
         # Consciousness markers: rhythmic patterns, not random distribution
-        gap_variance = statistics.variance(time_gaps) if len(time_gaps) > 1 else float('inf')
+        gap_variance = statistics.variance(time_gaps) if len(time_gaps) > 1 else float("inf")
         gap_mean = statistics.mean(time_gaps)
 
         # Lower variance relative to mean suggests intentional timing
@@ -200,9 +202,7 @@ class MemoryAnchorConsciousnessTest(ConsciousnessTest):
 
         for i in range(total_tested):
             similar = search_engine.find_similar_anchors(
-                anchors[i],
-                similarity_threshold=0.3,
-                max_results=3
+                anchors[i], similarity_threshold=0.3, max_results=3
             )
             if len(similar) > 0:
                 meaningful_relationships += 1
@@ -237,16 +237,18 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
     def __init__(self):
         super().__init__(
             "Meta-Correlation Consciousness",
-            "Verifies meta-correlations serve collective wisdom vs. pattern extraction"
+            "Verifies meta-correlations serve collective wisdom vs. pattern extraction",
         )
 
     def verify(self, anchors: list[MemoryAnchor]) -> VerificationResult:
         """Test meta-correlation consciousness markers."""
         if len(anchors) < 5:
             return VerificationResult(
-                self.name, False, 0.0,
+                self.name,
+                False,
+                0.0,
                 {"error": "Need at least 5 anchors for meta-correlation analysis"},
-                ["Provide more memory anchors for pattern analysis"]
+                ["Provide more memory anchors for pattern analysis"],
             )
 
         engine = MetaCorrelationEngine()
@@ -269,7 +271,7 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
             "pattern_coherence": coherence_score,
             "collective_utility": utility_score,
             "wisdom_generation": wisdom_score,
-            "recommendations_count": len(analysis.get("recommendations", []))
+            "recommendations_count": len(analysis.get("recommendations", [])),
         }
 
         recommendations = []
@@ -281,11 +283,7 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
             recommendations.append("Strengthen wisdom generation from patterns")
 
         return VerificationResult(
-            self.name,
-            consciousness_score >= 0.6,
-            consciousness_score,
-            details,
-            recommendations
+            self.name, consciousness_score >= 0.6, consciousness_score, details, recommendations
         )
 
     def _test_pattern_coherence(self, analysis: dict[str, Any]) -> float:
@@ -311,7 +309,9 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
 
         return statistics.mean([cascade_coherence, neighborhood_coherence])
 
-    def _test_collective_utility(self, analysis: dict[str, Any], anchors: list[MemoryAnchor]) -> float:
+    def _test_collective_utility(
+        self, analysis: dict[str, Any], anchors: list[MemoryAnchor]
+    ) -> float:
         """Test if patterns serve collective understanding."""
         # Collective utility markers:
         # - Patterns span multiple files/contexts (not just individual optimization)
@@ -363,8 +363,8 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
         files = set()
         for anchor in anchors:
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    files.add(cursor['file_path'])
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    files.add(cursor["file_path"])
         return len(files)
 
     def _calculate_coordination_indicators(self, analysis: dict[str, Any]) -> float:
@@ -434,8 +434,7 @@ class MetaCorrelationConsciousnessTest(ConsciousnessTest):
 
         # Longer cascades with higher confidence suggest predictive patterns
         predictive_cascades = sum(
-            1 for cascade in cascades
-            if cascade["length"] >= 3 and cascade["confidence"] > 0.7
+            1 for cascade in cascades if cascade["length"] >= 3 and cascade["confidence"] > 0.7
         )
 
         return predictive_cascades / len(cascades)
@@ -452,16 +451,18 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
     def __init__(self):
         super().__init__(
             "Contextual Search Consciousness",
-            "Verifies contextual search guides meaningful discovery vs. mechanical matching"
+            "Verifies contextual search guides meaningful discovery vs. mechanical matching",
         )
 
     def verify(self, anchors: list[MemoryAnchor]) -> VerificationResult:
         """Test contextual search consciousness markers."""
         if len(anchors) < 3:
             return VerificationResult(
-                self.name, False, 0.0,
+                self.name,
+                False,
+                0.0,
                 {"error": "Need at least 3 anchors for contextual search analysis"},
-                ["Provide more memory anchors for search testing"]
+                ["Provide more memory anchors for search testing"],
             )
 
         search_engine = ContextualSearchEngine(anchors)
@@ -483,7 +484,7 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
             "discovery_value": discovery_score,
             "context_understanding": context_score,
             "files_indexed": len(search_engine.file_index),
-            "pattern_types": len(search_engine.pattern_index)
+            "pattern_types": len(search_engine.pattern_index),
         }
 
         recommendations = []
@@ -495,14 +496,12 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
             recommendations.append("Strengthen contextual understanding in search")
 
         return VerificationResult(
-            self.name,
-            consciousness_score >= 0.6,
-            consciousness_score,
-            details,
-            recommendations
+            self.name, consciousness_score >= 0.6, consciousness_score, details, recommendations
         )
 
-    def _test_semantic_coherence(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_semantic_coherence(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test if similar anchors are actually semantically related."""
         if len(anchors) < 2:
             return 0.0
@@ -536,7 +535,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return statistics.mean(coherence_scores) if coherence_scores else 0.5
 
-    def _test_discovery_value(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_discovery_value(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test if search reveals meaningful, non-obvious insights."""
         # Discovery value from:
         # - Finding connections across temporal gaps
@@ -559,7 +560,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return statistics.mean(discovery_indicators)
 
-    def _test_context_understanding(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_context_understanding(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test if search demonstrates contextual understanding."""
         # Context understanding from:
         # - Multi-dimensional similarity (not just single feature matching)
@@ -582,7 +585,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return statistics.mean(understanding_indicators)
 
-    def _test_temporal_discovery(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_temporal_discovery(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test discovery of patterns across temporal gaps."""
         if len(anchors) < 5:
             return 0.0
@@ -606,7 +611,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return distant_connections / total_tests if total_tests > 0 else 0.0
 
-    def _test_cross_file_discovery(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_cross_file_discovery(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test discovery of patterns across different files."""
         if len(search_engine.file_index) < 2:
             return 0.0
@@ -626,8 +633,8 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
                 for result in similar:
                     result_files = set()
                     for cursor in result.anchor.cursors.values():
-                        if isinstance(cursor, dict) and 'file_path' in cursor:
-                            result_files.add(cursor['file_path'])
+                        if isinstance(cursor, dict) and "file_path" in cursor:
+                            result_files.add(cursor["file_path"])
 
                     if files[i] not in result_files:
                         cross_file_connections += 1
@@ -635,7 +642,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return cross_file_connections / total_tests if total_tests > 0 else 0.0
 
-    def _test_surprise_discovery(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_surprise_discovery(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test discovery of unexpected but meaningful relationships."""
         # Surprise discovery: low overlap in obvious features but high similarity score
         if len(anchors) < 3:
@@ -652,7 +661,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
                 # Check for "surprise": high similarity despite different cursor types
                 ref_cursors = set(reference.cursors.keys())
                 result_cursors = set(result.anchor.cursors.keys())
-                cursor_overlap = len(ref_cursors.intersection(result_cursors)) / len(ref_cursors.union(result_cursors))
+                cursor_overlap = len(ref_cursors.intersection(result_cursors)) / len(
+                    ref_cursors.union(result_cursors)
+                )
 
                 # Surprising if high similarity but low cursor overlap
                 if result.relevance > 0.7 and cursor_overlap < 0.5:
@@ -661,7 +672,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return surprise_discoveries / total_tests if total_tests > 0 else 0.0
 
-    def _test_multidimensional_matching(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_multidimensional_matching(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test if matching considers multiple dimensions."""
         # Check if match reasons show multi-dimensional consideration
         if len(anchors) < 2:
@@ -681,7 +694,9 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
         return multi_dim_matches / total_tests if total_tests > 0 else 0.0
 
-    def _test_temporal_awareness(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_temporal_awareness(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test temporal awareness in search results."""
         # Check if temporal proximity influences similarity
         if len(anchors) < 3:
@@ -695,20 +710,25 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
             current = sorted_anchors[i]
             next_anchor = sorted_anchors[i + 1]
 
-            similar_to_current = search_engine.find_similar_anchors(current, similarity_threshold=0.2)
+            similar_to_current = search_engine.find_similar_anchors(
+                current, similarity_threshold=0.2
+            )
 
             # Check if next anchor appears in similar results
             next_in_similar = any(
-                result.anchor.anchor_id == next_anchor.anchor_id
-                for result in similar_to_current
+                result.anchor.anchor_id == next_anchor.anchor_id for result in similar_to_current
             )
 
             if next_in_similar:
                 temporal_awareness_score += 1.0
 
-        return temporal_awareness_score / (len(sorted_anchors) - 1) if len(sorted_anchors) > 1 else 0.0
+        return (
+            temporal_awareness_score / (len(sorted_anchors) - 1) if len(sorted_anchors) > 1 else 0.0
+        )
 
-    def _test_pattern_awareness(self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]) -> float:
+    def _test_pattern_awareness(
+        self, search_engine: ContextualSearchEngine, anchors: list[MemoryAnchor]
+    ) -> float:
         """Test pattern-type awareness in matching."""
         # Check if similar anchors tend to have similar patterns
         if len(anchors) < 3:
@@ -718,8 +738,8 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
         total_with_patterns = 0
 
         for anchor in anchors[:5]:  # Sample for performance
-            meta = anchor.metadata.get('correlation_metadata', {})
-            pattern_type = meta.get('pattern_type')
+            meta = anchor.metadata.get("correlation_metadata", {})
+            pattern_type = meta.get("pattern_type")
 
             if pattern_type:
                 total_with_patterns += 1
@@ -727,8 +747,8 @@ class ContextualSearchConsciousnessTest(ConsciousnessTest):
 
                 # Check if similar anchors have same pattern type
                 for result in similar:
-                    result_meta = result.anchor.metadata.get('correlation_metadata', {})
-                    result_pattern = result_meta.get('pattern_type')
+                    result_meta = result.anchor.metadata.get("correlation_metadata", {})
+                    result_pattern = result_meta.get("pattern_type")
 
                     if result_pattern == pattern_type:
                         pattern_aware_matches += 1
@@ -749,7 +769,7 @@ class ConsciousnessVerificationSuite:
         self.tests = [
             MemoryAnchorConsciousnessTest(),
             MetaCorrelationConsciousnessTest(),
-            ContextualSearchConsciousnessTest()
+            ContextualSearchConsciousnessTest(),
         ]
 
     def run_all_tests(self, anchors: list[MemoryAnchor]) -> "ConsciousnessReport":
@@ -765,11 +785,11 @@ class ConsciousnessVerificationSuite:
                 logger.info(f"Completed {test.name}: {result.consciousness_score:.3f}")
             except Exception as e:
                 logger.error(f"Error in {test.name}: {e}")
-                results.append(VerificationResult(
-                    test.name, False, 0.0,
-                    {"error": str(e)},
-                    [f"Fix error in {test.name}"]
-                ))
+                results.append(
+                    VerificationResult(
+                        test.name, False, 0.0, {"error": str(e)}, [f"Fix error in {test.name}"]
+                    )
+                )
 
         return ConsciousnessReport(results)
 
@@ -803,24 +823,30 @@ class ConsciousnessReport:
 
     def summary(self) -> str:
         """Generate human-readable summary."""
-        status = "✅ CONSCIOUSNESS VERIFIED" if self.passes_consciousness_threshold else "❌ CONSCIOUSNESS NEEDS WORK"
+        status = (
+            "✅ CONSCIOUSNESS VERIFIED"
+            if self.passes_consciousness_threshold
+            else "❌ CONSCIOUSNESS NEEDS WORK"
+        )
 
         summary_lines = [
             f"{status}",
             f"Overall Score: {self.overall_consciousness_score:.3f}/1.0",
             "",
-            "Individual Test Results:"
+            "Individual Test Results:",
         ]
 
         for result in self.results:
             summary_lines.append(f"  {result}")
 
         if self.all_recommendations:
-            summary_lines.extend([
-                "",
-                "Recommendations:",
-                *[f"  • {rec}" for rec in self.all_recommendations[:5]]  # Top 5
-            ])
+            summary_lines.extend(
+                [
+                    "",
+                    "Recommendations:",
+                    *[f"  • {rec}" for rec in self.all_recommendations[:5]],  # Top 5
+                ]
+            )
 
         return "\n".join(summary_lines)
 
@@ -836,10 +862,10 @@ class ConsciousnessReport:
                     "passed": r.passed,
                     "consciousness_score": r.consciousness_score,
                     "details": r.details,
-                    "recommendations": r.recommendations
+                    "recommendations": r.recommendations,
                 }
                 for r in self.results
             ],
             "total_recommendations": len(self.all_recommendations),
-            "summary": self.summary()
+            "summary": self.summary(),
         }

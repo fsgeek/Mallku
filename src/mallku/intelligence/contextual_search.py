@@ -58,11 +58,11 @@ class ContextualSearchEngine:
         for anchor in self.anchors:
             # Index by files
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    self.file_index[cursor['file_path']].append(anchor)
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    self.file_index[cursor["file_path"]].append(anchor)
 
             # Index by pattern type
-            pattern_type = anchor.metadata.get('correlation_metadata', {}).get('pattern_type')
+            pattern_type = anchor.metadata.get("correlation_metadata", {}).get("pattern_type")
             if pattern_type:
                 self.pattern_index[pattern_type].append(anchor)
 
@@ -79,9 +79,7 @@ class ContextualSearchEngine:
         logger.info(f"  Pattern types: {list(self.pattern_index.keys())}")
 
     def search_by_context(
-        self,
-        query_context: dict[str, Any],
-        max_results: int = 10
+        self, query_context: dict[str, Any], max_results: int = 10
     ) -> list[SearchResult]:
         """
         Search for anchors matching a given context.
@@ -105,32 +103,36 @@ class ContextualSearchEngine:
             match_reasons = []
 
             # File matching
-            if 'files' in query_context:
-                file_matches = self._match_files(anchor, query_context['files'])
+            if "files" in query_context:
+                file_matches = self._match_files(anchor, query_context["files"])
                 if file_matches > 0:
                     relevance += file_matches * 0.3
                     match_reasons.append(f"Matched {file_matches} files")
 
             # Pattern matching
-            if 'patterns' in query_context and self._match_pattern(anchor, query_context['patterns']):
+            if "patterns" in query_context and self._match_pattern(
+                anchor, query_context["patterns"]
+            ):
                 relevance += 0.2
                 match_reasons.append("Pattern type match")
 
             # Time range matching
-            if 'time_range' in query_context and self._in_time_range(anchor, query_context['time_range']):
+            if "time_range" in query_context and self._in_time_range(
+                anchor, query_context["time_range"]
+            ):
                 relevance += 0.1
                 match_reasons.append("Within time range")
 
             # Confidence threshold
-            if 'confidence_min' in query_context:
-                conf = anchor.metadata.get('correlation_metadata', {}).get('confidence_score', 0)
-                if conf >= query_context['confidence_min']:
+            if "confidence_min" in query_context:
+                conf = anchor.metadata.get("correlation_metadata", {}).get("confidence_score", 0)
+                if conf >= query_context["confidence_min"]:
                     relevance += 0.1 * conf
                     match_reasons.append(f"High confidence ({conf:.3f})")
 
             # Cursor type matching
-            if 'cursor_types' in query_context:
-                cursor_matches = self._match_cursor_types(anchor, query_context['cursor_types'])
+            if "cursor_types" in query_context:
+                cursor_matches = self._match_cursor_types(anchor, query_context["cursor_types"])
                 if cursor_matches > 0:
                     relevance += cursor_matches * 0.2
                     match_reasons.append(f"Has {cursor_matches} cursor types")
@@ -147,7 +149,7 @@ class ContextualSearchEngine:
         self,
         reference_anchor: MemoryAnchor,
         similarity_threshold: float = 0.5,
-        max_results: int = 5
+        max_results: int = 5,
     ) -> list[SearchResult]:
         """
         Find anchors similar to a reference anchor.
@@ -182,11 +184,7 @@ class ContextualSearchEngine:
         file_anchors = self.file_index.get(file_path, [])
 
         if not file_anchors:
-            return {
-                "file": file_path,
-                "found": False,
-                "anchor_count": 0
-            }
+            return {"file": file_path, "found": False, "anchor_count": 0}
 
         # Analyze patterns
         pattern_distribution = Counter()
@@ -196,11 +194,13 @@ class ContextualSearchEngine:
 
         for anchor in file_anchors:
             # Pattern types
-            pattern_type = anchor.metadata.get('correlation_metadata', {}).get('pattern_type', 'unknown')
+            pattern_type = anchor.metadata.get("correlation_metadata", {}).get(
+                "pattern_type", "unknown"
+            )
             pattern_distribution[pattern_type] += 1
 
             # Confidence scores
-            conf = anchor.metadata.get('correlation_metadata', {}).get('confidence_score')
+            conf = anchor.metadata.get("correlation_metadata", {}).get("confidence_score")
             if conf is not None:
                 confidence_by_pattern[pattern_type].append(conf)
 
@@ -210,8 +210,8 @@ class ContextualSearchEngine:
 
             # Co-occurring files
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    other_file = cursor['file_path']
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    other_file = cursor["file_path"]
                     if other_file != file_path:
                         co_occurring_files[other_file] += 1
 
@@ -227,26 +227,21 @@ class ContextualSearchEngine:
             },
             "temporal_distribution": dict(temporal_distribution),
             "most_active_hours": sorted(
-                temporal_distribution.items(),
-                key=lambda x: x[1],
-                reverse=True
+                temporal_distribution.items(), key=lambda x: x[1], reverse=True
             )[:3],
             "frequently_co_occurring_files": co_occurring_files.most_common(5),
             "earliest_occurrence": min(a.timestamp for a in file_anchors),
             "latest_occurrence": max(a.timestamp for a in file_anchors),
             "time_span_hours": (
-                max(a.timestamp for a in file_anchors) -
-                min(a.timestamp for a in file_anchors)
-            ).total_seconds() / 3600
+                max(a.timestamp for a in file_anchors) - min(a.timestamp for a in file_anchors)
+            ).total_seconds()
+            / 3600,
         }
 
         return analysis
 
     def trace_temporal_flow(
-        self,
-        start_time: datetime,
-        duration: timedelta,
-        pattern_filter: list[str] | None = None
+        self, start_time: datetime, duration: timedelta, pattern_filter: list[str] | None = None
     ) -> list[dict[str, Any]]:
         """
         Trace the flow of patterns within a time window.
@@ -257,16 +252,14 @@ class ContextualSearchEngine:
         end_time = start_time + duration
 
         # Find anchors in time range
-        anchors_in_range = [
-            a for a in self.anchors
-            if start_time <= a.timestamp <= end_time
-        ]
+        anchors_in_range = [a for a in self.anchors if start_time <= a.timestamp <= end_time]
 
         # Apply pattern filter if provided
         if pattern_filter:
             anchors_in_range = [
-                a for a in anchors_in_range
-                if a.metadata.get('correlation_metadata', {}).get('pattern_type') in pattern_filter
+                a
+                for a in anchors_in_range
+                if a.metadata.get("correlation_metadata", {}).get("pattern_type") in pattern_filter
             ]
 
         # Sort by time
@@ -275,15 +268,15 @@ class ContextualSearchEngine:
         # Build timeline
         timeline = []
         for anchor in anchors_in_range:
-            meta = anchor.metadata.get('correlation_metadata', {})
+            meta = anchor.metadata.get("correlation_metadata", {})
 
             event = {
                 "timestamp": anchor.timestamp.isoformat(),
                 "anchor_id": str(anchor.anchor_id),
-                "pattern_type": meta.get('pattern_type', 'unknown'),
-                "confidence": meta.get('confidence_score', 0),
+                "pattern_type": meta.get("pattern_type", "unknown"),
+                "confidence": meta.get("confidence_score", 0),
                 "files_involved": self._extract_file_count(anchor),
-                "cursor_count": len(anchor.cursors)
+                "cursor_count": len(anchor.cursors),
             }
 
             timeline.append(event)
@@ -294,14 +287,14 @@ class ContextualSearchEngine:
         """Count how many query files are referenced in the anchor."""
         anchor_files = set()
         for cursor in anchor.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                anchor_files.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                anchor_files.add(cursor["file_path"])
 
         return len(set(query_files).intersection(anchor_files))
 
     def _match_pattern(self, anchor: MemoryAnchor, patterns: list[str]) -> bool:
         """Check if anchor's pattern type matches any in the list."""
-        pattern_type = anchor.metadata.get('correlation_metadata', {}).get('pattern_type')
+        pattern_type = anchor.metadata.get("correlation_metadata", {}).get("pattern_type")
         return pattern_type in patterns
 
     def _in_time_range(self, anchor: MemoryAnchor, time_range: tuple[datetime, datetime]) -> bool:
@@ -326,8 +319,8 @@ class ContextualSearchEngine:
             factors.append(file_jaccard)
 
         # Pattern similarity
-        pattern1 = anchor1.metadata.get('correlation_metadata', {}).get('pattern_type')
-        pattern2 = anchor2.metadata.get('correlation_metadata', {}).get('pattern_type')
+        pattern1 = anchor1.metadata.get("correlation_metadata", {}).get("pattern_type")
+        pattern2 = anchor2.metadata.get("correlation_metadata", {}).get("pattern_type")
         if pattern1 and pattern2:
             factors.append(1.0 if pattern1 == pattern2 else 0.0)
 
@@ -344,8 +337,8 @@ class ContextualSearchEngine:
             factors.append(cursor_jaccard)
 
         # Confidence similarity
-        conf1 = anchor1.metadata.get('correlation_metadata', {}).get('confidence_score', 0)
-        conf2 = anchor2.metadata.get('correlation_metadata', {}).get('confidence_score', 0)
+        conf1 = anchor1.metadata.get("correlation_metadata", {}).get("confidence_score", 0)
+        conf2 = anchor2.metadata.get("correlation_metadata", {}).get("confidence_score", 0)
         if conf1 and conf2:
             conf_similarity = 1.0 - abs(conf1 - conf2)
             factors.append(conf_similarity)
@@ -364,8 +357,8 @@ class ContextualSearchEngine:
             reasons.append(f"Share {len(common_files)} files")
 
         # Check pattern match
-        pattern1 = anchor1.metadata.get('correlation_metadata', {}).get('pattern_type')
-        pattern2 = anchor2.metadata.get('correlation_metadata', {}).get('pattern_type')
+        pattern1 = anchor1.metadata.get("correlation_metadata", {}).get("pattern_type")
+        pattern2 = anchor2.metadata.get("correlation_metadata", {}).get("pattern_type")
         if pattern1 and pattern2 and pattern1 == pattern2:
             reasons.append(f"Same pattern type: {pattern1}")
 
@@ -387,8 +380,8 @@ class ContextualSearchEngine:
         """Extract all file paths from an anchor as a set."""
         files = set()
         for cursor in anchor.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files.add(cursor["file_path"])
         return files
 
     def _extract_file_count(self, anchor: MemoryAnchor) -> int:

@@ -35,7 +35,7 @@ class WisdomSearchResult(SearchResult):
         match_reasons: list[str],
         wisdom_score: float = 0.0,
         discovery_value: float = 0.0,
-        consciousness_markers: list[str] = None
+        consciousness_markers: list[str] = None,
     ):
         super().__init__(anchor, relevance, match_reasons)
         self.wisdom_score = wisdom_score
@@ -43,8 +43,10 @@ class WisdomSearchResult(SearchResult):
         self.consciousness_markers = consciousness_markers or []
 
     def __repr__(self):
-        return (f"WisdomSearchResult(relevance={self.relevance:.3f}, "
-                f"wisdom={self.wisdom_score:.3f}, discovery={self.discovery_value:.3f})")
+        return (
+            f"WisdomSearchResult(relevance={self.relevance:.3f}, "
+            f"wisdom={self.wisdom_score:.3f}, discovery={self.discovery_value:.3f})"
+        )
 
 
 class ConsciousnessEnhancedSearch(ContextualSearchEngine):
@@ -76,7 +78,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
             "cascade_wisdom": self._extract_cascade_wisdom(analysis),
             "neighborhood_wisdom": self._extract_neighborhood_wisdom(analysis),
             "temporal_wisdom": self._extract_temporal_wisdom(analysis),
-            "confidence_wisdom": self._extract_confidence_wisdom(analysis)
+            "confidence_wisdom": self._extract_confidence_wisdom(analysis),
         }
 
         logger.info(f"Built wisdom patterns: {len(wisdom_patterns)} types")
@@ -88,17 +90,14 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
             "cross_context_bridges": self._find_cross_context_bridges(),
             "temporal_surprises": self._find_temporal_surprises(),
             "pattern_emergences": self._find_pattern_emergences(),
-            "file_relationship_mysteries": self._find_file_mysteries()
+            "file_relationship_mysteries": self._find_file_mysteries(),
         }
 
         logger.info(f"Built discovery amplifiers: {sum(len(v) for v in amplifiers.values())} total")
         return amplifiers
 
     def wisdom_search(
-        self,
-        reference_anchor: MemoryAnchor,
-        wisdom_threshold: float = 0.5,
-        max_results: int = 5
+        self, reference_anchor: MemoryAnchor, wisdom_threshold: float = 0.5, max_results: int = 5
     ) -> list[WisdomSearchResult]:
         """
         Search for anchors that serve wisdom rather than just similarity.
@@ -113,7 +112,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         base_results = self.find_similar_anchors(
             reference_anchor,
             similarity_threshold=0.2,  # Lower threshold for consciousness enhancement
-            max_results=max_results * 3  # Get more candidates for wisdom filtering
+            max_results=max_results * 3,  # Get more candidates for wisdom filtering
         )
 
         # Enhance each result with consciousness markers
@@ -121,7 +120,9 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         for result in base_results:
             wisdom_score = self._calculate_wisdom_score(reference_anchor, result.anchor)
             discovery_value = self._calculate_discovery_value(reference_anchor, result.anchor)
-            consciousness_markers = self._identify_consciousness_markers(reference_anchor, result.anchor)
+            consciousness_markers = self._identify_consciousness_markers(
+                reference_anchor, result.anchor
+            )
 
             # Create enhanced result
             wisdom_result = WisdomSearchResult(
@@ -130,7 +131,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
                 result.match_reasons,
                 wisdom_score,
                 discovery_value,
-                consciousness_markers
+                consciousness_markers,
             )
 
             # Filter by wisdom threshold
@@ -138,17 +139,12 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
                 wisdom_results.append(wisdom_result)
 
         # Sort by combined wisdom and relevance score
-        wisdom_results.sort(
-            key=lambda r: (r.wisdom_score * 0.6 + r.relevance * 0.4),
-            reverse=True
-        )
+        wisdom_results.sort(key=lambda r: (r.wisdom_score * 0.6 + r.relevance * 0.4), reverse=True)
 
         return wisdom_results[:max_results]
 
     def discover_consciousness_bridges(
-        self,
-        anchor_set: list[MemoryAnchor] = None,
-        min_bridge_strength: float = 0.6
+        self, anchor_set: list[MemoryAnchor] = None, min_bridge_strength: float = 0.6
     ) -> list[dict[str, Any]]:
         """
         Discover bridges between contexts that serve consciousness.
@@ -172,7 +168,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
                     "strength": bridge_data["strength"],
                     "anchors": bridge_data["anchors"],
                     "consciousness_value": self._evaluate_bridge_consciousness(bridge_data),
-                    "description": self._describe_bridge(bridge_data)
+                    "description": self._describe_bridge(bridge_data),
                 }
                 bridges.append(bridge_info)
 
@@ -184,7 +180,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
                     "strength": temporal_bridge["surprise_factor"],
                     "anchors": temporal_bridge["anchors"],
                     "consciousness_value": temporal_bridge["consciousness_markers"],
-                    "description": f"Temporal pattern spanning {temporal_bridge['time_span']} with consciousness markers"
+                    "description": f"Temporal pattern spanning {temporal_bridge['time_span']} with consciousness markers",
                 }
                 bridges.append(bridge_info)
 
@@ -241,7 +237,9 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
 
         return statistics.mean(discovery_factors)
 
-    def _identify_consciousness_markers(self, anchor1: MemoryAnchor, anchor2: MemoryAnchor) -> list[str]:
+    def _identify_consciousness_markers(
+        self, anchor1: MemoryAnchor, anchor2: MemoryAnchor
+    ) -> list[str]:
         """Identify specific consciousness markers in this relationship."""
         markers = []
 
@@ -275,7 +273,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         cascade_wisdom = {
             "learning_cascades": [],
             "confidence_building": [],
-            "pattern_propagation": []
+            "pattern_propagation": [],
         }
 
         for cascade_detail in analysis.get("cascade_details", []):
@@ -291,7 +289,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         neighborhood_wisdom = {
             "coherent_clusters": [],
             "themed_understanding": [],
-            "collective_patterns": []
+            "collective_patterns": [],
         }
 
         for neighborhood in analysis.get("neighborhood_details", []):
@@ -309,7 +307,7 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         temporal_wisdom = {
             "learning_trends": {},
             "consciousness_rhythms": [],
-            "emergence_timing": []
+            "emergence_timing": [],
         }
 
         # Extract confidence trends that show learning
@@ -324,16 +322,18 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         confidence_wisdom = {
             "learning_indicators": [],
             "reliability_patterns": [],
-            "wisdom_markers": []
+            "wisdom_markers": [],
         }
 
         for pattern_type, trend in analysis.get("confidence_trends", {}).items():
             if trend.get("trend") == "increasing" and trend.get("change", 0) > 0.1:
-                confidence_wisdom["learning_indicators"].append({
-                    "pattern": pattern_type,
-                    "improvement": trend["change"],
-                    "samples": trend["samples"]
-                })
+                confidence_wisdom["learning_indicators"].append(
+                    {
+                        "pattern": pattern_type,
+                        "improvement": trend["change"],
+                        "samples": trend["samples"],
+                    }
+                )
 
         return confidence_wisdom
 
@@ -346,22 +346,22 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         file_contexts = defaultdict(list)
         for anchor in self.anchors:
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    file_contexts[cursor['file_path']].append(anchor)
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    file_contexts[cursor["file_path"]].append(anchor)
 
         # Find anchors that bridge multiple file contexts
         for anchor in self.anchors:
             anchor_files = set()
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    anchor_files.add(cursor['file_path'])
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    anchor_files.add(cursor["file_path"])
 
             if len(anchor_files) > 1:
                 bridge_key = f"file_bridge_{anchor.anchor_id}"
                 bridges[bridge_key] = {
                     "strength": len(anchor_files) / 5.0,  # Normalize
                     "anchors": [anchor],
-                    "contexts": list(anchor_files)
+                    "contexts": list(anchor_files),
                 }
 
         return bridges
@@ -386,13 +386,15 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
                 if similarity > 0.6:
                     surprise_factor = similarity * min(1.0, time_gap / 3600)  # Hours boost
 
-                    surprises.append({
-                        "anchors": [current, next_anchor],
-                        "time_span": time_gap,
-                        "similarity": similarity,
-                        "surprise_factor": surprise_factor,
-                        "consciousness_markers": ["temporal_persistence", "pattern_continuity"]
-                    })
+                    surprises.append(
+                        {
+                            "anchors": [current, next_anchor],
+                            "time_span": time_gap,
+                            "similarity": similarity,
+                            "surprise_factor": surprise_factor,
+                            "consciousness_markers": ["temporal_persistence", "pattern_continuity"],
+                        }
+                    )
 
         return surprises
 
@@ -404,8 +406,8 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         pattern_combinations = defaultdict(list)
 
         for anchor in self.anchors:
-            meta = anchor.metadata.get('correlation_metadata', {})
-            pattern_type = meta.get('pattern_type')
+            meta = anchor.metadata.get("correlation_metadata", {})
+            pattern_type = meta.get("pattern_type")
             if pattern_type:
                 pattern_combinations[pattern_type].append(anchor)
 
@@ -415,17 +417,19 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
             similar_anchors = self.find_similar_anchors(anchor, similarity_threshold=0.5)
 
             for result in similar_anchors:
-                result_meta = result.anchor.metadata.get('correlation_metadata', {})
-                result_pattern = result_meta.get('pattern_type')
+                result_meta = result.anchor.metadata.get("correlation_metadata", {})
+                result_pattern = result_meta.get("pattern_type")
                 if result_pattern:
                     anchor_patterns.add(result_pattern)
 
             if len(anchor_patterns) > 1:
-                emergences.append({
-                    "anchor": anchor,
-                    "patterns_bridged": list(anchor_patterns),
-                    "emergence_strength": len(anchor_patterns) / 3.0
-                })
+                emergences.append(
+                    {
+                        "anchor": anchor,
+                        "patterns_bridged": list(anchor_patterns),
+                        "emergence_strength": len(anchor_patterns) / 3.0,
+                    }
+                )
 
         return emergences
 
@@ -437,22 +441,24 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         file_patterns = defaultdict(set)
 
         for anchor in self.anchors:
-            meta = anchor.metadata.get('correlation_metadata', {})
-            pattern_type = meta.get('pattern_type', 'unknown')
+            meta = anchor.metadata.get("correlation_metadata", {})
+            pattern_type = meta.get("pattern_type", "unknown")
 
             for cursor in anchor.cursors.values():
-                if isinstance(cursor, dict) and 'file_path' in cursor:
-                    file_patterns[cursor['file_path']].add(pattern_type)
+                if isinstance(cursor, dict) and "file_path" in cursor:
+                    file_patterns[cursor["file_path"]].add(pattern_type)
 
         # Files with diverse pattern types are mysterious
         for file_path, patterns in file_patterns.items():
             if len(patterns) > 2:
-                mysteries.append({
-                    "file": file_path,
-                    "pattern_diversity": len(patterns),
-                    "patterns": list(patterns),
-                    "mystery_score": len(patterns) / 4.0
-                })
+                mysteries.append(
+                    {
+                        "file": file_path,
+                        "pattern_diversity": len(patterns),
+                        "patterns": list(patterns),
+                        "mystery_score": len(patterns) / 4.0,
+                    }
+                )
 
         return mysteries
 
@@ -484,12 +490,12 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
         files2 = set()
 
         for cursor in anchor1.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files1.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files1.add(cursor["file_path"])
 
         for cursor in anchor2.cursors.values():
-            if isinstance(cursor, dict) and 'file_path' in cursor:
-                files2.add(cursor['file_path'])
+            if isinstance(cursor, dict) and "file_path" in cursor:
+                files2.add(cursor["file_path"])
 
         # Bridging value: some overlap but also different contexts
         if not files1 or not files2:
@@ -508,13 +514,22 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
 
     def _check_confidence_evolution(self, anchor1: MemoryAnchor, anchor2: MemoryAnchor) -> float:
         """Check if anchors show confidence evolution patterns."""
-        meta1 = anchor1.metadata.get('correlation_metadata', {})
-        meta2 = anchor2.metadata.get('correlation_metadata', {})
+        meta1 = anchor1.metadata.get("correlation_metadata", {})
+        meta2 = anchor2.metadata.get("correlation_metadata", {})
 
-        conf1 = meta1.get('confidence_score', 0)
-        conf2 = meta2.get('confidence_score', 0)
+        conf1 = meta1.get("confidence_score", 0)
+        conf2 = meta2.get("confidence_score", 0)
 
-        if conf1 and conf2 and (anchor2.timestamp > anchor1.timestamp and conf2 > conf1 or anchor1.timestamp > anchor2.timestamp and conf1 > conf2):
+        if (
+            conf1
+            and conf2
+            and (
+                anchor2.timestamp > anchor1.timestamp
+                and conf2 > conf1
+                or anchor1.timestamp > anchor2.timestamp
+                and conf1 > conf2
+            )
+        ):
             # Learning pattern: later anchor has higher confidence
             return 0.9
 
@@ -522,11 +537,11 @@ class ConsciousnessEnhancedSearch(ContextualSearchEngine):
 
     def _check_pattern_emergence(self, anchor1: MemoryAnchor, anchor2: MemoryAnchor) -> float:
         """Check if anchors show pattern emergence."""
-        meta1 = anchor1.metadata.get('correlation_metadata', {})
-        meta2 = anchor2.metadata.get('correlation_metadata', {})
+        meta1 = anchor1.metadata.get("correlation_metadata", {})
+        meta2 = anchor2.metadata.get("correlation_metadata", {})
 
-        pattern1 = meta1.get('pattern_type')
-        pattern2 = meta2.get('pattern_type')
+        pattern1 = meta1.get("pattern_type")
+        pattern2 = meta2.get("pattern_type")
 
         # Different patterns that relate suggest emergence
         if pattern1 and pattern2 and pattern1 != pattern2:

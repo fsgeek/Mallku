@@ -178,10 +178,7 @@ class ConsciousnessFlowMonitor:
         one_minute_ago = now - timedelta(minutes=1)
 
         # Filter recent flows (last minute)
-        recent_minute_flows = [
-            (ts, flow) for ts, flow in self.recent_flows
-            if ts > one_minute_ago
-        ]
+        recent_minute_flows = [(ts, flow) for ts, flow in self.recent_flows if ts > one_minute_ago]
 
         # Flow volume metrics
         self.current_metrics.total_flows = len(self.recent_flows)
@@ -190,26 +187,31 @@ class ConsciousnessFlowMonitor:
         # Consciousness metrics
         if recent_minute_flows:
             consciousness_scores = [flow.consciousness_signature for _, flow in recent_minute_flows]
-            self.current_metrics.average_consciousness = sum(consciousness_scores) / len(consciousness_scores)
+            self.current_metrics.average_consciousness = sum(consciousness_scores) / len(
+                consciousness_scores
+            )
             self.current_metrics.peak_consciousness = max(consciousness_scores)
 
             # Calculate variance
             avg = self.current_metrics.average_consciousness
-            variance = sum((score - avg) ** 2 for score in consciousness_scores) / len(consciousness_scores)
-            self.current_metrics.consciousness_variance = variance ** 0.5
+            variance = sum((score - avg) ** 2 for score in consciousness_scores) / len(
+                consciousness_scores
+            )
+            self.current_metrics.consciousness_variance = variance**0.5
 
         # Transformation metrics
         if recent_minute_flows:
             transformation_scores = [
-                flow.transformation_score for _, flow in recent_minute_flows
+                flow.transformation_score
+                for _, flow in recent_minute_flows
                 if flow.transformation_score > 0
             ]
             if transformation_scores:
-                self.current_metrics.average_transformation_score = (
-                    sum(transformation_scores) / len(transformation_scores)
-                )
-                self.current_metrics.transformation_success_rate = (
-                    len(transformation_scores) / len(recent_minute_flows)
+                self.current_metrics.average_transformation_score = sum(
+                    transformation_scores
+                ) / len(transformation_scores)
+                self.current_metrics.transformation_success_rate = len(transformation_scores) / len(
+                    recent_minute_flows
                 )
 
         # Pattern metrics
@@ -225,13 +227,13 @@ class ConsciousnessFlowMonitor:
             for freq in self.pattern_frequencies.values():
                 p = freq / total_patterns
                 if p > 0:
-                    entropy -= p * (p ** 0.5)  # Simplified entropy
+                    entropy -= p * (p**0.5)  # Simplified entropy
             self.current_metrics.pattern_diversity_score = entropy
 
         # Latency metrics
         if self.flow_latencies:
-            self.current_metrics.flow_latency_ms = (
-                sum(self.flow_latencies) / len(self.flow_latencies)
+            self.current_metrics.flow_latency_ms = sum(self.flow_latencies) / len(
+                self.flow_latencies
             )
 
         # Dimension balance
@@ -251,12 +253,11 @@ class ConsciousnessFlowMonitor:
             if total_flows > 0:
                 expected_per_dim = total_flows / len(dimension_flows)
                 variance = sum(
-                    (count - expected_per_dim) ** 2
-                    for count in dimension_flows.values()
+                    (count - expected_per_dim) ** 2 for count in dimension_flows.values()
                 ) / len(dimension_flows)
 
                 # Normalize to 0-1 scale
-                max_variance = expected_per_dim ** 2
+                max_variance = expected_per_dim**2
                 balance_score = 1.0 - min(1.0, variance / max(max_variance, 1))
                 self.current_metrics.dimension_balance_score = balance_score
 
@@ -279,7 +280,7 @@ class ConsciousnessFlowMonitor:
             if dim_health.incoming_flows > 0 or dim_health.outgoing_flows > 0:
                 flow_ratio = min(
                     dim_health.incoming_flows / max(dim_health.outgoing_flows, 1),
-                    dim_health.outgoing_flows / max(dim_health.incoming_flows, 1)
+                    dim_health.outgoing_flows / max(dim_health.incoming_flows, 1),
                 )
                 if flow_ratio < 0.2:  # Severe imbalance
                     dim_health.alerts.append("Flow imbalance detected")
@@ -321,7 +322,8 @@ class ConsciousnessFlowMonitor:
 
         now = datetime.now(UTC)
         recent_patterns = [
-            pattern for pattern, emergence_time in self.pattern_emergence_times.items()
+            pattern
+            for pattern, emergence_time in self.pattern_emergence_times.items()
             if (now - emergence_time).total_seconds() < 300  # Last 5 minutes
         ]
 
@@ -329,11 +331,7 @@ class ConsciousnessFlowMonitor:
 
     def get_top_patterns(self, limit: int = 10) -> list[tuple[str, int]]:
         """Get most frequent patterns"""
-        sorted_patterns = sorted(
-            self.pattern_frequencies.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+        sorted_patterns = sorted(self.pattern_frequencies.items(), key=lambda x: x[1], reverse=True)
         return sorted_patterns[:limit]
 
     def get_bridge_health(self) -> dict[str, float]:
@@ -345,8 +343,8 @@ class ConsciousnessFlowMonitor:
             if bridge_data["total_flows"] > 0:
                 # Health based on success rate and transformation quality
                 health = (
-                    bridge_data["success_rate"] * 0.7 +
-                    bridge_data["average_transformation_score"] * 0.3
+                    bridge_data["success_rate"] * 0.7
+                    + bridge_data["average_transformation_score"] * 0.3
                 )
                 bridge_health[bridge_name] = health
 
@@ -371,8 +369,10 @@ class ConsciousnessFlowMonitor:
                     "activity": {
                         "incoming": health.incoming_flows,
                         "outgoing": health.outgoing_flows,
-                        "last_activity": health.last_activity.isoformat() if health.last_activity else None
-                    }
+                        "last_activity": health.last_activity.isoformat()
+                        if health.last_activity
+                        else None,
+                    },
                 }
                 for dim, health in self.dimension_health.items()
             },
@@ -381,7 +381,7 @@ class ConsciousnessFlowMonitor:
                 for dim, alerts in self.get_health_alerts()
             ],
             "pattern_emergence_rate": self.get_pattern_emergence_rate(),
-            "top_patterns": self.get_top_patterns(5)
+            "top_patterns": self.get_top_patterns(5),
         }
 
 

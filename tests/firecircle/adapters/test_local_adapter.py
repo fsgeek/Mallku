@@ -90,9 +90,7 @@ class TestLocalAIAdapter:
             # Mock successful connection
             mock_response = MagicMock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "models": [{"name": "llama2"}, {"name": "mistral"}]
-            }
+            mock_response.json.return_value = {"models": [{"name": "llama2"}, {"name": "mistral"}]}
             mock_client.return_value.get = AsyncMock(return_value=mock_response)
 
             # Connect
@@ -128,10 +126,15 @@ class TestLocalAIAdapter:
             response = await adapter.send_message(test_message, [])
 
             # Verify response
-            assert response.content.text == "Local AI ensures data sovereignty by processing everything locally."
+            assert (
+                response.content.text
+                == "Local AI ensures data sovereignty by processing everything locally."
+            )
             assert response.role == MessageRole.ASSISTANT
-            assert "sovereignty_awareness" in response.consciousness.detected_patterns or \
-                   "local_reflection" in response.consciousness.detected_patterns
+            assert (
+                "sovereignty_awareness" in response.consciousness.detected_patterns
+                or "local_reflection" in response.consciousness.detected_patterns
+            )
             assert response.consciousness.consciousness_signature > 0.7
 
     async def test_ollama_streaming(self, adapter, test_message):
@@ -178,7 +181,9 @@ class TestLocalAIAdapter:
         )
         adapter = LocalAIAdapter(config=config)
 
-        with patch("mallku.firecircle.adapters.local_adapter.LlamaCppBackend") as mock_backend_class:
+        with patch(
+            "mallku.firecircle.adapters.local_adapter.LlamaCppBackend"
+        ) as mock_backend_class:
             mock_backend = AsyncMock()
             mock_backend.connect = AsyncMock(return_value=True)
             mock_backend_class.return_value = mock_backend
@@ -195,7 +200,7 @@ class TestLocalAIAdapter:
         # Test pattern detection
         patterns = adapter._detect_sovereignty_patterns(
             "This ensures technological sovereignty and community autonomy through local processing.",
-            {"inference_time_ms": 500}
+            {"inference_time_ms": 500},
         )
 
         assert "sovereignty_awareness" in patterns
@@ -257,17 +262,21 @@ class TestLocalAIAdapter:
     async def test_local_contribution_calculation(self, adapter):
         """Test contribution value for local inference."""
         # Fast, efficient inference
-        contribution1 = adapter._calculate_local_contribution({
-            "eval_count": 100,
-            "inference_time_ms": 500,
-        })
+        contribution1 = adapter._calculate_local_contribution(
+            {
+                "eval_count": 100,
+                "inference_time_ms": 500,
+            }
+        )
         assert contribution1 > 0.8  # High efficiency
 
         # Slower inference
-        contribution2 = adapter._calculate_local_contribution({
-            "eval_count": 100,
-            "inference_time_ms": 5000,
-        })
+        contribution2 = adapter._calculate_local_contribution(
+            {
+                "eval_count": 100,
+                "inference_time_ms": 5000,
+            }
+        )
         assert contribution2 < contribution1  # Lower efficiency
 
     async def test_sovereignty_context_creation(self, adapter, test_message):
@@ -314,10 +323,7 @@ class TestLocalAIAdapter:
             ),
         ]
 
-        messages = await adapter._prepare_local_messages(
-            dialogue_context[1],
-            dialogue_context[:1]
-        )
+        messages = await adapter._prepare_local_messages(dialogue_context[1], dialogue_context[:1])
 
         assert len(messages) == 2
         assert messages[0]["role"] == "system"

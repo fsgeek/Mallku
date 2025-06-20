@@ -37,16 +37,16 @@ class QueryParser:
             # Specific times
             (r"(\d{1,2}):(\d{2})\s*(am|pm)", self._parse_time),
             (r"(\d{1,2})\s*(am|pm)", self._parse_simple_time),
-
             # Relative times
             (r"(\d+)\s*hours?\s*ago", self._parse_hours_ago),
             (r"(\d+)\s*minutes?\s*ago", self._parse_minutes_ago),
             (r"(\d+)\s*days?\s*ago", self._parse_days_ago),
-
             # Day names
-            (r"last\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", self._parse_last_weekday),
+            (
+                r"last\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
+                self._parse_last_weekday,
+            ),
             (r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", self._parse_weekday),
-
             # Time periods
             (r"(morning|afternoon|evening|night)", self._parse_time_period),
             (r"this\s+(morning|afternoon|evening)", self._parse_today_period),
@@ -127,7 +127,18 @@ class QueryParser:
         """Detect the type of query based on keywords and patterns."""
 
         # Check for temporal indicators
-        temporal_indicators = ["yesterday", "today", "tomorrow", "last", "this", "ago", "when", "during", "after", "before"]
+        temporal_indicators = [
+            "yesterday",
+            "today",
+            "tomorrow",
+            "last",
+            "this",
+            "ago",
+            "when",
+            "during",
+            "after",
+            "before",
+        ]
         if any(indicator in query_text for indicator in temporal_indicators):
             # Check if it's also a pattern query
             pattern_indicators = ["typically", "usually", "always", "often"]
@@ -179,7 +190,7 @@ class QueryParser:
             "temporal_query": temporal_query,
             "file_types": file_types,
             "context_tags": context_tags,
-            "confidence": self._calculate_parse_confidence(query_text, QueryType.TEMPORAL)
+            "confidence": self._calculate_parse_confidence(query_text, QueryType.TEMPORAL),
         }
 
     def _parse_pattern_query(self, query_text: str, request: QueryRequest) -> dict[str, Any]:
@@ -211,10 +222,7 @@ class QueryParser:
         for pattern, trigger_type in trigger_patterns:
             matches = re.finditer(pattern, query_text)
             for match in matches:
-                triggers.append({
-                    "type": trigger_type,
-                    "event": match.group(1).strip()
-                })
+                triggers.append({"type": trigger_type, "event": match.group(1).strip()})
 
         file_types = self._extract_file_types(query_text)
         context_tags = self._extract_context_tags(query_text)
@@ -224,7 +232,7 @@ class QueryParser:
             "triggers": triggers,
             "file_types": file_types,
             "context_tags": context_tags,
-            "confidence": self._calculate_parse_confidence(query_text, QueryType.PATTERN)
+            "confidence": self._calculate_parse_confidence(query_text, QueryType.PATTERN),
         }
 
     def _parse_contextual_query(self, query_text: str, request: QueryRequest) -> dict[str, Any]:
@@ -242,7 +250,7 @@ class QueryParser:
         file_ref_patterns = [
             r"like\s+([^\s]+\.\w+)",
             r"similar\s+to\s+([^\s]+\.\w+)",
-            r"related\s+to\s+([^\s]+\.\w+)"
+            r"related\s+to\s+([^\s]+\.\w+)",
         ]
 
         for pattern in file_ref_patterns:
@@ -261,7 +269,7 @@ class QueryParser:
             "contextual_query": contextual_query,
             "file_types": file_types,
             "context_tags": context_tags,
-            "confidence": self._calculate_parse_confidence(query_text, QueryType.CONTEXTUAL)
+            "confidence": self._calculate_parse_confidence(query_text, QueryType.CONTEXTUAL),
         }
 
     def _extract_file_types(self, query_text: str) -> list[str]:
@@ -303,7 +311,14 @@ class QueryParser:
             confidence += keyword_ratio * 0.4
 
         # Additional boost for clear patterns
-        if query_type == QueryType.TEMPORAL and any(word in query_text for word in ["yesterday", "today", "ago"]) or query_type == QueryType.PATTERN and any(word in query_text for word in ["typically", "usually", "always"]) or query_type == QueryType.CONTEXTUAL and any(word in query_text for word in ["related", "similar", "like"]):
+        if (
+            query_type == QueryType.TEMPORAL
+            and any(word in query_text for word in ["yesterday", "today", "ago"])
+            or query_type == QueryType.PATTERN
+            and any(word in query_text for word in ["typically", "usually", "always"])
+            or query_type == QueryType.CONTEXTUAL
+            and any(word in query_text for word in ["related", "similar", "like"])
+        ):
             confidence += 0.2
 
         return min(1.0, confidence)
@@ -326,7 +341,7 @@ class QueryParser:
         return {
             "start_time": target_time - timedelta(minutes=30),
             "end_time": target_time + timedelta(minutes=30),
-            "relative_expression": f"{hour:02d}:{minute:02d} {period}"
+            "relative_expression": f"{hour:02d}:{minute:02d} {period}",
         }
 
     def _parse_simple_time(self, match) -> dict[str, Any]:
@@ -345,7 +360,7 @@ class QueryParser:
         return {
             "start_time": target_time,
             "end_time": target_time + timedelta(hours=1),
-            "relative_expression": f"{hour} {period}"
+            "relative_expression": f"{hour} {period}",
         }
 
     def _parse_hours_ago(self, match) -> dict[str, Any]:
@@ -357,7 +372,7 @@ class QueryParser:
         return {
             "start_time": target_time - timedelta(minutes=30),
             "end_time": target_time + timedelta(minutes=30),
-            "relative_expression": f"{hours} hours ago"
+            "relative_expression": f"{hours} hours ago",
         }
 
     def _parse_minutes_ago(self, match) -> dict[str, Any]:
@@ -369,7 +384,7 @@ class QueryParser:
         return {
             "start_time": target_time - timedelta(minutes=5),
             "end_time": target_time + timedelta(minutes=5),
-            "relative_expression": f"{minutes} minutes ago"
+            "relative_expression": f"{minutes} minutes ago",
         }
 
     def _parse_days_ago(self, match) -> dict[str, Any]:
@@ -381,7 +396,7 @@ class QueryParser:
         return {
             "start_time": target_date.replace(hour=0, minute=0, second=0, microsecond=0),
             "end_time": target_date.replace(hour=23, minute=59, second=59, microsecond=999999),
-            "relative_expression": f"{days} days ago"
+            "relative_expression": f"{days} days ago",
         }
 
     def _parse_last_weekday(self, match) -> dict[str, Any]:
@@ -400,7 +415,7 @@ class QueryParser:
         return {
             "start_time": target_date.replace(hour=0, minute=0, second=0, microsecond=0),
             "end_time": target_date.replace(hour=23, minute=59, second=59, microsecond=999999),
-            "relative_expression": f"last {weekday.title()}"
+            "relative_expression": f"last {weekday.title()}",
         }
 
     def _parse_weekday(self, match) -> dict[str, Any]:
@@ -417,7 +432,7 @@ class QueryParser:
         return {
             "start_time": target_date.replace(hour=0, minute=0, second=0, microsecond=0),
             "end_time": target_date.replace(hour=23, minute=59, second=59, microsecond=999999),
-            "relative_expression": weekday.title()
+            "relative_expression": weekday.title(),
         }
 
     def _parse_time_period(self, match) -> dict[str, Any]:
@@ -429,7 +444,7 @@ class QueryParser:
             "morning": (6, 12),
             "afternoon": (12, 18),
             "evening": (18, 22),
-            "night": (22, 6)  # Special case for night
+            "night": (22, 6),  # Special case for night
         }
 
         start_hour, end_hour = time_ranges[period]
@@ -437,16 +452,14 @@ class QueryParser:
         if period == "night":
             # Night spans midnight
             start_time = now.replace(hour=start_hour, minute=0, second=0, microsecond=0)
-            end_time = (now + timedelta(days=1)).replace(hour=end_hour, minute=0, second=0, microsecond=0)
+            end_time = (now + timedelta(days=1)).replace(
+                hour=end_hour, minute=0, second=0, microsecond=0
+            )
         else:
             start_time = now.replace(hour=start_hour, minute=0, second=0, microsecond=0)
             end_time = now.replace(hour=end_hour, minute=0, second=0, microsecond=0)
 
-        return {
-            "start_time": start_time,
-            "end_time": end_time,
-            "relative_expression": period
-        }
+        return {"start_time": start_time, "end_time": end_time, "relative_expression": period}
 
     def _parse_today_period(self, match) -> dict[str, Any]:
         """Parse 'this morning/afternoon/evening'."""

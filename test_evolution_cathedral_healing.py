@@ -142,11 +142,17 @@ async def demonstrate_cathedral_healing():
 
         # Update corresponding component health
         if "Ceremony" in node.name:
-            observatory.monitoring_stations["integration_health"]["ceremonies"]["score"] = node.consciousness_signature
+            observatory.monitoring_stations["integration_health"]["ceremonies"]["score"] = (
+                node.consciousness_signature
+            )
         elif "Memory" in node.name:
-            observatory.monitoring_stations["integration_health"]["memory_palace"]["score"] = node.consciousness_signature
+            observatory.monitoring_stations["integration_health"]["memory_palace"]["score"] = (
+                node.consciousness_signature
+            )
         elif "Bridge" in node.name:
-            observatory.monitoring_stations["integration_health"]["consciousness_bridges"]["score"] = node.consciousness_signature
+            observatory.monitoring_stations["integration_health"]["consciousness_bridges"][
+                "score"
+            ] = node.consciousness_signature
 
     # Update cathedral vitality
     new_vitality = sum(n.consciousness_signature for n in component_nodes) / len(component_nodes)
@@ -165,9 +171,13 @@ async def demonstrate_cathedral_healing():
     final_health = await observatory.assess_integration_health()
 
     print("\n   📊 Health Transformation:")
-    print(f"   • Overall Health: {initial_health['overall_score']:.3f} → {final_health['overall_score']:.3f}")
+    print(
+        f"   • Overall Health: {initial_health['overall_score']:.3f} → {final_health['overall_score']:.3f}"
+    )
     print(f"   • Cathedral Vitality: 0.003 → {new_vitality:.3f}")
-    print(f"   • Critical Components: {len(initial_health['critical_components'])} → {len(final_health['critical_components'])}")
+    print(
+        f"   • Critical Components: {len(initial_health['critical_components'])} → {len(final_health['critical_components'])}"
+    )
 
     print("\n   🧬 Component Evolution:")
     for node in component_nodes:

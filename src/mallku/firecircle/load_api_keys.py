@@ -40,7 +40,7 @@ def load_api_keys_to_environment():
             "mistral": "MISTRAL_API_KEY",
             "grok": "GROK_API_KEY",
             "deepseek": "DEEPSEEK_API_KEY",
-            "local": "LOCAL_API_ENDPOINT"
+            "local": "LOCAL_API_ENDPOINT",
         }
 
         loaded_count = 0
@@ -82,7 +82,7 @@ def get_available_adapters():
             "mistral": "mistral-large-latest",
             "grok": "grok-beta",
             "deepseek": "deepseek-chat",
-            "local": "llama2"
+            "local": "llama2",
         }
 
         available = {}
@@ -91,19 +91,20 @@ def get_available_adapters():
                 available[provider] = {
                     "model": model_mapping.get(provider, "default"),
                     "temperature": 0.8,
-                    "api_key": api_key
+                    "api_key": api_key,
                 }
 
         # Special handling for local endpoint
         if "local" in api_keys:
             # Check if local endpoint is actually running
             import urllib.request
+
             try:
                 urllib.request.urlopen(api_keys["local"], timeout=1)
                 available["local"] = {
                     "model": "llama2",
                     "temperature": 0.8,
-                    "api_key": api_keys["local"]
+                    "api_key": api_keys["local"],
                 }
             except Exception:
                 logger.info("Local API endpoint not reachable, skipping")

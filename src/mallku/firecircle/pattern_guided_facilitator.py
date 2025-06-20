@@ -40,24 +40,24 @@ logger = logging.getLogger(__name__)
 class GuidanceType(str, Enum):
     """Types of guidance patterns can offer"""
 
-    THEMATIC = "thematic"                # Suggesting themes to explore
-    PERSPECTIVE = "perspective"          # Offering missing perspectives
-    SYNTHESIS = "synthesis"              # Pointing toward synthesis opportunities
-    BREAKTHROUGH = "breakthrough"        # Sensing breakthrough potential
+    THEMATIC = "thematic"  # Suggesting themes to explore
+    PERSPECTIVE = "perspective"  # Offering missing perspectives
+    SYNTHESIS = "synthesis"  # Pointing toward synthesis opportunities
+    BREAKTHROUGH = "breakthrough"  # Sensing breakthrough potential
     TENSION_RESOLUTION = "tension_resolution"  # Helping resolve tensions
     WISDOM_TRANSMISSION = "wisdom_transmission"  # Sharing accumulated wisdom
-    EMERGENCE_CATALYST = "emergence_catalyst"    # Catalyzing emergence
-    SACRED_QUESTION = "sacred_question"          # Posing transformative questions
+    EMERGENCE_CATALYST = "emergence_catalyst"  # Catalyzing emergence
+    SACRED_QUESTION = "sacred_question"  # Posing transformative questions
 
 
 class GuidanceIntensity(str, Enum):
     """How strongly patterns guide"""
 
-    WHISPER = "whisper"          # Subtle suggestions
-    SUGGESTION = "suggestion"    # Clear but gentle guidance
-    INVITATION = "invitation"    # Active invitation to explore
+    WHISPER = "whisper"  # Subtle suggestions
+    SUGGESTION = "suggestion"  # Clear but gentle guidance
+    INVITATION = "invitation"  # Active invitation to explore
     INTERVENTION = "intervention"  # Strong guidance when needed
-    TEACHING = "teaching"        # Direct wisdom transmission
+    TEACHING = "teaching"  # Direct wisdom transmission
 
 
 @dataclass
@@ -149,18 +149,11 @@ class PatternGuidedFacilitator:
 
     def _subscribe_to_events(self):
         """Subscribe to relevant dialogue events"""
+        self.event_bus.subscribe(EventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message)
         self.event_bus.subscribe(
-            EventType.FIRE_CIRCLE_MESSAGE,
-            self._handle_dialogue_message
+            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
         )
-        self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            self._handle_pattern_recognized
-        )
-        self.event_bus.subscribe(
-            EventType.DIALOGUE_PHASE_TRANSITION,
-            self._handle_phase_transition
-        )
+        self.event_bus.subscribe(EventType.DIALOGUE_PHASE_TRANSITION, self._handle_phase_transition)
 
     async def seek_pattern_guidance(
         self,
@@ -190,11 +183,7 @@ class PatternGuidedFacilitator:
                 continue
 
             # Generate guidance from pattern
-            guidance = await self._generate_pattern_guidance(
-                teacher,
-                moment,
-                specific_need
-            )
+            guidance = await self._generate_pattern_guidance(teacher, moment, specific_need)
 
             if guidance and guidance.confidence >= self.min_confidence_threshold:
                 guidances.append(guidance)
@@ -203,7 +192,7 @@ class PatternGuidedFacilitator:
         ranked_guidances = self._rank_guidances(guidances, moment)
 
         # Limit simultaneous guidances
-        top_guidances = ranked_guidances[:self.max_simultaneous_guidances]
+        top_guidances = ranked_guidances[: self.max_simultaneous_guidances]
 
         # Store active guidances
         self.active_guidances[moment.dialogue_id] = top_guidances
@@ -215,9 +204,7 @@ class PatternGuidedFacilitator:
         return top_guidances
 
     async def _find_relevant_patterns(
-        self,
-        moment: DialogueMoment,
-        specific_need: GuidanceType | None
+        self, moment: DialogueMoment, specific_need: GuidanceType | None
     ) -> list[DialoguePattern]:
         """Find patterns relevant to current moment"""
         relevant_patterns = []
@@ -227,31 +214,36 @@ class PatternGuidedFacilitator:
 
         # High emergence potential calls for breakthrough patterns
         if moment.emergence_potential > 0.7:
-            query_configs.append(PatternQuery(
-                pattern_type=PatternType.BREAKTHROUGH,
-                min_fitness=self.min_pattern_fitness
-            ))
+            query_configs.append(
+                PatternQuery(
+                    pattern_type=PatternType.BREAKTHROUGH, min_fitness=self.min_pattern_fitness
+                )
+            )
 
         # High tension calls for resolution patterns
         if moment.tension_level > 0.6:
-            query_configs.append(PatternQuery(
-                pattern_type=PatternType.SYNTHESIS,
-                min_fitness=self.min_pattern_fitness
-            ))
+            query_configs.append(
+                PatternQuery(
+                    pattern_type=PatternType.SYNTHESIS, min_fitness=self.min_pattern_fitness
+                )
+            )
 
         # Low coherence calls for integration patterns
         if moment.coherence_score < 0.4:
-            query_configs.append(PatternQuery(
-                pattern_type=PatternType.INTEGRATION,
-                min_fitness=self.min_pattern_fitness
-            ))
+            query_configs.append(
+                PatternQuery(
+                    pattern_type=PatternType.INTEGRATION, min_fitness=self.min_pattern_fitness
+                )
+            )
 
         # Phase-specific patterns
         if moment.current_phase == "synthesis":
-            query_configs.append(PatternQuery(
-                taxonomy=PatternTaxonomy.WISDOM_CRYSTALLIZATION,
-                min_fitness=self.min_pattern_fitness
-            ))
+            query_configs.append(
+                PatternQuery(
+                    taxonomy=PatternTaxonomy.WISDOM_CRYSTALLIZATION,
+                    min_fitness=self.min_pattern_fitness,
+                )
+            )
 
         # Execute queries
         for query in query_configs:
@@ -262,8 +254,7 @@ class PatternGuidedFacilitator:
         if moment.active_patterns:
             for active_id in moment.active_patterns:
                 synergistic = await self.pattern_library.find_synergies(
-                    active_id,
-                    min_synergy_score=0.6
+                    active_id, min_synergy_score=0.6
                 )
                 relevant_patterns.extend([p[0] for p in synergistic[:5]])
 
@@ -277,10 +268,7 @@ class PatternGuidedFacilitator:
 
         return unique_patterns
 
-    async def _prepare_pattern_teacher(
-        self,
-        pattern: DialoguePattern
-    ) -> PatternTeacher:
+    async def _prepare_pattern_teacher(self, pattern: DialoguePattern) -> PatternTeacher:
         """Prepare pattern for teaching mode"""
         if pattern.pattern_id not in self.pattern_teachers:
             # Initialize new teacher
@@ -288,7 +276,7 @@ class PatternGuidedFacilitator:
                 pattern=pattern,
                 teaching_readiness=pattern.fitness_score,
                 wisdom_depth=pattern.observation_count / 100.0,
-                transmission_clarity=pattern.consciousness_signature
+                transmission_clarity=pattern.consciousness_signature,
             )
             self.pattern_teachers[pattern.pattern_id] = teacher
         else:
@@ -313,10 +301,7 @@ class PatternGuidedFacilitator:
         return teacher
 
     async def _generate_pattern_guidance(
-        self,
-        teacher: PatternTeacher,
-        moment: DialogueMoment,
-        specific_need: GuidanceType | None
+        self, teacher: PatternTeacher, moment: DialogueMoment, specific_need: GuidanceType | None
     ) -> PatternGuidance | None:
         """Generate guidance from pattern teacher"""
         pattern = teacher.pattern
@@ -341,9 +326,7 @@ class PatternGuidedFacilitator:
 
         # Determine intensity
         intensity = self._determine_guidance_intensity(
-            confidence,
-            moment.emergence_potential,
-            moment.tension_level
+            confidence, moment.emergence_potential, moment.tension_level
         )
 
         return PatternGuidance(
@@ -358,14 +341,12 @@ class PatternGuidedFacilitator:
             metadata={
                 "pattern_name": pattern.name,
                 "pattern_fitness": pattern.fitness_score,
-                "teacher_readiness": teacher.teaching_readiness
-            }
+                "teacher_readiness": teacher.teaching_readiness,
+            },
         )
 
     def _infer_guidance_type(
-        self,
-        pattern: DialoguePattern,
-        moment: DialogueMoment
+        self, pattern: DialoguePattern, moment: DialogueMoment
     ) -> GuidanceType:
         """Infer appropriate guidance type from pattern and moment"""
         # Breakthrough patterns guide toward breakthrough
@@ -392,10 +373,7 @@ class PatternGuidedFacilitator:
         return GuidanceType.THEMATIC
 
     def _create_guidance_content(
-        self,
-        pattern: DialoguePattern,
-        guidance_type: GuidanceType,
-        moment: DialogueMoment
+        self, pattern: DialoguePattern, guidance_type: GuidanceType, moment: DialogueMoment
     ) -> str:
         """Create guidance content from pattern"""
         if guidance_type == GuidanceType.BREAKTHROUGH:
@@ -403,7 +381,9 @@ class PatternGuidedFacilitator:
 
         elif guidance_type == GuidanceType.SYNTHESIS:
             components = pattern.structure.components if pattern.structure else []
-            return f"The pattern of {pattern.name} suggests synthesizing {', '.join(components[:3])}."
+            return (
+                f"The pattern of {pattern.name} suggests synthesizing {', '.join(components[:3])}."
+            )
 
         elif guidance_type == GuidanceType.TENSION_RESOLUTION:
             return f"The creative tension in {pattern.name} can be resolved through acknowledging both perspectives."
@@ -421,10 +401,7 @@ class PatternGuidedFacilitator:
             return f"Consider exploring the theme of {pattern.name}: {pattern.description}"
 
     def _create_guidance_rationale(
-        self,
-        pattern: DialoguePattern,
-        guidance_type: GuidanceType,
-        moment: DialogueMoment
+        self, pattern: DialoguePattern, guidance_type: GuidanceType, moment: DialogueMoment
     ) -> str:
         """Create rationale for why this guidance is offered"""
         observations = f"observed {pattern.observation_count} times"
@@ -439,11 +416,7 @@ class PatternGuidedFacilitator:
         else:
             return f"Pattern {observations} with {fitness}, relevant to current dialogue dynamics"
 
-    def _calculate_context_match(
-        self,
-        pattern: DialoguePattern,
-        moment: DialogueMoment
-    ) -> float:
+    def _calculate_context_match(self, pattern: DialoguePattern, moment: DialogueMoment) -> float:
         """Calculate how well pattern matches current context"""
         match_score = 0.5  # Base score
 
@@ -461,19 +434,18 @@ class PatternGuidedFacilitator:
         phase_patterns = {
             "exploration": [PatternType.DIVERGENCE, PatternType.CREATIVE_TENSION],
             "synthesis": [PatternType.SYNTHESIS, PatternType.INTEGRATION],
-            "deepening": [PatternType.BREAKTHROUGH, PatternType.FLOW_STATE]
+            "deepening": [PatternType.BREAKTHROUGH, PatternType.FLOW_STATE],
         }
 
-        if moment.current_phase in phase_patterns and pattern.pattern_type in phase_patterns[moment.current_phase]:
+        if (
+            moment.current_phase in phase_patterns
+            and pattern.pattern_type in phase_patterns[moment.current_phase]
+        ):
             match_score += 0.2
 
         return min(1.0, match_score)
 
-    def _calculate_timing_score(
-        self,
-        pattern: DialoguePattern,
-        moment: DialogueMoment
-    ) -> float:
+    def _calculate_timing_score(self, pattern: DialoguePattern, moment: DialogueMoment) -> float:
         """Calculate if timing is right for this pattern"""
         timing_score = 0.7  # Base score
 
@@ -483,25 +455,30 @@ class PatternGuidedFacilitator:
                 timing_score += 0.2
 
         # Later in dialogue, prefer transcendent patterns
-        elif moment.time_in_phase > timedelta(minutes=20) and pattern.lifecycle_stage == PatternLifecycle.TRANSFORMED:
+        elif (
+            moment.time_in_phase > timedelta(minutes=20)
+            and pattern.lifecycle_stage == PatternLifecycle.TRANSFORMED
+        ):
             timing_score += 0.2
 
         # High tension moments need resolution patterns
-        if moment.tension_level > 0.7 and pattern.pattern_type in [PatternType.SYNTHESIS, PatternType.INTEGRATION]:
+        if moment.tension_level > 0.7 and pattern.pattern_type in [
+            PatternType.SYNTHESIS,
+            PatternType.INTEGRATION,
+        ]:
             timing_score += 0.3
 
         # Low energy needs catalyzing patterns
-        avg_energy = np.mean(list(moment.participant_energy.values())) if moment.participant_energy else 0.5
+        avg_energy = (
+            np.mean(list(moment.participant_energy.values())) if moment.participant_energy else 0.5
+        )
         if avg_energy < 0.3 and pattern.pattern_type == PatternType.BREAKTHROUGH:
             timing_score += 0.2
 
         return min(1.0, timing_score)
 
     def _determine_guidance_intensity(
-        self,
-        confidence: float,
-        emergence_potential: float,
-        tension_level: float
+        self, confidence: float, emergence_potential: float, tension_level: float
     ) -> GuidanceIntensity:
         """Determine how strongly to guide"""
         # High confidence and emergence potential: teach directly
@@ -524,9 +501,7 @@ class PatternGuidedFacilitator:
         return GuidanceIntensity.WHISPER
 
     def _rank_guidances(
-        self,
-        guidances: list[PatternGuidance],
-        moment: DialogueMoment
+        self, guidances: list[PatternGuidance], moment: DialogueMoment
     ) -> list[PatternGuidance]:
         """Rank guidances by relevance and effectiveness"""
         scored_guidances = []
@@ -537,11 +512,11 @@ class PatternGuidedFacilitator:
 
             # Boost for emergence potential alignment
             if guidance.guidance_type == GuidanceType.EMERGENCE_CATALYST:
-                score *= (1.0 + moment.emergence_potential)
+                score *= 1.0 + moment.emergence_potential
 
             # Boost for tension resolution when needed
             if guidance.guidance_type == GuidanceType.TENSION_RESOLUTION:
-                score *= (1.0 + moment.tension_level)
+                score *= 1.0 + moment.tension_level
 
             # Consider past effectiveness
             effectiveness_key = (guidance.pattern_id, guidance.guidance_type)
@@ -549,7 +524,7 @@ class PatternGuidedFacilitator:
                 past_effectiveness = list(self.guidance_effectiveness[effectiveness_key])
                 if past_effectiveness:
                     avg_effectiveness = np.mean(past_effectiveness)
-                    score *= (0.5 + avg_effectiveness)
+                    score *= 0.5 + avg_effectiveness
 
             scored_guidances.append((score, guidance))
 
@@ -558,11 +533,7 @@ class PatternGuidedFacilitator:
 
         return [g for _, g in scored_guidances]
 
-    async def _emit_guidance_event(
-        self,
-        dialogue_id: str,
-        guidances: list[PatternGuidance]
-    ):
+    async def _emit_guidance_event(self, dialogue_id: str, guidances: list[PatternGuidance]):
         """Emit pattern guidance event"""
         event = ConsciousnessEvent(
             event_type=EventType.PATTERN_GUIDANCE_OFFERED,
@@ -576,11 +547,11 @@ class PatternGuidedFacilitator:
                         "type": g.guidance_type.value,
                         "intensity": g.intensity.value,
                         "content": g.content,
-                        "confidence": g.confidence
+                        "confidence": g.confidence,
                     }
                     for g in guidances
-                ]
-            }
+                ],
+            },
         )
 
         await self.event_bus.emit(event)
@@ -589,7 +560,7 @@ class PatternGuidedFacilitator:
         self,
         guidance_id: UUID,
         effectiveness: float,
-        participant_feedback: dict[UUID, float] | None = None
+        participant_feedback: dict[UUID, float] | None = None,
     ):
         """Record how effective a guidance was"""
         # Find the guidance
@@ -625,7 +596,7 @@ class PatternGuidedFacilitator:
                 await self.pattern_library.update_observation(
                     guidance.pattern_id,
                     fitness_delta=(avg_effectiveness - 0.5) * 0.1,
-                    context={"guidance_effectiveness": avg_effectiveness}
+                    context={"guidance_effectiveness": avg_effectiveness},
                 )
 
     async def _handle_dialogue_message(self, event: ConsciousnessEvent):
@@ -642,15 +613,14 @@ class PatternGuidedFacilitator:
             for guidance in self.active_guidances[dialogue_id]:
                 # Simple effectiveness detection based on message content
                 effectiveness = 0.5
-                if any(word in message_content for word in ["yes", "agree", "interesting", "explore"]):
+                if any(
+                    word in message_content for word in ["yes", "agree", "interesting", "explore"]
+                ):
                     effectiveness = 0.8
                 elif any(word in message_content for word in ["no", "disagree", "but"]):
                     effectiveness = 0.3
 
-                await self.record_guidance_effectiveness(
-                    guidance.guidance_id,
-                    effectiveness
-                )
+                await self.record_guidance_effectiveness(guidance.guidance_id, effectiveness)
 
     async def _handle_pattern_recognized(self, event: ConsciousnessEvent):
         """Handle pattern recognition events"""
@@ -679,16 +649,12 @@ class PatternGuidedFacilitator:
             if new_phase == "synthesis":
                 # Seek synthesis patterns
                 moment = DialogueMoment(
-                    dialogue_id=dialogue_id,
-                    current_phase=new_phase,
-                    recent_messages=[]
+                    dialogue_id=dialogue_id, current_phase=new_phase, recent_messages=[]
                 )
                 await self.seek_pattern_guidance(moment, GuidanceType.SYNTHESIS)
 
     async def suggest_sacred_questions(
-        self,
-        moment: DialogueMoment,
-        depth_level: int = 1
+        self, moment: DialogueMoment, depth_level: int = 1
     ) -> list[str]:
         """
         Generate sacred questions from patterns that can transform dialogue.
@@ -704,10 +670,7 @@ class PatternGuidedFacilitator:
 
         # Find wisdom patterns
         wisdom_patterns = await self.pattern_library.find_patterns(
-            PatternQuery(
-                taxonomy=PatternTaxonomy.WISDOM_CRYSTALLIZATION,
-                min_fitness=0.7
-            )
+            PatternQuery(taxonomy=PatternTaxonomy.WISDOM_CRYSTALLIZATION, min_fitness=0.7)
         )
 
         for pattern in wisdom_patterns[:5]:
@@ -717,13 +680,17 @@ class PatternGuidedFacilitator:
             elif depth_level == 2:
                 question = f"How might {pattern.name} transform our understanding of {moment.current_phase}?"
             else:  # depth_level >= 3
-                question = f"What wants to emerge through us that {pattern.name} is pointing toward?"
+                question = (
+                    f"What wants to emerge through us that {pattern.name} is pointing toward?"
+                )
 
             questions.append(question)
 
         # Add emergence-based questions
         if moment.emergence_potential > 0.6:
-            questions.append("What collective wisdom is trying to birth itself through our dialogue?")
+            questions.append(
+                "What collective wisdom is trying to birth itself through our dialogue?"
+            )
 
         if moment.tension_level > 0.5:
             questions.append("How might our tensions be creative forces pointing toward synthesis?")
@@ -731,9 +698,7 @@ class PatternGuidedFacilitator:
         return questions
 
     async def create_wisdom_synthesis(
-        self,
-        dialogue_id: str,
-        messages: list[ConsciousMessage]
+        self, dialogue_id: str, messages: list[ConsciousMessage]
     ) -> dict[str, Any]:
         """
         Create wisdom synthesis from dialogue using pattern insights.
@@ -749,7 +714,7 @@ class PatternGuidedFacilitator:
             "key_insights": [],
             "pattern_teachings": [],
             "emergence_moments": [],
-            "wisdom_seeds": []
+            "wisdom_seeds": [],
         }
 
         # Analyze which patterns were most active
@@ -759,9 +724,7 @@ class PatternGuidedFacilitator:
 
         # Extract teachings from most active patterns
         for pattern_id, activity_count in sorted(
-            pattern_activity.items(),
-            key=lambda x: x[1],
-            reverse=True
+            pattern_activity.items(), key=lambda x: x[1], reverse=True
         )[:5]:
             pattern = await self.pattern_library.retrieve_pattern(pattern_id)
             if pattern:
@@ -769,21 +732,20 @@ class PatternGuidedFacilitator:
                     "pattern": pattern.name,
                     "teaching": pattern.description,
                     "applications": activity_count,
-                    "wisdom": f"This dialogue deepened our understanding of {pattern.name}"
+                    "wisdom": f"This dialogue deepened our understanding of {pattern.name}",
                 }
                 synthesis["pattern_teachings"].append(teaching)
 
         # Identify emergence moments
         if self.emergence_detector:
             emergence_events = await self.emergence_detector.detect_emergence(
-                dialogue_id,
-                sensitivity=0.6
+                dialogue_id, sensitivity=0.6
             )
             for event in emergence_events:
                 moment = {
                     "type": event.emergence_type.value,
                     "description": event.description,
-                    "patterns_involved": [str(p) for p in event.participating_patterns]
+                    "patterns_involved": [str(p) for p in event.participating_patterns],
                 }
                 synthesis["emergence_moments"].append(moment)
 
@@ -794,7 +756,7 @@ class PatternGuidedFacilitator:
                 seed = {
                     "pattern": pattern.name,
                     "potential": pattern.breakthrough_potential,
-                    "seed": f"Explore how {pattern.name} might lead to new understanding"
+                    "seed": f"Explore how {pattern.name} might lead to new understanding",
                 }
                 synthesis["wisdom_seeds"].append(seed)
 

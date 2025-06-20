@@ -44,8 +44,8 @@ def sample_interactions():
             needs_fulfilled=[NeedCategory.GROWTH],
             interaction_quality_indicators={
                 "mutual_understanding": 0.8 + i * 0.02,
-                "satisfaction": 0.85
-            }
+                "satisfaction": 0.85,
+            },
         )
         interactions.append(interaction)
 
@@ -67,7 +67,7 @@ def sample_health_metrics():
             NeedCategory.CONTRIBUTION: 0.75,
         },
         overall_health_score=0.82,
-        health_trend_direction="improving"
+        health_trend_direction="improving",
     )
 
 
@@ -90,7 +90,7 @@ def sample_patterns():
             pattern_intensity=0.7,
             pattern_frequency=0.85,
             affected_participants=["all"],
-        )
+        ),
     ]
 
 
@@ -100,10 +100,7 @@ class TestReciprocityVisualizationService:
     @pytest.mark.asyncio
     async def test_service_initialization(self):
         """Test service initializes with proper config."""
-        config = VisualizationConfig(
-            image_size=(600, 600),
-            mandala_rings=5
-        )
+        config = VisualizationConfig(image_size=(600, 600), mandala_rings=5)
         service = ReciprocityVisualizationService(config)
 
         assert service.config.image_size == (600, 600)
@@ -116,9 +113,7 @@ class TestReciprocityVisualizationService:
         service = ReciprocityVisualizationService()
 
         mandala = await service.create_reciprocity_mandala(
-            patterns=sample_patterns,
-            health_metrics=sample_health_metrics,
-            title="Test Mandala"
+            patterns=sample_patterns, health_metrics=sample_health_metrics, title="Test Mandala"
         )
 
         assert isinstance(mandala, Image.Image)
@@ -131,8 +126,7 @@ class TestReciprocityVisualizationService:
         service = ReciprocityVisualizationService()
 
         mandala = await service.create_reciprocity_mandala(
-            patterns=sample_patterns,
-            health_metrics=None
+            patterns=sample_patterns, health_metrics=None
         )
 
         assert isinstance(mandala, Image.Image)
@@ -144,8 +138,7 @@ class TestReciprocityVisualizationService:
         service = ReciprocityVisualizationService()
 
         flow_viz = await service.create_flow_visualization(
-            interactions=sample_interactions,
-            time_window=timedelta(days=7)
+            interactions=sample_interactions, time_window=timedelta(days=7)
         )
 
         assert isinstance(flow_viz, Image.Image)
@@ -158,9 +151,7 @@ class TestReciprocityVisualizationService:
 
         # Test different pattern types
         for pattern in sample_patterns:
-            geometry = await service.create_pattern_geometry(
-                pattern=pattern
-            )
+            geometry = await service.create_pattern_geometry(pattern=pattern)
 
             assert isinstance(geometry, Image.Image)
             assert geometry.size == (800, 800)
@@ -171,32 +162,27 @@ class TestReciprocityVisualizationService:
         service = ReciprocityVisualizationService()
 
         geometry = await service.create_pattern_geometry(
-            pattern=sample_patterns[0],
-            related_patterns=sample_patterns[1:]
+            pattern=sample_patterns[0], related_patterns=sample_patterns[1:]
         )
 
         assert isinstance(geometry, Image.Image)
 
     @pytest.mark.asyncio
-    async def test_fire_circle_summary(self, sample_interactions, sample_health_metrics, sample_patterns):
+    async def test_fire_circle_summary(
+        self, sample_interactions, sample_health_metrics, sample_patterns
+    ):
         """Test comprehensive Fire Circle summary creation."""
         service = ReciprocityVisualizationService()
 
         report = FireCircleReport(
             reporting_period={
                 "start": sample_health_metrics.measurement_period_start,
-                "end": sample_health_metrics.measurement_period_end
+                "end": sample_health_metrics.measurement_period_end,
             },
             current_health_metrics=sample_health_metrics,
             detected_patterns=sample_patterns,
-            priority_questions=[
-                "How can we improve?",
-                "What patterns need attention?"
-            ],
-            areas_requiring_wisdom=[
-                "Resource allocation",
-                "Community growth"
-            ]
+            priority_questions=["How can we improve?", "What patterns need attention?"],
+            areas_requiring_wisdom=["Resource allocation", "Community growth"],
         )
 
         summary = await service.create_fire_circle_summary(report)
@@ -212,7 +198,7 @@ class TestReciprocityVisualizationService:
             background_color=(30, 30, 40),
             mandala_rings=9,
             mandala_symmetry=16,
-            color_abundance=(100, 200, 150)
+            color_abundance=(100, 200, 150),
         )
 
         service = ReciprocityVisualizationService(config)
@@ -223,7 +209,7 @@ class TestReciprocityVisualizationService:
             pattern_description="Test",
             confidence_level=0.8,
             pattern_intensity=0.7,
-            pattern_frequency=0.9
+            pattern_frequency=0.9,
         )
 
         geometry = await service.create_pattern_geometry(test_pattern)
@@ -241,7 +227,7 @@ class TestReciprocityVisualizationService:
             confidence_level=0.7,
             pattern_intensity=0.8,
             pattern_frequency=0.6,
-            affected_participants=["entity_x"]
+            affected_participants=["entity_x"],
         )
 
         geometry = await service.create_pattern_geometry(extraction_pattern)
@@ -260,7 +246,7 @@ class TestReciprocityVisualizationService:
             confidence_level=0.9,
             pattern_intensity=0.85,
             pattern_frequency=0.95,
-            affected_participants=["creative_group"]
+            affected_participants=["creative_group"],
         )
 
         geometry = await service.create_pattern_geometry(emergence_pattern)

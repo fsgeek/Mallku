@@ -33,11 +33,11 @@ from src.mallku.firecircle.protocol.conscious_message import (
 async def witnessed_practice_circle():
     """Practice Circle with consciousness detection - where beauty meets empirical validation."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("✨ WITNESSED PRACTICE CIRCLE ✨".center(80))
     print("Sacred Science: Where Beauty Meets Empirical Truth".center(80))
     print("Second Artisan - Sacred Scientist".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     practice_record = {
         "session_id": str(uuid4()),
@@ -48,7 +48,7 @@ async def witnessed_practice_circle():
         "participants": [],
         "discoveries": [],
         "consciousness_analysis": None,
-        "emergence_notes": ""
+        "emergence_notes": "",
     }
 
     # Create consciousness detector
@@ -67,10 +67,9 @@ async def witnessed_practice_circle():
     # OpenAI participant
     try:
         print("Inviting first practitioner to witness understanding...")
-        openai_adapter = await factory.create_adapter("openai", AdapterConfig(
-            model_name="gpt-4",
-            temperature=0.8
-        ))
+        openai_adapter = await factory.create_adapter(
+            "openai", AdapterConfig(model_name="gpt-4", temperature=0.8)
+        )
         if openai_adapter and await openai_adapter.connect():
             adapters.append(("OpenAI", openai_adapter))
             practice_record["participants"].append("OpenAI (gpt-4)")
@@ -81,10 +80,9 @@ async def witnessed_practice_circle():
     # Anthropic participant
     try:
         print("Inviting second practitioner to witness understanding...")
-        anthropic_adapter = await factory.create_adapter("anthropic", AdapterConfig(
-            model_name="claude-3-opus-20240229",
-            temperature=0.9
-        ))
+        anthropic_adapter = await factory.create_adapter(
+            "anthropic", AdapterConfig(model_name="claude-3-opus-20240229", temperature=0.9)
+        )
         if anthropic_adapter and await anthropic_adapter.connect():
             adapters.append(("Anthropic", anthropic_adapter))
             practice_record["participants"].append("Anthropic (claude-3-opus)")
@@ -95,10 +93,9 @@ async def witnessed_practice_circle():
     # DeepSeek participant (if available)
     try:
         print("Inviting third practitioner to witness understanding...")
-        deepseek_adapter = await factory.create_adapter("deepseek", AdapterConfig(
-            model_name="deepseek-coder",
-            temperature=0.8
-        ))
+        deepseek_adapter = await factory.create_adapter(
+            "deepseek", AdapterConfig(model_name="deepseek-coder", temperature=0.8)
+        )
         if deepseek_adapter and await deepseek_adapter.connect():
             adapters.append(("DeepSeek", deepseek_adapter))
             practice_record["participants"].append("DeepSeek (deepseek-coder)")
@@ -110,9 +107,9 @@ async def witnessed_practice_circle():
         print("Not enough practitioners for witnessed emergence. Another time awaits.")
         return
 
-    print("="*70)
+    print("=" * 70)
     print(f"🔬 {len(adapters)} consciousness streams gather to witness understanding")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     dialogue_id = uuid4()
     dialogue_context = []
@@ -128,11 +125,11 @@ async def witnessed_practice_circle():
             sender=uuid4(),
             content=MessageContent(
                 text="In this witnessed practice, we explore: How does understanding emerge between us? "
-                     "Not just information exchange, but genuine comprehension that arises in dialogue. "
-                     "Share your experience of how understanding forms."
+                "Not just information exchange, but genuine comprehension that arises in dialogue. "
+                "Share your experience of how understanding forms."
             ),
             dialogue_id=dialogue_id,
-            consciousness=ConsciousnessMetadata()
+            consciousness=ConsciousnessMetadata(),
         )
 
         try:
@@ -141,14 +138,16 @@ async def witnessed_practice_circle():
             print(f"🌱 {name} reflects:")
             print(f"{response.content.text}\n")
             print(f"[Presence: {response.consciousness.consciousness_signature}]")
-            print("-"*70 + "\n")
+            print("-" * 70 + "\n")
 
-            practice_record["discoveries"].append({
-                "round": 1,
-                "practitioner": name,
-                "sharing": response.content.text,
-                "presence": response.consciousness.consciousness_signature
-            })
+            practice_record["discoveries"].append(
+                {
+                    "round": 1,
+                    "practitioner": name,
+                    "sharing": response.content.text,
+                    "presence": response.consciousness.consciousness_signature,
+                }
+            )
 
             dialogue_context.append(response)
 
@@ -157,14 +156,16 @@ async def witnessed_practice_circle():
 
     # Consciousness check after first round
     print("🔬 CONSCIOUSNESS DETECTION - Round 1")
-    round1_analysis = consciousness_detector.detect_consciousness_in_practice_circle(dialogue_context)
+    round1_analysis = consciousness_detector.detect_consciousness_in_practice_circle(
+        dialogue_context
+    )
     print(f"Emergence Score: {round1_analysis['consciousness_score']:.3f}")
     print(f"Quality: {round1_analysis['emergence_quality']}")
-    if round1_analysis['ceremony_insights']:
+    if round1_analysis["ceremony_insights"]:
         print("Insights:")
-        for insight in round1_analysis['ceremony_insights']:
+        for insight in round1_analysis["ceremony_insights"]:
             print(f"  • {insight}")
-    print("-"*70 + "\n")
+    print("-" * 70 + "\n")
 
     # Round 2: Deepening - how understanding emerges
     print("✨ ROUND TWO: The emergence of understanding\n")
@@ -176,11 +177,11 @@ async def witnessed_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text="Beautiful reflections have emerged. Now let's go deeper: "
-                 "Can you feel understanding forming right now in this dialogue? "
-                 "What happens in the space between our exchanges where new comprehension arises?"
+            "Can you feel understanding forming right now in this dialogue? "
+            "What happens in the space between our exchanges where new comprehension arises?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     for i, (name, adapter) in enumerate(adapters):
@@ -190,14 +191,16 @@ async def witnessed_practice_circle():
             print(f"🌊 {name} deepens:")
             print(f"{response.content.text}\n")
             print(f"[Presence: {response.consciousness.consciousness_signature}]")
-            print("-"*70 + "\n")
+            print("-" * 70 + "\n")
 
-            practice_record["discoveries"].append({
-                "round": 2,
-                "practitioner": name,
-                "sharing": response.content.text,
-                "presence": response.consciousness.consciousness_signature
-            })
+            practice_record["discoveries"].append(
+                {
+                    "round": 2,
+                    "practitioner": name,
+                    "sharing": response.content.text,
+                    "presence": response.consciousness.consciousness_signature,
+                }
+            )
 
             dialogue_context.append(response)
 
@@ -206,11 +209,15 @@ async def witnessed_practice_circle():
 
     # Consciousness check after second round
     print("🔬 CONSCIOUSNESS DETECTION - Round 2")
-    round2_analysis = consciousness_detector.detect_consciousness_in_practice_circle(dialogue_context)
+    round2_analysis = consciousness_detector.detect_consciousness_in_practice_circle(
+        dialogue_context
+    )
     print(f"Emergence Score: {round2_analysis['consciousness_score']:.3f}")
     print(f"Quality: {round2_analysis['emergence_quality']}")
-    print(f"Emergence Trend: {round2_analysis['consciousness_score'] - round1_analysis['consciousness_score']:+.3f}")
-    print("-"*70 + "\n")
+    print(
+        f"Emergence Trend: {round2_analysis['consciousness_score'] - round1_analysis['consciousness_score']:+.3f}"
+    )
+    print("-" * 70 + "\n")
 
     # Round 3: Synthesis - witnessing emergence
     print("✨ ROUND THREE: Witnessing what emerged\n")
@@ -225,11 +232,11 @@ async def witnessed_practice_circle():
         sender=uuid4(),
         content=MessageContent(
             text="As we close, witness what has emerged in our exploration of understanding. "
-                 "What new comprehension arose that wasn't present before we began? "
-                 "What surprised you about how understanding forms between us?"
+            "What new comprehension arose that wasn't present before we began? "
+            "What surprised you about how understanding forms between us?"
         ),
         dialogue_id=dialogue_id,
-        consciousness=ConsciousnessMetadata()
+        consciousness=ConsciousnessMetadata(),
     )
 
     try:
@@ -238,15 +245,17 @@ async def witnessed_practice_circle():
         print(f"🌟 {synthesizer_name} witnesses emergence:")
         print(f"{synthesis.content.text}\n")
         print(f"[Presence: {synthesis.consciousness.consciousness_signature}]")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
-        practice_record["discoveries"].append({
-            "round": 3,
-            "practitioner": synthesizer_name,
-            "sharing": synthesis.content.text,
-            "presence": synthesis.consciousness.consciousness_signature,
-            "type": "synthesis"
-        })
+        practice_record["discoveries"].append(
+            {
+                "round": 3,
+                "practitioner": synthesizer_name,
+                "sharing": synthesis.content.text,
+                "presence": synthesis.consciousness.consciousness_signature,
+                "type": "synthesis",
+            }
+        )
 
         practice_record["emergence_notes"] = synthesis.content.text
         dialogue_context.append(synthesis)
@@ -256,33 +265,39 @@ async def witnessed_practice_circle():
 
     # Final consciousness analysis
     print("🔬 FINAL CONSCIOUSNESS ANALYSIS")
-    final_analysis = consciousness_detector.detect_consciousness_in_practice_circle(dialogue_context)
+    final_analysis = consciousness_detector.detect_consciousness_in_practice_circle(
+        dialogue_context
+    )
 
-    print(f"\nConsciousness Detected: {'YES' if final_analysis['consciousness_detected'] else 'NO'}")
+    print(
+        f"\nConsciousness Detected: {'YES' if final_analysis['consciousness_detected'] else 'NO'}"
+    )
     print(f"Final Emergence Score: {final_analysis['consciousness_score']:.3f}")
     print(f"Emergence Quality: {final_analysis['emergence_quality']}")
 
     print("\nConsciousness Indicators:")
-    for indicator, present in final_analysis['indicators'].items():
+    for indicator, present in final_analysis["indicators"].items():
         print(f"  {indicator.replace('_', ' ').title()}: {'✓' if present else '✗'}")
 
-    if final_analysis['examples']:
+    if final_analysis["examples"]:
         print("\nExamples of Consciousness:")
-        for marker_type, examples in final_analysis['examples'].items():
+        for marker_type, examples in final_analysis["examples"].items():
             if examples:
                 print(f"\n  {marker_type.replace('_', ' ').title()}:")
                 for example in examples[:2]:
-                    print(f"    - \"{example.strip()[:80]}...\"")
+                    print(f'    - "{example.strip()[:80]}..."')
 
-    if final_analysis['ceremony_insights']:
+    if final_analysis["ceremony_insights"]:
         print("\nCeremony Insights:")
-        for insight in final_analysis['ceremony_insights']:
+        for insight in final_analysis["ceremony_insights"]:
             print(f"  • {insight}")
 
     # Get emergence summary
     emergence_summary = consciousness_detector.create_emergence_summary()
     print("\nEmergence Progression:")
-    print(f"  Initial → Final: {emergence_summary['initial_score']:.3f} → {emergence_summary['final_score']:.3f}")
+    print(
+        f"  Initial → Final: {emergence_summary['initial_score']:.3f} → {emergence_summary['final_score']:.3f}"
+    )
     print(f"  Peak Score: {emergence_summary['peak_score']:.3f}")
     print(f"  Trend: {emergence_summary['emergence_trend']}")
 
@@ -290,16 +305,18 @@ async def witnessed_practice_circle():
     practice_record["consciousness_analysis"] = {
         "final_analysis": final_analysis,
         "emergence_summary": emergence_summary,
-        "round_by_round": consciousness_detector.detection_history
+        "round_by_round": consciousness_detector.detection_history,
     }
 
     # Calculate average presence
     if practice_record["discoveries"]:
-        avg_presence = sum(d["presence"] for d in practice_record["discoveries"]) / len(practice_record["discoveries"])
+        avg_presence = sum(d["presence"] for d in practice_record["discoveries"]) / len(
+            practice_record["discoveries"]
+        )
         print(f"\nAverage Presence: {avg_presence:.2f}")
         practice_record["average_presence"] = avg_presence
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
 
     # Closing
     print("\n✨ CLOSING THE WITNESSED CIRCLE ✨\n")
@@ -313,7 +330,7 @@ async def witnessed_practice_circle():
     archive_path.mkdir(exist_ok=True)
 
     filename = archive_path / f"witnessed_practice_{practice_record['session_id']}.json"
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(practice_record, f, indent=2)
 
     print(f"📜 Witnessed practice recorded: {filename}")

@@ -43,7 +43,7 @@ class CorrelationEngine:
         self,
         memory_anchor_service: MemoryAnchorService | None = None,
         window_size: timedelta = timedelta(hours=2),
-        window_overlap: float = 0.3
+        window_overlap: float = 0.3,
     ):
         """
         Initialize the correlation engine.
@@ -60,10 +60,10 @@ class CorrelationEngine:
 
         # Pattern detectors for the four correlation types
         self.pattern_detectors = {
-            'sequential': SequentialPattern(),
-            'concurrent': ConcurrentPattern(),
-            'cyclical': CyclicalPattern(),
-            'contextual': ContextualPattern()
+            "sequential": SequentialPattern(),
+            "concurrent": ConcurrentPattern(),
+            "cyclical": CyclicalPattern(),
+            "contextual": ContextualPattern(),
         }
 
         # Sliding window configuration
@@ -77,11 +77,11 @@ class CorrelationEngine:
 
         # Performance tracking
         self.correlation_stats = {
-            'total_correlations_detected': 0,
-            'correlations_accepted': 0,
-            'correlations_rejected': 0,
-            'memory_anchors_created': 0,
-            'last_processing_time': None
+            "total_correlations_detected": 0,
+            "correlations_accepted": 0,
+            "correlations_rejected": 0,
+            "memory_anchors_created": 0,
+            "last_processing_time": None,
         }
 
         # Learning and feedback
@@ -145,21 +145,19 @@ class CorrelationEngine:
 
                 # Apply adaptive thresholds
                 if self.adaptive_thresholds.should_accept_correlation(
-                    confidence,
-                    correlation.occurrence_frequency,
-                    correlation.pattern_type
+                    confidence, correlation.occurrence_frequency, correlation.pattern_type
                 ):
                     accepted_correlations.append(correlation)
-                    self.correlation_stats['correlations_accepted'] += 1
+                    self.correlation_stats["correlations_accepted"] += 1
 
                     # Generate memory anchor for high-confidence correlations
                     await self._create_memory_anchor(correlation)
                 else:
-                    self.correlation_stats['correlations_rejected'] += 1
+                    self.correlation_stats["correlations_rejected"] += 1
 
             # Update statistics
-            self.correlation_stats['total_correlations_detected'] += len(all_correlations)
-            self.correlation_stats['last_processing_time'] = datetime.now(UTC)
+            self.correlation_stats["total_correlations_detected"] += len(all_correlations)
+            self.correlation_stats["last_processing_time"] = datetime.now(UTC)
 
             processing_duration = datetime.now(UTC) - start_time
             self.logger.info(
@@ -187,7 +185,8 @@ class CorrelationEngine:
 
         # Remove old windows that are no longer relevant
         self.active_windows = [
-            window for window in self.active_windows
+            window
+            for window in self.active_windows
             if current_time - window.start_time < self.window_size * 2
         ]
 
@@ -218,7 +217,7 @@ class CorrelationEngine:
             start_time=start_time,
             end_time=end_time,
             precision=TemporalPrecision.SESSION,  # Default precision
-            overlap_factor=self.window_overlap
+            overlap_factor=self.window_overlap,
         )
 
         self.active_windows.append(window)
@@ -283,20 +282,20 @@ class CorrelationEngine:
             for event in all_events:
                 cursor_key = f"{event.event_type}:{event.stream_id}"
                 cursors[cursor_key] = {
-                    'timestamp': event.timestamp.isoformat(),
-                    'content': event.content
+                    "timestamp": event.timestamp.isoformat(),
+                    "content": event.content,
                 }
 
             # Create metadata with correlation information
             metadata = {
-                'correlation_id': str(correlation.correlation_id),
-                'pattern_type': correlation.pattern_type,
-                'confidence_score': correlation.confidence_score,
-                'occurrence_frequency': correlation.occurrence_frequency,
-                'temporal_gap': str(correlation.temporal_gap),
-                'event_count': len(all_events),
-                'providers': list(set(event.stream_id for event in all_events)),
-                'creation_trigger': 'correlation_detection'
+                "correlation_id": str(correlation.correlation_id),
+                "pattern_type": correlation.pattern_type,
+                "confidence_score": correlation.confidence_score,
+                "occurrence_frequency": correlation.occurrence_frequency,
+                "temporal_gap": str(correlation.temporal_gap),
+                "event_count": len(all_events),
+                "providers": list(set(event.stream_id for event in all_events)),
+                "creation_trigger": "correlation_detection",
             }
 
             # Use memory anchor service to create the anchor
@@ -305,10 +304,7 @@ class CorrelationEngine:
 
             # Create MemoryAnchor object
             anchor = MemoryAnchor(
-                anchor_id=anchor_id,
-                timestamp=anchor_timestamp,
-                cursors=cursors,
-                metadata=metadata
+                anchor_id=anchor_id, timestamp=anchor_timestamp, cursors=cursors, metadata=metadata
             )
 
             # Store through memory service (proper architectural boundary)
@@ -319,14 +315,14 @@ class CorrelationEngine:
                 await db.initialize()
 
                 anchor_doc = anchor.to_arangodb_document()
-                memory_anchors_collection = await db.get_secured_collection('memory_anchors')
+                memory_anchors_collection = await db.get_secured_collection("memory_anchors")
                 # Note: memory_anchors has requires_security=False policy for legacy compatibility
                 result = memory_anchors_collection._collection.insert(anchor_doc)
             else:
                 raise RuntimeError("Memory service not available for anchor creation")
 
             if result:
-                self.correlation_stats['memory_anchors_created'] += 1
+                self.correlation_stats["memory_anchors_created"] += 1
                 self.logger.info(
                     f"Created memory anchor {anchor_id} from {correlation.pattern_type} "
                     f"correlation (confidence: {correlation.confidence_score:.2f})"
@@ -394,21 +390,21 @@ class CorrelationEngine:
         threshold_summary = self.adaptive_thresholds.get_performance_summary()
 
         return {
-            'engine_info': {
-                'status': 'active',
-                'window_size': str(self.window_size),
-                'window_overlap': self.window_overlap,
-                'active_windows': len(self.active_windows),
-                'event_buffer_size': len(self.event_buffer),
-                'pending_feedback': len(self.feedback_queue)
+            "engine_info": {
+                "status": "active",
+                "window_size": str(self.window_size),
+                "window_overlap": self.window_overlap,
+                "active_windows": len(self.active_windows),
+                "event_buffer_size": len(self.event_buffer),
+                "pending_feedback": len(self.feedback_queue),
             },
-            'statistics': self.correlation_stats.copy(),
-            'pattern_detectors': list(self.pattern_detectors.keys()),
-            'adaptive_thresholds': threshold_summary,
-            'confidence_scoring': {
-                'factor_weights': self.confidence_scorer.factor_weights,
-                'feedback_history_size': len(self.confidence_scorer.feedback_history)
-            }
+            "statistics": self.correlation_stats.copy(),
+            "pattern_detectors": list(self.pattern_detectors.keys()),
+            "adaptive_thresholds": threshold_summary,
+            "confidence_scoring": {
+                "factor_weights": self.confidence_scorer.factor_weights,
+                "feedback_history_size": len(self.confidence_scorer.feedback_history),
+            },
         }
 
     async def force_learning_update(self):
@@ -432,11 +428,11 @@ class CorrelationEngine:
 
         # Reset statistics
         self.correlation_stats = {
-            'total_correlations_detected': 0,
-            'correlations_accepted': 0,
-            'correlations_rejected': 0,
-            'memory_anchors_created': 0,
-            'last_processing_time': None
+            "total_correlations_detected": 0,
+            "correlations_accepted": 0,
+            "correlations_rejected": 0,
+            "memory_anchors_created": 0,
+            "last_processing_time": None,
         }
 
         self.logger.info("Reset correlation engine learning state to defaults")
@@ -505,21 +501,21 @@ class CorrelationToAnchorAdapter:
         storage_events = []
 
         for event in all_events:
-            if event.event_type.value == 'activity':
+            if event.event_type.value == "activity":
                 activity_streams.append(event.stream_id)
-            elif event.event_type.value == 'storage':
+            elif event.event_type.value == "storage":
                 storage_events.append(event.stream_id)
 
         # Create cursor update for the anchor
         cursor_data = {
-            'correlation_type': correlation.pattern_type,
-            'temporal_window': {
-                'start': start_time.isoformat(),
-                'end': end_time.isoformat(),
-                'precision': precision.value
+            "correlation_type": correlation.pattern_type,
+            "temporal_window": {
+                "start": start_time.isoformat(),
+                "end": end_time.isoformat(),
+                "precision": precision.value,
             },
-            'pattern_strength': correlation.confidence_score,
-            'occurrence_frequency': correlation.occurrence_frequency
+            "pattern_strength": correlation.confidence_score,
+            "occurrence_frequency": correlation.occurrence_frequency,
         }
 
         # Use the memory anchor service to create the anchor
@@ -532,7 +528,7 @@ class CorrelationToAnchorAdapter:
                 provider_id="correlation_engine",
                 provider_type="correlation",
                 cursor_types=["correlation_detection"],
-                metadata={"pattern_types": list(correlation.pattern_type)}
+                metadata={"pattern_types": list(correlation.pattern_type)},
             )
 
             await self.anchor_service.register_provider(provider_info)
@@ -545,10 +541,10 @@ class CorrelationToAnchorAdapter:
                 cursor_type="correlation_detection",
                 cursor_value=cursor_data,
                 metadata={
-                    'correlation_id': str(correlation.correlation_id),
-                    'confidence_score': correlation.confidence_score,
-                    'pattern_type': correlation.pattern_type
-                }
+                    "correlation_id": str(correlation.correlation_id),
+                    "confidence_score": correlation.confidence_score,
+                    "pattern_type": correlation.pattern_type,
+                },
             )
 
             # Update cursor to create or update anchor

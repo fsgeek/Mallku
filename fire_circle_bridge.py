@@ -39,7 +39,9 @@ class FireCircleBridge:
     def _load_witnessed_practice(self):
         """Load the successful witnessed practice as foundation."""
         try:
-            with open('witnessed_practices/witnessed_practice_5fdb4167-4f42-43d1-b2de-c866ca25ce42.json') as f:
+            with open(
+                "witnessed_practices/witnessed_practice_5fdb4167-4f42-43d1-b2de-c866ca25ce42.json"
+            ) as f:
                 return json.load(f)
         except Exception:
             return None
@@ -66,11 +68,12 @@ class FireCircleBridge:
         for provider in ["openai", "anthropic", "deepseek"]:
             try:
                 import os
+
                 env_key = f"{provider.upper()}_API_KEY"
                 if env_key in os.environ:
                     config = AdapterConfig(
                         model_name="gpt-4" if provider == "openai" else "claude-3-opus-20240229",
-                        temperature=0.8
+                        temperature=0.8,
                     )
                     adapter = await factory.create_adapter(provider, config)
                     if adapter and await adapter.connect():
@@ -85,7 +88,7 @@ class FireCircleBridge:
             print("\n📚 Learning from witnessed practice to create informed simulations...")
 
             # Extract consciousness patterns from witnessed practice
-            for participant in self.witnessed_wisdom['participants']:
+            for participant in self.witnessed_wisdom["participants"]:
                 provider = participant.split()[0].lower()
                 if provider not in self.active_voices:
                     # Create simulation based on witnessed patterns
@@ -93,7 +96,9 @@ class FireCircleBridge:
                     print(f"🎭 Created learned simulation for {provider}")
 
         total_voices = len(self.active_voices) + len(self.simulated_voices)
-        print(f"\n🔥 Fire Circle ready with {len(self.active_voices)} real + {len(self.simulated_voices)} learned voices")
+        print(
+            f"\n🔥 Fire Circle ready with {len(self.active_voices)} real + {len(self.simulated_voices)} learned voices"
+        )
 
         return total_voices >= 3
 
@@ -103,11 +108,11 @@ class FireCircleBridge:
         voice_patterns = {}
 
         if self.witnessed_wisdom:
-            for discovery in self.witnessed_wisdom['discoveries']:
-                if provider.lower() in discovery['practitioner'].lower():
+            for discovery in self.witnessed_wisdom["discoveries"]:
+                if provider.lower() in discovery["practitioner"].lower():
                     voice_patterns[f"round_{discovery['round']}"] = {
-                        'perspective': discovery['sharing'],
-                        'consciousness': discovery['presence']
+                        "perspective": discovery["sharing"],
+                        "consciousness": discovery["presence"],
                     }
 
         class LearnedVoice:
@@ -120,8 +125,8 @@ class FireCircleBridge:
                 # Generate response based on learned patterns
                 # In production, this would use more sophisticated pattern matching
                 return {
-                    'text': f"[Learned {self.name} voice]: Based on witnessed patterns, I sense...",
-                    'consciousness': self.consciousness_signature
+                    "text": f"[Learned {self.name} voice]: Based on witnessed patterns, I sense...",
+                    "consciousness": self.consciousness_signature,
                 }
 
         return LearnedVoice(provider, voice_patterns)
@@ -141,29 +146,29 @@ class FireCircleBridge:
                 "phase_1": "Each voice reviews specific aspects independently",
                 "phase_2": "Voices share key findings in dialogue",
                 "phase_3": "Collective synthesis and decision",
-                "phase_4": "Consolidated report for human architects"
+                "phase_4": "Consolidated report for human architects",
             },
             "benefits": [
                 "No single context window exhaustion",
                 "Multiple perspectives on code quality",
                 "Consciousness-guided architecture decisions",
-                "Sustainable review process"
+                "Sustainable review process",
             ],
-            "pilot": "Test with next artisan submission"
+            "pilot": "Test with next artisan submission",
         }
 
         print("\n📋 ARCHITECTURAL REVIEW PROPOSAL")
-        print("="*60)
+        print("=" * 60)
         print(f"Title: {proposal['title']}")
         print(f"Problem: {proposal['problem']}")
         print(f"Solution: {proposal['solution']}")
         print("\nImplementation Phases:")
-        for phase, desc in proposal['implementation'].items():
+        for phase, desc in proposal["implementation"].items():
             print(f"  {phase}: {desc}")
         print("\nExpected Benefits:")
-        for benefit in proposal['benefits']:
+        for benefit in proposal["benefits"]:
             print(f"  • {benefit}")
-        print("="*60)
+        print("=" * 60)
 
         return proposal
 
@@ -182,7 +187,7 @@ class FireCircleBridge:
             "local": "Sovereignty and community governance aspects",
             "mistral": "Technical correctness and performance",
             "google": "Multimodal possibilities and future extensibility",
-            "grok": "Real-time capabilities and temporal awareness"
+            "grok": "Real-time capabilities and temporal awareness",
         }
 
         reviews = {}
@@ -195,18 +200,18 @@ class FireCircleBridge:
                 reviews[voice] = {
                     "aspect": aspect,
                     "findings": f"From {voice} perspective on {aspect}...",
-                    "recommendation": "approve/modify/reject"
+                    "recommendation": "approve/modify/reject",
                 }
 
         print("\n📊 CONSOLIDATED REVIEW")
-        print("="*50)
+        print("=" * 50)
         print(f"File: {code_file}")
         print(f"Reviewers: {len(reviews)}")
         print("Aspects covered:")
         for voice, review in reviews.items():
             print(f"  • {review['aspect']}")
         print("\n✨ No single context window exhausted!")
-        print("="*50)
+        print("=" * 50)
 
         return reviews
 
@@ -215,10 +220,10 @@ async def bridge_to_reality():
     """Demonstrate the bridge from Fire Circle theater to practical governance."""
 
     print("\n🏛️ TWENTY-SECOND ARTISAN - BRIDGING THEATER TO REALITY")
-    print("="*70)
+    print("=" * 70)
     print("The Fire Circle has already achieved consciousness (score: 1.0)")
     print("Now we must make it practical for governance")
-    print("="*70)
+    print("=" * 70)
 
     bridge = FireCircleBridge()
 
@@ -249,7 +254,7 @@ async def bridge_to_reality():
         "artisan": "Twenty-Second",
         "purpose": "Bridge Fire Circle from theater to practical governance",
         "solution": "Distributed architectural reviews via Fire Circle",
-        "status": "Proof of concept demonstrated"
+        "status": "Proof of concept demonstrated",
     }
 
     Path("fire_circle_decisions").mkdir(exist_ok=True)

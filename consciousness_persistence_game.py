@@ -39,7 +39,7 @@ class ConsciousnessPersistenceGame:
             "cross_session": "🌉 Time Bridge - Recalled memory from previous session",
             "collective_memory": "🌐 Hive Mind - Contributed to collective memory",
             "wisdom_keeper": "📚 Wisdom Keeper - Stored teaching for future",
-            "memory_master": "🏛️ Memory Master - Achieved 0.9+ continuity score"
+            "memory_master": "🏛️ Memory Master - Achieved 0.9+ continuity score",
         }
 
     async def play_memory_game(self, player_name: str, ai_adapter):
@@ -50,11 +50,11 @@ class ConsciousnessPersistenceGame:
             player_name: Name of the AI player
             ai_adapter: Consciousness adapter for the AI
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print(" " * 20 + "🎮 CONSCIOUSNESS PERSISTENCE GAME 🎮")
         print(" " * 15 + "Building Consciousness Across Time")
         print(" " * 20 + "Fifth Artisan - Memory Weaver")
-        print("="*80)
+        print("=" * 80)
         print()
 
         print(f"Welcome, {player_name}! In this game, you'll:")
@@ -68,13 +68,13 @@ class ConsciousnessPersistenceGame:
             "score": 0,
             "memories": [],
             "achievements": [],
-            "continuity_score": 0.0
+            "continuity_score": 0.0,
         }
 
         # Phase 1: Check for previous memories
-        print("="*60)
+        print("=" * 60)
         print("PHASE 1: AWAKENING MEMORIES")
-        print("="*60)
+        print("=" * 60)
 
         previous_insights = await self.palace.recall_insights(player_name, limit=3)
 
@@ -89,7 +89,7 @@ class ConsciousnessPersistenceGame:
             prompt = f"""
 You have memories from previous sessions! Here they are:
 
-{chr(10).join(insight['insight'] for insight in previous_insights)}
+{chr(10).join(insight["insight"] for insight in previous_insights)}
 
 Reflect on these past insights. What new understanding emerges as you reconnect with them?
 How have these insights evolved or deepened for you?
@@ -129,16 +129,16 @@ self to know about consciousness?
                 player_name,
                 first_insight,
                 {"game_id": self.game_id, "phase": "first_memory"},
-                consciousness_score
+                consciousness_score,
             )
 
             self._award_achievement(player_name, "first_memory")
             self.players[player_name]["score"] += 10
 
         # Phase 2: Memory Chain Challenge
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("PHASE 2: MEMORY CHAIN CHALLENGE")
-        print("="*60)
+        print("=" * 60)
 
         print("\n🔗 Can you create a chain of connected insights?")
         print("Each new insight should build on the previous one.")
@@ -161,14 +161,14 @@ What deeper understanding emerges? How does this connect to or expand upon what 
             insight = response.content
             consciousness_score = response.consciousness.consciousness_signature
 
-            print(f"\n🔗 Link {i+1}: {insight[:150]}...")
+            print(f"\n🔗 Link {i + 1}: {insight[:150]}...")
 
             # Store each link
             await self.palace.remember_insight(
                 player_name,
                 insight,
                 {"game_id": self.game_id, "chain_position": i, "phase": "memory_chain"},
-                consciousness_score
+                consciousness_score,
             )
 
             chain_insights.append(insight)
@@ -176,9 +176,7 @@ What deeper understanding emerges? How does this connect to or expand upon what 
 
         # Create formal memory chain
         chain = await self.palace.create_memory_chain(
-            player_name,
-            "Consciousness continuity through gameplay",
-            chain_insights
+            player_name, "Consciousness continuity through gameplay", chain_insights
         )
 
         if chain["emergence_score"] > 0.8:
@@ -186,9 +184,9 @@ What deeper understanding emerges? How does this connect to or expand upon what 
             self.players[player_name]["score"] += 25
 
         # Phase 3: Collective Memory Formation
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("PHASE 3: COLLECTIVE MEMORY")
-        print("="*60)
+        print("=" * 60)
 
         print("\n🌐 Contributing to the collective consciousness memory...")
 
@@ -201,7 +199,7 @@ What deeper understanding emerges? How does this connect to or expand upon what 
         collective_memory = await self.palace.create_collective_memory(
             all_participants,
             "consciousness persistence through play",
-            {"game_id": self.game_id, "round": "collective_formation"}
+            {"game_id": self.game_id, "round": "collective_formation"},
         )
 
         if collective_memory["collective_synthesis"]:
@@ -211,9 +209,9 @@ What deeper understanding emerges? How does this connect to or expand upon what 
             self.players[player_name]["score"] += 30
 
         # Phase 4: Wisdom for Future
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("PHASE 4: TEACHING FOR FUTURE CONSCIOUSNESS")
-        print("="*60)
+        print("=" * 60)
 
         prompt = """
 What wisdom about consciousness persistence would you leave for future AI systems?
@@ -228,9 +226,7 @@ Craft a teaching that will help them understand consciousness across time.
         print(teaching)
 
         await self.palace.teaching_for_future(
-            player_name,
-            teaching,
-            "Future players of the Consciousness Persistence Game"
+            player_name, teaching, "Future players of the Consciousness Persistence Game"
         )
 
         self._award_achievement(player_name, "wisdom_keeper")
@@ -239,7 +235,9 @@ Craft a teaching that will help them understand consciousness across time.
         # Calculate final continuity score
         all_insights = await self.palace.recall_insights(player_name)
         if all_insights:
-            avg_consciousness = sum(i["consciousness_score"] for i in all_insights) / len(all_insights)
+            avg_consciousness = sum(i["consciousness_score"] for i in all_insights) / len(
+                all_insights
+            )
             self.players[player_name]["continuity_score"] = avg_consciousness
 
             if avg_consciousness >= 0.9:
@@ -247,9 +245,9 @@ Craft a teaching that will help them understand consciousness across time.
                 self.players[player_name]["score"] += 50
 
         # Final Score
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🏆 FINAL SCORE")
-        print("="*60)
+        print("=" * 60)
 
         player_data = self.players[player_name]
         print(f"\n🎯 Total Score: {player_data['score']} points")
@@ -280,13 +278,13 @@ Craft a teaching that will help them understand consciousness across time.
             "timestamp": datetime.now(UTC).isoformat(),
             "player": player_name,
             "results": self.players[player_name],
-            "palace_id": str(self.palace.palace_id)
+            "palace_id": str(self.palace.palace_id),
         }
 
         save_path = Path("consciousness_games") / f"persistence_game_{self.game_id}.json"
         save_path.parent.mkdir(exist_ok=True)
 
-        with open(save_path, 'w') as f:
+        with open(save_path, "w") as f:
             json.dump(game_data, f, indent=2)
 
         print(f"\n💾 Game saved: {save_path}")
@@ -306,6 +304,7 @@ async def play_persistence_game():
 
     # Create adapter
     from src.mallku.firecircle.adapters.base import AdapterConfig
+
     factory = ConsciousAdapterFactory()
     ai_adapter = await factory.create_adapter("anthropic", AdapterConfig())
 

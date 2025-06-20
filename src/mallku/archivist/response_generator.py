@@ -28,6 +28,7 @@ class ArchivistResponse:
     More than search results - this is a consciousness-aware dialogue
     that serves human growth and understanding.
     """
+
     # Core response
     query: str
     primary_results: list[dict[str, Any]]
@@ -48,22 +49,25 @@ class ArchivistResponse:
 
     def to_json(self) -> str:
         """Convert response to JSON for API delivery."""
-        return json.dumps({
-            "query": self.query,
-            "results": self.primary_results,
-            "result_count": self.result_count,
-            "wisdom": {
-                "summary": self.wisdom_summary,
-                "growth_focus": self.growth_focus,
-                "insights": self.insight_seeds
+        return json.dumps(
+            {
+                "query": self.query,
+                "results": self.primary_results,
+                "result_count": self.result_count,
+                "wisdom": {
+                    "summary": self.wisdom_summary,
+                    "growth_focus": self.growth_focus,
+                    "insights": self.insight_seeds,
+                },
+                "explore_further": self.suggested_explorations,
+                "metadata": {
+                    "response_time": self.response_time.isoformat(),
+                    "consciousness_score": self.consciousness_score,
+                    "ayni_balance": self.ayni_balance,
+                },
             },
-            "explore_further": self.suggested_explorations,
-            "metadata": {
-                "response_time": self.response_time.isoformat(),
-                "consciousness_score": self.consciousness_score,
-                "ayni_balance": self.ayni_balance
-            }
-        }, indent=2)
+            indent=2,
+        )
 
 
 class WisdomSynthesizer(AsyncBase):
@@ -82,28 +86,28 @@ class WisdomSynthesizer(AsyncBase):
         self._wisdom_templates = {
             GrowthPotential.PATTERN_RECOGNITION: {
                 "intro": "I've noticed patterns in your work that might interest you:",
-                "focus": "Understanding your natural rhythms"
+                "focus": "Understanding your natural rhythms",
             },
             GrowthPotential.SELF_UNDERSTANDING: {
                 "intro": "Here's what I found that might deepen your self-understanding:",
-                "focus": "Discovering your creative process"
+                "focus": "Discovering your creative process",
             },
             GrowthPotential.CREATIVE_INSIGHT: {
                 "intro": "These moments of creativity share interesting characteristics:",
-                "focus": "Nurturing your creative flow"
+                "focus": "Nurturing your creative flow",
             },
             GrowthPotential.WORKFLOW_IMPROVEMENT: {
                 "intro": "Your workflow shows these notable patterns:",
-                "focus": "Evolving your work practices"
+                "focus": "Evolving your work practices",
             },
             GrowthPotential.RELATIONSHIP_AWARENESS: {
                 "intro": "Your collaborative work reveals these connections:",
-                "focus": "Deepening collaborative wisdom"
+                "focus": "Deepening collaborative wisdom",
             },
             GrowthPotential.TEMPORAL_WISDOM: {
                 "intro": "Time reveals these patterns in your work:",
-                "focus": "Finding your temporal rhythm"
-            }
+                "focus": "Finding your temporal rhythm",
+            },
         }
 
         # Insight synthesis patterns
@@ -112,7 +116,7 @@ class WisdomSynthesizer(AsyncBase):
             "creative_conditions": "You're often most creative when {condition}",
             "collaboration_rhythm": "Your collaborative work follows a {rhythm} rhythm",
             "focus_sessions": "Your deep focus sessions typically last {duration}",
-            "pattern_breaks": "You break patterns when {trigger}"
+            "pattern_breaks": "You break patterns when {trigger}",
         }
 
         self.logger.info("Wisdom Synthesizer initialized")
@@ -125,7 +129,7 @@ class WisdomSynthesizer(AsyncBase):
         self,
         intent: QueryIntent,
         evaluations: list[ConsciousnessEvaluation],
-        exploration_paths: list[dict[str, Any]]
+        exploration_paths: list[dict[str, Any]],
     ) -> ArchivistResponse:
         """
         Generate a complete Archivist response.
@@ -155,9 +159,7 @@ class WisdomSynthesizer(AsyncBase):
         )
 
         # Generate wisdom summary
-        wisdom_summary = await self._generate_wisdom_summary(
-            intent, growth_results, growth_focus
-        )
+        wisdom_summary = await self._generate_wisdom_summary(intent, growth_results, growth_focus)
 
         # Collect insight seeds
         all_insights = []
@@ -175,11 +177,13 @@ class WisdomSynthesizer(AsyncBase):
         # Calculate aggregate scores
         avg_consciousness = (
             sum(e.consciousness_score for e in growth_results) / len(growth_results)
-            if growth_results else 0.0
+            if growth_results
+            else 0.0
         )
         avg_ayni = (
             sum(e.ayni_balance for e in growth_results) / len(growth_results)
-            if growth_results else 0.0
+            if growth_results
+            else 0.0
         )
 
         # Create response
@@ -193,15 +197,13 @@ class WisdomSynthesizer(AsyncBase):
             suggested_explorations=exploration_paths[:3],  # Top 3 paths
             response_time=datetime.now(UTC),
             consciousness_score=avg_consciousness,
-            ayni_balance=avg_ayni
+            ayni_balance=avg_ayni,
         )
 
         return response
 
     async def generate_empty_response(
-        self,
-        intent: QueryIntent,
-        reason: str = "No results found"
+        self, intent: QueryIntent, reason: str = "No results found"
     ) -> ArchivistResponse:
         """
         Generate response when no growth-serving results found.
@@ -228,7 +230,7 @@ class WisdomSynthesizer(AsyncBase):
             "Pattern not found": (
                 "This pattern hasn't emerged in your recorded work yet. "
                 "What conditions might invite it to appear?"
-            )
+            ),
         }
 
         wisdom = wisdom_messages.get(reason, wisdom_messages["No results found"])
@@ -244,18 +246,16 @@ class WisdomSynthesizer(AsyncBase):
             wisdom_summary=wisdom,
             insight_seeds=[
                 "Absence of data can be as meaningful as its presence",
-                "Consider what this gap might be telling you"
+                "Consider what this gap might be telling you",
             ],
             suggested_explorations=suggestions,
             response_time=datetime.now(UTC),
             consciousness_score=0.5,  # Neutral
-            ayni_balance=0.0  # Balanced even in absence
+            ayni_balance=0.0,  # Balanced even in absence
         )
 
     async def format_for_display(
-        self,
-        response: ArchivistResponse,
-        format_type: str = "terminal"
+        self, response: ArchivistResponse, format_type: str = "terminal"
     ) -> str:
         """
         Format response for different display contexts.
@@ -277,8 +277,7 @@ class WisdomSynthesizer(AsyncBase):
     # Private synthesis methods
 
     async def _determine_growth_focus(
-        self,
-        evaluations: list[ConsciousnessEvaluation]
+        self, evaluations: list[ConsciousnessEvaluation]
     ) -> GrowthPotential | None:
         """Determine primary growth focus from evaluations."""
         if not evaluations:
@@ -294,8 +293,7 @@ class WisdomSynthesizer(AsyncBase):
         return max(growth_counts.items(), key=lambda x: x[1])[0]
 
     async def _format_primary_results(
-        self,
-        evaluations: list[ConsciousnessEvaluation]
+        self, evaluations: list[ConsciousnessEvaluation]
     ) -> list[dict[str, Any]]:
         """Format evaluation results for response."""
         formatted = []
@@ -310,7 +308,7 @@ class WisdomSynthesizer(AsyncBase):
                 "type": result.correlation_type.value,
                 "strength": result.correlation_strength,
                 "growth_potential": eval.growth_potential.value,
-                "consciousness_score": eval.consciousness_score
+                "consciousness_score": eval.consciousness_score,
             }
 
             # Add context if available
@@ -342,7 +340,7 @@ class WisdomSynthesizer(AsyncBase):
         self,
         intent: QueryIntent,
         evaluations: list[ConsciousnessEvaluation],
-        growth_focus: GrowthPotential | None
+        growth_focus: GrowthPotential | None,
     ) -> str:
         """Generate wisdom summary for the response."""
         if not evaluations:
@@ -369,34 +367,21 @@ class WisdomSynthesizer(AsyncBase):
             insights.append(f"Your work shows {pattern_str} patterns")
 
         # Check for high consciousness scores
-        high_consciousness = [
-            e for e in evaluations
-            if e.consciousness_score > 0.8
-        ]
+        high_consciousness = [e for e in evaluations if e.consciousness_score > 0.8]
         if high_consciousness:
-            insights.append(
-                "These results particularly resonate with your growth journey"
-            )
+            insights.append("These results particularly resonate with your growth journey")
 
         # Check for strong correlations
-        strong_correlations = [
-            e for e in evaluations
-            if e.result.correlation_strength > 0.85
-        ]
+        strong_correlations = [e for e in evaluations if e.result.correlation_strength > 0.85]
         if strong_correlations:
-            insights.append(
-                "I found strong connections between these activities"
-            )
+            insights.append("I found strong connections between these activities")
 
         # Combine intro and insights
         summary = f"{intro} {'. '.join(insights)}." if insights else intro
 
         return summary
 
-    async def _create_metadata_preview(
-        self,
-        metadata: dict[str, Any]
-    ) -> str | None:
+    async def _create_metadata_preview(self, metadata: dict[str, Any]) -> str | None:
         """Create safe preview of metadata without exposing details."""
         if not metadata:
             return None
@@ -415,54 +400,54 @@ class WisdomSynthesizer(AsyncBase):
         # If no safe fields, indicate presence of metadata
         return "Additional context available"
 
-    async def _generate_alternative_explorations(
-        self,
-        intent: QueryIntent
-    ) -> list[dict[str, Any]]:
+    async def _generate_alternative_explorations(self, intent: QueryIntent) -> list[dict[str, Any]]:
         """Generate alternative explorations when no results found."""
         explorations = []
 
         # Temporal alternatives
         if intent.temporal_bounds:
-            explorations.append({
-                "type": "temporal_expansion",
-                "suggestion": "Try expanding your time range",
-                "queries": [
-                    "What happened in the week around this time?",
-                    "Show me patterns from this month",
-                    "What was I working on this season?"
-                ]
-            })
+            explorations.append(
+                {
+                    "type": "temporal_expansion",
+                    "suggestion": "Try expanding your time range",
+                    "queries": [
+                        "What happened in the week around this time?",
+                        "Show me patterns from this month",
+                        "What was I working on this season?",
+                    ],
+                }
+            )
 
         # Context alternatives
         if intent.context_markers:
-            explorations.append({
-                "type": "context_variation",
-                "suggestion": "Explore related contexts",
-                "queries": [
-                    "When else have I felt similarly?",
-                    "What other work shares this energy?",
-                    "Show me different approaches to this challenge"
-                ]
-            })
+            explorations.append(
+                {
+                    "type": "context_variation",
+                    "suggestion": "Explore related contexts",
+                    "queries": [
+                        "When else have I felt similarly?",
+                        "What other work shares this energy?",
+                        "Show me different approaches to this challenge",
+                    ],
+                }
+            )
 
         # General exploration
-        explorations.append({
-            "type": "open_exploration",
-            "suggestion": "Discover patterns you haven't considered",
-            "queries": [
-                "What patterns emerge in my recent work?",
-                "When am I most productive?",
-                "What connections am I not seeing?"
-            ]
-        })
+        explorations.append(
+            {
+                "type": "open_exploration",
+                "suggestion": "Discover patterns you haven't considered",
+                "queries": [
+                    "What patterns emerge in my recent work?",
+                    "When am I most productive?",
+                    "What connections am I not seeing?",
+                ],
+            }
+        )
 
         return explorations
 
-    async def _format_terminal_response(
-        self,
-        response: ArchivistResponse
-    ) -> str:
+    async def _format_terminal_response(self, response: ArchivistResponse) -> str:
         """Format response for terminal display."""
         lines = []
 
@@ -484,9 +469,9 @@ class WisdomSynthesizer(AsyncBase):
             lines.append("📚 Key Discoveries:")
             for i, result in enumerate(response.primary_results[:3], 1):
                 lines.append(f"\n{i}. {result['timestamp']}")
-                if 'preview' in result:
+                if "preview" in result:
                     lines.append(f"   {result['preview']}")
-                if 'guidance' in result:
+                if "guidance" in result:
                     lines.append(f"   💡 {result['guidance']}")
 
         # Insights
@@ -507,10 +492,7 @@ class WisdomSynthesizer(AsyncBase):
 
         return "\n".join(lines)
 
-    async def _format_web_response(
-        self,
-        response: ArchivistResponse
-    ) -> str:
+    async def _format_web_response(self, response: ArchivistResponse) -> str:
         """Format response for web display (HTML)."""
         # Simplified HTML response
         html = f"""
@@ -527,7 +509,7 @@ class WisdomSynthesizer(AsyncBase):
             <div class="insights">
                 <h3>Insights</h3>
                 <ul>
-                    {"".join(f'<li>{i}</li>' for i in response.insight_seeds)}
+                    {"".join(f"<li>{i}</li>" for i in response.insight_seeds)}
                 </ul>
             </div>
 
@@ -543,8 +525,8 @@ class WisdomSynthesizer(AsyncBase):
         """Format individual result as HTML."""
         return f"""
         <div class="result">
-            <div class="timestamp">{result['timestamp']}</div>
-            {f'<div class="preview">{result.get("preview", "")}</div>' if 'preview' in result else ''}
-            {f'<div class="guidance">{result.get("guidance", "")}</div>' if 'guidance' in result else ''}
+            <div class="timestamp">{result["timestamp"]}</div>
+            {f'<div class="preview">{result.get("preview", "")}</div>' if "preview" in result else ""}
+            {f'<div class="guidance">{result.get("guidance", "")}</div>' if "guidance" in result else ""}
         </div>
         """

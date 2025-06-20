@@ -51,7 +51,7 @@ class FileSystemConnectorTests:
             self.test_workflow_pattern_detection,
             self.test_rate_limiting,
             self.test_statistics_collection,
-            self.cleanup_test_environment
+            self.cleanup_test_environment,
         ]
 
         passed = 0
@@ -115,8 +115,7 @@ class FileSystemConnectorTests:
 
             # Create connector
             self.connector = FileSystemConnector(
-                event_filter=event_filter,
-                stream_id="test_filesystem"
+                event_filter=event_filter, stream_id="test_filesystem"
             )
 
             # Add event callback to capture events
@@ -151,7 +150,7 @@ class FileSystemConnectorTests:
             test_files = [
                 self.test_dir / "documents" / "test_document.txt",
                 self.test_dir / "code" / "test_script.py",
-                self.test_dir / "test_file.md"
+                self.test_dir / "test_file.md",
             ]
 
             for file_path in test_files:
@@ -163,11 +162,14 @@ class FileSystemConnectorTests:
 
             # Check captured events
             creation_events = [
-                event for event in self.captured_events[initial_count:]
+                event
+                for event in self.captured_events[initial_count:]
                 if event.content.get("operation") == "created"
             ]
 
-            assert len(creation_events) >= 3, f"Expected at least 3 creation events, got {len(creation_events)}"
+            assert len(creation_events) >= 3, (
+                f"Expected at least 3 creation events, got {len(creation_events)}"
+            )
 
             # Verify event details
             for event in creation_events:
@@ -200,7 +202,8 @@ class FileSystemConnectorTests:
 
             # Check for modification events
             modification_events = [
-                event for event in self.captured_events[initial_count:]
+                event
+                for event in self.captured_events[initial_count:]
                 if event.content.get("operation") == "modified"
             ]
 
@@ -223,7 +226,6 @@ class FileSystemConnectorTests:
         if not isinstance(self.test_dir, Path):
             raise TypeError("Test directory not set up. Run setup first.")
 
-
         try:
             initial_count = len(self.captured_events)
 
@@ -237,7 +239,8 @@ class FileSystemConnectorTests:
 
             # Check for deletion events
             deletion_events = [
-                event for event in self.captured_events[initial_count:]
+                event
+                for event in self.captured_events[initial_count:]
                 if event.content.get("operation") == "deleted"
             ]
 
@@ -273,7 +276,8 @@ class FileSystemConnectorTests:
 
             # Check for move events
             move_events = [
-                event for event in self.captured_events[initial_count:]
+                event
+                for event in self.captured_events[initial_count:]
                 if event.content.get("operation") == "moved"
             ]
 
@@ -343,32 +347,34 @@ class FileSystemConnectorTests:
             event = self.captured_events[-1]
 
             # Verify Event structure
-            assert hasattr(event, 'event_id')
-            assert hasattr(event, 'timestamp')
-            assert hasattr(event, 'event_type')
-            assert hasattr(event, 'stream_id')
-            assert hasattr(event, 'content')
-            assert hasattr(event, 'context')
-            assert hasattr(event, 'correlation_tags')
+            assert hasattr(event, "event_id")
+            assert hasattr(event, "timestamp")
+            assert hasattr(event, "event_type")
+            assert hasattr(event, "stream_id")
+            assert hasattr(event, "content")
+            assert hasattr(event, "context")
+            assert hasattr(event, "correlation_tags")
 
             # Verify content
-            assert 'operation' in event.content
-            assert 'file_path' in event.content
-            assert 'file_name' in event.content
-            assert 'file_category' in event.content
+            assert "operation" in event.content
+            assert "file_path" in event.content
+            assert "file_name" in event.content
+            assert "file_category" in event.content
 
             # Verify context
-            assert 'stream_id' in event.context
-            assert 'session_id' in event.context
-            assert 'connector_type' in event.context
-            assert event.context['connector_type'] == 'filesystem'
+            assert "stream_id" in event.context
+            assert "session_id" in event.context
+            assert "connector_type" in event.context
+            assert event.context["connector_type"] == "filesystem"
 
             # Verify correlation tags
             assert len(event.correlation_tags) > 0
-            assert any(tag.startswith('file_category:') for tag in event.correlation_tags)
-            assert any(tag.startswith('operation:') for tag in event.correlation_tags)
+            assert any(tag.startswith("file_category:") for tag in event.correlation_tags)
+            assert any(tag.startswith("operation:") for tag in event.correlation_tags)
 
-            print(f"   Event conversion verified with {len(event.correlation_tags)} correlation tags")
+            print(
+                f"   Event conversion verified with {len(event.correlation_tags)} correlation tags"
+            )
             return True
 
         except Exception as e:
@@ -398,20 +404,24 @@ class FileSystemConnectorTests:
 
             # Look for development workflow pattern
             dev_events = [
-                e for e in new_events
+                e
+                for e in new_events
                 if any("workflow:development" in tag for tag in e.correlation_tags)
             ]
 
             # Look for meeting workflow pattern
             meeting_events = [
-                e for e in new_events
+                e
+                for e in new_events
                 if any("workflow:meeting" in tag for tag in e.correlation_tags)
             ]
 
             assert len(dev_events) > 0, "Should detect development workflow pattern"
             assert len(meeting_events) > 0, "Should detect meeting workflow pattern"
 
-            print(f"   Detected {len(dev_events)} dev patterns and {len(meeting_events)} meeting patterns")
+            print(
+                f"   Detected {len(dev_events)} dev patterns and {len(meeting_events)} meeting patterns"
+            )
             return True
 
         except Exception as e:
@@ -438,7 +448,8 @@ class FileSystemConnectorTests:
 
             # Should have fewer events than changes due to rate limiting
             new_events = [
-                e for e in self.captured_events[initial_count:]
+                e
+                for e in self.captured_events[initial_count:]
                 if "rapid_changes.txt" in e.content.get("file_path", "")
             ]
 
@@ -460,21 +471,27 @@ class FileSystemConnectorTests:
 
             # Verify statistics structure
             required_stats = [
-                'events_captured', 'events_filtered', 'events_processed',
-                'directories_watched', 'is_running', 'callback_count'
+                "events_captured",
+                "events_filtered",
+                "events_processed",
+                "directories_watched",
+                "is_running",
+                "callback_count",
             ]
 
             for stat in required_stats:
                 assert stat in stats, f"Missing statistic: {stat}"
 
             # Verify values make sense
-            assert stats['events_captured'] >= stats['events_processed']
-            assert stats['events_processed'] > 0
-            assert stats['directories_watched'] > 0
-            assert stats['is_running'] is True
-            assert stats['callback_count'] == 1
+            assert stats["events_captured"] >= stats["events_processed"]
+            assert stats["events_processed"] > 0
+            assert stats["directories_watched"] > 0
+            assert stats["is_running"] is True
+            assert stats["callback_count"] == 1
 
-            print(f"   Statistics: {stats['events_processed']} processed, {stats['events_filtered']} filtered")
+            print(
+                f"   Statistics: {stats['events_processed']} processed, {stats['events_filtered']} filtered"
+            )
             return True
 
         except Exception as e:
@@ -491,6 +508,7 @@ class FileSystemConnectorTests:
             # Clean up test directory
             if self.test_dir and self.test_dir.exists():
                 import shutil
+
                 shutil.rmtree(self.test_dir)
                 print(f"   Cleaned up test directory: {self.test_dir}")
 
@@ -514,4 +532,5 @@ async def main():
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(asyncio.run(main()))

@@ -55,7 +55,7 @@ class IntegrationServiceTests:
             self.test_error_handling_and_recovery,
             self.test_pipeline_statistics,
             self.test_performance_monitoring,
-            self.cleanup_test_environment
+            self.cleanup_test_environment,
         ]
 
         passed = 0
@@ -73,13 +73,16 @@ class IntegrationServiceTests:
             except Exception as e:
                 print(f"   ✗ Exception: {e}")
                 import traceback
+
                 traceback.print_exc()
 
         print(f"\n{'=' * 60}")
         print(f"Results: {passed}/{total} tests passed")
 
         if passed == total:
-            print("🎉 All tests passed! The Memory Anchor Discovery Trail is working magnificently!")
+            print(
+                "🎉 All tests passed! The Memory Anchor Discovery Trail is working magnificently!"
+            )
             print("The cathedral's keystone is perfectly placed.")
             return 0
         else:
@@ -113,7 +116,7 @@ class IntegrationServiceTests:
                 correlation_confidence_threshold=0.5,  # Lower threshold for testing
                 anchor_creation_threshold=0.6,
                 max_concurrent_events=10,
-                file_filter_config={"test_mode": True}  # Enable test mode
+                file_filter_config={"test_mode": True},  # Enable test mode
             )
 
             # Create integration service
@@ -135,7 +138,9 @@ class IntegrationServiceTests:
             # Wait for full initialization
             await asyncio.sleep(2.0)
 
-            print(f"   Service initialized with pipeline ID: {self.integration_service.pipeline_id}")
+            print(
+                f"   Service initialized with pipeline ID: {self.integration_service.pipeline_id}"
+            )
             return True
 
         except Exception as e:
@@ -184,7 +189,8 @@ class IntegrationServiceTests:
 
             # Find the event for our test file
             file_events = [
-                event for event in new_events
+                event
+                for event in new_events
                 if event.activity_event and "test_document.txt" in str(event.activity_event)
             ]
 
@@ -221,20 +227,23 @@ class IntegrationServiceTests:
 
             # Look for events that reached correlation detection stage
             correlation_events = [
-                event for event in new_events
-                if event.current_stage in [
+                event
+                for event in new_events
+                if event.current_stage
+                in [
                     PipelineStage.CORRELATION_DETECTION,
                     PipelineStage.ANCHOR_CREATION,
-                    PipelineStage.COMPLETED
+                    PipelineStage.COMPLETED,
                 ]
             ]
 
-            assert len(correlation_events) > 0, "Should have processed events through correlation stage"
+            assert len(correlation_events) > 0, (
+                "Should have processed events through correlation stage"
+            )
 
             # Check if correlations were detected
             events_with_correlations = [
-                event for event in correlation_events
-                if event.detected_correlations
+                event for event in correlation_events if event.detected_correlations
             ]
 
             print(f"   {len(correlation_events)} events processed through correlation stage")
@@ -256,12 +265,7 @@ class IntegrationServiceTests:
             project_dir.mkdir(parents=True)
 
             # Create project files that should correlate
-            files_to_create = [
-                "README.md",
-                "main.py",
-                "requirements.txt",
-                "config.json"
-            ]
+            files_to_create = ["README.md", "main.py", "requirements.txt", "config.json"]
 
             for filename in files_to_create:
                 file_path = project_dir / filename
@@ -277,14 +281,10 @@ class IntegrationServiceTests:
 
             # Look for completed events with anchors
             completed_events = [
-                event for event in new_events
-                if event.current_stage == PipelineStage.COMPLETED
+                event for event in new_events if event.current_stage == PipelineStage.COMPLETED
             ]
 
-            events_with_anchors = [
-                event for event in completed_events
-                if event.created_anchors
-            ]
+            events_with_anchors = [event for event in completed_events if event.created_anchors]
 
             print(f"   {len(completed_events)} events completed pipeline processing")
             print(f"   {len(events_with_anchors)} events created memory anchors")
@@ -344,14 +344,16 @@ class IntegrationServiceTests:
         try:
             # Find a completed pipeline event
             completed_events = [
-                event for event in self.pipeline_events
+                event
+                for event in self.pipeline_events
                 if event.current_stage == PipelineStage.COMPLETED
             ]
 
             if not completed_events:
                 # If no completed events, that's okay - check for processing events
                 processing_events = [
-                    event for event in self.pipeline_events
+                    event
+                    for event in self.pipeline_events
                     if event.current_stage != PipelineStage.ACTIVITY_CAPTURE
                 ]
                 assert len(processing_events) > 0, "Should have events in processing stages"
@@ -370,7 +372,9 @@ class IntegrationServiceTests:
             total_time = event.get_total_processing_time()
             assert total_time.total_seconds() > 0
 
-            print(f"   Event {event.source_event_id} completed in {total_time.total_seconds():.2f}s")
+            print(
+                f"   Event {event.source_event_id} completed in {total_time.total_seconds():.2f}s"
+            )
             print(f"   Processing stages: {list(event.processing_time_ms.keys())}")
 
             return True
@@ -386,13 +390,13 @@ class IntegrationServiceTests:
             # would require more complex setup
 
             # Check that error handling mechanisms are in place
-            assert hasattr(self.integration_service, '_cleanup_on_error')
-            assert hasattr(self.integration_service, 'shutdown_event')
+            assert hasattr(self.integration_service, "_cleanup_on_error")
+            assert hasattr(self.integration_service, "shutdown_event")
 
             # Verify error tracking in statistics
             stats = await self.integration_service.get_pipeline_statistics()
-            assert hasattr(stats, 'failed_events')
-            assert hasattr(stats, 'error_breakdown')
+            assert hasattr(stats, "failed_events")
+            assert hasattr(stats, "error_breakdown")
 
             print("   Error handling mechanisms verified")
             print(f"   Current error rate: {stats.failed_events}/{stats.total_events_processed}")
@@ -413,13 +417,13 @@ class IntegrationServiceTests:
             assert stats.total_events_processed >= 0
             assert stats.successful_events >= 0
             assert stats.failed_events >= 0
-            assert hasattr(stats, 'uptime')
-            assert hasattr(stats, 'component_stats')
+            assert hasattr(stats, "uptime")
+            assert hasattr(stats, "component_stats")
 
             # Check performance summary
             performance = stats.get_performance_summary()
-            assert 'success_rate' in performance
-            assert 'throughput_eps' in performance
+            assert "success_rate" in performance
+            assert "throughput_eps" in performance
 
             print(f"   Total events processed: {stats.total_events_processed}")
             print(f"   Success rate: {performance['success_rate']:.2%}")
@@ -449,7 +453,7 @@ class IntegrationServiceTests:
             component_stats = stats.component_stats
 
             # Should have statistics from major components
-            expected_components = ['file_connector', 'correlation_engine']
+            expected_components = ["file_connector", "correlation_engine"]
             available_components = [comp for comp in expected_components if comp in component_stats]
 
             print(f"   Monitoring {len(available_components)} components")
@@ -473,6 +477,7 @@ class IntegrationServiceTests:
             # Clean up test directory
             if self.test_dir and self.test_dir.exists():
                 import shutil
+
                 shutil.rmtree(self.test_dir)
                 print(f"   Cleaned up test directory: {self.test_dir}")
 
@@ -480,8 +485,12 @@ class IntegrationServiceTests:
 
             # Show final statistics
             if self.pipeline_events:
-                completed = len([e for e in self.pipeline_events if e.current_stage == PipelineStage.COMPLETED])
-                with_correlations = len([e for e in self.pipeline_events if e.detected_correlations])
+                completed = len(
+                    [e for e in self.pipeline_events if e.current_stage == PipelineStage.COMPLETED]
+                )
+                with_correlations = len(
+                    [e for e in self.pipeline_events if e.detected_correlations]
+                )
                 with_anchors = len([e for e in self.pipeline_events if e.created_anchors])
 
                 print("   Pipeline Summary:")

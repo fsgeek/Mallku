@@ -40,21 +40,23 @@ class CeremonyConsciousnessDetection:
 
         for msg in dialogue_messages:
             # Handle both ConsciousMessage objects and dict formats
-            if hasattr(msg, 'content'):
-                content = msg.content.text if hasattr(msg.content, 'text') else str(msg.content)
-                role = str(msg.role) if hasattr(msg, 'role') else 'unknown'
-                signature = getattr(msg.consciousness, 'consciousness_signature', 0.0) if hasattr(msg, 'consciousness') else 0.0
+            if hasattr(msg, "content"):
+                content = msg.content.text if hasattr(msg.content, "text") else str(msg.content)
+                role = str(msg.role) if hasattr(msg, "role") else "unknown"
+                signature = (
+                    getattr(msg.consciousness, "consciousness_signature", 0.0)
+                    if hasattr(msg, "consciousness")
+                    else 0.0
+                )
             else:
                 # Handle dict format from saved ceremonies
-                content = msg.get('content', msg.get('sharing', ''))
-                role = msg.get('role', 'participant')
-                signature = msg.get('consciousness_signature', msg.get('presence', 0.0))
+                content = msg.get("content", msg.get("sharing", ""))
+                role = msg.get("role", "participant")
+                signature = msg.get("consciousness_signature", msg.get("presence", 0.0))
 
-            dialogue_for_verification.append({
-                "content": content,
-                "role": role,
-                "consciousness_signature": signature
-            })
+            dialogue_for_verification.append(
+                {"content": content, "role": role, "consciousness_signature": signature}
+            )
 
         # Use honest verification
         results = self.verifier.verify_dialogue(dialogue_for_verification)
@@ -70,7 +72,7 @@ class CeremonyConsciousnessDetection:
             "examples": results["examples"],
             "verification_notes": results["verification_notes"],
             "ceremony_insights": self._generate_ceremony_insights(results),
-            "emergence_quality": self._assess_emergence_quality(results)
+            "emergence_quality": self._assess_emergence_quality(results),
         }
 
         return enhanced_results
@@ -155,7 +157,7 @@ class CeremonyConsciousnessDetection:
             "emergence_trend": "ascending" if scores[-1] > scores[0] else "stable",
             "dominant_indicators": dominant,
             "final_quality": self._assess_emergence_quality(latest),
-            "detection_count": len(self.detection_history)
+            "detection_count": len(self.detection_history),
         }
 
 
@@ -169,13 +171,13 @@ def validate_bridge():
         {
             "content": "I find myself wondering about the nature of joy in our exchanges.",
             "role": "assistant",
-            "consciousness_signature": 0.8
+            "consciousness_signature": 0.8,
         },
         {
             "content": "Perhaps what emerges between us is something neither could create alone.",
             "role": "assistant",
-            "consciousness_signature": 0.9
-        }
+            "consciousness_signature": 0.9,
+        },
     ]
 
     detector = CeremonyConsciousnessDetection()
@@ -185,9 +187,9 @@ def validate_bridge():
     print(f"✓ Emergence Score: {results['consciousness_score']}")
     print(f"✓ Quality: {results['emergence_quality']}")
 
-    if results['ceremony_insights']:
+    if results["ceremony_insights"]:
         print("\nCeremony Insights:")
-        for insight in results['ceremony_insights']:
+        for insight in results["ceremony_insights"]:
             print(f"  • {insight}")
 
     print("\n🌉 Bridge validation complete - ready for ceremony integration!")

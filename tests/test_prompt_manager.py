@@ -22,12 +22,11 @@ def mock_llm_service():
     service = MagicMock()
     service.initialize = AsyncMock()
     service.generate_response = AsyncMock()
-    service.get_service_metrics = AsyncMock(return_value=MagicMock(
-        total_requests=0,
-        cache_hit_rate=0.0,
-        average_response_time=0.0,
-        total_tokens_used=0
-    ))
+    service.get_service_metrics = AsyncMock(
+        return_value=MagicMock(
+            total_requests=0, cache_hit_rate=0.0, average_response_time=0.0, total_tokens_used=0
+        )
+    )
     service.get_cache_statistics = AsyncMock(return_value={})
     return service
 
@@ -69,7 +68,7 @@ class TestPromptManager:
             await prompt_manager.execute_prompt(
                 category=PromptCategory.DATABASE_VALIDATION,
                 prompt="Validate this schema",
-                context={}  # Missing required fields
+                context={},  # Missing required fields
             )
 
         violation_error = exc_info.value
@@ -89,7 +88,7 @@ class TestPromptManager:
             tokens_used=100,
             processing_time=1.0,
             cached=False,
-            quality_score=0.9
+            quality_score=0.9,
         )
         mock_llm_service.generate_response.return_value = mock_response
 
@@ -100,8 +99,8 @@ class TestPromptManager:
             context={
                 "schema": {"field": "definition"},
                 "purpose": "Testing schema analysis",
-                "examples": ["Example schema usage"]
-            }
+                "examples": ["Example schema usage"],
+            },
         )
 
         assert response.response_text == "Schema analysis complete"
@@ -121,7 +120,7 @@ class TestPromptManager:
             tokens_used=50,
             processing_time=0.5,
             cached=False,
-            quality_score=0.8
+            quality_score=0.8,
         )
         mock_llm_service.generate_response.return_value = mock_response
 
@@ -132,9 +131,9 @@ class TestPromptManager:
             context={
                 "schema": {"test": "field"},
                 "description": "Test schema",
-                "examples": ["example1", "example2"]
+                "examples": ["example1", "example2"],
             },
-            temperature=0.9  # Outside range [0.1, 0.5] for database validation
+            temperature=0.9,  # Outside range [0.1, 0.5] for database validation
         )
 
         # Verify the request was adjusted
@@ -151,10 +150,7 @@ class TestPromptManager:
             await prompt_manager.execute_prompt(
                 category=PromptCategory.DATABASE_VALIDATION,
                 prompt="Validate this",
-                context={
-                    "description": "Test",
-                    "examples": ["ex1", "ex2"]
-                }
+                context={"description": "Test", "examples": ["ex1", "ex2"]},
             )
 
         # Test insufficient examples
@@ -165,8 +161,8 @@ class TestPromptManager:
                 context={
                     "schema": {"field": "def"},
                     "description": "Test",
-                    "examples": ["only_one"]  # Needs at least 2
-                }
+                    "examples": ["only_one"],  # Needs at least 2
+                },
             )
 
     @pytest.mark.asyncio
@@ -182,7 +178,7 @@ class TestPromptManager:
             tokens_used=200,
             processing_time=2.0,
             cached=False,
-            quality_score=0.85
+            quality_score=0.85,
         )
         mock_llm_service.generate_response.return_value = mock_response
 
@@ -190,10 +186,10 @@ class TestPromptManager:
             collection_description="User interaction tracking for reciprocity analysis",
             schema_definition={
                 "user_id": {"type": "uuid", "obfuscation": "encrypted"},
-                "action": {"type": "string", "obfuscation": "uuid_only"}
+                "action": {"type": "string", "obfuscation": "uuid_only"},
             },
             examples=["User helped another user", "User shared knowledge"],
-            test_mechanisms=["schema_test", "example_test"]
+            test_mechanisms=["schema_test", "example_test"],
         )
 
         assert "validation_passed" in result
@@ -209,14 +205,14 @@ class TestPromptManager:
         result1 = await prompt_manager.cache_prompt_qualification(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test"}
+            context={"schema": {}, "purpose": "test"},
         )
 
         # Second validation should be cached
         result2 = await prompt_manager.cache_prompt_qualification(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test"}
+            context={"schema": {}, "purpose": "test"},
         )
 
         # Results should be identical (cached)
@@ -250,7 +246,7 @@ class TestPromptManager:
             tokens_used=50,
             processing_time=1.0,
             cached=False,
-            quality_score=0.8
+            quality_score=0.8,
         )
         mock_llm_service.generate_response.return_value = mock_response
 
@@ -258,7 +254,7 @@ class TestPromptManager:
         await prompt_manager.execute_prompt(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test", "examples": ["test example"]}
+            context={"schema": {}, "purpose": "test", "examples": ["test example"]},
         )
 
         # Check metrics
@@ -281,7 +277,7 @@ class TestPromptManager:
             tokens_used=20,
             processing_time=0.5,
             cached=False,
-            quality_score=0.3  # Below threshold
+            quality_score=0.3,  # Below threshold
         )
         mock_llm_service.generate_response.return_value = mock_response
 
@@ -289,7 +285,7 @@ class TestPromptManager:
         response = await prompt_manager.execute_prompt(
             category=PromptCategory.SCHEMA_ANALYSIS,
             prompt="Test prompt",
-            context={"schema": {}, "purpose": "test", "examples": ["test example"]}
+            context={"schema": {}, "purpose": "test", "examples": ["test example"]},
         )
 
         assert response.quality_score == 0.3
@@ -311,10 +307,10 @@ class TestContractValidation:
             context={
                 "schema": {"field": "definition"},
                 "description": "Test schema",
-                "examples": ["ex1", "ex2"]
+                "examples": ["ex1", "ex2"],
             },
             max_tokens=1000,
-            temperature=0.3
+            temperature=0.3,
         )
 
         # Should validate successfully
@@ -329,7 +325,7 @@ class TestContractValidation:
         test_result = manager.validate_test_mechanisms(
             category=PromptCategory.DATABASE_VALIDATION,
             test_prompts=["Test prompt 1", "Test prompt 2"],
-            expected_patterns=["schema", "validation", "completeness"]
+            expected_patterns=["schema", "validation", "completeness"],
         )
 
         assert "test_coverage" in test_result

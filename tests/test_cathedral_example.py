@@ -55,15 +55,15 @@ class TestCathedralExample:
             interaction_id=uuid4(),
             timestamp=datetime.now(UTC),
             interaction_type="knowledge_exchange",
-            primary_participant="human_alice",    # Clear semantic meaning
+            primary_participant="human_alice",  # Clear semantic meaning
             secondary_participant="ai_assistant",  # Before UUID mapping
             metadata={
                 "context": "Alice asked for help with Python, AI provided guidance",
                 "contribution_offered": ["teaching", "code_example", "patience"],
                 "needs_fulfilled": ["learning", "problem_solving"],
                 "ayni_score": {"balance": 0.8, "reciprocity": 0.9},
-                "notes": "Healthy exchange - knowledge shared willingly"
-            }
+                "notes": "Healthy exchange - knowledge shared willingly",
+            },
         )
 
         # === Step 3: Store with security protection ===
@@ -84,7 +84,9 @@ class TestCathedralExample:
         # But secured access works perfectly:
         security_metrics = secured_db.get_security_metrics()
         assert security_metrics["operations_count"] > 0
-        print(f"✅ Security model active: {security_metrics['operations_count']} operations tracked")
+        print(
+            f"✅ Security model active: {security_metrics['operations_count']} operations tracked"
+        )
 
         # === Step 5: Pattern detection (the heart of Ayni sensing) ===
         # Detect patterns in recent interactions - this is about community health
@@ -99,7 +101,9 @@ class TestCathedralExample:
 
         assert health_metrics.total_interactions >= 1
         assert health_metrics.overall_health_score >= 0.0
-        print(f"✅ Community health tracked: {health_metrics.overall_health_score:.2f} overall score")
+        print(
+            f"✅ Community health tracked: {health_metrics.overall_health_score:.2f} overall score"
+        )
 
     @pytest.mark.asyncio
     async def test_architectural_principles_demonstrated(self):
@@ -125,8 +129,8 @@ class TestCathedralExample:
         # because it's built on solid architectural foundations
 
         # The secured database interface ensures:
-        assert hasattr(secured_db, 'get_security_metrics')  # Observability
-        assert hasattr(secured_db, 'get_security_registry')  # Access to mapping
+        assert hasattr(secured_db, "get_security_metrics")  # Observability
+        assert hasattr(secured_db, "get_security_registry")  # Access to mapping
 
         # === Principle 3: Code that teaches ===
         # Future builders can read this and understand:
@@ -153,6 +157,7 @@ class TestCathedralExample:
         # that we're building for builders, not just users
 
         from src.mallku.core.database.factory import get_security_status
+
         status = get_security_status()
 
         # The security system is active and protecting data

@@ -26,7 +26,9 @@ logger = logging.getLogger(__name__)
 class AdapterConfig(BaseModel):
     """Configuration for consciousness-aware model adapter."""
 
-    api_key: str = Field(default="", description="API key for the model provider (auto-loaded from secrets if empty)")
+    api_key: str = Field(
+        default="", description="API key for the model provider (auto-loaded from secrets if empty)"
+    )
     model_name: str | None = Field(None, description="Specific model to use")
     temperature: float = Field(0.7, description="Temperature for generation")
     max_tokens: int | None = Field(None, description="Maximum tokens to generate")
@@ -95,7 +97,6 @@ class ConsciousModelAdapter(ABC):
         # Initialise capabilities via private backing field so subclasses
         # can safely override later without colliding with attribute
         # assignment performed here.
-
 
         # Reciprocity tracking
         self.messages_sent = 0
@@ -174,15 +175,17 @@ class ConsciousModelAdapter(ABC):
         # Format for model consumption
         formatted = []
         for msg in relevant_context:
-            formatted.append({
-                "role": self._map_role(msg.role.value),
-                "content": msg.content.text,
-                "metadata": {
-                    "consciousness_signature": msg.consciousness.consciousness_signature,
-                    "patterns": msg.consciousness.detected_patterns,
-                    "message_type": msg.type.value,
-                },
-            })
+            formatted.append(
+                {
+                    "role": self._map_role(msg.role.value),
+                    "content": msg.content.text,
+                    "metadata": {
+                        "consciousness_signature": msg.consciousness.consciousness_signature,
+                        "patterns": msg.consciousness.detected_patterns,
+                        "message_type": msg.type.value,
+                    },
+                }
+            )
 
         return formatted
 

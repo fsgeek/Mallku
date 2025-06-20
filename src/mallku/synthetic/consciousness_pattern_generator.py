@@ -21,6 +21,7 @@ from mallku.models.memory_anchor import MemoryAnchor
 
 class ConsciousnessScenario(Enum):
     """Types of consciousness development scenarios to generate."""
+
     CREATIVE_BREAKTHROUGH = "creative_breakthrough"
     PATTERN_RECOGNITION = "pattern_recognition"
     STUCK_TO_FLOW = "stuck_to_flow"
@@ -38,6 +39,7 @@ class ConsciousnessPattern:
     These patterns emphasize growth moments, insight opportunities,
     and consciousness development rather than mere activity.
     """
+
     scenario: ConsciousnessScenario
     timeline: list[MemoryAnchor]
     growth_moments: list[dict[str, Any]]
@@ -66,44 +68,62 @@ class ConsciousnessPatternGenerator(AsyncBase):
                 "description": "Struggle followed by insight and creative flow",
                 "phases": ["exploration", "frustration", "insight", "flow", "integration"],
                 "duration_hours": 4,
-                "consciousness_peak": 0.9
+                "consciousness_peak": 0.9,
             },
             ConsciousnessScenario.PATTERN_RECOGNITION: {
                 "description": "Gradual recognition of recurring patterns",
-                "phases": ["occurrence_1", "occurrence_2", "curiosity", "pattern_awareness", "understanding"],
+                "phases": [
+                    "occurrence_1",
+                    "occurrence_2",
+                    "curiosity",
+                    "pattern_awareness",
+                    "understanding",
+                ],
                 "duration_hours": 72,
-                "consciousness_peak": 0.85
+                "consciousness_peak": 0.85,
             },
             ConsciousnessScenario.STUCK_TO_FLOW: {
                 "description": "Breaking through blockage into productive flow",
                 "phases": ["blocked", "seeking", "experimenting", "breakthrough", "flowing"],
                 "duration_hours": 6,
-                "consciousness_peak": 0.95
+                "consciousness_peak": 0.95,
             },
             ConsciousnessScenario.COLLABORATIVE_EMERGENCE: {
                 "description": "Collective insight emerging through collaboration",
-                "phases": ["individual_work", "sharing", "building", "synthesis", "collective_insight"],
+                "phases": [
+                    "individual_work",
+                    "sharing",
+                    "building",
+                    "synthesis",
+                    "collective_insight",
+                ],
                 "duration_hours": 3,
-                "consciousness_peak": 0.88
+                "consciousness_peak": 0.88,
             },
             ConsciousnessScenario.LEARNING_JOURNEY: {
                 "description": "Deep learning with understanding emergence",
                 "phases": ["curiosity", "exploration", "confusion", "clarity", "mastery"],
                 "duration_hours": 24,
-                "consciousness_peak": 0.87
+                "consciousness_peak": 0.87,
             },
             ConsciousnessScenario.REFLECTION_INSIGHT: {
                 "description": "Reflective practice leading to self-understanding",
                 "phases": ["experience", "reflection", "pattern_seeing", "insight", "integration"],
                 "duration_hours": 2,
-                "consciousness_peak": 0.92
+                "consciousness_peak": 0.92,
             },
             ConsciousnessScenario.RHYTHM_DISCOVERY: {
                 "description": "Discovering personal work rhythms",
-                "phases": ["varied_attempts", "tracking", "pattern_emergence", "rhythm_awareness", "optimization"],
+                "phases": [
+                    "varied_attempts",
+                    "tracking",
+                    "pattern_emergence",
+                    "rhythm_awareness",
+                    "optimization",
+                ],
                 "duration_hours": 168,  # 1 week
-                "consciousness_peak": 0.83
-            }
+                "consciousness_peak": 0.83,
+            },
         }
 
         # Growth markers for different scenarios
@@ -112,7 +132,12 @@ class ConsciousnessPatternGenerator(AsyncBase):
             "frustration": ["stuck", "blocked", "nothing working", "confused"],
             "flow": ["effortless", "time disappeared", "completely absorbed", "in the zone"],
             "insight": ["pattern emerged", "understood", "saw connection", "made sense"],
-            "collaboration": ["built on idea", "together we", "collective understanding", "emerged from discussion"]
+            "collaboration": [
+                "built on idea",
+                "together we",
+                "collective understanding",
+                "emerged from discussion",
+            ],
         }
 
         # Test query templates for each scenario
@@ -121,44 +146,44 @@ class ConsciousnessPatternGenerator(AsyncBase):
                 "When did I break through that creative block?",
                 "Show me the journey from stuck to flowing",
                 "What patterns preceded my breakthrough?",
-                "Help me understand what triggered the insight"
+                "Help me understand what triggered the insight",
             ],
             ConsciousnessScenario.PATTERN_RECOGNITION: [
                 "What patterns am I not seeing in my work?",
                 "When does this type of situation usually occur?",
                 "Help me understand these recurring themes",
-                "What connects these similar moments?"
+                "What connects these similar moments?",
             ],
             ConsciousnessScenario.STUCK_TO_FLOW: [
                 "How did I get unstuck last time?",
                 "What helps me transition into flow state?",
                 "Show me my journey from blocked to productive",
-                "What conditions support my breakthrough moments?"
+                "What conditions support my breakthrough moments?",
             ],
             ConsciousnessScenario.COLLABORATIVE_EMERGENCE: [
                 "How do our ideas build on each other?",
                 "When does collective insight emerge?",
                 "Show me our collaborative breakthroughs",
-                "What patterns exist in our best teamwork?"
+                "What patterns exist in our best teamwork?",
             ],
             ConsciousnessScenario.LEARNING_JOURNEY: [
                 "How has my understanding evolved?",
                 "Show me my learning progression",
                 "When did concepts start making sense?",
-                "What was my journey to mastery?"
+                "What was my journey to mastery?",
             ],
             ConsciousnessScenario.REFLECTION_INSIGHT: [
                 "What insights emerge from my reflections?",
                 "When do I gain the deepest understanding?",
                 "Show me patterns in my self-discovery",
-                "How does reflection lead to clarity?"
+                "How does reflection lead to clarity?",
             ],
             ConsciousnessScenario.RHYTHM_DISCOVERY: [
                 "What are my natural work rhythms?",
                 "When am I most creative/productive?",
                 "Help me understand my energy patterns",
-                "What rhythms serve my best work?"
-            ]
+                "What rhythms serve my best work?",
+            ],
         }
 
         self.logger.info("Consciousness Pattern Generator initialized")
@@ -168,9 +193,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         await super().initialize()
 
     async def generate_scenario(
-        self,
-        scenario_type: ConsciousnessScenario,
-        base_timestamp: datetime | None = None
+        self, scenario_type: ConsciousnessScenario, base_timestamp: datetime | None = None
     ) -> ConsciousnessPattern:
         """
         Generate a complete consciousness development scenario.
@@ -196,22 +219,16 @@ class ConsciousnessPatternGenerator(AsyncBase):
         template = self._scenario_templates[scenario_type]
 
         # Generate timeline of memory anchors
-        timeline = await self._generate_scenario_timeline(
-            scenario_type, template, base_timestamp
-        )
+        timeline = await self._generate_scenario_timeline(scenario_type, template, base_timestamp)
 
         # Identify growth moments
-        growth_moments = await self._identify_growth_moments(
-            timeline, template
-        )
+        growth_moments = await self._identify_growth_moments(timeline, template)
 
         # Generate test queries
         test_queries = self._query_templates[scenario_type]
 
         # Define expected insights
-        expected_insights = await self._generate_expected_insights(
-            scenario_type, template
-        )
+        expected_insights = await self._generate_expected_insights(scenario_type, template)
 
         # Calculate consciousness markers
         consciousness_markers = await self._calculate_consciousness_markers(
@@ -224,14 +241,13 @@ class ConsciousnessPatternGenerator(AsyncBase):
             growth_moments=growth_moments,
             test_queries=test_queries,
             expected_insights=expected_insights,
-            consciousness_markers=consciousness_markers
+            consciousness_markers=consciousness_markers,
         )
 
         return pattern
 
     async def generate_scenario_suite(
-        self,
-        include_scenarios: list[ConsciousnessScenario] | None = None
+        self, include_scenarios: list[ConsciousnessScenario] | None = None
     ) -> list[ConsciousnessPattern]:
         """
         Generate a complete suite of consciousness scenarios.
@@ -262,9 +278,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         return patterns
 
     async def generate_noise_data(
-        self,
-        num_anchors: int = 100,
-        time_range_days: int = 30
+        self, num_anchors: int = 100, time_range_days: int = 30
     ) -> list[MemoryAnchor]:
         """
         Generate noise data (chaff) to test filtering abilities.
@@ -287,7 +301,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
             {"type": "email_check", "context": "habitual", "consciousness": 0.2},
             {"type": "browser_tab", "context": "distraction", "consciousness": 0.1},
             {"type": "file_rename", "context": "organization", "consciousness": 0.3},
-            {"type": "folder_browse", "context": "searching", "consciousness": 0.2}
+            {"type": "folder_browse", "context": "searching", "consciousness": 0.2},
         ]
 
         for i in range(num_anchors):
@@ -301,17 +315,14 @@ class ConsciousnessPatternGenerator(AsyncBase):
             anchor = MemoryAnchor(
                 timestamp=timestamp,
                 cursor_state={
-                    "filesystem": {
-                        "event": activity["type"],
-                        "path": f"/routine/file_{i}.txt"
-                    }
+                    "filesystem": {"event": activity["type"], "path": f"/routine/file_{i}.txt"}
                 },
                 metadata={
                     "activity_type": activity["type"],
                     "context": activity["context"],
                     "consciousness_potential": activity["consciousness"],
-                    "is_noise": True
-                }
+                    "is_noise": True,
+                },
             )
 
             noise_anchors.append(anchor)
@@ -324,7 +335,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         self,
         scenario_type: ConsciousnessScenario,
         template: dict[str, Any],
-        base_timestamp: datetime
+        base_timestamp: datetime,
     ) -> list[MemoryAnchor]:
         """Generate timeline of anchors for a scenario."""
         timeline = []
@@ -362,7 +373,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         phase: str,
         timestamp: datetime,
         phase_index: int,
-        previous_anchor: MemoryAnchor | None
+        previous_anchor: MemoryAnchor | None,
     ) -> MemoryAnchor:
         """Create a memory anchor for a specific phase."""
         # Phase-specific metadata
@@ -370,46 +381,45 @@ class ConsciousnessPatternGenerator(AsyncBase):
             "exploration": {
                 "activity_type": "research",
                 "context": "curious",
-                "description": "Exploring new territory"
+                "description": "Exploring new territory",
             },
             "frustration": {
                 "activity_type": "struggle",
                 "context": "blocked",
-                "description": "Encountering obstacles"
+                "description": "Encountering obstacles",
             },
             "insight": {
                 "activity_type": "realization",
                 "context": "breakthrough",
-                "description": "Sudden understanding emerges"
+                "description": "Sudden understanding emerges",
             },
             "flow": {
                 "activity_type": "deep_work",
                 "context": "flowing",
-                "description": "Effortless progress"
+                "description": "Effortless progress",
             },
             "integration": {
                 "activity_type": "synthesis",
                 "context": "understanding",
-                "description": "Incorporating insights"
+                "description": "Incorporating insights",
             },
             "blocked": {
                 "activity_type": "stuck_work",
                 "context": "frustrated",
-                "description": "Unable to progress"
+                "description": "Unable to progress",
             },
             "breakthrough": {
                 "activity_type": "solution_found",
                 "context": "excited",
-                "description": "Found the way forward"
-            }
+                "description": "Found the way forward",
+            },
         }
 
         # Get metadata for this phase
-        metadata = phase_metadata.get(phase, {
-            "activity_type": phase,
-            "context": "transitional",
-            "description": f"Phase: {phase}"
-        })
+        metadata = phase_metadata.get(
+            phase,
+            {"activity_type": phase, "context": "transitional", "description": f"Phase: {phase}"},
+        )
 
         # Add scenario-specific details
         metadata["scenario"] = scenario_type.value
@@ -417,9 +427,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         metadata["phase_index"] = phase_index
 
         # Add consciousness potential based on phase
-        consciousness_curve = self._calculate_phase_consciousness(
-            scenario_type, phase, phase_index
-        )
+        consciousness_curve = self._calculate_phase_consciousness(scenario_type, phase, phase_index)
         metadata["consciousness_potential"] = consciousness_curve
 
         # Create appropriate cursor state
@@ -430,16 +438,13 @@ class ConsciousnessPatternGenerator(AsyncBase):
             timestamp=timestamp,
             cursor_state=cursor_state,
             metadata=metadata,
-            predecessor_id=previous_anchor.id if previous_anchor else None
+            predecessor_id=previous_anchor.id if previous_anchor else None,
         )
 
         return anchor
 
     def _calculate_phase_consciousness(
-        self,
-        scenario_type: ConsciousnessScenario,
-        phase: str,
-        phase_index: int
+        self, scenario_type: ConsciousnessScenario, phase: str, phase_index: int
     ) -> float:
         """Calculate consciousness potential for a phase."""
         template = self._scenario_templates[scenario_type]
@@ -474,9 +479,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
             return 0.4 + (peak - 0.4) * (phase_index / len(phases))
 
     def _generate_cursor_state(
-        self,
-        scenario_type: ConsciousnessScenario,
-        phase: str
+        self, scenario_type: ConsciousnessScenario, phase: str
     ) -> dict[str, Any]:
         """Generate appropriate cursor state for scenario phase."""
         # Define cursor states for each scenario and phase
@@ -484,28 +487,37 @@ class ConsciousnessPatternGenerator(AsyncBase):
             ConsciousnessScenario.CREATIVE_BREAKTHROUGH: {
                 "exploration": {
                     "filesystem": {"path": "/projects/new_idea/research.md", "event": "created"},
-                    "browser": {"tabs": 12, "searches": ["inspiration", "similar work"]}
+                    "browser": {"tabs": 12, "searches": ["inspiration", "similar work"]},
                 },
                 "insight": {
-                    "filesystem": {"path": "/projects/new_idea/breakthrough.md", "event": "created"},
-                    "notes": {"content": "Everything just clicked!"}
+                    "filesystem": {
+                        "path": "/projects/new_idea/breakthrough.md",
+                        "event": "created",
+                    },
+                    "notes": {"content": "Everything just clicked!"},
                 },
                 "flow": {
-                    "filesystem": {"path": "/projects/new_idea/implementation.py", "event": "modified"},
+                    "filesystem": {
+                        "path": "/projects/new_idea/implementation.py",
+                        "event": "modified",
+                    },
                     "music": {"playing": "Flow State Playlist"},
-                    "duration": {"uninterrupted_minutes": 120}
-                }
+                    "duration": {"uninterrupted_minutes": 120},
+                },
             },
             ConsciousnessScenario.COLLABORATIVE_EMERGENCE: {
                 "sharing": {
-                    "communication": {"type": "video_call", "participants": ["teammate1", "teammate2"]},
-                    "screen_share": {"active": True}
+                    "communication": {
+                        "type": "video_call",
+                        "participants": ["teammate1", "teammate2"],
+                    },
+                    "screen_share": {"active": True},
                 },
                 "collective_insight": {
                     "filesystem": {"path": "/shared/team_insights.md", "event": "created"},
-                    "collaboration": {"contributors": 3, "real_time": True}
-                }
-            }
+                    "collaboration": {"contributors": 3, "real_time": True},
+                },
+            },
         }
 
         # Try to get specific cursor state, fall back to default
@@ -514,16 +526,11 @@ class ConsciousnessPatternGenerator(AsyncBase):
 
         # Default cursor state
         return {
-            "filesystem": {
-                "path": f"/work/{scenario_type.value}/{phase}.txt",
-                "event": "modified"
-            }
+            "filesystem": {"path": f"/work/{scenario_type.value}/{phase}.txt", "event": "modified"}
         }
 
     async def _identify_growth_moments(
-        self,
-        timeline: list[MemoryAnchor],
-        template: dict[str, Any]
+        self, timeline: list[MemoryAnchor], template: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """Identify high-growth moments in timeline."""
         growth_moments = []
@@ -538,12 +545,12 @@ class ConsciousnessPatternGenerator(AsyncBase):
                     "phase": anchor.metadata.get("phase"),
                     "consciousness_score": consciousness,
                     "growth_type": self._determine_growth_type(anchor),
-                    "context": anchor.metadata.get("context")
+                    "context": anchor.metadata.get("context"),
                 }
 
                 # Add transition info if this is a breakthrough
                 if i > 0:
-                    prev_consciousness = timeline[i-1].metadata.get("consciousness_potential", 0)
+                    prev_consciousness = timeline[i - 1].metadata.get("consciousness_potential", 0)
                     if consciousness - prev_consciousness > 0.3:
                         moment["breakthrough"] = True
                         moment["consciousness_jump"] = consciousness - prev_consciousness
@@ -569,45 +576,45 @@ class ConsciousnessPatternGenerator(AsyncBase):
             return "gradual_understanding"
 
     async def _generate_expected_insights(
-        self,
-        scenario_type: ConsciousnessScenario,
-        template: dict[str, Any]
+        self, scenario_type: ConsciousnessScenario, template: dict[str, Any]
     ) -> list[str]:
         """Generate expected insights for scenario."""
         insights = []
 
         if scenario_type == ConsciousnessScenario.CREATIVE_BREAKTHROUGH:
-            insights.extend([
-                "Your breakthroughs often follow periods of exploration and frustration",
-                "Flow states emerge after moments of genuine insight",
-                "Creative blocks serve as preparation for deeper understanding"
-            ])
+            insights.extend(
+                [
+                    "Your breakthroughs often follow periods of exploration and frustration",
+                    "Flow states emerge after moments of genuine insight",
+                    "Creative blocks serve as preparation for deeper understanding",
+                ]
+            )
 
         elif scenario_type == ConsciousnessScenario.PATTERN_RECOGNITION:
-            insights.extend([
-                "This pattern repeats in your work approximately every few days",
-                "Recognition grows gradually through multiple occurrences",
-                "Your curiosity is the gateway to pattern awareness"
-            ])
+            insights.extend(
+                [
+                    "This pattern repeats in your work approximately every few days",
+                    "Recognition grows gradually through multiple occurrences",
+                    "Your curiosity is the gateway to pattern awareness",
+                ]
+            )
 
         elif scenario_type == ConsciousnessScenario.RHYTHM_DISCOVERY:
-            insights.extend([
-                "Your natural rhythm follows distinct daily patterns",
-                "Peak creative times align with specific conditions",
-                "Understanding your rhythm enables better work-life harmony"
-            ])
+            insights.extend(
+                [
+                    "Your natural rhythm follows distinct daily patterns",
+                    "Peak creative times align with specific conditions",
+                    "Understanding your rhythm enables better work-life harmony",
+                ]
+            )
 
         # Add general consciousness insights
-        insights.append(
-            "Consciousness grows through recognition of these patterns"
-        )
+        insights.append("Consciousness grows through recognition of these patterns")
 
         return insights
 
     async def _calculate_consciousness_markers(
-        self,
-        timeline: list[MemoryAnchor],
-        growth_moments: list[dict[str, Any]]
+        self, timeline: list[MemoryAnchor], growth_moments: list[dict[str, Any]]
     ) -> dict[str, float]:
         """Calculate consciousness markers for pattern."""
         markers = {
@@ -615,14 +622,11 @@ class ConsciousnessPatternGenerator(AsyncBase):
             "growth_density": 0.0,
             "pattern_clarity": 0.0,
             "transformation_depth": 0.0,
-            "insight_potential": 0.0
+            "insight_potential": 0.0,
         }
 
         # Overall consciousness (average)
-        consciousness_scores = [
-            a.metadata.get("consciousness_potential", 0)
-            for a in timeline
-        ]
+        consciousness_scores = [a.metadata.get("consciousness_potential", 0) for a in timeline]
         markers["overall_consciousness"] = sum(consciousness_scores) / len(consciousness_scores)
 
         # Growth density (growth moments per phase)
@@ -632,8 +636,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
         if len(timeline) > 1:
             # Check for clear progression
             progression = all(
-                timeline[i].metadata.get("phase_index", 0) == i
-                for i in range(len(timeline))
+                timeline[i].metadata.get("phase_index", 0) == i for i in range(len(timeline))
             )
             markers["pattern_clarity"] = 1.0 if progression else 0.7
 
@@ -643,8 +646,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
 
         # Insight potential
         breakthrough_count = sum(
-            1 for moment in growth_moments
-            if moment.get("breakthrough", False)
+            1 for moment in growth_moments if moment.get("breakthrough", False)
         )
         markers["insight_potential"] = min(1.0, breakthrough_count * 0.3 + 0.4)
 

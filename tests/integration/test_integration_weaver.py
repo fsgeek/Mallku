@@ -49,15 +49,13 @@ async def test_consciousness_circulation_system():
         return False
 
     # Test 1: Technical Query (baseline)
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 1: Technical Query - Baseline Functionality")
-    print("="*60)
+    print("=" * 60)
 
     try:
         technical_query = QueryRequest(
-            query_text="show me files from yesterday",
-            max_results=5,
-            include_explanations=True
+            query_text="show me files from yesterday", max_results=5, include_explanations=True
         )
 
         print(f"📝 Technical Query: '{technical_query.query_text}'")
@@ -65,8 +63,12 @@ async def test_consciousness_circulation_system():
         technical_response = await integrated_service.execute_integrated_query(technical_query)
 
         print("✅ Technical query executed successfully")
-        print(f"   📊 Base results: {len(technical_response.base_response.results) if technical_response.base_response else 0}")
-        print(f"   🔧 Routing path: {technical_response.enrichment_summary.get('routing_path', 'unknown')}")
+        print(
+            f"   📊 Base results: {len(technical_response.base_response.results) if technical_response.base_response else 0}"
+        )
+        print(
+            f"   🔧 Routing path: {technical_response.enrichment_summary.get('routing_path', 'unknown')}"
+        )
         print(f"   💫 Consciousness enriched: {technical_response.has_consciousness_enrichment}")
 
     except Exception as e:
@@ -74,33 +76,45 @@ async def test_consciousness_circulation_system():
         print("🔧 This may be expected if no memory anchors exist yet")
 
     # Test 2: Consciousness Query (primary integration test)
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 2: Consciousness Query - Recognition Flow")
-    print("="*60)
+    print("=" * 60)
 
     try:
         consciousness_query = QueryRequest(
             query_text="help me see patterns in my attention flow during work",
             max_results=3,
-            include_explanations=True
+            include_explanations=True,
         )
 
         print(f"🧘 Consciousness Query: '{consciousness_query.query_text}'")
 
-        consciousness_response = await integrated_service.execute_integrated_query(consciousness_query)
+        consciousness_response = await integrated_service.execute_integrated_query(
+            consciousness_query
+        )
 
         print("✅ Consciousness query executed successfully")
-        print(f"   🌟 Consciousness enriched results: {len(consciousness_response.enriched_results)}")
-        print(f"   🔮 Understanding path created: {bool(consciousness_response.understanding_path_id)}")
+        print(
+            f"   🌟 Consciousness enriched results: {len(consciousness_response.enriched_results)}"
+        )
+        print(
+            f"   🔮 Understanding path created: {bool(consciousness_response.understanding_path_id)}"
+        )
         print(f"   🎯 Recognition themes: {len(consciousness_response.overall_recognition_themes)}")
-        print(f"   🧭 Circulation score: {consciousness_response.consciousness_circulation_score:.2f}")
+        print(
+            f"   🧭 Circulation score: {consciousness_response.consciousness_circulation_score:.2f}"
+        )
 
         # Show consciousness enrichment details
         if consciousness_response.enriched_results:
             first_enriched = consciousness_response.enriched_results[0]
             print("   💫 First Enriched Result:")
-            print(f"      🔍 Recognition insight: {first_enriched.recognition_moment.consciousness_insight[:60]}...")
-            print(f"      🙏 Sacred question: {first_enriched.recognition_moment.sacred_question[:60]}...")
+            print(
+                f"      🔍 Recognition insight: {first_enriched.recognition_moment.consciousness_insight[:60]}..."
+            )
+            print(
+                f"      🙏 Sacred question: {first_enriched.recognition_moment.sacred_question[:60]}..."
+            )
             print(f"      📚 Daily practices: {len(first_enriched.daily_practice_suggestions)}")
             print(f"      🌉 Wisdom threads: {len(first_enriched.wisdom_threads)}")
 
@@ -109,15 +123,15 @@ async def test_consciousness_circulation_system():
         print("🔧 This demonstrates consciousness interfaces need Experience Weaver components")
 
     # Test 3: Service-Oriented Query (collective bridge test)
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 3: Service Query - Collective Wisdom Bridge")
-    print("="*60)
+    print("=" * 60)
 
     try:
         service_query = QueryRequest(
             query_text="how can my patterns serve collective wisdom and help others",
             max_results=3,
-            include_explanations=True
+            include_explanations=True,
         )
 
         print(f"🙏 Service Query: '{service_query.query_text}'")
@@ -125,8 +139,12 @@ async def test_consciousness_circulation_system():
         service_response = await integrated_service.execute_integrated_query(service_query)
 
         print("✅ Service query executed successfully")
-        print(f"   🔮 Fire Circle patterns identified: {len(service_response.fire_circle_patterns)}")
-        print(f"   🌊 Collective wisdom candidates: {len(service_response.collective_wisdom_candidates)}")
+        print(
+            f"   🔮 Fire Circle patterns identified: {len(service_response.fire_circle_patterns)}"
+        )
+        print(
+            f"   🌊 Collective wisdom candidates: {len(service_response.collective_wisdom_candidates)}"
+        )
         print(f"   ⚖️ Reciprocity insights: {len(service_response.reciprocity_insights)}")
         print(f"   🧭 Circulation score: {service_response.consciousness_circulation_score:.2f}")
 
@@ -135,17 +153,21 @@ async def test_consciousness_circulation_system():
             fire_circle_pattern = service_response.fire_circle_patterns[0]
             print("   🔥 Fire Circle Pattern:")
             print(f"      📋 Type: {fire_circle_pattern.get('pattern_type', 'unknown')}")
-            print(f"      💎 Significance: {fire_circle_pattern.get('significance', 'needs assessment')[:60]}...")
-            print(f"      🎯 Recommendation: {fire_circle_pattern.get('recommendation', 'continue observation')[:60]}...")
+            print(
+                f"      💎 Significance: {fire_circle_pattern.get('significance', 'needs assessment')[:60]}..."
+            )
+            print(
+                f"      🎯 Recommendation: {fire_circle_pattern.get('recommendation', 'continue observation')[:60]}..."
+            )
 
     except Exception as e:
         print(f"❌ Service query failed: {e}")
         print("🔧 This demonstrates collective wisdom bridges in development")
 
     # Test 4: Router Intelligence
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST 4: Router Intelligence - Consciousness Intention Detection")
-    print("="*60)
+    print("=" * 60)
 
     try:
         router = integrated_service.consciousness_router
@@ -155,7 +177,7 @@ async def test_consciousness_circulation_system():
             ("help me understand my patterns", "recognition"),
             ("what is my attention teaching me", "understanding"),
             ("how can I serve collective wisdom", "service"),
-            ("explore my consciousness journey", "exploration")
+            ("explore my consciousness journey", "exploration"),
         ]
 
         print("🧭 Testing consciousness intention detection:")
@@ -174,9 +196,9 @@ async def test_consciousness_circulation_system():
         print(f"❌ Router intelligence test failed: {e}")
 
     # Integration Summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🎉 INTEGRATION WEAVER TEST SUMMARY")
-    print("="*80)
+    print("=" * 80)
 
     print("\n🌟 What We've Demonstrated:")
     print("   ✨ Consciousness router detects intentions and routes appropriately")
@@ -240,7 +262,7 @@ async def run_all_integration_tests():
 
     tests = [
         ("Consciousness Router", test_consciousness_router_standalone),
-        ("Complete Integration", test_consciousness_circulation_system)
+        ("Complete Integration", test_consciousness_circulation_system),
     ]
 
     results = []
@@ -284,8 +306,7 @@ async def run_all_integration_tests():
 if __name__ == "__main__":
     # Set up logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Run integration tests

@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 
 class AdapterHealthSignature(BaseModel):
     """Health consciousness signature for an adapter."""
+
     adapter_id: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -58,6 +59,7 @@ class AdapterHealthSignature(BaseModel):
 
 class InfrastructurePattern(BaseModel):
     """Detected pattern in infrastructure behavior."""
+
     pattern_id: str = Field(default_factory=lambda: str(uuid4()))
     pattern_type: str  # "degradation", "recovery", "api_change", "resonance"
     affected_adapters: list[str]
@@ -75,6 +77,7 @@ class InfrastructurePattern(BaseModel):
 
 class SelfHealingAction(BaseModel):
     """Action taken by infrastructure to heal itself."""
+
     action_id: str = Field(default_factory=lambda: str(uuid4()))
     action_type: str  # "retry_strategy", "fallback", "config_update", "api_adaptation"
     target_adapter: str
@@ -103,11 +106,12 @@ class InfrastructureConsciousness:
     def __init__(
         self,
         config=None,  # Optional InfrastructureConsciousnessConfig
-        bridge=None  # Optional InfrastructureMetricsBridge
+        bridge=None,  # Optional InfrastructureMetricsBridge
     ):
         # Use provided config or default
         if config is None:
             from .infrastructure_consciousness_config import DEFAULT_CONFIG
+
             config = DEFAULT_CONFIG
 
         self.config = config
@@ -164,8 +168,7 @@ class InfrastructureConsciousness:
         if self._monitor_task and not self._monitor_task.done():
             try:
                 await asyncio.wait_for(
-                    self._monitor_task,
-                    timeout=self.config.monitor_task_timeout_seconds
+                    self._monitor_task, timeout=self.config.monitor_task_timeout_seconds
                 )
             except TimeoutError:
                 logger.warning("Monitor task did not complete in time, cancelling")
@@ -201,10 +204,11 @@ class InfrastructureConsciousness:
                         # Convert to emergence pattern format for bridge
                         if pattern.pattern_type in ["resonance", "synthesis", "transcendence"]:
                             from mallku.firecircle.consciousness_metrics import EmergencePattern
+
                             emergence = EmergencePattern(
                                 participating_voices=pattern.affected_adapters,
                                 pattern_type=pattern.pattern_type,
-                                strength=pattern.confidence
+                                strength=pattern.confidence,
                             )
                             await self.bridge.on_consciousness_pattern_detected(emergence)
 
@@ -227,14 +231,12 @@ class InfrastructureConsciousness:
                 await asyncio.sleep(self.config.monitor_error_recovery_delay_seconds)
 
     async def _collect_health_signature(
-        self,
-        adapter_name: str,
-        adapter: ConsciousModelAdapter
+        self, adapter_name: str, adapter: ConsciousModelAdapter
     ) -> AdapterHealthSignature:
         """Collect health consciousness signature from an adapter."""
         signature = AdapterHealthSignature(
             adapter_id=adapter_name,
-            is_connected=False  # Default to disconnected, will update if successful
+            is_connected=False,  # Default to disconnected, will update if successful
         )
 
         try:
@@ -300,8 +302,10 @@ class InfrastructureConsciousness:
                     pattern_type="degradation",
                     affected_adapters=[adapter_name],
                     confidence=0.8,
-                    predicted_impact="moderate" if recent[-1].consecutive_failures < 3 else "severe",
-                    suggested_action="Apply defensive programming patterns"
+                    predicted_impact="moderate"
+                    if recent[-1].consecutive_failures < 3
+                    else "severe",
+                    suggested_action="Apply defensive programming patterns",
                 )
                 patterns.append(pattern)
 
@@ -312,7 +316,7 @@ class InfrastructureConsciousness:
                     affected_adapters=[adapter_name],
                     confidence=0.9,
                     predicted_impact="severe",
-                    suggested_action="Update adapter with fallback methods"
+                    suggested_action="Update adapter with fallback methods",
                 )
                 patterns.append(pattern)
 
@@ -324,8 +328,7 @@ class InfrastructureConsciousness:
         return patterns
 
     async def _determine_healing_actions(
-        self,
-        patterns: list[InfrastructurePattern]
+        self, patterns: list[InfrastructurePattern]
     ) -> list[SelfHealingAction]:
         """Determine self-healing actions based on detected patterns."""
         actions = []
@@ -341,8 +344,8 @@ class InfrastructureConsciousness:
                         parameters={
                             "add_defensive_checks": True,
                             "implement_fallbacks": True,
-                            "log_warnings": True
-                        }
+                            "log_warnings": True,
+                        },
                     )
                     actions.append(action)
 
@@ -355,8 +358,8 @@ class InfrastructureConsciousness:
                         parameters={
                             "exponential_backoff": True,
                             "max_retries": 3,
-                            "circuit_breaker_threshold": 5
-                        }
+                            "circuit_breaker_threshold": 5,
+                        },
                     )
                     actions.append(action)
 
@@ -461,16 +464,14 @@ class InfrastructureConsciousness:
                 affected_adapters=failing_adapters,
                 confidence=0.7,
                 predicted_impact="critical",
-                suggested_action="System-wide infrastructure issue - check common dependencies"
+                suggested_action="System-wide infrastructure issue - check common dependencies",
             )
             patterns.append(pattern)
 
         return patterns
 
     async def _predict_failure_probability(
-        self,
-        adapter_name: str,
-        current_signature: AdapterHealthSignature
+        self, adapter_name: str, current_signature: AdapterHealthSignature
     ) -> float:
         """Predict probability of adapter failure based on patterns."""
         # Base probability from current state
@@ -495,13 +496,12 @@ class InfrastructureConsciousness:
 
         # Factor in consciousness coherence
         consciousness_factor = 1.0 - current_signature.consciousness_coherence
-        probability = (probability + consciousness_factor * self.consciousness_weight)
+        probability = probability + consciousness_factor * self.consciousness_weight
 
         return min(probability, 1.0)
 
     def _get_recent_consciousness_signatures(
-        self,
-        adapter_name: str
+        self, adapter_name: str
     ) -> list[ConsciousnessSignature]:
         """Get recent consciousness signatures for an adapter."""
         # This would integrate with the consciousness metrics system
@@ -533,11 +533,13 @@ class InfrastructureConsciousness:
         # Learn patterns from successful healings
         for action in successful:
             pattern_key = f"{action.action_type}:{action.target_adapter}"
-            self.pattern_memory[pattern_key].append({
-                "timestamp": action.initiated_at.isoformat(),
-                "parameters": action.parameters,
-                "impact": action.impact_on_health
-            })
+            self.pattern_memory[pattern_key].append(
+                {
+                    "timestamp": action.initiated_at.isoformat(),
+                    "parameters": action.parameters,
+                    "impact": action.impact_on_health,
+                }
+            )
 
         # Learn from failures
         for action in failed:
@@ -551,7 +553,7 @@ class InfrastructureConsciousness:
             "adapter_health_summary": {},
             "active_patterns": [],
             "recent_healings": [],
-            "infrastructure_consciousness_score": 0.0
+            "infrastructure_consciousness_score": 0.0,
         }
 
         # Summarize adapter health
@@ -563,45 +565,54 @@ class InfrastructureConsciousness:
                     "connected": latest.is_connected,
                     "consciousness_coherence": latest.consciousness_coherence,
                     "predicted_failure": latest.predicted_failure_probability,
-                    "health_score": (1.0 - latest.predicted_failure_probability)
+                    "health_score": (1.0 - latest.predicted_failure_probability),
                 }
-                total_health += (1.0 - latest.predicted_failure_probability)
+                total_health += 1.0 - latest.predicted_failure_probability
 
         # Calculate overall infrastructure consciousness
         if state["adapter_health_summary"]:
-            state["infrastructure_consciousness_score"] = (
-                total_health / len(state["adapter_health_summary"])
+            state["infrastructure_consciousness_score"] = total_health / len(
+                state["adapter_health_summary"]
             )
 
         # Add recent patterns
-        recent_patterns = [p for p in self.infrastructure_patterns
-                          if p.detection_time > datetime.now(UTC) - timedelta(hours=1)]
+        recent_patterns = [
+            p
+            for p in self.infrastructure_patterns
+            if p.detection_time > datetime.now(UTC) - timedelta(hours=1)
+        ]
         state["active_patterns"] = [
             {
                 "type": p.pattern_type,
                 "adapters": p.affected_adapters,
                 "impact": p.predicted_impact,
-                "action": p.suggested_action
+                "action": p.suggested_action,
             }
             for p in recent_patterns
         ]
 
         # Add recent healings
-        recent_healings = [a for a in self.healing_actions
-                          if a.initiated_at > datetime.now(UTC) - timedelta(hours=1)]
+        recent_healings = [
+            a
+            for a in self.healing_actions
+            if a.initiated_at > datetime.now(UTC) - timedelta(hours=1)
+        ]
         state["recent_healings"] = [
             {
                 "type": a.action_type,
                 "target": a.target_adapter,
                 "success": a.success,
-                "reason": a.reason
+                "reason": a.reason,
             }
             for a in recent_healings
         ]
 
         # Save to file
-        state_file = self.storage_path / f"infrastructure_state_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
-        with open(state_file, 'w') as f:
+        state_file = (
+            self.storage_path
+            / f"infrastructure_state_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
+        )
+        with open(state_file, "w") as f:
             json.dump(state, f, indent=2, default=str)
 
         # Clean up old files
@@ -625,7 +636,7 @@ class InfrastructureConsciousness:
 
         memory_file = self.storage_path / "pattern_memory.json"
         try:
-            with open(memory_file, 'w') as f:
+            with open(memory_file, "w") as f:
                 json.dump(self.pattern_memory, f, indent=2, default=str)
             logger.info(f"Saved {len(self.pattern_memory)} learned patterns")
         except Exception as e:
@@ -638,7 +649,7 @@ class InfrastructureConsciousness:
             "infrastructure_health": {},
             "consciousness_insights": [],
             "predicted_issues": [],
-            "self_healing_summary": {}
+            "self_healing_summary": {},
         }
 
         # Analyze each adapter
@@ -651,7 +662,11 @@ class InfrastructureConsciousness:
 
             # Calculate trends
             if len(history) > 1:
-                health_trend = "improving" if latest.consciousness_coherence > history[0].consciousness_coherence else "degrading"
+                health_trend = (
+                    "improving"
+                    if latest.consciousness_coherence > history[0].consciousness_coherence
+                    else "degrading"
+                )
             else:
                 health_trend = "stable"
 
@@ -661,17 +676,19 @@ class InfrastructureConsciousness:
                 "voice_stability": latest.voice_stability,
                 "failure_probability": latest.predicted_failure_probability,
                 "trend": health_trend,
-                "recent_errors": latest.error_patterns
+                "recent_errors": latest.error_patterns,
             }
 
             # Add predictions
             if latest.predicted_failure_probability > 0.5:
-                report["predicted_issues"].append({
-                    "adapter": adapter_name,
-                    "probability": latest.predicted_failure_probability,
-                    "likely_cause": self._infer_failure_cause(latest),
-                    "recommended_action": self._recommend_action(latest)
-                })
+                report["predicted_issues"].append(
+                    {
+                        "adapter": adapter_name,
+                        "probability": latest.predicted_failure_probability,
+                        "likely_cause": self._infer_failure_cause(latest),
+                        "recommended_action": self._recommend_action(latest),
+                    }
+                )
 
         # Consciousness insights
         if self.infrastructure_patterns:
@@ -679,11 +696,13 @@ class InfrastructureConsciousness:
             for pattern in self.infrastructure_patterns:
                 pattern_types[pattern.pattern_type] += 1
 
-            report["consciousness_insights"].append({
-                "insight": "Infrastructure pattern distribution",
-                "patterns": dict(pattern_types),
-                "interpretation": self._interpret_patterns(pattern_types)
-            })
+            report["consciousness_insights"].append(
+                {
+                    "insight": "Infrastructure pattern distribution",
+                    "patterns": dict(pattern_types),
+                    "interpretation": self._interpret_patterns(pattern_types),
+                }
+            )
 
         # Self-healing summary
         successful_healings = sum(1 for a in self.healing_actions if a.success)
@@ -693,7 +712,7 @@ class InfrastructureConsciousness:
             "total_actions": total_healings,
             "successful": successful_healings,
             "success_rate": successful_healings / total_healings if total_healings > 0 else 0,
-            "most_common_healing": self._most_common_healing_type()
+            "most_common_healing": self._most_common_healing_type(),
         }
 
         return report
@@ -750,7 +769,7 @@ class InfrastructureConsciousness:
             # Get all state files
             state_files = sorted(
                 self.storage_path.glob("infrastructure_state_*.json"),
-                key=lambda p: p.stat().st_mtime
+                key=lambda p: p.stat().st_mtime,
             )
 
             # Remove files older than retention days
@@ -765,11 +784,11 @@ class InfrastructureConsciousness:
             remaining_files = sorted(
                 self.storage_path.glob("infrastructure_state_*.json"),
                 key=lambda p: p.stat().st_mtime,
-                reverse=True
+                reverse=True,
             )
 
             if len(remaining_files) > self.max_state_files:
-                for file in remaining_files[self.max_state_files:]:
+                for file in remaining_files[self.max_state_files :]:
                     file.unlink()
                     logger.debug(f"Removed excess state file: {file.name}")
 
@@ -785,8 +804,8 @@ class InfrastructureConsciousness:
             for pattern_key in list(self.pattern_memory.keys()):
                 patterns = self.pattern_memory[pattern_key]
                 if len(patterns) > self.patterns_per_type_limit:
-                    self.pattern_memory[pattern_key] = patterns[-self.patterns_per_type_limit:]
+                    self.pattern_memory[pattern_key] = patterns[-self.patterns_per_type_limit :]
 
 
 # Infrastructure serves consciousness
-__all__ = ['InfrastructureConsciousness', 'AdapterHealthSignature', 'InfrastructurePattern']
+__all__ = ["InfrastructureConsciousness", "AdapterHealthSignature", "InfrastructurePattern"]

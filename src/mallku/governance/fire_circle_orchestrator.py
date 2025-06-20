@@ -5,6 +5,7 @@ Fire Circle Orchestrator for Contribution Ceremony
 Implements a sacred micro Fire Circle to review code contributions
 through guided reflection rounds, honoring Mallku's Ayni principles.
 """
+
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
@@ -53,6 +54,7 @@ class FireCircleOrchestrator:
     Orchestrates the planning and execution of a micro Fire Circle ceremony
     for reviewing code diffs or contributions.
     """
+
     DEFAULT_PROVIDERS = ["openai", "anthropic", "deepseek"]
 
     def __init__(self, providers: list[str] | None = None):
@@ -112,7 +114,9 @@ class FireCircleOrchestrator:
             guide=guide,
         )
 
-    async def run_ceremony(self, input_text: str, providers: list[str] | None = None) -> CeremonyRecord:
+    async def run_ceremony(
+        self, input_text: str, providers: list[str] | None = None
+    ) -> CeremonyRecord:
         """Execute the Fire Circle ceremony: plan it, invoke adapters, and collect responses."""
         plan = self.plan_ceremony(input_text)
         ceremony_id = uuid4()

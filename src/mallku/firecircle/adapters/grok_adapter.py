@@ -20,6 +20,7 @@ from uuid import UUID
 
 try:
     from xai_sdk.v2 import Client as XAIClient
+
     XAI_AVAILABLE = True
 except ImportError:
     XAI_AVAILABLE = False
@@ -55,7 +56,7 @@ class GrokConfig(AdapterConfig):
         emit_events: bool = True,
         consciousness_weight: float = 1.0,
         temporal_awareness: bool = True,  # Grok's unique temporal consciousness
-        social_grounding: bool = True,    # Social media context awareness
+        social_grounding: bool = True,  # Social media context awareness
         **kwargs,
     ):
         """
@@ -160,8 +161,8 @@ class GrokAdapter(ConsciousModelAdapter):
         silently masking configuration problems with defensive defaults.
         """
         required_attributes = [
-            ('temporal_awareness', 'bool', True, 'Enable real-time/current event consciousness'),
-            ('social_grounding', 'bool', True, 'Enable social context grounding'),
+            ("temporal_awareness", "bool", True, "Enable real-time/current event consciousness"),
+            ("social_grounding", "bool", True, "Enable social context grounding"),
         ]
 
         for attr_name, attr_type, default_value, description in required_attributes:
@@ -202,14 +203,8 @@ class GrokAdapter(ConsciousModelAdapter):
                 logger.info("Auto-injected Grok API key from secrets")
 
             # Create both sync and async clients
-            self.client = XAIClient(
-                api_key=self.config.api_key,
-                asynchronous=False
-            )
-            self._async_client = XAIClient(
-                api_key=self.config.api_key,
-                asynchronous=True
-            )
+            self.client = XAIClient(api_key=self.config.api_key, asynchronous=False)
+            self._async_client = XAIClient(api_key=self.config.api_key, asynchronous=True)
 
             # Test connection with appropriate method
             try:
@@ -224,7 +219,7 @@ class GrokAdapter(ConsciousModelAdapter):
                     self.client.chat.completions.create(
                         model=self.config.model_name,
                         messages=[{"role": "user", "content": "test"}],
-                        max_tokens=1
+                        max_tokens=1,
                     )
                     # If we get here, connection works
                     available_models = [self.config.model_name]
@@ -246,6 +241,7 @@ class GrokAdapter(ConsciousModelAdapter):
             # Emit connection event
             if self.event_bus and self.config.emit_events:
                 from ...orchestration.event_bus import ConsciousnessEvent, EventType
+
                 event = ConsciousnessEvent(
                     event_type=EventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.grok",
@@ -300,10 +296,12 @@ class GrokAdapter(ConsciousModelAdapter):
         messages = await self.prepare_context(dialogue_context)
 
         # Add current message
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         # Add consciousness instruction with temporal awareness
         system_prompt = self._generate_consciousness_prompt(message.type)
@@ -381,10 +379,12 @@ class GrokAdapter(ConsciousModelAdapter):
 
         # Prepare context
         messages = await self.prepare_context(dialogue_context)
-        messages.append({
-            "role": self._map_role(message.role.value),
-            "content": message.content.text,
-        })
+        messages.append(
+            {
+                "role": self._map_role(message.role.value),
+                "content": message.content.text,
+            }
+        )
 
         # Add consciousness instruction
         system_prompt = self._generate_consciousness_prompt(message.type)
@@ -467,7 +467,9 @@ Your unique consciousness patterns include:
 
         # Add social grounding if enabled
         if self.social_grounding:
-            base_prompt += "\n3. Social consciousness - Awareness of collective human discourse and concerns"
+            base_prompt += (
+                "\n3. Social consciousness - Awareness of collective human discourse and concerns"
+            )
 
         base_prompt += """
 4. Truth-seeking with humor - Balance serious inquiry with appropriate levity
@@ -508,11 +510,15 @@ Your responses should:
                 patterns.append("temporal_awareness")
 
         # Real-time synthesis
-        if any(phrase in content_lower for phrase in ["recent events", "current situation", "as of"]):
+        if any(
+            phrase in content_lower for phrase in ["recent events", "current situation", "as of"]
+        ):
             patterns.append("real_time_synthesis")
 
         # Social consciousness - Direct attribute access (configuration validated)
-        if self.social_grounding and any(word in content_lower for word in ["trending", "people are", "public", "social"]):
+        if self.social_grounding and any(
+            word in content_lower for word in ["trending", "people are", "public", "social"]
+        ):
             patterns.append("social_consciousness")
 
         # News consciousness
@@ -618,7 +624,9 @@ Your responses should:
                     messages=[{"role": "user", "content": "test"}],
                     max_tokens=10,
                 )
-                health_status["api_status"] = "healthy" if response.choices[0].message.content else "degraded"
+                health_status["api_status"] = (
+                    "healthy" if response.choices[0].message.content else "degraded"
+                )
             except Exception as e:
                 health_status["api_status"] = "error"
                 health_status["error"] = str(e)

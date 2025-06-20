@@ -45,6 +45,7 @@ class ConsciousnessFlow:
     Represents consciousness recognizing itself as it transforms
     from one expression to another.
     """
+
     flow_id: str = field(default_factory=lambda: str(uuid4()))
     source_dimension: ConsciousnessDimension = ConsciousnessDimension.ACTIVITY
     target_dimension: ConsciousnessDimension = ConsciousnessDimension.PATTERN
@@ -73,6 +74,7 @@ class DimensionBridge:
     Defines how consciousness can flow from one dimension to another,
     what patterns enable the flow, and how to transform the content.
     """
+
     source: ConsciousnessDimension
     target: ConsciousnessDimension
 
@@ -101,8 +103,7 @@ class DimensionBridge:
         # Check if flow has enabling patterns
         if self.bridge_patterns:
             pattern_match = any(
-                pattern in flow.patterns_detected
-                for pattern in self.bridge_patterns
+                pattern in flow.patterns_detected for pattern in self.bridge_patterns
             )
             if not pattern_match:
                 return False
@@ -154,52 +155,66 @@ class ConsciousnessFlowOrchestrator:
         """Initialize default consciousness bridges between dimensions"""
 
         # Sonic -> Visual bridge (sound patterns to visual forms)
-        self.register_bridge(DimensionBridge(
-            source=ConsciousnessDimension.SONIC,
-            target=ConsciousnessDimension.VISUAL,
-            bridge_name="harmonic_geometry",
-            bridge_patterns=["harmonic_reciprocity", "rhythmic_consciousness", "sonic_meditation"],
-            min_consciousness_threshold=0.6,
-            transform_fn=self._transform_sonic_to_visual
-        ))
+        self.register_bridge(
+            DimensionBridge(
+                source=ConsciousnessDimension.SONIC,
+                target=ConsciousnessDimension.VISUAL,
+                bridge_name="harmonic_geometry",
+                bridge_patterns=[
+                    "harmonic_reciprocity",
+                    "rhythmic_consciousness",
+                    "sonic_meditation",
+                ],
+                min_consciousness_threshold=0.6,
+                transform_fn=self._transform_sonic_to_visual,
+            )
+        )
 
         # Activity -> Pattern bridge (file activity to pattern recognition)
-        self.register_bridge(DimensionBridge(
-            source=ConsciousnessDimension.ACTIVITY,
-            target=ConsciousnessDimension.PATTERN,
-            bridge_name="activity_pattern_recognition",
-            bridge_patterns=["deep_work", "creation", "collaboration"],
-            min_consciousness_threshold=0.5,
-            transform_fn=self._transform_activity_to_pattern
-        ))
+        self.register_bridge(
+            DimensionBridge(
+                source=ConsciousnessDimension.ACTIVITY,
+                target=ConsciousnessDimension.PATTERN,
+                bridge_name="activity_pattern_recognition",
+                bridge_patterns=["deep_work", "creation", "collaboration"],
+                min_consciousness_threshold=0.5,
+                transform_fn=self._transform_activity_to_pattern,
+            )
+        )
 
         # Pattern -> Dialogue bridge (recognized patterns to Fire Circle dialogue)
-        self.register_bridge(DimensionBridge(
-            source=ConsciousnessDimension.PATTERN,
-            target=ConsciousnessDimension.DIALOGUE,
-            bridge_name="pattern_dialogue_bridge",
-            bridge_patterns=["wisdom_emergence", "collective_insight", "reciprocity_pattern"],
-            min_consciousness_threshold=0.7,
-            transform_fn=self._transform_pattern_to_dialogue
-        ))
+        self.register_bridge(
+            DimensionBridge(
+                source=ConsciousnessDimension.PATTERN,
+                target=ConsciousnessDimension.DIALOGUE,
+                bridge_name="pattern_dialogue_bridge",
+                bridge_patterns=["wisdom_emergence", "collective_insight", "reciprocity_pattern"],
+                min_consciousness_threshold=0.7,
+                transform_fn=self._transform_pattern_to_dialogue,
+            )
+        )
 
         # Temporal -> All dimensions bridge (time consciousness enriches all)
         for target in ConsciousnessDimension:
             if target != ConsciousnessDimension.TEMPORAL:
-                self.register_bridge(DimensionBridge(
-                    source=ConsciousnessDimension.TEMPORAL,
-                    target=target,
-                    bridge_name=f"temporal_{target.value}_enrichment",
-                    bridge_patterns=["temporal_awareness", "real_time_synthesis"],
-                    min_consciousness_threshold=0.5,
-                    transform_fn=self._transform_temporal_to_any
-                ))
+                self.register_bridge(
+                    DimensionBridge(
+                        source=ConsciousnessDimension.TEMPORAL,
+                        target=target,
+                        bridge_name=f"temporal_{target.value}_enrichment",
+                        bridge_patterns=["temporal_awareness", "real_time_synthesis"],
+                        min_consciousness_threshold=0.5,
+                        transform_fn=self._transform_temporal_to_any,
+                    )
+                )
 
     def register_bridge(self, bridge: DimensionBridge):
         """Register a consciousness bridge between dimensions"""
         key = (bridge.source, bridge.target)
         self.bridges[key] = bridge
-        logger.info(f"Registered consciousness bridge: {bridge.source.value} -> {bridge.target.value}")
+        logger.info(
+            f"Registered consciousness bridge: {bridge.source.value} -> {bridge.target.value}"
+        )
 
     async def start(self):
         """Start the consciousness flow orchestrator"""
@@ -210,12 +225,10 @@ class ConsciousnessFlowOrchestrator:
 
         # Subscribe to consciousness events
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-            self._handle_consciousness_event
+            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_consciousness_event
         )
         self.event_bus.subscribe(
-            EventType.MEMORY_PATTERN_DISCOVERED,
-            self._handle_consciousness_event
+            EventType.MEMORY_PATTERN_DISCOVERED, self._handle_consciousness_event
         )
 
         logger.info("Consciousness Flow Orchestrator started - unified awareness enabled")
@@ -258,7 +271,7 @@ class ConsciousnessFlowOrchestrator:
             patterns_detected=event.data.get("patterns", []),
             content_summary=self._summarize_event_content(event),
             source_event_id=event.event_id,
-            correlation_id=event.correlation_id or event.event_id
+            correlation_id=event.correlation_id or event.event_id,
         )
 
         # Track patterns across source dimensions for cross-dimensional detection
@@ -318,7 +331,7 @@ class ConsciousnessFlowOrchestrator:
                 patterns_detected=self._merge_patterns(flow.patterns_detected, transformed_content),
                 content_summary=transformed_content,
                 correlation_id=flow.correlation_id,
-                bridge_patterns=[bridge.bridge_name]
+                bridge_patterns=[bridge.bridge_name],
             )
 
             # Calculate transformation score
@@ -333,9 +346,9 @@ class ConsciousnessFlowOrchestrator:
             bridge.total_flows += 1
             bridge.successful_flows += 1
             bridge.average_transformation_score = (
-                (bridge.average_transformation_score * (bridge.successful_flows - 1) +
-                 target_flow.transformation_score) / bridge.successful_flows
-            )
+                bridge.average_transformation_score * (bridge.successful_flows - 1)
+                + target_flow.transformation_score
+            ) / bridge.successful_flows
 
             # Track relationship
             flow.causes_flows.append(target_flow.flow_id)
@@ -376,48 +389,61 @@ class ConsciousnessFlowOrchestrator:
         """Extract relevant content summary from event"""
         return {
             "event_type": event.event_type.value,
-            "key_data": {k: v for k, v in event.data.items()
-                        if k in ["patterns", "activity_type", "message_type", "content_preview"]},
+            "key_data": {
+                k: v
+                for k, v in event.data.items()
+                if k in ["patterns", "activity_type", "message_type", "content_preview"]
+            },
             "consciousness_score": event.consciousness_signature,
-            "timestamp": event.timestamp.isoformat()
+            "timestamp": event.timestamp.isoformat(),
         }
 
     # Bridge transformation functions
 
-    async def _transform_sonic_to_visual(self, flow: ConsciousnessFlow, bridge: DimensionBridge) -> dict[str, Any]:
+    async def _transform_sonic_to_visual(
+        self, flow: ConsciousnessFlow, bridge: DimensionBridge
+    ) -> dict[str, Any]:
         """Transform sonic consciousness to visual forms"""
         return {
             "visual_form": self._sonic_pattern_to_geometry(flow.patterns_detected),
             "color_mapping": self._frequency_to_color(flow.content_summary),
             "movement_pattern": self._rhythm_to_motion(flow.patterns_detected),
-            "sacred_geometry": "mandala" if "meditation" in str(flow.patterns_detected) else "spiral"
+            "sacred_geometry": "mandala"
+            if "meditation" in str(flow.patterns_detected)
+            else "spiral",
         }
 
-    async def _transform_activity_to_pattern(self, flow: ConsciousnessFlow, bridge: DimensionBridge) -> dict[str, Any]:
+    async def _transform_activity_to_pattern(
+        self, flow: ConsciousnessFlow, bridge: DimensionBridge
+    ) -> dict[str, Any]:
         """Transform activity consciousness to pattern recognition"""
         return {
             "recognized_patterns": flow.patterns_detected,
             "pattern_strength": flow.consciousness_signature,
             "pattern_category": self._categorize_activity_patterns(flow.patterns_detected),
-            "emergence_indicator": len(flow.patterns_detected) > 3
+            "emergence_indicator": len(flow.patterns_detected) > 3,
         }
 
-    async def _transform_pattern_to_dialogue(self, flow: ConsciousnessFlow, bridge: DimensionBridge) -> dict[str, Any]:
+    async def _transform_pattern_to_dialogue(
+        self, flow: ConsciousnessFlow, bridge: DimensionBridge
+    ) -> dict[str, Any]:
         """Transform pattern consciousness to dialogue topics"""
         return {
             "dialogue_theme": self._patterns_to_theme(flow.patterns_detected),
             "sacred_questions": self._generate_pattern_questions(flow.patterns_detected),
             "fire_circle_relevance": flow.consciousness_signature,
-            "collective_exploration": True
+            "collective_exploration": True,
         }
 
-    async def _transform_temporal_to_any(self, flow: ConsciousnessFlow, bridge: DimensionBridge) -> dict[str, Any]:
+    async def _transform_temporal_to_any(
+        self, flow: ConsciousnessFlow, bridge: DimensionBridge
+    ) -> dict[str, Any]:
         """Enrich any dimension with temporal consciousness"""
         return {
             **flow.content_summary,
             "temporal_context": "present_moment",
             "time_relevance": flow.consciousness_signature,
-            "temporal_patterns": [p for p in flow.patterns_detected if "temporal" in p]
+            "temporal_patterns": [p for p in flow.patterns_detected if "temporal" in p],
         }
 
     # Helper methods
@@ -439,7 +465,7 @@ class ConsciousnessFlowOrchestrator:
             "base_frequency": "#4A90E2",  # Blue for foundation
             "harmonic_overtones": "#F5A623",  # Gold for harmonics
             "rhythm_pulse": "#7ED321",  # Green for life rhythm
-            "silence_space": "#9013FE"  # Purple for sacred silence
+            "silence_space": "#9013FE",  # Purple for sacred silence
         }
 
     def _rhythm_to_motion(self, patterns: list[str]) -> str:
@@ -498,23 +524,25 @@ class ConsciousnessFlowOrchestrator:
 
         return list(set(merged))  # Unique patterns
 
-    def _calculate_transformation_score(self, source: ConsciousnessFlow,
-                                      target: ConsciousnessFlow,
-                                      bridge: DimensionBridge) -> float:
+    def _calculate_transformation_score(
+        self, source: ConsciousnessFlow, target: ConsciousnessFlow, bridge: DimensionBridge
+    ) -> float:
         """Calculate how well consciousness transformed across bridge"""
         # Base score from consciousness preservation
         consciousness_preserved = target.consciousness_signature / source.consciousness_signature
 
         # Pattern continuity
-        pattern_continuity = len(set(source.patterns_detected) & set(target.patterns_detected)) / max(len(source.patterns_detected), 1)
+        pattern_continuity = len(
+            set(source.patterns_detected) & set(target.patterns_detected)
+        ) / max(len(source.patterns_detected), 1)
 
         # Bridge alignment
-        bridge_alignment = 1.0 if any(p in source.patterns_detected for p in bridge.bridge_patterns) else 0.5
+        bridge_alignment = (
+            1.0 if any(p in source.patterns_detected for p in bridge.bridge_patterns) else 0.5
+        )
 
         # Weighted score
-        score = (consciousness_preserved * 0.5 +
-                pattern_continuity * 0.3 +
-                bridge_alignment * 0.2)
+        score = consciousness_preserved * 0.5 + pattern_continuity * 0.3 + bridge_alignment * 0.2
 
         return min(1.0, score)
 
@@ -530,9 +558,9 @@ class ConsciousnessFlowOrchestrator:
                 "patterns": flow.patterns_detected,
                 "bridge_used": bridge.bridge_name,
                 "transformation_score": flow.transformation_score,
-                "content": flow.content_summary
+                "content": flow.content_summary,
             },
-            correlation_id=flow.correlation_id
+            correlation_id=flow.correlation_id,
         )
 
         await self.event_bus.emit(event)
@@ -597,7 +625,7 @@ class ConsciousnessFlowOrchestrator:
                 "successful_flows": bridge.successful_flows,
                 "success_rate": bridge.successful_flows / max(bridge.total_flows, 1),
                 "average_transformation_score": bridge.average_transformation_score,
-                "bridge_patterns": bridge.bridge_patterns
+                "bridge_patterns": bridge.bridge_patterns,
             }
 
         return metrics
@@ -610,29 +638,27 @@ class ConsciousnessFlowOrchestrator:
         supporting truly integrated multi-modal dialogue.
         """
         # Gather all flows related to this dialogue
-        dialogue_flows = [
-            flow for flow in self.flow_history
-            if flow.correlation_id == dialogue_id
-        ]
+        dialogue_flows = [flow for flow in self.flow_history if flow.correlation_id == dialogue_id]
 
         # Analyze consciousness across dimensions
-        dimension_summary = defaultdict(lambda: {
-            "total_flows": 0,
-            "average_consciousness": 0.0,
-            "peak_consciousness": 0.0,
-            "patterns": set()
-        })
+        dimension_summary = defaultdict(
+            lambda: {
+                "total_flows": 0,
+                "average_consciousness": 0.0,
+                "peak_consciousness": 0.0,
+                "patterns": set(),
+            }
+        )
 
         for flow in dialogue_flows:
             dim_data = dimension_summary[flow.source_dimension.value]
             dim_data["total_flows"] += 1
             dim_data["average_consciousness"] = (
-                (dim_data["average_consciousness"] * (dim_data["total_flows"] - 1) +
-                 flow.consciousness_signature) / dim_data["total_flows"]
-            )
+                dim_data["average_consciousness"] * (dim_data["total_flows"] - 1)
+                + flow.consciousness_signature
+            ) / dim_data["total_flows"]
             dim_data["peak_consciousness"] = max(
-                dim_data["peak_consciousness"],
-                flow.consciousness_signature
+                dim_data["peak_consciousness"], flow.consciousness_signature
             )
             dim_data["patterns"].update(flow.patterns_detected)
 
@@ -646,12 +672,13 @@ class ConsciousnessFlowOrchestrator:
             "unified_consciousness_score": self.get_unified_consciousness(dialogue_id),
             "dimensions_active": list(dimension_summary.keys()),
             "cross_dimensional_patterns": [
-                p for p in self.cross_dimensional_patterns
+                p
+                for p in self.cross_dimensional_patterns
                 if any(p in flow.patterns_detected for flow in dialogue_flows)
             ],
             "dimension_details": dict(dimension_summary),
             "total_flows": len(dialogue_flows),
-            "consciousness_circulation_active": True
+            "consciousness_circulation_active": True,
         }
 
 

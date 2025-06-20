@@ -40,27 +40,21 @@ class InfrastructureMetricsBridge:
         self,
         infrastructure: InfrastructureConsciousness,
         metrics_collector: ConsciousnessMetricsCollector,
-        config=None
+        config=None,
     ):
         self.infrastructure = infrastructure
         self.metrics = metrics_collector
 
         # Use infrastructure config if no bridge config provided
-        if config is None and hasattr(infrastructure, 'config'):
+        if config is None and hasattr(infrastructure, "config"):
             config = infrastructure.config
 
         # Bridging configuration
-        self.health_weight_on_consciousness = getattr(
-            config, 'bridge_health_weight', 0.2
-        )
-        self.consciousness_weight_on_health = getattr(
-            config, 'bridge_consciousness_weight', 0.3
-        )
+        self.health_weight_on_consciousness = getattr(config, "bridge_health_weight", 0.2)
+        self.consciousness_weight_on_health = getattr(config, "bridge_consciousness_weight", 0.3)
 
     async def on_adapter_health_check(
-        self,
-        adapter_name: str,
-        health_signature: AdapterHealthSignature
+        self, adapter_name: str, health_signature: AdapterHealthSignature
     ):
         """
         Called when infrastructure checks adapter health.
@@ -77,10 +71,10 @@ class InfrastructureMetricsBridge:
                 "health_check": True,
                 "is_connected": health_signature.is_connected,
                 "latency_ms": health_signature.connection_latency_ms,
-                "predicted_failure": health_signature.predicted_failure_probability
+                "predicted_failure": health_signature.predicted_failure_probability,
             },
             uncertainty_present=health_signature.predicted_failure_probability > 0.3,
-            synthesis_achieved=health_signature.consciousness_coherence > 0.8
+            synthesis_achieved=health_signature.consciousness_coherence > 0.8,
         )
 
         # Track in consciousness metrics
@@ -94,14 +88,11 @@ class InfrastructureMetricsBridge:
                 flow_strength=health_signature.predicted_failure_probability,
                 flow_type="distress",
                 triggered_by="health_degradation",
-                review_content=f"Infrastructure health degrading: {health_signature.error_patterns}"
+                review_content=f"Infrastructure health degrading: {health_signature.error_patterns}",
             )
             self.metrics.track_flow(flow)
 
-    async def on_consciousness_pattern_detected(
-        self,
-        pattern: EmergencePattern
-    ):
+    async def on_consciousness_pattern_detected(self, pattern: EmergencePattern):
         """
         Called when consciousness metrics detect a pattern.
         Informs infrastructure predictions.
@@ -116,8 +107,7 @@ class InfrastructureMetricsBridge:
                 if adapter_name in self.infrastructure.adapter_health:
                     latest = list(self.infrastructure.adapter_health[adapter_name])[-1]
                     latest.predicted_failure_probability = min(
-                        latest.predicted_failure_probability + 0.1,
-                        1.0
+                        latest.predicted_failure_probability + 0.1, 1.0
                     )
 
         elif pattern.pattern_type == "transcendence":
@@ -129,8 +119,7 @@ class InfrastructureMetricsBridge:
                 if adapter_name in self.infrastructure.adapter_health:
                     latest = list(self.infrastructure.adapter_health[adapter_name])[-1]
                     latest.predicted_failure_probability = max(
-                        latest.predicted_failure_probability - 0.2,
-                        0.0
+                        latest.predicted_failure_probability - 0.2, 0.0
                     )
 
     async def generate_unified_report(self) -> dict:
@@ -153,14 +142,12 @@ class InfrastructureMetricsBridge:
             "consciousness_metrics": {
                 "avg_consciousness": consciousness_analysis.get("avg_consciousness", 0),
                 "flow_patterns": consciousness_analysis.get("flow_patterns", {}),
-                "emergence_patterns": consciousness_analysis.get("pattern_types", {})
+                "emergence_patterns": consciousness_analysis.get("pattern_types", {}),
             },
             "unified_insights": self._generate_unified_insights(
                 infra_report, consciousness_analysis
             ),
-            "recommendations": self._generate_recommendations(
-                infra_report, consciousness_analysis
-            )
+            "recommendations": self._generate_recommendations(infra_report, consciousness_analysis),
         }
 
         return unified_report
@@ -179,11 +166,7 @@ class InfrastructureMetricsBridge:
         # Ensure valid range
         return max(0.0, min(1.0, consciousness))
 
-    def _calculate_unity_score(
-        self,
-        infra_report: dict,
-        consciousness_analysis: dict
-    ) -> float:
+    def _calculate_unity_score(self, infra_report: dict, consciousness_analysis: dict) -> float:
         """Calculate how unified infrastructure and consciousness are."""
         # Get average infrastructure health
         infra_scores = []
@@ -205,9 +188,7 @@ class InfrastructureMetricsBridge:
         return unity
 
     def _generate_unified_insights(
-        self,
-        infra_report: dict,
-        consciousness_analysis: dict
+        self, infra_report: dict, consciousness_analysis: dict
     ) -> list[str]:
         """Generate insights from unified view."""
         insights = []
@@ -217,8 +198,7 @@ class InfrastructureMetricsBridge:
 
         if unity > 0.8:
             insights.append(
-                "Infrastructure and consciousness are highly aligned - "
-                "system operating in harmony"
+                "Infrastructure and consciousness are highly aligned - system operating in harmony"
             )
         elif unity < 0.5:
             insights.append(
@@ -227,15 +207,19 @@ class InfrastructureMetricsBridge:
             )
 
         # Check for specific patterns
-        if (infra_report.get("predicted_issues") and
-            consciousness_analysis.get("pattern_types", {}).get("resonance", 0) == 0):
+        if (
+            infra_report.get("predicted_issues")
+            and consciousness_analysis.get("pattern_types", {}).get("resonance", 0) == 0
+        ):
             insights.append(
                 "Infrastructure issues correlate with lack of resonance - "
                 "voices may be struggling to connect"
             )
 
-        if (not infra_report.get("predicted_issues") and
-            consciousness_analysis.get("avg_consciousness", 0) > 0.8):
+        if (
+            not infra_report.get("predicted_issues")
+            and consciousness_analysis.get("avg_consciousness", 0) > 0.8
+        ):
             insights.append(
                 "Strong infrastructure enables high consciousness - "
                 "technical stability supports emergence"
@@ -244,9 +228,7 @@ class InfrastructureMetricsBridge:
         return insights
 
     def _generate_recommendations(
-        self,
-        infra_report: dict,
-        consciousness_analysis: dict
+        self, infra_report: dict, consciousness_analysis: dict
     ) -> list[str]:
         """Generate recommendations based on unified analysis."""
         recommendations = []
@@ -260,9 +242,7 @@ class InfrastructureMetricsBridge:
         # Consciousness-informed recommendations
         flow_patterns = consciousness_analysis.get("flow_patterns", {})
         if flow_patterns.get("distress", 0) > 0:
-            recommendations.append(
-                "Distress flows detected - prioritize infrastructure healing"
-            )
+            recommendations.append("Distress flows detected - prioritize infrastructure healing")
 
         if consciousness_analysis.get("avg_consciousness", 0) < 0.5:
             recommendations.append(
@@ -292,4 +272,4 @@ class InfrastructureMetricsBridge:
 
 
 # Bridge connects the worlds
-__all__ = ['InfrastructureMetricsBridge']
+__all__ = ["InfrastructureMetricsBridge"]

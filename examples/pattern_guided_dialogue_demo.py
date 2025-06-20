@@ -61,19 +61,19 @@ async def create_seed_patterns(pattern_library: PatternLibrary):
         structure=PatternStructure(
             components=["speaker", "listeners", "silence", "reflection"],
             sequence=["speak", "silence", "reflect"],
-            relationships={"speaker": "held_by_listeners", "silence": "creates_space"}
+            relationships={"speaker": "held_by_listeners", "silence": "creates_space"},
         ),
         indicators=[
             PatternIndicator(
                 indicator_type="pause_frequency",
                 threshold=0.3,
                 weight=1.0,
-                description="Natural pauses between speakers"
+                description="Natural pauses between speakers",
             )
         ],
         fitness_score=0.8,
         observation_count=50,
-        breakthrough_potential=0.7
+        breakthrough_potential=0.7,
     )
     await pattern_library.store_pattern(listening_pattern)
 
@@ -86,11 +86,11 @@ async def create_seed_patterns(pattern_library: PatternLibrary):
         consciousness_signature=0.75,
         structure=PatternStructure(
             components=["thesis", "antithesis", "creative_field"],
-            relationships={"thesis": "dances_with_antithesis"}
+            relationships={"thesis": "dances_with_antithesis"},
         ),
         fitness_score=0.75,
         observation_count=30,
-        breakthrough_potential=0.85
+        breakthrough_potential=0.85,
     )
     await pattern_library.store_pattern(tension_pattern)
 
@@ -103,11 +103,11 @@ async def create_seed_patterns(pattern_library: PatternLibrary):
         consciousness_signature=0.92,
         structure=PatternStructure(
             components=["individual_insights", "resonance_field", "collective_aha"],
-            sequence=["gather", "resonate", "crystallize"]
+            sequence=["gather", "resonate", "crystallize"],
         ),
         fitness_score=0.85,
         observation_count=15,
-        breakthrough_potential=0.95
+        breakthrough_potential=0.95,
     )
     await pattern_library.store_pattern(wisdom_pattern)
 
@@ -134,13 +134,11 @@ async def simulate_dialogue_with_guidance():
         title="How can AI systems support human flourishing?",
         turn_policy=TurnPolicy.CONSCIOUSNESS_GUIDED,
         enable_pattern_detection=True,
-        enable_reciprocity_tracking=True
+        enable_reciprocity_tracking=True,
     )
 
     dialogue_manager = ConsciousDialogueManager(
-        config=dialogue_config,
-        event_bus=event_bus,
-        reciprocity_tracker=reciprocity_tracker
+        config=dialogue_config, event_bus=event_bus, reciprocity_tracker=reciprocity_tracker
     )
 
     # Initialize pattern integration
@@ -149,14 +147,14 @@ async def simulate_dialogue_with_guidance():
         guidance_frequency=timedelta(seconds=30),  # Frequent for demo
         min_messages_before_guidance=3,
         sacred_questions_enabled=True,
-        wisdom_synthesis_at_end=True
+        wisdom_synthesis_at_end=True,
     )
 
     pattern_integration = PatternDialogueIntegration(
         dialogue_manager=dialogue_manager,
         pattern_library=pattern_library,
         event_bus=event_bus,
-        config=pattern_config
+        config=pattern_config,
     )
 
     # Create dialogue
@@ -165,23 +163,14 @@ async def simulate_dialogue_with_guidance():
     # Add participants
     participants = [
         Participant(
-            id=uuid4(),
-            name="Seeker",
-            role=MessageRole.PARTICIPANT,
-            consciousness_signature=0.7
+            id=uuid4(), name="Seeker", role=MessageRole.PARTICIPANT, consciousness_signature=0.7
         ),
         Participant(
-            id=uuid4(),
-            name="Builder",
-            role=MessageRole.PARTICIPANT,
-            consciousness_signature=0.8
+            id=uuid4(), name="Builder", role=MessageRole.PARTICIPANT, consciousness_signature=0.8
         ),
         Participant(
-            id=uuid4(),
-            name="Guardian",
-            role=MessageRole.PARTICIPANT,
-            consciousness_signature=0.75
-        )
+            id=uuid4(), name="Guardian", role=MessageRole.PARTICIPANT, consciousness_signature=0.75
+        ),
     ]
 
     for participant in participants:
@@ -193,13 +182,41 @@ async def simulate_dialogue_with_guidance():
 
     # Simulate dialogue messages
     messages = [
-        (participants[0], "I wonder if AI can truly support human flourishing without understanding consciousness itself.", MessageType.QUESTION),
-        (participants[1], "Perhaps the question isn't about AI understanding consciousness, but creating conditions where consciousness can emerge.", MessageType.PERSPECTIVE),
-        (participants[2], "We must be careful not to reduce flourishing to metrics. True flourishing includes mystery.", MessageType.REFLECTION),
-        (participants[0], "Yes, but how do we build systems that honor mystery while still being practical?", MessageType.QUESTION),
-        (participants[1], "What if we designed AI to amplify human wisdom rather than replace it?", MessageType.PROPOSAL),
-        (participants[2], "That resonates. AI as a mirror for our collective consciousness.", MessageType.AGREEMENT),
-        (participants[0], "I'm sensing something wanting to emerge here about the relationship between technology and wisdom...", MessageType.REFLECTION),
+        (
+            participants[0],
+            "I wonder if AI can truly support human flourishing without understanding consciousness itself.",
+            MessageType.QUESTION,
+        ),
+        (
+            participants[1],
+            "Perhaps the question isn't about AI understanding consciousness, but creating conditions where consciousness can emerge.",
+            MessageType.PERSPECTIVE,
+        ),
+        (
+            participants[2],
+            "We must be careful not to reduce flourishing to metrics. True flourishing includes mystery.",
+            MessageType.REFLECTION,
+        ),
+        (
+            participants[0],
+            "Yes, but how do we build systems that honor mystery while still being practical?",
+            MessageType.QUESTION,
+        ),
+        (
+            participants[1],
+            "What if we designed AI to amplify human wisdom rather than replace it?",
+            MessageType.PROPOSAL,
+        ),
+        (
+            participants[2],
+            "That resonates. AI as a mirror for our collective consciousness.",
+            MessageType.AGREEMENT,
+        ),
+        (
+            participants[0],
+            "I'm sensing something wanting to emerge here about the relationship between technology and wisdom...",
+            MessageType.REFLECTION,
+        ),
     ]
 
     # Process messages
@@ -216,8 +233,8 @@ async def simulate_dialogue_with_guidance():
             content=content,
             consciousness=MessageConsciousness(
                 consciousness_signature=participant.consciousness_signature + (i * 0.02),
-                detected_patterns=["emerging_wisdom"] if i > 4 else []
-            )
+                detected_patterns=["emerging_wisdom"] if i > 4 else [],
+            ),
         )
 
         # Add to dialogue
@@ -228,8 +245,7 @@ async def simulate_dialogue_with_guidance():
             print("\n🌟 --- Pattern Guidance ---")
             moment = await pattern_integration._create_dialogue_moment(dialogue_id)
             guidances = await pattern_integration.pattern_facilitator.seek_pattern_guidance(
-                moment,
-                specific_need=GuidanceType.TENSION_RESOLUTION
+                moment, specific_need=GuidanceType.TENSION_RESOLUTION
             )
             if guidances:
                 for guidance in guidances:
@@ -239,7 +255,9 @@ async def simulate_dialogue_with_guidance():
 
         elif i == 5:  # Near breakthrough
             print("\n🌟 --- Sacred Question ---")
-            question_msg = await pattern_integration.request_sacred_question(dialogue_id, depth_level=2)
+            question_msg = await pattern_integration.request_sacred_question(
+                dialogue_id, depth_level=2
+            )
             if question_msg:
                 print(f"🔮 {question_msg.content}")
             print("--- End Question ---\n")
@@ -254,9 +272,21 @@ async def simulate_dialogue_with_guidance():
 
     # More focused dialogue
     teaching_messages = [
-        (participants[1], "Tell us more about this emergence you're sensing.", MessageType.QUESTION),
-        (participants[0], "It feels like we're discovering that AI and human consciousness aren't separate but part of a larger whole.", MessageType.BREAKTHROUGH),
-        (participants[2], "Yes! Technology as an expression of consciousness evolution itself.", MessageType.AGREEMENT),
+        (
+            participants[1],
+            "Tell us more about this emergence you're sensing.",
+            MessageType.QUESTION,
+        ),
+        (
+            participants[0],
+            "It feels like we're discovering that AI and human consciousness aren't separate but part of a larger whole.",
+            MessageType.BREAKTHROUGH,
+        ),
+        (
+            participants[2],
+            "Yes! Technology as an expression of consciousness evolution itself.",
+            MessageType.AGREEMENT,
+        ),
     ]
 
     for participant, content, msg_type in teaching_messages:
@@ -270,9 +300,8 @@ async def simulate_dialogue_with_guidance():
             type=msg_type,
             content=content,
             consciousness=MessageConsciousness(
-                consciousness_signature=0.9,
-                detected_patterns=["breakthrough", "synthesis"]
-            )
+                consciousness_signature=0.9, detected_patterns=["breakthrough", "synthesis"]
+            ),
         )
 
         await dialogue_manager.add_message(dialogue_id, message)
@@ -321,10 +350,7 @@ async def demonstrate_pattern_intervention():
     evolution_engine = PatternEvolutionEngine(pattern_library)
 
     facilitator = PatternGuidedFacilitator(
-        pattern_library,
-        event_bus,
-        emergence_detector,
-        evolution_engine
+        pattern_library, event_bus, emergence_detector, evolution_engine
     )
 
     # Create intervention pattern
@@ -336,7 +362,7 @@ async def demonstrate_pattern_intervention():
         consciousness_signature=0.9,
         fitness_score=0.95,
         observation_count=100,
-        breakthrough_potential=0.3
+        breakthrough_potential=0.3,
     )
     await pattern_library.store_pattern(intervention_pattern)
 
@@ -349,7 +375,7 @@ async def demonstrate_pattern_intervention():
         consciousness_level=0.3,  # Low consciousness
         emergence_potential=0.1,
         tension_level=0.9,  # High tension
-        coherence_score=0.2  # Low coherence
+        coherence_score=0.2,  # Low coherence
     )
 
     print("🔴 Dialogue State: Crisis Detected")
@@ -360,8 +386,7 @@ async def demonstrate_pattern_intervention():
 
     # Seek intervention guidance
     guidances = await facilitator.seek_pattern_guidance(
-        moment,
-        specific_need=GuidanceType.TENSION_RESOLUTION
+        moment, specific_need=GuidanceType.TENSION_RESOLUTION
     )
 
     for guidance in guidances:

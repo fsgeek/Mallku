@@ -34,5 +34,5 @@ __all__ = [
     "TemporalQuery",
     "PatternQuery",
     "ContextualQuery",
-    "QueryParser"
+    "QueryParser",
 ]

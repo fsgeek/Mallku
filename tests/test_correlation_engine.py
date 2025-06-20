@@ -32,6 +32,7 @@ try:
     )
     from mallku.correlation.models import Event, EventType, TemporalPrecision
     from mallku.services.memory_anchor_service import MemoryAnchorService
+
     print("✓ Successfully imported Correlation Engine components")
 except ImportError as e:
     print(f"✗ Failed to import components: {e}")
@@ -67,7 +68,7 @@ class CorrelationEngineTests:
             self.test_feedback_learning,
             self.test_memory_anchor_integration,
             self.test_performance_monitoring,
-            self.cleanup_test_environment
+            self.cleanup_test_environment,
         ]
 
         passed = 0
@@ -106,7 +107,7 @@ class CorrelationEngineTests:
             self.correlation_engine = CorrelationEngine(
                 memory_anchor_service=memory_service,
                 window_size=timedelta(hours=12),  # Large enough to capture full test patterns
-                window_overlap=0.3
+                window_overlap=0.3,
             )
 
             await self.correlation_engine.initialize()
@@ -115,15 +116,17 @@ class CorrelationEngineTests:
             assert self.correlation_engine.confidence_scorer is not None
             assert self.correlation_engine.adaptive_thresholds is not None
             assert len(self.correlation_engine.pattern_detectors) == 4
-            assert 'sequential' in self.correlation_engine.pattern_detectors
-            assert 'concurrent' in self.correlation_engine.pattern_detectors
-            assert 'cyclical' in self.correlation_engine.pattern_detectors
-            assert 'contextual' in self.correlation_engine.pattern_detectors
+            assert "sequential" in self.correlation_engine.pattern_detectors
+            assert "concurrent" in self.correlation_engine.pattern_detectors
+            assert "cyclical" in self.correlation_engine.pattern_detectors
+            assert "contextual" in self.correlation_engine.pattern_detectors
 
             status = self.correlation_engine.get_engine_status()
-            assert status['engine_info']['status'] == 'active'
+            assert status["engine_info"]["status"] == "active"
 
-            print(f"   Engine initialized with {len(self.correlation_engine.pattern_detectors)} pattern detectors")
+            print(
+                f"   Engine initialized with {len(self.correlation_engine.pattern_detectors)} pattern detectors"
+            )
             return True
 
         except Exception as e:
@@ -136,97 +139,115 @@ class CorrelationEngineTests:
             base_time = datetime.now(UTC)
 
             # Generate sequential pattern: email -> document creation
-            self.test_events.extend([
-                Event(
-                    timestamp=base_time + timedelta(minutes=i*60),
-                    event_type=EventType.COMMUNICATION,
-                    stream_id="email_inbox",
-                    content={"subject": f"Project Update {i}", "sender": "boss@company.com"},
-                    context={"location": "office", "device": "laptop"},
-                    correlation_tags=["work", "communication"]
-                ) for i in range(5)
-            ])
+            self.test_events.extend(
+                [
+                    Event(
+                        timestamp=base_time + timedelta(minutes=i * 60),
+                        event_type=EventType.COMMUNICATION,
+                        stream_id="email_inbox",
+                        content={"subject": f"Project Update {i}", "sender": "boss@company.com"},
+                        context={"location": "office", "device": "laptop"},
+                        correlation_tags=["work", "communication"],
+                    )
+                    for i in range(5)
+                ]
+            )
 
             # Followed by document creation (sequential pattern)
-            self.test_events.extend([
-                Event(
-                    timestamp=base_time + timedelta(minutes=i*60 + 5),
-                    event_type=EventType.STORAGE,
-                    stream_id="document_creation",
-                    content={"filename": f"response_{i}.docx", "type": "document"},
-                    context={"location": "office", "device": "laptop"},
-                    correlation_tags=["work", "document"]
-                ) for i in range(5)
-            ])
+            self.test_events.extend(
+                [
+                    Event(
+                        timestamp=base_time + timedelta(minutes=i * 60 + 5),
+                        event_type=EventType.STORAGE,
+                        stream_id="document_creation",
+                        content={"filename": f"response_{i}.docx", "type": "document"},
+                        context={"location": "office", "device": "laptop"},
+                        correlation_tags=["work", "document"],
+                    )
+                    for i in range(5)
+                ]
+            )
 
             # Generate concurrent pattern: music + coding
             music_start = base_time + timedelta(hours=2)
             for i in range(3):
                 # Music starts
-                self.test_events.append(Event(
-                    timestamp=music_start + timedelta(hours=i*2),
-                    event_type=EventType.ACTIVITY,
-                    stream_id="spotify",
-                    content={"track": "Focus Music", "artist": "Ambient Collective"},
-                    context={"location": "home", "device": "desktop"},
-                    correlation_tags=["music", "focus"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=music_start + timedelta(hours=i * 2),
+                        event_type=EventType.ACTIVITY,
+                        stream_id="spotify",
+                        content={"track": "Focus Music", "artist": "Ambient Collective"},
+                        context={"location": "home", "device": "desktop"},
+                        correlation_tags=["music", "focus"],
+                    )
+                )
 
                 # Coding activity starts shortly after (concurrent)
-                self.test_events.append(Event(
-                    timestamp=music_start + timedelta(hours=i*2, minutes=2),
-                    event_type=EventType.ACTIVITY,
-                    stream_id="code_editor",
-                    content={"file": "correlation_engine.py", "action": "edit"},
-                    context={"location": "home", "device": "desktop"},
-                    correlation_tags=["coding", "focus"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=music_start + timedelta(hours=i * 2, minutes=2),
+                        event_type=EventType.ACTIVITY,
+                        stream_id="code_editor",
+                        content={"file": "correlation_engine.py", "action": "edit"},
+                        context={"location": "home", "device": "desktop"},
+                        correlation_tags=["coding", "focus"],
+                    )
+                )
 
             # Generate cyclical pattern: daily standup -> task updates
             standup_base = base_time + timedelta(days=1, hours=9)  # 9 AM daily
             for day in range(7):  # Week of standups
-                self.test_events.append(Event(
-                    timestamp=standup_base + timedelta(days=day),
-                    event_type=EventType.COMMUNICATION,
-                    stream_id="teams_meetings",
-                    content={"meeting": "Daily Standup", "duration": 15},
-                    context={"location": "office", "device": "laptop"},
-                    correlation_tags=["meeting", "standup"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=standup_base + timedelta(days=day),
+                        event_type=EventType.COMMUNICATION,
+                        stream_id="teams_meetings",
+                        content={"meeting": "Daily Standup", "duration": 15},
+                        context={"location": "office", "device": "laptop"},
+                        correlation_tags=["meeting", "standup"],
+                    )
+                )
 
                 # Task updates follow (cyclical pattern)
-                self.test_events.append(Event(
-                    timestamp=standup_base + timedelta(days=day, minutes=30),
-                    event_type=EventType.ACTIVITY,
-                    stream_id="task_tracker",
-                    content={"action": "update_tasks", "count": 3},
-                    context={"location": "office", "device": "laptop"},
-                    correlation_tags=["tasks", "planning"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=standup_base + timedelta(days=day, minutes=30),
+                        event_type=EventType.ACTIVITY,
+                        stream_id="task_tracker",
+                        content={"action": "update_tasks", "count": 3},
+                        context={"location": "office", "device": "laptop"},
+                        correlation_tags=["tasks", "planning"],
+                    )
+                )
 
             # Generate contextual pattern: travel context + expense reports
             travel_base = base_time + timedelta(days=10)
             travel_locations = ["airport", "hotel", "conference_center"]
 
             for i, location in enumerate(travel_locations):
-                self.test_events.append(Event(
-                    timestamp=travel_base + timedelta(hours=i*4),
-                    event_type=EventType.ENVIRONMENTAL,
-                    stream_id="location_service",
-                    content={"location": location, "activity": "business_travel"},
-                    context={"travel_mode": "business", "trip_id": "conf_2024"},
-                    correlation_tags=["travel", "business"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=travel_base + timedelta(hours=i * 4),
+                        event_type=EventType.ENVIRONMENTAL,
+                        stream_id="location_service",
+                        content={"location": location, "activity": "business_travel"},
+                        context={"travel_mode": "business", "trip_id": "conf_2024"},
+                        correlation_tags=["travel", "business"],
+                    )
+                )
 
                 # Expense reports created in travel context
-                self.test_events.append(Event(
-                    timestamp=travel_base + timedelta(hours=i*4 + 1),
-                    event_type=EventType.STORAGE,
-                    stream_id="expense_tracker",
-                    content={"expense_type": "business", "amount": 50.0 + i*25},
-                    context={"travel_mode": "business", "trip_id": "conf_2024"},
-                    correlation_tags=["expense", "business"]
-                ))
+                self.test_events.append(
+                    Event(
+                        timestamp=travel_base + timedelta(hours=i * 4 + 1),
+                        event_type=EventType.STORAGE,
+                        stream_id="expense_tracker",
+                        content={"expense_type": "business", "amount": 50.0 + i * 25},
+                        context={"travel_mode": "business", "trip_id": "conf_2024"},
+                        correlation_tags=["expense", "business"],
+                    )
+                )
 
             # Sort all events by timestamp
             self.test_events.sort(key=lambda e: e.timestamp)
@@ -261,9 +282,11 @@ class CorrelationEngineTests:
                 assert pattern.confidence_score >= 0.5
                 assert pattern.temporal_gap.total_seconds() > 0
 
-                print(f"   Found sequential pattern: {pattern.occurrence_frequency} occurrences, "
-                      f"confidence: {pattern.confidence_score:.2f}, "
-                      f"avg gap: {pattern.temporal_gap}")
+                print(
+                    f"   Found sequential pattern: {pattern.occurrence_frequency} occurrences, "
+                    f"confidence: {pattern.confidence_score:.2f}, "
+                    f"avg gap: {pattern.temporal_gap}"
+                )
 
             return True
 
@@ -292,9 +315,11 @@ class CorrelationEngineTests:
                 assert pattern.occurrence_frequency >= 2
                 assert pattern.temporal_gap.total_seconds() < 300  # Should be close in time
 
-                print(f"   Found concurrent pattern: {pattern.occurrence_frequency} occurrences, "
-                      f"confidence: {pattern.confidence_score:.2f}, "
-                      f"avg gap: {pattern.temporal_gap}")
+                print(
+                    f"   Found concurrent pattern: {pattern.occurrence_frequency} occurrences, "
+                    f"confidence: {pattern.confidence_score:.2f}, "
+                    f"avg gap: {pattern.temporal_gap}"
+                )
 
             return True
 
@@ -323,9 +348,11 @@ class CorrelationEngineTests:
 
             for pattern in all_patterns:
                 if pattern.pattern_type == "cyclical":
-                    print(f"   Found cyclical pattern: {pattern.occurrence_frequency} occurrences, "
-                          f"confidence: {pattern.confidence_score:.2f}, "
-                          f"period: {pattern.temporal_gap}")
+                    print(
+                        f"   Found cyclical pattern: {pattern.occurrence_frequency} occurrences, "
+                        f"confidence: {pattern.confidence_score:.2f}, "
+                        f"period: {pattern.temporal_gap}"
+                    )
 
             return True
 
@@ -353,8 +380,10 @@ class CorrelationEngineTests:
                 assert pattern.pattern_type == "contextual"
                 assert pattern.occurrence_frequency >= 2
 
-                print(f"   Found contextual pattern: {pattern.occurrence_frequency} occurrences, "
-                      f"confidence: {pattern.confidence_score:.2f}")
+                print(
+                    f"   Found contextual pattern: {pattern.occurrence_frequency} occurrences, "
+                    f"confidence: {pattern.confidence_score:.2f}"
+                )
 
             return True
 
@@ -378,7 +407,7 @@ class CorrelationEngineTests:
                 pattern_stability=0.8,
                 pattern_type="sequential",
                 confidence_score=0.0,  # Will be calculated
-                last_occurrence=datetime.now(UTC)
+                last_occurrence=datetime.now(UTC),
             )
 
             # Calculate confidence
@@ -390,8 +419,11 @@ class CorrelationEngineTests:
             # Verify factor breakdown
             factors = test_correlation.confidence_factors
             expected_factors = [
-                'temporal_consistency', 'frequency_strength',
-                'context_coherence', 'causal_plausibility', 'user_validation'
+                "temporal_consistency",
+                "frequency_strength",
+                "context_coherence",
+                "causal_plausibility",
+                "user_validation",
             ]
 
             for factor in expected_factors:
@@ -400,9 +432,9 @@ class CorrelationEngineTests:
 
             # Test explanation generation
             explanation = scorer.get_confidence_explanation(test_correlation)
-            assert 'overall_confidence' in explanation
-            assert 'factor_breakdown' in explanation
-            assert 'pattern_details' in explanation
+            assert "overall_confidence" in explanation
+            assert "factor_breakdown" in explanation
+            assert "pattern_details" in explanation
 
             print(f"   Confidence score: {confidence:.3f}")
             print(f"   Factor breakdown: {factors}")
@@ -435,7 +467,7 @@ class CorrelationEngineTests:
                     is_meaningful=True,
                     confidence_rating=0.8 + (i * 0.01),  # 0.8 to 0.89
                     feedback_source="test_suite",
-                    explanation="High quality correlation"
+                    explanation="High quality correlation",
                 )
                 feedback_batch.append(feedback)
 
@@ -446,20 +478,20 @@ class CorrelationEngineTests:
                     is_meaningful=False,
                     confidence_rating=0.3 + (i * 0.02),  # 0.3 to 0.38
                     feedback_source="test_suite",
-                    explanation="Spurious correlation"
+                    explanation="Spurious correlation",
                 )
                 feedback_batch.append(feedback)
 
             # Process feedback
             results = thresholds.update_from_feedback(feedback_batch)
 
-            assert 'metrics' in results
-            metrics = results['metrics']
+            assert "metrics" in results
+            metrics = results["metrics"]
 
             # Verify metrics calculation
-            assert 'precision' in metrics
-            assert 'recall' in metrics
-            assert 'f1_score' in metrics
+            assert "precision" in metrics
+            assert "recall" in metrics
+            assert "f1_score" in metrics
 
             # Test threshold acceptance
             high_conf_accepted = thresholds.should_accept_correlation(0.9, 5, "sequential")
@@ -470,9 +502,9 @@ class CorrelationEngineTests:
 
             # Test performance summary
             summary = thresholds.get_performance_summary()
-            assert 'performance_trends' in summary
-            assert 'current_thresholds' in summary
-            assert 'learning_stats' in summary
+            assert "performance_trends" in summary
+            assert "current_thresholds" in summary
+            assert "learning_stats" in summary
 
             print(f"   Initial confidence threshold: {initial_confidence}")
             print(f"   Updated confidence threshold: {thresholds.confidence_threshold}")
@@ -538,11 +570,11 @@ class CorrelationEngineTests:
 
             # Reset statistics and thresholds to ensure clean test
             self.correlation_engine.correlation_stats = {
-                'total_correlations_detected': 0,
-                'correlations_accepted': 0,
-                'correlations_rejected': 0,
-                'memory_anchors_created': 0,
-                'last_processing_time': None
+                "total_correlations_detected": 0,
+                "correlations_accepted": 0,
+                "correlations_rejected": 0,
+                "memory_anchors_created": 0,
+                "last_processing_time": None,
             }
 
             # Reset adaptive thresholds to defaults for consistent testing
@@ -553,24 +585,31 @@ class CorrelationEngineTests:
 
             # Verify processing occurred
             stats = self.correlation_engine.correlation_stats
-            assert stats['total_correlations_detected'] > 0, "Should detect correlations"
-            assert stats['last_processing_time'] is not None, "Should record processing time"
+            assert stats["total_correlations_detected"] > 0, "Should detect correlations"
+            assert stats["last_processing_time"] is not None, "Should record processing time"
 
             # The key test: the system should detect patterns and make threshold decisions
             # Some correlations may be rejected due to threshold filtering, which is correct behavior
-            total_processed = stats['correlations_accepted'] + stats['correlations_rejected']
+            total_processed = stats["correlations_accepted"] + stats["correlations_rejected"]
             assert total_processed > 0, "Should process some correlations (accepted or rejected)"
 
             # Verify quality of accepted correlations (if any)
             for correlation in correlations:
-                assert correlation.confidence_score > 0.0, "Correlations should have confidence scores"
-                assert correlation.pattern_type in ['sequential', 'concurrent', 'cyclical', 'contextual']
+                assert correlation.confidence_score > 0.0, (
+                    "Correlations should have confidence scores"
+                )
+                assert correlation.pattern_type in [
+                    "sequential",
+                    "concurrent",
+                    "cyclical",
+                    "contextual",
+                ]
                 assert correlation.occurrence_frequency > 0
 
             # Test status reporting
             status = self.correlation_engine.get_engine_status()
-            assert status['engine_info']['status'] == 'active'
-            assert status['statistics']['total_correlations_detected'] > 0
+            assert status["engine_info"]["status"] == "active"
+            assert status["statistics"]["total_correlations_detected"] > 0
 
             print(f"   Processed {len(self.test_events)} events")
             print(f"   Detected {stats['total_correlations_detected']} total correlations")
@@ -600,7 +639,7 @@ class CorrelationEngineTests:
                     is_meaningful=True,
                     confidence_rating=0.8 + (i * 0.02),
                     feedback_source="test_user",
-                    explanation="This correlation is very helpful"
+                    explanation="This correlation is very helpful",
                 )
                 feedback_batch.append(feedback)
 
@@ -611,7 +650,7 @@ class CorrelationEngineTests:
                     is_meaningful=False,
                     confidence_rating=0.2 + (i * 0.05),
                     feedback_source="test_user",
-                    explanation="This seems like noise"
+                    explanation="This seems like noise",
                 )
                 feedback_batch.append(feedback)
 
@@ -623,14 +662,20 @@ class CorrelationEngineTests:
             await self.correlation_engine.force_learning_update()
 
             # Verify feedback was processed
-            assert len(self.correlation_engine.feedback_queue) == 0, "Feedback queue should be empty after processing"
+            assert len(self.correlation_engine.feedback_queue) == 0, (
+                "Feedback queue should be empty after processing"
+            )
 
             # Check that thresholds may have been updated
-            thresholds_summary = self.correlation_engine.adaptive_thresholds.get_performance_summary()
-            assert 'performance_trends' in thresholds_summary
+            thresholds_summary = (
+                self.correlation_engine.adaptive_thresholds.get_performance_summary()
+            )
+            assert "performance_trends" in thresholds_summary
 
             print(f"   Processed {len(feedback_batch)} feedback items")
-            print(f"   Current confidence threshold: {self.correlation_engine.adaptive_thresholds.confidence_threshold:.3f}")
+            print(
+                f"   Current confidence threshold: {self.correlation_engine.adaptive_thresholds.confidence_threshold:.3f}"
+            )
 
             return True
 
@@ -645,11 +690,13 @@ class CorrelationEngineTests:
                 return False
 
             # Check that memory anchor service is connected
-            assert self.correlation_engine.memory_service is not None, "Memory service should be connected"
+            assert self.correlation_engine.memory_service is not None, (
+                "Memory service should be connected"
+            )
 
             # Verify anchor creation statistics
             stats = self.correlation_engine.correlation_stats
-            anchors_created = stats.get('memory_anchors_created', 0)
+            anchors_created = stats.get("memory_anchors_created", 0)
 
             # Should have created some anchors from high-confidence correlations
             print(f"   Memory anchors created: {anchors_created}")
@@ -670,7 +717,7 @@ class CorrelationEngineTests:
                 pattern_stability=0.9,
                 pattern_type="sequential",
                 confidence_score=0.85,  # High confidence
-                last_occurrence=datetime.now(UTC)
+                last_occurrence=datetime.now(UTC),
             )
 
             # Test anchor creation
@@ -700,27 +747,36 @@ class CorrelationEngineTests:
             status = self.correlation_engine.get_engine_status()
 
             # Verify status structure
-            required_sections = ['engine_info', 'statistics', 'pattern_detectors', 'adaptive_thresholds']
+            required_sections = [
+                "engine_info",
+                "statistics",
+                "pattern_detectors",
+                "adaptive_thresholds",
+            ]
             for section in required_sections:
                 assert section in status, f"Missing status section: {section}"
 
             # Verify engine info
-            engine_info = status['engine_info']
-            assert engine_info['status'] == 'active'
-            assert 'window_size' in engine_info
-            assert 'active_windows' in engine_info
-            assert 'event_buffer_size' in engine_info
+            engine_info = status["engine_info"]
+            assert engine_info["status"] == "active"
+            assert "window_size" in engine_info
+            assert "active_windows" in engine_info
+            assert "event_buffer_size" in engine_info
 
             # Verify statistics
-            statistics = status['statistics']
-            stat_keys = ['total_correlations_detected', 'correlations_accepted', 'correlations_rejected']
+            statistics = status["statistics"]
+            stat_keys = [
+                "total_correlations_detected",
+                "correlations_accepted",
+                "correlations_rejected",
+            ]
             for key in stat_keys:
                 assert key in statistics, f"Missing statistic: {key}"
                 assert isinstance(statistics[key], int), f"Statistic {key} should be integer"
 
             # Verify pattern detectors
-            detectors = status['pattern_detectors']
-            expected_detectors = ['sequential', 'concurrent', 'cyclical', 'contextual']
+            detectors = status["pattern_detectors"]
+            expected_detectors = ["sequential", "concurrent", "cyclical", "contextual"]
             for detector in expected_detectors:
                 assert detector in detectors, f"Missing pattern detector: {detector}"
 
@@ -728,8 +784,8 @@ class CorrelationEngineTests:
             self.correlation_engine.reset_learning_state()
 
             reset_stats = self.correlation_engine.correlation_stats
-            assert reset_stats['total_correlations_detected'] == 0
-            assert reset_stats['correlations_accepted'] == 0
+            assert reset_stats["total_correlations_detected"] == 0
+            assert reset_stats["correlations_accepted"] == 0
 
             print(f"   Status sections verified: {list(status.keys())}")
             print(f"   Pattern detectors: {detectors}")

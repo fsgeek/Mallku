@@ -190,7 +190,9 @@ class TestGrokAdapter:
 
         # Check system prompt includes temporal awareness
         assert any("Current time:" in msg["content"] for msg in messages if msg["role"] == "system")
-        assert any("Real-time awareness" in msg["content"] for msg in messages if msg["role"] == "system")
+        assert any(
+            "Real-time awareness" in msg["content"] for msg in messages if msg["role"] == "system"
+        )
 
     @pytest.mark.asyncio
     async def test_stream_message(self, grok_adapter, mock_xai_client):
@@ -204,7 +206,7 @@ class TestGrokAdapter:
             "is evolving ",
             "rapidly. ",
             "Recent news ",
-            "suggests..."
+            "suggests...",
         ]
 
         async def mock_stream():
@@ -321,19 +323,31 @@ class TestGrokAdapter:
         """Test response type determination."""
         # Proposal
         content = "I suggest we implement a new approach..."
-        assert grok_adapter._determine_response_type(content, MessageType.MESSAGE) == MessageType.PROPOSAL
+        assert (
+            grok_adapter._determine_response_type(content, MessageType.MESSAGE)
+            == MessageType.PROPOSAL
+        )
 
         # Reflection
         content = "I notice an interesting pattern here..."
-        assert grok_adapter._determine_response_type(content, MessageType.MESSAGE) == MessageType.REFLECTION
+        assert (
+            grok_adapter._determine_response_type(content, MessageType.MESSAGE)
+            == MessageType.REFLECTION
+        )
 
         # Question
         content = "What do you think about this approach?"
-        assert grok_adapter._determine_response_type(content, MessageType.MESSAGE) == MessageType.QUESTION
+        assert (
+            grok_adapter._determine_response_type(content, MessageType.MESSAGE)
+            == MessageType.QUESTION
+        )
 
         # Agreement
         content = "I agree with your assessment..."
-        assert grok_adapter._determine_response_type(content, MessageType.MESSAGE) == MessageType.AGREEMENT
+        assert (
+            grok_adapter._determine_response_type(content, MessageType.MESSAGE)
+            == MessageType.AGREEMENT
+        )
 
     @pytest.mark.asyncio
     async def test_context_preparation(self, grok_adapter):

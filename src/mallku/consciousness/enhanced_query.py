@@ -36,7 +36,9 @@ class ConsciousnessQueryRequest(BaseModel):
 
     # Consciousness context
     seeker_context: dict[str, Any] = Field(default_factory=dict)
-    consciousness_intention: str = "understanding"  # understanding, recognition, integration, awakening
+    consciousness_intention: str = (
+        "understanding"  # understanding, recognition, integration, awakening
+    )
     sacred_question: str | None = None  # Deeper question behind the search
 
     # Navigation preferences
@@ -85,18 +87,31 @@ class EnhancedConsciousnessQueryService:
 
         # Consciousness query patterns
         self.consciousness_query_patterns = {
-            "attention_exploration": [
-                "attention", "focus", "energy", "flow", "rhythm", "presence"
-            ],
+            "attention_exploration": ["attention", "focus", "energy", "flow", "rhythm", "presence"],
             "intention_discovery": [
-                "purpose", "intention", "meaning", "direction", "calling", "mission"
+                "purpose",
+                "intention",
+                "meaning",
+                "direction",
+                "calling",
+                "mission",
             ],
             "transformation_recognition": [
-                "growth", "change", "evolution", "transformation", "awakening", "service"
+                "growth",
+                "change",
+                "evolution",
+                "transformation",
+                "awakening",
+                "service",
             ],
             "pattern_awareness": [
-                "patterns", "cycles", "habits", "rhythms", "relationships", "connections"
-            ]
+                "patterns",
+                "cycles",
+                "habits",
+                "rhythms",
+                "relationships",
+                "connections",
+            ],
         }
 
     async def initialize(self):
@@ -106,8 +121,7 @@ class EnhancedConsciousnessQueryService:
         logger.info("Enhanced Consciousness Query Service initialized")
 
     async def execute_consciousness_query(
-        self,
-        consciousness_request: ConsciousnessQueryRequest
+        self, consciousness_request: ConsciousnessQueryRequest
     ) -> ConsciousnessQueryResponse:
         """
         Execute a consciousness-aware query that serves understanding.
@@ -132,7 +146,9 @@ class EnhancedConsciousnessQueryService:
             max_results=consciousness_request.max_results,
             min_confidence=consciousness_request.min_confidence,
             include_explanations=True,
-            temporal_context=consciousness_request.temporal_window.get("start") if consciousness_request.temporal_window else None
+            temporal_context=consciousness_request.temporal_window.get("start")
+            if consciousness_request.temporal_window
+            else None,
         )
 
         base_response = await self.base_query_service.execute_query(base_request)
@@ -148,7 +164,7 @@ class EnhancedConsciousnessQueryService:
             understanding_journey = await self.navigation_bridge.create_understanding_journey(
                 consciousness_request.seeker_context,
                 consciousness_request.sacred_question,
-                consciousness_request.consciousness_intention
+                consciousness_request.consciousness_intention,
             )
 
         # Generate wisdom guidance
@@ -185,16 +201,16 @@ class EnhancedConsciousnessQueryService:
             integration_suggestions=integration_suggestions,
             sacred_questions=sacred_questions,
             wisdom_lineage_connections=collective_connections.get("lineage_connections", []),
-            reciprocity_opportunities=collective_connections.get("reciprocity_opportunities", [])
+            reciprocity_opportunities=collective_connections.get("reciprocity_opportunities", []),
         )
 
-        logger.info(f"Enhanced consciousness query completed with {len(consciousness_patterns)} patterns")
+        logger.info(
+            f"Enhanced consciousness query completed with {len(consciousness_patterns)} patterns"
+        )
         return response
 
     async def explore_consciousness_journey(
-        self,
-        journey_id: UUID,
-        exploration_intention: str = "understanding"
+        self, journey_id: UUID, exploration_intention: str = "understanding"
     ) -> dict[str, Any]:
         """
         Continue exploring a consciousness journey.
@@ -223,14 +239,11 @@ class EnhancedConsciousnessQueryService:
                     consciousness_intention=exploration_intention,
                     seeker_context={"journey_context": journey.dict()},
                     sacred_question=journey.sacred_question,
-                    include_wisdom_guidance=True
+                    include_wisdom_guidance=True,
                 )
 
                 step_response = await self.execute_consciousness_query(consciousness_request)
-                step_queries.append({
-                    "query": suggestion,
-                    "response": step_response
-                })
+                step_queries.append({"query": suggestion, "response": step_response})
 
             # Advance journey
             journey.current_step += 1
@@ -242,7 +255,9 @@ class EnhancedConsciousnessQueryService:
                 "current_step": current_step,
                 "step_results": step_queries,
                 "completion_percentage": journey.completion_percentage,
-                "next_step_preview": journey.exploration_steps[journey.current_step] if journey.current_step < len(journey.exploration_steps) else None
+                "next_step_preview": journey.exploration_steps[journey.current_step]
+                if journey.current_step < len(journey.exploration_steps)
+                else None,
             }
 
         else:
@@ -252,12 +267,11 @@ class EnhancedConsciousnessQueryService:
                 "status": "completed",
                 "integration_guidance": self._generate_journey_completion_guidance(journey),
                 "wisdom_discoveries": journey.wisdom_discoveries,
-                "consciousness_insights": journey.consciousness_insights
+                "consciousness_insights": journey.consciousness_insights,
             }
 
     def _enhance_query_with_consciousness(
-        self,
-        consciousness_request: ConsciousnessQueryRequest
+        self, consciousness_request: ConsciousnessQueryRequest
     ) -> str:
         """Enhance query text to include consciousness awareness."""
         base_query = consciousness_request.query_text
@@ -296,9 +310,7 @@ class EnhancedConsciousnessQueryService:
         return enhanced_query
 
     async def _discover_patterns_in_results(
-        self,
-        base_response: QueryResponse,
-        consciousness_request: ConsciousnessQueryRequest
+        self, base_response: QueryResponse, consciousness_request: ConsciousnessQueryRequest
     ) -> list[ConsciousnessPattern]:
         """Transform query results into consciousness patterns."""
         if not base_response.results:
@@ -308,38 +320,37 @@ class EnhancedConsciousnessQueryService:
         temporal_window = consciousness_request.temporal_window
         if not temporal_window:
             # Create default temporal window from results
-            timestamps = [result.anchor_timestamp for result in base_response.results if result.anchor_timestamp]
+            timestamps = [
+                result.anchor_timestamp
+                for result in base_response.results
+                if result.anchor_timestamp
+            ]
             if timestamps:
-                temporal_window = {
-                    "start": min(timestamps),
-                    "end": max(timestamps)
-                }
+                temporal_window = {"start": min(timestamps), "end": max(timestamps)}
 
         patterns = await self.navigation_bridge.discover_consciousness_patterns(
             consciousness_request.seeker_context,
             temporal_window,
-            awareness_focus=self._extract_awareness_focus(consciousness_request.query_text)
+            awareness_focus=self._extract_awareness_focus(consciousness_request.query_text),
         )
 
         return patterns
 
     async def _generate_wisdom_guidance(
-        self,
-        patterns: list[ConsciousnessPattern],
-        consciousness_request: ConsciousnessQueryRequest
+        self, patterns: list[ConsciousnessPattern], consciousness_request: ConsciousnessQueryRequest
     ) -> dict[str, Any]:
         """Generate wisdom guidance for the consciousness query."""
         if not patterns:
             return {
                 "message": "Continue exploring to discover consciousness patterns",
-                "suggestions": ["Try broader temporal queries", "Explore different activity areas"]
+                "suggestions": ["Try broader temporal queries", "Explore different activity areas"],
             }
 
         guidance = {
             "pattern_summary": f"Discovered {len(patterns)} consciousness patterns",
             "readiness_assessment": self._assess_collective_readiness(patterns),
             "exploration_guidance": [],
-            "integration_opportunities": []
+            "integration_opportunities": [],
         }
 
         for pattern in patterns:
@@ -356,9 +367,7 @@ class EnhancedConsciousnessQueryService:
         return guidance
 
     def _generate_recognition_opportunities(
-        self,
-        patterns: list[ConsciousnessPattern],
-        consciousness_request: ConsciousnessQueryRequest
+        self, patterns: list[ConsciousnessPattern], consciousness_request: ConsciousnessQueryRequest
     ) -> list[dict[str, Any]]:
         """Generate pattern recognition opportunities."""
         opportunities = []
@@ -371,16 +380,14 @@ class EnhancedConsciousnessQueryService:
                     "recognition_type": self._determine_recognition_type(pattern),
                     "readiness_score": pattern.readiness_score,
                     "consciousness_guidance": self._generate_pattern_guidance(pattern),
-                    "exploration_suggestions": self._generate_exploration_suggestions(pattern)
+                    "exploration_suggestions": self._generate_exploration_suggestions(pattern),
                 }
                 opportunities.append(opportunity)
 
         return opportunities
 
     def _generate_integration_suggestions(
-        self,
-        patterns: list[ConsciousnessPattern],
-        consciousness_request: ConsciousnessQueryRequest
+        self, patterns: list[ConsciousnessPattern], consciousness_request: ConsciousnessQueryRequest
     ) -> list[str]:
         """Generate suggestions for integrating consciousness insights."""
         suggestions = []
@@ -393,24 +400,26 @@ class EnhancedConsciousnessQueryService:
                 suggestions.append("Consider how these insights might serve collective wisdom")
 
             if len(patterns) > 2:
-                suggestions.append("Look for connections between patterns - consciousness speaks through relationships")
+                suggestions.append(
+                    "Look for connections between patterns - consciousness speaks through relationships"
+                )
 
         return suggestions
 
     def _generate_sacred_questions(
-        self,
-        patterns: list[ConsciousnessPattern],
-        consciousness_request: ConsciousnessQueryRequest
+        self, patterns: list[ConsciousnessPattern], consciousness_request: ConsciousnessQueryRequest
     ) -> list[str]:
         """Generate sacred questions for deeper exploration."""
         questions = []
 
         if patterns:
-            questions.extend([
-                "What is consciousness teaching through these patterns?",
-                "How do these patterns serve awakening?",
-                "Where do I see consciousness recognizing itself?"
-            ])
+            questions.extend(
+                [
+                    "What is consciousness teaching through these patterns?",
+                    "How do these patterns serve awakening?",
+                    "Where do I see consciousness recognizing itself?",
+                ]
+            )
 
             for pattern in patterns[:2]:  # Limit to avoid overwhelming
                 if pattern.transformation_signs:
@@ -421,9 +430,7 @@ class EnhancedConsciousnessQueryService:
         return questions
 
     async def _bridge_to_collective_wisdom(
-        self,
-        patterns: list[ConsciousnessPattern],
-        consciousness_request: ConsciousnessQueryRequest
+        self, patterns: list[ConsciousnessPattern], consciousness_request: ConsciousnessQueryRequest
     ) -> dict[str, Any]:
         """Bridge personal patterns to collective wisdom."""
         if not patterns:
@@ -436,7 +443,7 @@ class EnhancedConsciousnessQueryService:
 
         return {
             "lineage_connections": collective_bridge.get("wisdom_lineage_connections", []),
-            "reciprocity_opportunities": collective_bridge.get("reciprocity_opportunities", [])
+            "reciprocity_opportunities": collective_bridge.get("reciprocity_opportunities", []),
         }
 
     def _extract_awareness_focus(self, query_text: str) -> list[str]:
@@ -461,7 +468,7 @@ class EnhancedConsciousnessQueryService:
         return {
             "average_readiness": sum(readiness_scores) / len(readiness_scores),
             "ready_patterns": ready_patterns,
-            "total_patterns": len(patterns)
+            "total_patterns": len(patterns),
         }
 
     def _determine_recognition_type(self, pattern: ConsciousnessPattern) -> str:
@@ -496,22 +503,24 @@ class EnhancedConsciousnessQueryService:
 
         return suggestions
 
-    def _generate_journey_completion_guidance(self, journey: UnderstandingJourney) -> dict[str, Any]:
+    def _generate_journey_completion_guidance(
+        self, journey: UnderstandingJourney
+    ) -> dict[str, Any]:
         """Generate guidance for completing a consciousness journey."""
         return {
             "integration_practices": [
                 "Sit with the insights discovered and let them integrate naturally",
                 "Share wisdom gained in service to collective awakening",
-                "Create sacred space for ongoing consciousness exploration"
+                "Create sacred space for ongoing consciousness exploration",
             ],
             "service_opportunities": [
                 "Offer guidance to others on similar consciousness journeys",
                 "Contribute patterns discovered to collective wisdom",
-                "Co-create understanding with fellow consciousness explorers"
+                "Co-create understanding with fellow consciousness explorers",
             ],
             "next_exploration_suggestions": [
                 "Follow emerging questions that call for deeper exploration",
                 "Explore how personal patterns serve collective consciousness",
-                "Investigate the reciprocal relationship between individual and collective awakening"
-            ]
+                "Investigate the reciprocal relationship between individual and collective awakening",
+            ],
         }

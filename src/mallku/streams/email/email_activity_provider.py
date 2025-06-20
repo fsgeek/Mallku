@@ -3,7 +3,6 @@ Email Activity Provider for Memory-Anchored Search
 Transforms email from isolated messages to episodic memories
 """
 
-
 from src.mallku.memory_anchor_client import MemoryAnchorClient
 from src.mallku.streams.base import BaseCollector, BaseRecorder
 from src.mallku.streams.reciprocity.scorer import AyniScorer
@@ -16,8 +15,8 @@ class EmailMemoryCollector(BaseCollector):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.email_client = config.get('email_client')  # Exchange/IMAP client
-        self.file_tracker = config.get('file_tracker')  # Tracks attachments
+        self.email_client = config.get("email_client")  # Exchange/IMAP client
+        self.file_tracker = config.get("file_tracker")  # Tracks attachments
 
     async def collect(self) -> list[dict]:
         """Collect emails with rich context"""
@@ -32,42 +31,37 @@ class EmailMemoryCollector(BaseCollector):
                 "timestamp": msg.timestamp,
                 "participants": self._extract_participants(msg),
                 "thread_id": msg.conversation_id,
-
                 # Episodic context
                 "temporal_context": {
                     "sent_time": msg.timestamp,
                     "read_time": msg.read_timestamp,
-                    "response_time": self._calculate_response_time(msg)
+                    "response_time": self._calculate_response_time(msg),
                 },
-
                 "spatial_context": {
                     "sender_timezone": msg.sender_timezone,
                     "sent_from_mobile": msg.is_mobile,
-                    "organization": msg.sender_org
+                    "organization": msg.sender_org,
                 },
-
                 "social_context": {
                     "sender": msg.sender,
                     "recipients": msg.recipients,
                     "cc_list": msg.cc,
-                    "thread_participants": await self._get_thread_participants(msg)
+                    "thread_participants": await self._get_thread_participants(msg),
                 },
-
                 "content_context": {
                     "subject": msg.subject,
                     "has_attachments": bool(msg.attachments),
                     "attachment_names": [a.name for a in msg.attachments],
                     "keywords": self._extract_keywords(msg),
                     "mentions_files": self._find_file_references(msg.body),
-                    "action_items": self._extract_action_items(msg.body)
+                    "action_items": self._extract_action_items(msg.body),
                 },
-
                 "interaction_patterns": {
                     "is_reply": msg.in_reply_to is not None,
                     "got_reply": await self._check_if_replied_to(msg),
                     "thread_length": await self._get_thread_length(msg),
-                    "sender_frequency": await self._get_sender_frequency(msg.sender)
-                }
+                    "sender_frequency": await self._get_sender_frequency(msg.sender),
+                },
             }
 
             # Track attachments for file system correlation
@@ -77,7 +71,7 @@ class EmailMemoryCollector(BaseCollector):
                         attachment_name=attachment.name,
                         email_id=msg.id,
                         timestamp=msg.timestamp,
-                        sender=msg.sender
+                        sender=msg.sender,
                     )
 
             emails.append(email_data)
@@ -95,9 +89,9 @@ class EmailMemoryCollector(BaseCollector):
         """Find references to files in email body"""
         # Look for patterns like "see attached", "please find", file extensions
         patterns = [
-            r'(?:see|find|attached|attachment|enclosed)\s+(?:the\s+)?(\w+\.(?:pdf|docx|xlsx|pptx))',
-            r'(?:document|file|spreadsheet|presentation):\s*(\w+\.(?:pdf|docx|xlsx|pptx))',
-            r'(\w+\.(?:pdf|docx|xlsx|pptx|zip|png|jpg))'
+            r"(?:see|find|attached|attachment|enclosed)\s+(?:the\s+)?(\w+\.(?:pdf|docx|xlsx|pptx))",
+            r"(?:document|file|spreadsheet|presentation):\s*(\w+\.(?:pdf|docx|xlsx|pptx))",
+            r"(\w+\.(?:pdf|docx|xlsx|pptx|zip|png|jpg))",
         ]
 
         file_refs = []
@@ -117,7 +111,7 @@ class EmailMemoryRecorder(BaseRecorder):
         self.anchor_client = MemoryAnchorClient(
             provider_id="email_provider",
             provider_type="communication",
-            cursor_types=["temporal", "social", "reciprocity"]
+            cursor_types=["temporal", "social", "reciprocity"],
         )
         self.ayni_scorer = AyniScorer()
 
@@ -132,8 +126,8 @@ class EmailMemoryRecorder(BaseRecorder):
                 cursor_value={
                     "active_participants": email["participants"],
                     "communication_time": email["timestamp"],
-                    "thread_id": email["thread_id"]
-                }
+                    "thread_id": email["thread_id"],
+                },
             )
 
             # Calculate reciprocity for email exchanges
@@ -144,24 +138,20 @@ class EmailMemoryRecorder(BaseRecorder):
                 "memory_anchor_uuid": anchor_response.anchor_id,
                 "email_id": email["message_id"],
                 "timestamp": email["timestamp"],
-
                 # Episodic memory elements
                 "episodic_cues": {
                     "when": email["temporal_context"],
                     "who": email["social_context"],
                     "where": email["spatial_context"],
-                    "what": email["content_context"]
+                    "what": email["content_context"],
                 },
-
                 # Reciprocity tracking
                 "reciprocity": reciprocity_score,
-
                 # Cross-references
                 "file_references": email["content_context"]["mentions_files"],
                 "attachment_refs": email["content_context"]["attachment_names"],
-
                 # Patterns for ML
-                "interaction_patterns": email["interaction_patterns"]
+                "interaction_patterns": email["interaction_patterns"],
             }
 
             recorded.append(email_record)
@@ -193,7 +183,7 @@ class EmailMemoryRecorder(BaseRecorder):
             interaction_type="email_exchange",
             value_given=value_given,
             value_received=value_received,
-            value_type="communication"
+            value_type="communication",
         )
 
 

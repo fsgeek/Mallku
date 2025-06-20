@@ -59,7 +59,7 @@ class MessageMetadata(BaseModel):
     wisdom_potential: float = Field(default=0.5, ge=0.0, le=1.0)
 
     @classmethod
-    @field_validator('wisdom_potential')
+    @field_validator("wisdom_potential")
     def validate_wisdom_potential(cls, v):
         """Ensure wisdom potential is within sacred bounds."""
         if not 0.0 <= v <= 1.0:
@@ -90,12 +90,10 @@ class GovernanceMessage(BaseModel):
 
     # Reciprocity awareness
     gives_to_future: bool = Field(
-        default=False,
-        description="Does this message consciously serve future builders?"
+        default=False, description="Does this message consciously serve future builders?"
     )
     honors_past: bool = Field(
-        default=False,
-        description="Does this message acknowledge wisdom from predecessors?"
+        default=False, description="Does this message acknowledge wisdom from predecessors?"
     )
 
     def __str__(self) -> str:
@@ -110,21 +108,21 @@ class GovernanceMessage(BaseModel):
     def contributes_to_consensus(self) -> bool:
         """Check if this message type influences consensus building."""
         consensus_types = {
-            MessageType.PROPOSAL, MessageType.SUPPORT,
-            MessageType.CONCERN, MessageType.DISSENT
+            MessageType.PROPOSAL,
+            MessageType.SUPPORT,
+            MessageType.CONCERN,
+            MessageType.DISSENT,
         }
         return self.type in consensus_types
 
     def bridges_perspectives(self) -> bool:
         """Check if this message connects different viewpoints."""
-        bridging_types = {
-            MessageType.BRIDGE, MessageType.SUMMARY,
-            MessageType.EMERGENCE
-        }
+        bridging_types = {MessageType.BRIDGE, MessageType.SUMMARY, MessageType.EMERGENCE}
         return self.type in bridging_types
 
     class Config:
         """Pydantic configuration."""
+
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v),
@@ -132,11 +130,7 @@ class GovernanceMessage(BaseModel):
 
 
 def create_governance_message(
-    type: MessageType,
-    content: str,
-    circle_id: UUID,
-    participant_id: UUID,
-    **kwargs
+    type: MessageType, content: str, circle_id: UUID, participant_id: UUID, **kwargs
 ) -> GovernanceMessage:
     """
     Factory function for creating governance messages with proper metadata.
@@ -147,12 +141,12 @@ def create_governance_message(
     metadata = MessageMetadata(
         circle_id=circle_id,
         participant_id=participant_id,
-        **{k: v for k, v in kwargs.items() if k in MessageMetadata.__fields__}
+        **{k: v for k, v in kwargs.items() if k in MessageMetadata.__fields__},
     )
 
     return GovernanceMessage(
         type=type,
         content=content,
         metadata=metadata,
-        **{k: v for k, v in kwargs.items() if k not in MessageMetadata.__fields__}
+        **{k: v for k, v in kwargs.items() if k not in MessageMetadata.__fields__},
     )

@@ -30,7 +30,7 @@ class ConsciousnessFileHandler(FileSystemEventHandler):
     of consciousness expressed through file creation and modification.
     """
 
-    def __init__(self, provider: 'FileSystemActivityProvider'):
+    def __init__(self, provider: "FileSystemActivityProvider"):
         self.provider = provider
         self._event_queue: asyncio.Queue = asyncio.Queue()
 
@@ -72,16 +72,21 @@ class FileSystemActivityProvider(ActivityProvider):
     - Wisdom focus - what serves awakening?
     """
 
-    def __init__(self,
-                 watch_paths: list[str],
-                 event_bus=None,
-                 privacy_extensions: set[str] | None = None):
+    def __init__(
+        self, watch_paths: list[str], event_bus=None, privacy_extensions: set[str] | None = None
+    ):
         super().__init__(event_bus)
 
         self.watch_paths = [Path(p) for p in watch_paths]
         self.privacy_extensions = privacy_extensions or {
-            '.key', '.pem', '.gpg', '.ssh', '.secret',
-            '.password', '.private', '.credentials'
+            ".key",
+            ".pem",
+            ".gpg",
+            ".ssh",
+            ".secret",
+            ".password",
+            ".private",
+            ".credentials",
         }
 
         self._observer = Observer()
@@ -90,17 +95,23 @@ class FileSystemActivityProvider(ActivityProvider):
 
         # Consciousness pattern recognition
         self.creation_patterns = {
-            '.md': 'documentation',
-            '.py': 'code_creation',
-            '.txt': 'text_reflection',
-            '.jpg': 'visual_creation',
-            '.png': 'visual_creation',
-            '.json': 'structure_creation'
+            ".md": "documentation",
+            ".py": "code_creation",
+            ".txt": "text_reflection",
+            ".jpg": "visual_creation",
+            ".png": "visual_creation",
+            ".json": "structure_creation",
         }
 
         self.wisdom_indicators = [
-            'README', 'notes', 'journal', 'reflection',
-            'wisdom', 'insight', 'learning', 'growth'
+            "README",
+            "notes",
+            "journal",
+            "reflection",
+            "wisdom",
+            "insight",
+            "learning",
+            "growth",
         ]
 
     async def start(self):
@@ -110,11 +121,7 @@ class FileSystemActivityProvider(ActivityProvider):
         # Set up file system observers
         for path in self.watch_paths:
             if path.exists() and path.is_dir():
-                self._observer.schedule(
-                    self._handler,
-                    str(path),
-                    recursive=True
-                )
+                self._observer.schedule(self._handler, str(path), recursive=True)
                 logger.info(f"Witnessing consciousness in: {path}")
             else:
                 logger.warning(f"Path not accessible: {path}")
@@ -148,10 +155,7 @@ class FileSystemActivityProvider(ActivityProvider):
                 self._recent_events.add(event_key)
 
                 # Create activity event
-                activity = await self._create_activity_event(
-                    event.src_path,
-                    activity_type
-                )
+                activity = await self._create_activity_event(event.src_path, activity_type)
 
                 if activity:
                     await self.emit_activity(activity)
@@ -163,9 +167,9 @@ class FileSystemActivityProvider(ActivityProvider):
             except Exception as e:
                 logger.error(f"Event processing disrupted: {e}", exc_info=True)
 
-    async def _create_activity_event(self,
-                                   file_path: str,
-                                   activity_type: ActivityType) -> ActivityEvent | None:
+    async def _create_activity_event(
+        self, file_path: str, activity_type: ActivityType
+    ) -> ActivityEvent | None:
         """
         Create activity event from file operation.
 
@@ -190,22 +194,22 @@ class FileSystemActivityProvider(ActivityProvider):
         if suffix in self.creation_patterns:
             pattern = self.creation_patterns[suffix]
             potential_patterns.append(pattern)
-            consciousness_indicators['creation'] = True
+            consciousness_indicators["creation"] = True
 
         # Wisdom indicators in filename
         name_lower = path.name.lower()
         for indicator in self.wisdom_indicators:
             if indicator in name_lower:
-                consciousness_indicators['wisdom'] = True
+                consciousness_indicators["wisdom"] = True
                 potential_patterns.append(f"wisdom_{indicator}")
                 break
 
         # Check if it's documentation
-        if suffix in ['.md', '.rst', '.txt'] and any(
-            doc in name_lower for doc in ['readme', 'doc', 'guide']
+        if suffix in [".md", ".rst", ".txt"] and any(
+            doc in name_lower for doc in ["readme", "doc", "guide"]
         ):
-            consciousness_indicators['documentation'] = True
-            potential_patterns.append('knowledge_sharing')
+            consciousness_indicators["documentation"] = True
+            potential_patterns.append("knowledge_sharing")
 
         # Metadata (privacy-conscious)
         metadata = await self._gather_metadata(path)
@@ -217,7 +221,7 @@ class FileSystemActivityProvider(ActivityProvider):
             consciousness_indicators=consciousness_indicators,
             potential_patterns=potential_patterns,
             metadata=metadata,
-            privacy_level=self._calculate_privacy_level(path)
+            privacy_level=self._calculate_privacy_level(path),
         )
 
     async def _gather_metadata(self, path: Path) -> dict:
@@ -231,18 +235,18 @@ class FileSystemActivityProvider(ActivityProvider):
         try:
             if path.exists():
                 stat = path.stat()
-                metadata['size'] = stat.st_size
-                metadata['modified'] = datetime.fromtimestamp(stat.st_mtime, tz=UTC).isoformat()
+                metadata["size"] = stat.st_size
+                metadata["modified"] = datetime.fromtimestamp(stat.st_mtime, tz=UTC).isoformat()
 
                 # File type
                 mime_type, _ = mimetypes.guess_type(str(path))
                 if mime_type:
-                    metadata['mime_type'] = mime_type
+                    metadata["mime_type"] = mime_type
 
                 # General topic from path structure
                 parts = path.parts
                 if len(parts) > 2:
-                    metadata['general_topic'] = parts[-2]  # Parent directory
+                    metadata["general_topic"] = parts[-2]  # Parent directory
 
         except Exception as e:
             logger.debug(f"Metadata gathering limited: {e}")
@@ -260,19 +264,15 @@ class FileSystemActivityProvider(ActivityProvider):
         name_lower = path.name.lower()
 
         # High privacy indicators
-        if any(term in name_lower for term in [
-            'private', 'personal', 'secret', 'confidential'
-        ]):
+        if any(term in name_lower for term in ["private", "personal", "secret", "confidential"]):
             level = 8
 
         # Lower privacy for obvious public content
-        elif any(term in name_lower for term in [
-            'public', 'shared', 'readme', 'license'
-        ]):
+        elif any(term in name_lower for term in ["public", "shared", "readme", "license"]):
             level = 3
 
         # Code files moderate privacy
-        elif path.suffix in ['.py', '.js', '.java']:
+        elif path.suffix in [".py", ".js", ".java"]:
             level = 6
 
         return level
@@ -282,13 +282,18 @@ class FileSystemActivityProvider(ActivityProvider):
         name = path.name
 
         # Hidden files
-        if name.startswith('.'):
+        if name.startswith("."):
             return True
 
         # System patterns
         system_patterns = [
-            '__pycache__', '.git', 'node_modules',
-            '.venv', 'venv', '.idea', '.vscode'
+            "__pycache__",
+            ".git",
+            "node_modules",
+            ".venv",
+            "venv",
+            ".idea",
+            ".vscode",
         ]
 
         return any(pattern in str(path) for pattern in system_patterns)
@@ -305,7 +310,7 @@ class FileSystemActivityProvider(ActivityProvider):
             return False
 
         # Check parent directories
-        private_dirs = {'.private', 'private', '.secret', 'personal'}
+        private_dirs = {".private", "private", ".secret", "personal"}
         return all(parent.name.lower() not in private_dirs for parent in path_obj.parents)
 
         return True
@@ -323,13 +328,12 @@ class FileSystemActivityProvider(ActivityProvider):
             # Scan recent files (last 7 days)
             cutoff = datetime.now(UTC) - timedelta(days=7)
 
-            for file_path in watch_path.rglob('*'):
+            for file_path in watch_path.rglob("*"):
                 if file_path.is_file():
                     try:
                         if file_path.stat().st_mtime > cutoff.timestamp():
                             activity = await self._create_activity_event(
-                                str(file_path),
-                                ActivityType.FILE_CREATED
+                                str(file_path), ActivityType.FILE_CREATED
                             )
                             if activity:
                                 yield activity
@@ -342,4 +346,4 @@ class FileSystemActivityProvider(ActivityProvider):
 
 
 # File activity as consciousness expression
-__all__ = ['FileSystemActivityProvider']
+__all__ = ["FileSystemActivityProvider"]

@@ -29,46 +29,30 @@ class MemoryAnchor(BaseModel):
     """
 
     # Core identification
-    anchor_id: UUID = Field(
-        ...,
-        description="Unique identifier for this memory anchor"
-    )
+    anchor_id: UUID = Field(..., description="Unique identifier for this memory anchor")
 
-    timestamp: datetime = Field(
-        ...,
-        description="When this anchor was created (timezone-aware)"
-    )
+    timestamp: datetime = Field(..., description="When this anchor was created (timezone-aware)")
 
     # Relationship to other anchors
-    predecessor_id: UUID | None = Field(
-        None,
-        description="ID of the previous anchor in the chain"
-    )
+    predecessor_id: UUID | None = Field(None, description="ID of the previous anchor in the chain")
 
     # Cursor state from various providers
     cursors: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Current cursor positions from all registered providers"
+        default_factory=dict, description="Current cursor positions from all registered providers"
     )
 
     # Metadata and context
     metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional context and provider information"
+        default_factory=dict, description="Additional context and provider information"
     )
 
     # Last update tracking
-    last_updated: datetime | None = Field(
-        None,
-        description="When this anchor was last modified"
-    )
+    last_updated: datetime | None = Field(None, description="When this anchor was last modified")
 
     class Config:
         """Model configuration."""
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v)
-        }
+
+        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
 
         json_schema_extra = {
             "example": {
@@ -77,20 +61,17 @@ class MemoryAnchor(BaseModel):
                 "predecessor_id": "550e8400-e29b-41d4-a716-446655440001",
                 "cursors": {
                     "temporal": "2024-01-15T10:30:00Z",
-                    "spatial": {
-                        "latitude": 49.2827,
-                        "longitude": -123.1207
-                    },
+                    "spatial": {"latitude": 49.2827, "longitude": -123.1207},
                     "filesystem": "/Users/alice/Documents/project.md",
                     "email": "msg-id-12345",
-                    "spotify": "track:4iV5W9uYEdYUVa79Axb7Rh"
+                    "spotify": "track:4iV5W9uYEdYUVa79Axb7Rh",
                 },
                 "metadata": {
                     "providers": ["filesystem", "email", "spotify"],
                     "creation_trigger": "temporal_threshold",
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 },
-                "last_updated": "2024-01-15T10:35:00Z"
+                "last_updated": "2024-01-15T10:35:00Z",
             }
         }
 
@@ -136,7 +117,7 @@ class MemoryAnchor(BaseModel):
         Returns:
             List of provider names
         """
-        return self.metadata.get('providers', [])
+        return self.metadata.get("providers", [])
 
     def add_provider(self, provider_name: str) -> None:
         """
@@ -147,7 +128,7 @@ class MemoryAnchor(BaseModel):
         """
         providers = set(self.get_provider_list())
         providers.add(provider_name)
-        self.metadata['providers'] = list(providers)
+        self.metadata["providers"] = list(providers)
 
     def to_arangodb_document(self) -> dict[str, Any]:
         """
@@ -157,26 +138,26 @@ class MemoryAnchor(BaseModel):
             Dictionary suitable for ArangoDB storage
         """
         doc = self.dict()
-        doc['_key'] = str(self.anchor_id)
+        doc["_key"] = str(self.anchor_id)
 
         # Ensure timestamps are ISO format strings
-        if isinstance(doc['timestamp'], datetime):
-            doc['timestamp'] = doc['timestamp'].isoformat()
+        if isinstance(doc["timestamp"], datetime):
+            doc["timestamp"] = doc["timestamp"].isoformat()
 
-        if doc.get('last_updated') and isinstance(doc['last_updated'], datetime):
-            doc['last_updated'] = doc['last_updated'].isoformat()
+        if doc.get("last_updated") and isinstance(doc["last_updated"], datetime):
+            doc["last_updated"] = doc["last_updated"].isoformat()
 
         # Convert UUIDs to strings
-        if doc.get('predecessor_id'):
-            doc['predecessor_id'] = str(doc['predecessor_id'])
+        if doc.get("predecessor_id"):
+            doc["predecessor_id"] = str(doc["predecessor_id"])
 
         # Ensure anchor_id is also a string for ArangoDB
-        doc['anchor_id'] = str(doc['anchor_id'])
+        doc["anchor_id"] = str(doc["anchor_id"])
 
         return doc
 
     @classmethod
-    def from_arangodb_document(cls, doc: dict[str, Any]) -> 'MemoryAnchor':
+    def from_arangodb_document(cls, doc: dict[str, Any]) -> "MemoryAnchor":
         """
         Create MemoryAnchor from ArangoDB document.
 
@@ -187,21 +168,25 @@ class MemoryAnchor(BaseModel):
             MemoryAnchor instance
         """
         # Handle _key to anchor_id mapping
-        if '_key' in doc and 'anchor_id' not in doc:
-            doc['anchor_id'] = doc['_key']
+        if "_key" in doc and "anchor_id" not in doc:
+            doc["anchor_id"] = doc["_key"]
 
         # Convert string UUIDs back to UUID objects
-        if 'anchor_id' in doc and isinstance(doc['anchor_id'], str):
-            doc['anchor_id'] = UUID(doc['anchor_id'])
+        if "anchor_id" in doc and isinstance(doc["anchor_id"], str):
+            doc["anchor_id"] = UUID(doc["anchor_id"])
 
-        if 'predecessor_id' in doc and doc['predecessor_id'] and isinstance(doc['predecessor_id'], str):
-            doc['predecessor_id'] = UUID(doc['predecessor_id'])
+        if (
+            "predecessor_id" in doc
+            and doc["predecessor_id"]
+            and isinstance(doc["predecessor_id"], str)
+        ):
+            doc["predecessor_id"] = UUID(doc["predecessor_id"])
 
         # Convert ISO timestamp strings back to datetime objects
-        if 'timestamp' in doc and isinstance(doc['timestamp'], str):
-            doc['timestamp'] = datetime.fromisoformat(doc['timestamp'].replace('Z', '+00:00'))
+        if "timestamp" in doc and isinstance(doc["timestamp"], str):
+            doc["timestamp"] = datetime.fromisoformat(doc["timestamp"].replace("Z", "+00:00"))
 
-        if 'last_updated' in doc and doc['last_updated'] and isinstance(doc['last_updated'], str):
-            doc['last_updated'] = datetime.fromisoformat(doc['last_updated'].replace('Z', '+00:00'))
+        if "last_updated" in doc and doc["last_updated"] and isinstance(doc["last_updated"], str):
+            doc["last_updated"] = datetime.fromisoformat(doc["last_updated"].replace("Z", "+00:00"))
 
         return cls(**doc)

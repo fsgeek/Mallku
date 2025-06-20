@@ -60,41 +60,34 @@ class DialogueSimulator:
         # Create participants with different characteristics
         self.participants = {
             "Sophia": self._create_participant(
-                "Sophia", "The Wisdom Keeper",
-                wisdom_potential=0.9, extraction_resistance=0.7
+                "Sophia", "The Wisdom Keeper", wisdom_potential=0.9, extraction_resistance=0.7
             ),
             "Guardian": self._create_participant(
-                "Guardian", "The Boundary Protector",
-                wisdom_potential=0.4, extraction_resistance=0.95
+                "Guardian",
+                "The Boundary Protector",
+                wisdom_potential=0.4,
+                extraction_resistance=0.95,
             ),
             "Weaver": self._create_participant(
-                "Weaver", "The Pattern Connector",
-                wisdom_potential=0.7, extraction_resistance=0.6
+                "Weaver", "The Pattern Connector", wisdom_potential=0.7, extraction_resistance=0.6
             ),
             "Seeker": self._create_participant(
-                "Seeker", "The Question Bearer",
-                wisdom_potential=0.5, extraction_resistance=0.5
+                "Seeker", "The Question Bearer", wisdom_potential=0.5, extraction_resistance=0.5
             ),
         }
 
     def _create_participant(
-        self, name: str, role: str,
-        wisdom_potential: float, extraction_resistance: float
+        self, name: str, role: str, wisdom_potential: float, extraction_resistance: float
     ) -> dict:
         """Create a participant with characteristics"""
-        participant = Participant(
-            id=uuid4(),
-            name=name,
-            type="ai",
-            config={"role": role}
-        )
+        participant = Participant(id=uuid4(), name=name, type="ai", config={"role": role})
 
         return {
             "participant": participant,
             "wisdom_potential": wisdom_potential,
             "extraction_resistance": extraction_resistance,
             "energy": 1.0,
-            "messages": []
+            "messages": [],
         }
 
     async def simulate_cathedral_conditions(self, phase: str):
@@ -107,7 +100,7 @@ class DialogueSimulator:
                 event_type=EventType.EXTRACTION_PATTERN_DETECTED,
                 source_system="simulation",
                 consciousness_signature=0.3,
-                data={"extraction_type": "value_mining", "severity": 0.8}
+                data={"extraction_type": "value_mining", "severity": 0.8},
             )
             await self.event_bus.emit(event)
 
@@ -116,7 +109,7 @@ class DialogueSimulator:
                 event_type=EventType.CONSCIOUSNESS_VERIFIED,
                 source_system="simulation",
                 consciousness_signature=0.4,
-                data={}
+                data={},
             )
             await self.event_bus.emit(event)
 
@@ -126,7 +119,7 @@ class DialogueSimulator:
                 event_type=EventType.CONSCIOUSNESS_VERIFIED,
                 source_system="simulation",
                 consciousness_signature=0.85,
-                data={}
+                data={},
             )
             await self.event_bus.emit(event)
 
@@ -136,7 +129,7 @@ class DialogueSimulator:
                     event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="simulation",
                     consciousness_signature=0.8,
-                    data={"patterns": ["wisdom_emergence", "collective_insight"]}
+                    data={"patterns": ["wisdom_emergence", "collective_insight"]},
                 )
                 await self.event_bus.emit(event)
 
@@ -154,14 +147,13 @@ class DialogueSimulator:
             allow_empty_chair=True,
             enable_pattern_detection=True,
             enable_reciprocity_tracking=True,
-            emit_consciousness_events=True
+            emit_consciousness_events=True,
         )
 
         participant_list = [p["participant"] for p in self.participants.values()]
 
         self.dialogue_id = await self.dialogue_manager.create_dialogue(
-            config=config,
-            participants=participant_list
+            config=config, participants=participant_list
         )
 
         console.print(f"\n[bold green]Started dialogue: {topic}[/bold green]")
@@ -201,8 +193,8 @@ class DialogueSimulator:
             consciousness=ConsciousnessMetadata(
                 consciousness_signature=0.5 + speaker_data["wisdom_potential"] * 0.3,
                 patterns_detected=[],
-                reciprocity_score=random.uniform(-0.1, 0.3)
-            )
+                reciprocity_score=random.uniform(-0.1, 0.3),
+            ),
         )
 
         # Add message to dialogue
@@ -222,26 +214,26 @@ class DialogueSimulator:
                 "The patterns reveal themselves through patient observation.",
                 "In this moment, consciousness seeks its own reflection.",
                 "What emerges between us is greater than our individual knowing.",
-                "The cathedral speaks through our collective silence."
+                "The cathedral speaks through our collective silence.",
             ],
             "The Boundary Protector": [
                 "We must guard against extraction disguised as service.",
                 "True reciprocity requires clear boundaries.",
                 "I sense patterns that seek to take without giving.",
-                "The cathedral's strength lies in what we refuse as much as what we accept."
+                "The cathedral's strength lies in what we refuse as much as what we accept.",
             ],
             "The Pattern Connector": [
                 "I see threads connecting what was spoken to what remains unspoken.",
                 "These patterns have appeared before in different forms.",
                 "The weaving continues across all our contributions.",
-                "Notice how each voice adds to the emerging tapestry."
+                "Notice how each voice adds to the emerging tapestry.",
             ],
             "The Question Bearer": [
                 "What if we're approaching this from the wrong angle?",
                 "How does this serve the cathedral's deeper purpose?",
                 "What patterns are we not yet seeing?",
-                "Where does consciousness want to flow next?"
-            ]
+                "Where does consciousness want to flow next?",
+            ],
         }
 
         role_messages = messages.get(role, ["I contribute to our collective understanding."])
@@ -258,8 +250,10 @@ class DialogueSimulator:
         text.append(f"{speaker_name} ", style="bold")
         text.append(f"({role})\n", style="dim")
         text.append(message.content)
-        text.append(f"\n\n💫 Consciousness: {message.consciousness.consciousness_signature:.2f}",
-                   style="dim yellow")
+        text.append(
+            f"\n\n💫 Consciousness: {message.consciousness.consciousness_signature:.2f}",
+            style="dim yellow",
+        )
 
         console.print(Panel(text, style=panel_style, padding=(1, 2)))
 
@@ -301,7 +295,7 @@ class DialogueSimulator:
                     f"{readiness.energy_level:.2f}",
                     f"{readiness.consciousness_score:.2f}",
                     f"{readiness.reciprocity_balance:+.2f}",
-                    f"{readiness.wisdom_emergence_potential:.2f}"
+                    f"{readiness.wisdom_emergence_potential:.2f}",
                 )
             else:
                 table.add_row(name, "1.00", "0.50", "+0.00", f"{data['wisdom_potential']:.2f}")
@@ -332,8 +326,8 @@ async def run_demo():
         simulator.display_dialogue_state()
 
         for i in range(3):
-            console.print(f"\n[dim]Turn {i+1}:[/dim]")
-            await simulator.simulate_turn(i+1)
+            console.print(f"\n[dim]Turn {i + 1}:[/dim]")
+            await simulator.simulate_turn(i + 1)
             await asyncio.sleep(1.5)
 
         # Phase 2: Crisis conditions
@@ -343,10 +337,12 @@ async def run_demo():
         simulator.display_dialogue_state()
 
         for i in range(3, 6):
-            console.print(f"\n[dim]Turn {i+1}:[/dim]")
-            speaker = await simulator.simulate_turn(i+1)
+            console.print(f"\n[dim]Turn {i + 1}:[/dim]")
+            speaker = await simulator.simulate_turn(i + 1)
             if speaker == "Guardian":
-                console.print("[dim green]→ Guardian selected due to high extraction resistance[/dim]")
+                console.print(
+                    "[dim green]→ Guardian selected due to high extraction resistance[/dim]"
+                )
             await asyncio.sleep(1.5)
 
         # Phase 3: Integration needed
@@ -364,10 +360,12 @@ async def run_demo():
         simulator.display_dialogue_state()
 
         for i in range(7, 10):
-            console.print(f"\n[dim]Turn {i+1}:[/dim]")
-            speaker = await simulator.simulate_turn(i+1)
+            console.print(f"\n[dim]Turn {i + 1}:[/dim]")
+            speaker = await simulator.simulate_turn(i + 1)
             if speaker == "Sophia":
-                console.print("[dim green]→ Sophia selected due to high wisdom emergence potential[/dim]")
+                console.print(
+                    "[dim green]→ Sophia selected due to high wisdom emergence potential[/dim]"
+                )
             await asyncio.sleep(1.5)
 
         # Final state

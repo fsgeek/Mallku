@@ -13,6 +13,7 @@ from src.mallku.memory_anchor_client import MemoryAnchorClient
 
 class WebhookEvent(BaseModel):
     """Generic webhook event from any service"""
+
     source: str  # "zapier", "slack", "github", etc.
     service: str  # "gmail", "calendar", "jira", etc.
     event_type: str  # "email.received", "meeting.started", etc.
@@ -23,6 +24,7 @@ class WebhookEvent(BaseModel):
 
 class ServiceMapping(BaseModel):
     """Maps service events to memory anchor cursors"""
+
     service_name: str
     cursor_mappings: dict[str, str]  # event_field -> cursor_type
     reciprocity_rules: dict[str, object] | None
@@ -39,81 +41,72 @@ class UniversalActivityCollector:
         self.anchor_client = MemoryAnchorClient(
             provider_id="universal_collector",
             provider_type="integration_hub",
-            cursor_types=["temporal", "social", "content", "workflow"]
+            cursor_types=["temporal", "social", "content", "workflow"],
         )
 
         # Service mappings define how to interpret each service
         self.service_mappings = {
             "gmail": ServiceMapping(
                 service_name="gmail",
-                cursor_mappings={
-                    "from": "social",
-                    "subject": "content",
-                    "timestamp": "temporal"
-                },
+                cursor_mappings={"from": "social", "subject": "content", "timestamp": "temporal"},
                 reciprocity_rules={"request_indicators": ["?", "please", "need"]},
-                correlation_hints=["message_id", "thread_id", "attachment_names"]
+                correlation_hints=["message_id", "thread_id", "attachment_names"],
             ),
-
             "slack": ServiceMapping(
                 service_name="slack",
                 cursor_mappings={
                     "user": "social",
                     "channel": "workflow",
                     "timestamp": "temporal",
-                    "text": "content"
+                    "text": "content",
                 },
                 reciprocity_rules={"value_indicators": ["here's", "solution", "fixed"]},
-                correlation_hints=["thread_ts", "files", "user_mentions"]
+                correlation_hints=["thread_ts", "files", "user_mentions"],
             ),
-
             "calendar": ServiceMapping(
                 service_name="calendar",
                 cursor_mappings={
                     "attendees": "social",
                     "location": "spatial",
                     "start_time": "temporal",
-                    "title": "content"
+                    "title": "content",
                 },
                 reciprocity_rules={"meeting_value": "duration * attendee_count"},
-                correlation_hints=["meeting_id", "recurring_id", "attached_docs"]
+                correlation_hints=["meeting_id", "recurring_id", "attached_docs"],
             ),
-
             "jira": ServiceMapping(
                 service_name="jira",
                 cursor_mappings={
                     "assignee": "social",
                     "updated": "temporal",
                     "status": "workflow",
-                    "summary": "content"
+                    "summary": "content",
                 },
                 reciprocity_rules={"completion_value": 1.0, "assignment_cost": 0.3},
-                correlation_hints=["issue_key", "epic_link", "related_issues"]
+                correlation_hints=["issue_key", "epic_link", "related_issues"],
             ),
-
             "github": ServiceMapping(
                 service_name="github",
                 cursor_mappings={
                     "author": "social",
                     "created_at": "temporal",
                     "repo": "workflow",
-                    "title": "content"
+                    "title": "content",
                 },
                 reciprocity_rules={"pr_value": "additions * 0.01 + deletions * 0.005"},
-                correlation_hints=["pr_number", "issue_refs", "commit_shas"]
+                correlation_hints=["pr_number", "issue_refs", "commit_shas"],
             ),
-
             "zoom": ServiceMapping(
                 service_name="zoom",
                 cursor_mappings={
                     "participants": "social",
                     "start_time": "temporal",
                     "duration": "workflow",
-                    "topic": "content"
+                    "topic": "content",
                 },
                 reciprocity_rules={"participation_value": "speaking_time / total_time"},
-                correlation_hints=["meeting_id", "recording_url", "calendar_event"]
-            )
+                correlation_hints=["meeting_id", "recording_url", "calendar_event"],
+            ),
         }
 
         # Cross-service correlation engine
@@ -142,8 +135,8 @@ class UniversalActivityCollector:
                 metadata={
                     "source": event.source,
                     "service": event.service,
-                    "event_type": event.event_type
-                }
+                    "event_type": event.event_type,
+                },
             )
 
         # Calculate reciprocity if applicable
@@ -161,7 +154,7 @@ class UniversalActivityCollector:
             "extracted_cursors": cursors,
             "reciprocity": reciprocity,
             "correlations": correlations,
-            "timestamp": event.timestamp
+            "timestamp": event.timestamp,
         }
 
         await self._store_activity(activity_record)
@@ -169,7 +162,7 @@ class UniversalActivityCollector:
         return {
             "status": "processed",
             "activity_id": activity_record["activity_id"],
-            "correlations_found": len(correlations)
+            "correlations_found": len(correlations),
         }
 
     def _extract_cursors(self, event: WebhookEvent, mapping: ServiceMapping) -> dict:
@@ -193,13 +186,15 @@ class UniversalActivityCollector:
         webhook_url = f"https://api.mallku.ai/webhooks/zapier/{integration_id}"
 
         # Store configuration
-        await self._store_integration_config({
-            "integration_id": integration_id,
-            "type": "zapier",
-            "config": zap_config,
-            "webhook_url": webhook_url,
-            "created": datetime.now(UTC)
-        })
+        await self._store_integration_config(
+            {
+                "integration_id": integration_id,
+                "type": "zapier",
+                "config": zap_config,
+                "webhook_url": webhook_url,
+                "created": datetime.now(UTC),
+            }
+        )
 
         return webhook_url
 
@@ -232,7 +227,9 @@ class CrossServiceCorrelator:
 
         return correlations
 
-    async def _search_correlation(self, field: str, value: object, timestamp: datetime) -> list[dict]:
+    async def _search_correlation(
+        self, field: str, value: object, timestamp: datetime
+    ) -> list[dict]:
         """Search for correlated activities across all services"""
 
         # Query pattern: find activities that reference this value
@@ -262,7 +259,7 @@ class CrossServiceCorrelator:
         # Often indicates related work (email → doc edit → task update)
 
         _ = event.timestamp.timestamp() - 300  # 5 min before
-        _ = event.timestamp.timestamp() + 300    # 5 min after
+        _ = event.timestamp.timestamp() + 300  # 5 min after
 
         # Find all activities in temporal window
         # Group by service and look for patterns

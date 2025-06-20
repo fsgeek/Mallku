@@ -14,11 +14,11 @@ from .memory_buffer_wrangler import MemoryBufferWrangler
 from .queue_wrangler import QueueWrangler
 
 __all__ = [
-    'DataWranglerInterface',
-    'BaseWrangler',
-    'WranglerCapabilities',
-    'IdentityWrangler',
-    'EventEmittingWrangler',
-    'MemoryBufferWrangler',
-    'QueueWrangler',
+    "DataWranglerInterface",
+    "BaseWrangler",
+    "WranglerCapabilities",
+    "IdentityWrangler",
+    "EventEmittingWrangler",
+    "MemoryBufferWrangler",
+    "QueueWrangler",
 ]

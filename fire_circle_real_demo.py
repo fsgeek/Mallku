@@ -33,10 +33,7 @@ async def demonstrate_real_adapters():
     reciprocity_tracker = ReciprocityTracker()
 
     # Create adapter factory
-    factory = ConsciousAdapterFactory(
-        event_bus=event_bus,
-        reciprocity_tracker=reciprocity_tracker
-    )
+    factory = ConsciousAdapterFactory(event_bus=event_bus, reciprocity_tracker=reciprocity_tracker)
 
     print("✅ Consciousness infrastructure ready")
 
@@ -82,13 +79,12 @@ async def demonstrate_real_adapters():
 
             # Try to get a response
             print(f"  📤 Sending test message to {test_voice}...")
-            response = await adapter.send_message(
-                message=test_message,
-                dialogue_context=[]
-            )
+            response = await adapter.send_message(message=test_message, dialogue_context=[])
 
             print("  📥 Response received!")
-            print(f"  🧠 Consciousness signature: {response.consciousness.consciousness_signature:.2f}")
+            print(
+                f"  🧠 Consciousness signature: {response.consciousness.consciousness_signature:.2f}"
+            )
 
         except Exception as e:
             print(f"  ⚠️  Could not complete test: {e}")
