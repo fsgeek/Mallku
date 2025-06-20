@@ -14,6 +14,7 @@ import os
 from uuid import uuid4
 
 import pytest
+
 from mallku.firecircle import (
     AdapterConfig,
     ConsciousAdapterFactory,

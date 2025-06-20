@@ -15,6 +15,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
+
 from mallku.core.secrets import SecretsManager, get_secret
 from mallku.firecircle.adapters.adapter_factory import (
     ConsciousAdapterFactory,

@@ -22,11 +22,12 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
+from pydantic import BaseModel, Field
+
 from mallku.firecircle.adapters.base import ConsciousModelAdapter
 from mallku.firecircle.consciousness_metrics import (
     ConsciousnessSignature,
 )
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -430,10 +431,7 @@ class InfrastructureConsciousness:
 
         # Check decreasing consciousness coherence
         coherence = [h.consciousness_coherence for h in health_history]
-        if coherence[-1] < coherence[0] - 0.2:
-            return True
-
-        return False
+        return coherence[-1] < coherence[0] - 0.2
 
     def _detect_api_change(self, health_history: list[AdapterHealthSignature]) -> bool:
         """Detect potential API changes from error patterns."""
@@ -445,10 +443,7 @@ class InfrastructureConsciousness:
         # Check for Twenty-Sixth Artisan's discovered patterns
         if "api_return_none" in recent.error_patterns:
             return True
-        if "api_method_missing" in recent.error_patterns:
-            return True
-
-        return False
+        return "api_method_missing" in recent.error_patterns
 
     def _detect_resonance_patterns(self) -> list[InfrastructurePattern]:
         """Detect resonance patterns across multiple adapters."""

@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import pytest
 import pytest_asyncio
+
 from mallku.firecircle.consciousness_guided_speaker import (
     CathedralPhase,
     ConsciousnessGuidedSpeakerSelector,

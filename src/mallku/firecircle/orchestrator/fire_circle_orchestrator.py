@@ -746,10 +746,7 @@ Speak from the collective wisdom that has emerged, not just your individual pers
         ]
 
         content_lower = message.content.text.lower()
-        if any(phrase in content_lower for phrase in emergence_phrases):
-            return True
-
-        return False
+        return bool(any(phrase in content_lower for phrase in emergence_phrases))
 
     async def _send_invocation(self, ceremony_id: UUID, dialogue_id: UUID) -> None:
         """Send opening invocation for the ceremony."""

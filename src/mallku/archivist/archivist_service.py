@@ -289,13 +289,7 @@ class ArchivistService(AsyncBase):
             return True
 
         # Need clarification if no clear search parameters
-        if (not intent.temporal_bounds and
-            not intent.context_markers and
-            not intent.activity_types and
-            not intent.social_references):
-            return True
-
-        return False
+        return bool(not intent.temporal_bounds and not intent.context_markers and not intent.activity_types and not intent.social_references)
 
     async def _create_clarification_response(
         self,

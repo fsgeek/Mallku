@@ -9,6 +9,8 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
 
+from pydantic import BaseModel, Field
+
 from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig
 from mallku.firecircle.protocol.conscious_message import (
@@ -18,7 +20,6 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from pydantic import BaseModel, Field
 
 
 class Round(BaseModel):

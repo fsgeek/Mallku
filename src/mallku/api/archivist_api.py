@@ -16,12 +16,13 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel, Field
+
 from mallku.archivist.archivist_service import ArchivistService
 from mallku.archivist.response_generator import ArchivistResponse
 from mallku.core.database import IndalekoDBConfig
 from mallku.events.event_bus import EventBus
 from mallku.services.memory_anchor_service import MemoryAnchorService
-from pydantic import BaseModel, Field
 
 # Pydantic models for API
 

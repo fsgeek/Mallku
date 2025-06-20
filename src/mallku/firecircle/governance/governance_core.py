@@ -71,7 +71,7 @@ class FireCircleGovernance(AsyncBase):
         self.test_generator = TestScenarioGenerator()
 
         # Governance state
-        self._active_proposals: dict["UUID", DevelopmentProposal] = {}
+        self._active_proposals: dict[UUID, DevelopmentProposal] = {}
         self._decision_history: list[GovernanceDecision] = []
         self._builder_assessments: dict[str, list[ConsciousnessAlignment]] = {}
         self._pattern_authority: dict[str, float] = {}  # Pattern ID -> authority score

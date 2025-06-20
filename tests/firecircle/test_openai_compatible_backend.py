@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
+
 from mallku.firecircle.adapters.local_adapter import (
     LocalAdapterConfig,
     LocalAIAdapter,

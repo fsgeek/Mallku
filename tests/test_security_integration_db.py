@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import aiosqlite
+
 from mallku.core.security import (
     FieldIndexStrategy,
     FieldObfuscationLevel,

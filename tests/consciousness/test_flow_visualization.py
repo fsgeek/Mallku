@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 import pytest
 import pytest_asyncio
+
 from mallku.consciousness.flow_monitor import ConsciousnessFlowMonitor, FlowMetrics
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,

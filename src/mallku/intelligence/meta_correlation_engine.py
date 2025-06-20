@@ -283,10 +283,7 @@ class MetaCorrelationEngine:
             'contextual': ['cyclical'],
         }
 
-        if pattern1 in progressions and pattern2 in progressions.get(pattern1, []):
-            return True
-
-        return False
+        return bool(pattern1 in progressions and pattern2 in progressions.get(pattern1, []))
 
     def _calculate_cascade_strength(self, cascade: list[MemoryAnchor]) -> float:
         """Calculate the strength of a potential cascade."""
