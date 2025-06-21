@@ -19,11 +19,10 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from uuid import UUID
 
-from openai import AsyncOpenAI
-
 from mallku.core.secrets import get_secret
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
+from openai import AsyncOpenAI
 
 from ..protocol.conscious_message import (
     ConsciousMessage,

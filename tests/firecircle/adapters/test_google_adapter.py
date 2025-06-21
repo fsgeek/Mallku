@@ -15,8 +15,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from PIL import Image
-
 from mallku.firecircle.adapters.google_adapter import (
     GeminiConfig,
     GoogleAIAdapter,
@@ -29,6 +27,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageType,
 )
 from mallku.orchestration.event_bus import ConsciousnessEventBus
+from PIL import Image
 
 
 @pytest.fixture

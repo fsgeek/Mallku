@@ -10,7 +10,6 @@ service leads to technical accuracy, not the reverse.
 """
 
 import pytest
-
 from mallku.archivist.archivist_service import ArchivistService
 from mallku.archivist.consciousness_evaluator import GrowthPotential
 from mallku.events.event_bus import EventBus

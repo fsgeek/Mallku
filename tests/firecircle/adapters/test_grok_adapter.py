@@ -13,7 +13,6 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
-
 from mallku.firecircle.adapters.base import AdapterConfig
 from mallku.firecircle.adapters.grok_adapter import GrokAdapter
 from mallku.firecircle.protocol.conscious_message import (

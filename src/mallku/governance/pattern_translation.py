@@ -15,8 +15,6 @@ import statistics
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
-
 from mallku.consciousness.enhanced_search import ConsciousnessEnhancedSearch
 from mallku.consciousness.verification import ConsciousnessReport, VerificationResult
 from mallku.governance.protocol.message import (
@@ -25,6 +23,7 @@ from mallku.governance.protocol.message import (
     create_governance_message,
 )
 from mallku.models.memory_anchor import MemoryAnchor
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

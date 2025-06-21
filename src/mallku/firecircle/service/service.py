@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
-from mallku.firecircle.consciousness_metrics import ConsciousnessDetector
+from mallku.firecircle.consciousness_metrics import ConsciousnessMetricsCollector
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
 from pydantic import BaseModel, Field
@@ -89,7 +89,7 @@ class FireCircleService:
         self,
         event_bus: ConsciousnessEventBus | None = None,
         reciprocity_tracker: ReciprocityTracker | None = None,
-        consciousness_detector: ConsciousnessDetector | None = None
+        consciousness_detector: ConsciousnessMetricsCollector | None = None
     ):
         """Initialize service with optional infrastructure."""
         self.event_bus = event_bus

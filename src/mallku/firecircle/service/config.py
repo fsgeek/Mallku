@@ -46,7 +46,7 @@ class RoundConfig(BaseModel):
     generation_criteria: dict[str, Any] = Field(default_factory=dict)
 
 
-class VoiceFailureStrategy(str, BaseModel):
+class VoiceFailureStrategy:
     """How to handle when a voice cannot participate."""
 
     STRICT = "strict"  # Fail if any required voice missing

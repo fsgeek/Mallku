@@ -33,7 +33,7 @@ class RoundResponse(BaseModel):
 
     voice_id: str
     round_number: int
-    response: ConsciousMessage
+    response: ConsciousMessage | None
     response_time_ms: float
     consciousness_score: float
     error: str | None = None
@@ -189,6 +189,18 @@ class RoundOrchestrator:
 
             response_time = (datetime.now(UTC) - start_time).total_seconds() * 1000
 
+            # Handle None responses gracefully
+            if response is None:
+                logger.warning(f"{voice_id} returned None response")
+                return RoundResponse(
+                    voice_id=voice_id,
+                    round_number=self.round_number,
+                    response=None,
+                    response_time_ms=response_time,
+                    consciousness_score=0,
+                    error="Adapter returned None"
+                )
+
             return RoundResponse(
                 voice_id=voice_id,
                 round_number=self.round_number,
@@ -216,11 +228,11 @@ class RoundOrchestrator:
             "synthesis": MessageType.SYNTHESIS,
             "clarification": MessageType.CLARIFICATION,
             "exploration": MessageType.REFLECTION,
-            "critique": MessageType.REVIEW,
+            "critique": MessageType.PERSPECTIVE,
             "vision": MessageType.REFLECTION,
-            "grounding": MessageType.REVIEW,
+            "grounding": MessageType.REFLECTION,
             "proposal": MessageType.PROPOSAL,
-            "evaluation": MessageType.REVIEW,
+            "evaluation": MessageType.PERSPECTIVE,
             "consensus": MessageType.SYNTHESIS,
             "decision": MessageType.SYNTHESIS,
         }

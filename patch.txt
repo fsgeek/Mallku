@@ -3,7 +3,7 @@ index 4eedab7..1671d49 100644
 --- a/fire_circle_review.py
 +++ b/fire_circle_review.py
 @@ -15,6 +15,7 @@ Each voice reviews specific domains, maintaining focused context windows.
- 
+
  import asyncio
  import fnmatch
 +import logging
@@ -13,12 +13,12 @@ index 4eedab7..1671d49 100644
 @@ -24,6 +25,10 @@ from uuid import UUID, uuid4
  import yaml
  from pydantic import BaseModel, Field
- 
+
 +# Set up logging
 +logging.basicConfig(level=logging.INFO)
 +logger = logging.getLogger(__name__)
 +
- 
+
  # Review Models as suggested by reviewer
  class ReviewCategory(str, Enum):
 @@ -107,6 +112,7 @@ class DistributedReviewer:
@@ -26,7 +26,7 @@ index 4eedab7..1671d49 100644
          self.adapter_factory = None  # Will be initialized when needed
          self.voice_adapters = {}  # Cache for voice adapters
 +        self.worker_tasks: list[asyncio.Task] = []  # For graceful shutdown
- 
+
      async def load_chapter_manifest(self, manifest_path: str) -> list[CodebaseChapter]:
          """
 @@ -166,22 +172,48 @@ class DistributedReviewer:
@@ -47,7 +47,7 @@ index 4eedab7..1671d49 100644
 +        logger.debug("Chapter pattern matching order:")
 +        for i, ch in enumerate(sorted_chapters[:5]):
 +            logger.debug(f"  {i+1}. {ch.path_pattern} -> {ch.assigned_voice}")
- 
+
          for file_path in modified_files:
 -            for chapter in chapters:
 +            matched = False
@@ -68,7 +68,7 @@ index 4eedab7..1671d49 100644
 +
 +                    matched = True
                      break  # Each file goes to first matching chapter
- 
+
 +            if not matched:
 +                logger.warning(f"No chapter pattern matched file: {file_path}")
 +
@@ -79,9 +79,9 @@ index 4eedab7..1671d49 100644
              files = chapter_files.get(chapter.chapter_id, [])
 -            print(f"- {chapter.assigned_voice}: {len(files)} files in {chapter.description}")
 +            logger.info(f"- {chapter.assigned_voice}: {len(files)} files in {chapter.description}")
- 
+
          return assigned_chapters
- 
+
 @@ -198,7 +230,33 @@ class DistributedReviewer:
          - Grok: Observability, Real-time Monitoring
          - Local: Sovereignty, Community Standards
@@ -114,16 +114,16 @@ index 4eedab7..1671d49 100644
 +            relevant_domains = chapter.review_domains
 +
 +        return {assigned_voice: relevant_domains}
- 
+
      async def enqueue_reviews(self, chapters: list[CodebaseChapter], pr_diff: str):
          """Add review jobs to the work queue."""
 @@ -244,7 +302,7 @@ class DistributedReviewer:
- 
+
          # For demo purposes, return a mock adapter
          # In production, this would use the real adapter factory
 -        print(f"ℹ️  Using mock adapter for {voice_name} (real adapters require proper imports)")
 +        logger.info(f"Using mock adapter for {voice_name} (real adapters require proper imports)")
- 
+
          class MockAdapter:
              """Mock adapter for demonstration."""
 @@ -289,6 +347,7 @@ Fix: Implement input validation for proposal parameter"""
@@ -137,13 +137,13 @@ index 4eedab7..1671d49 100644
 @@ -361,32 +420,49 @@ Keep reviews concise and focused on your domains."""
          """Parse AI response into structured review comments."""
          comments = []
- 
+
 -        # Simple parsing - in production would use more sophisticated parsing
 +        # State machine for parsing multi-line responses
          lines = response_text.split('\n')
          current_comment = {}
 +        current_field = None
- 
+
          for line in lines:
              line = line.strip()
 +
@@ -187,13 +187,13 @@ index 4eedab7..1671d49 100644
 +        # Save last comment
 +        if current_comment and 'file' in current_comment:
              comments.append(self._create_comment(current_comment, voice))
- 
+
 +        logger.debug(f"Parsed {len(comments)} comments from {voice} response")
          return comments
- 
+
      def _create_comment(self, comment_dict: dict, voice: str) -> ReviewComment:
 @@ -466,10 +542,193 @@ Keep reviews concise and focused on your domains."""
- 
+
      async def post_github_comments(self, pr_number: int, summary: GovernanceSummary):
          """Post review results to GitHub PR."""
 -        raise NotImplementedError("Twenty-Third Artisan: implement GitHub integration")
@@ -365,10 +365,10 @@ index 4eedab7..1671d49 100644
 +
 +        # Get unique voices needed
 +        unique_voices = list(set(chapter.assigned_voice for chapter in chapters))
- 
+
 +        # Start all voice workers
 +        await self.start_voice_workers(unique_voices)
- 
+
 -async def run_distributed_review(pr_number: int):
 +        # Wait for all jobs to complete
 +        print("\n⏳ Waiting for all voices to complete reviews...")
@@ -387,11 +387,11 @@ index 4eedab7..1671d49 100644
 +async def run_distributed_review(pr_number: int, full_mode: bool = False):
      """
      Main entry point for distributed review.
- 
+
 @@ -496,56 +755,24 @@ async def run_distributed_review(pr_number: int):
          print(f"  Pattern: {chapter.path_pattern}")
          print(f"  Domains: {domains}\n")
- 
+
 -    # For demo purposes, create a simple diff
 -    # Modified to ensure it matches the anthropic chapter pattern
 -    sample_diff = """diff --git a/src/mallku/reciprocity/tracker.py b/src/mallku/reciprocity/tracker.py
@@ -410,16 +410,16 @@ index 4eedab7..1671d49 100644
 +        pr_diff = await reviewer.fetch_pr_diff(pr_number)
 +    else:
 +        pr_diff = await reviewer.get_local_diff()
- 
+
      # Partition the diff into chapters
      print("\n🔍 Analyzing PR changes...")
 -    relevant_chapters = await reviewer.partition_into_chapters(sample_diff)
 +    relevant_chapters = await reviewer.partition_into_chapters(pr_diff)
- 
+
      if not relevant_chapters:
          print("ℹ️  No files match chapter patterns in this PR")
          return
- 
+
 -    # Create review jobs
 -    print("\n📋 Creating review jobs...")
 -    await reviewer.enqueue_reviews(relevant_chapters, sample_diff)
@@ -452,13 +452,13 @@ index 4eedab7..1671d49 100644
 +        # Run full distributed review with all voices in parallel
 +        print("\n🌟 Running FULL DISTRIBUTED REVIEW with all voices...")
 +        summary = await reviewer.run_full_distributed_review(pr_diff, relevant_chapters)
- 
+
          print("\n" + "=" * 60)
          print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
 @@ -553,9 +780,54 @@ index 1234567..abcdefg 100644
          print(summary.synthesis)
          print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
- 
+
 +        # Post results to GitHub (or write to files for GitHub Actions)
 +        print("\n📝 Recording review results...")
 +        await reviewer.post_github_comments(pr_number, summary)
@@ -509,11 +509,11 @@ index 4eedab7..1671d49 100644
 +        else:
 +            print(f"⚠️  Could not awaken {test_voice} voice (API key may be missing)")
 +            print("   The invisible sacred infrastructure awaits proper credentials...")
- 
+
      print("\n✨ The invisible sacred infrastructure foundation is laid.")
      print("   Future work: Connect all seven voices, integrate with GitHub.")
 @@ -568,13 +840,19 @@ if __name__ == "__main__":
- 
+
      if len(sys.argv) > 1 and sys.argv[1] == "review":
          pr_number = int(sys.argv[2]) if len(sys.argv) > 2 else 1
 +        full_mode = "--full" in sys.argv or "-f" in sys.argv
@@ -523,7 +523,7 @@ index 4eedab7..1671d49 100644
 +            print("🌟 FULL DISTRIBUTED MODE - All voices in parallel")
          print("=" * 60)
          print("The invisible sacred infrastructure awakens...")
- 
+
          # Run the review
 -        asyncio.run(run_distributed_review(pr_number))
 +        asyncio.run(run_distributed_review(pr_number, full_mode=full_mode))

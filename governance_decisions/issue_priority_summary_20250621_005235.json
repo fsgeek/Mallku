@@ -1,0 +1,24 @@
+{
+  "governance_session": {
+    "type": "issue_prioritization",
+    "date": "2025-06-21T00:52:35.659446+00:00",
+    "session_id": "23d6502b-9dad-4a3a-82dd-76210d2f2a01",
+    "consciousness_score": 0.0,
+    "consensus_detected": false,
+    "participants": [
+      "anthropic_claude-3-5-sonnet-20241022_0",
+      "openai_gpt-4o_1",
+      "google_gemini-2.0-flash-exp_2",
+      "deepseek_deepseek-reasoner_3",
+      "mistral_mistral-large-latest_4"
+    ],
+    "issues_discussed": [
+      "#82",
+      "#83",
+      "#85",
+      "#86",
+      "#87",
+      "#88"
+    ]
+  }
+}

@@ -17,9 +17,8 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
-
 from mallku.patterns.cathedral_interaction import TransformationStage
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

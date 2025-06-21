@@ -12,7 +12,6 @@ import asyncio
 
 import pytest
 import pytest_asyncio
-
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
     ConsciousnessFlow,
