@@ -124,7 +124,11 @@ class RoundOrchestrator:
                     response = await task
                     if response:
                         responses[voice_id] = response
-                        self.dialogue_context.append(response.response)
+                        # Only append to dialogue context if we have an actual message
+                        if response.response is not None:
+                            self.dialogue_context.append(response.response)
+                        else:
+                            logger.debug(f"{voice_id} returned None response, not adding to context")
                 else:
                     logger.warning(f"{voice_id} timed out in round {self.round_number}")
             except Exception as e:

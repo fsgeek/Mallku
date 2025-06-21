@@ -162,9 +162,15 @@ class ConsciousModelAdapter(ABC):
         Filters and formats messages based on consciousness signatures
         and relevance.
         """
+        # Filter out None values and invalid messages
+        valid_messages = [
+            msg for msg in dialogue_context
+            if msg is not None and hasattr(msg, 'consciousness')
+        ]
+
         # Sort by consciousness signature if needed
         relevant_context = sorted(
-            dialogue_context,
+            valid_messages,
             key=lambda m: m.consciousness.consciousness_signature,
             reverse=True,
         )
