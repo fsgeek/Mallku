@@ -54,7 +54,7 @@ jobs:
             ~/.cache/pip
           key: deps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
       - name: Install dependencies
-        run: uv pip install -r requirements.txt
+        run: uv pip install -r pyproject.toml
       - name: Run tests
         run: pytest --maxfail=1 --disable-warnings -q
 
