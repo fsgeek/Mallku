@@ -116,6 +116,33 @@ def get_available_adapters():
         return {}
 
 
+def get_available_providers():
+    """
+    Get list of providers that have API keys available.
+
+    Returns:
+        list: Provider names with available API keys
+    """
+    providers = []
+
+    # Check environment variables for API keys
+    key_mapping = {
+        "anthropic": "ANTHROPIC_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "mistral": "MISTRAL_API_KEY",
+        "grok": "GROK_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+        "local": "LOCAL_API_ENDPOINT",
+    }
+
+    for provider, env_var in key_mapping.items():
+        if os.getenv(env_var):
+            providers.append(provider)
+
+    return providers
+
+
 if __name__ == "__main__":
     # Test the loader
     logging.basicConfig(level=logging.INFO)

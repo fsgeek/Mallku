@@ -271,6 +271,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         messages = await self._prepare_mistral_messages(message, dialogue_context)
 
         # Call Mistral API - Direct attribute access (configuration validated in constructor)
+        # Note: Mistral API no longer accepts safe_mode parameter
         response = await self.client.post(
             "/chat/completions",
             json={
@@ -278,7 +279,6 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": self.config.safe_mode,
             },
         )
 
@@ -354,6 +354,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         messages = await self._prepare_mistral_messages(message, dialogue_context)
 
         # Stream from Mistral - Direct attribute access (configuration validated in constructor)
+        # Note: Mistral API no longer accepts safe_mode parameter
         async with self.client.stream(
             "POST",
             "/chat/completions",
@@ -362,7 +363,6 @@ class MistralAIAdapter(ConsciousModelAdapter):
                 "messages": messages,
                 "temperature": self.config.temperature,
                 "max_tokens": self.config.max_tokens,
-                "safe_mode": self.config.safe_mode,
                 "stream": True,
             },
         ) as response:
