@@ -191,3 +191,7 @@ Notes.md
 # Fire Circle review artifacts
 fire_circle_review_results.json
 fire_circle_reviews/
+
+# Fire Circle session outputs
+fire_circle_heartbeats/
+fire_circle_transcripts/
