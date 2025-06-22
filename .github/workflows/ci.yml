@@ -28,6 +28,8 @@ jobs:
           key: uv-${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
       - name: Install pre-commit
         run: uv pip install pre-commit
+      - name: sync
+        run: uv sync
       - name: Show versions
         run: |
           python --version
