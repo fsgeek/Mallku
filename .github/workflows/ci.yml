@@ -30,7 +30,7 @@ jobs:
         run: uv pip install pre-commit
 
       - name: Run pre-commit hooks
-        run: uv pre-commit run --all-files
+        run: uv run --active pre-commit run --all-files
 
   test:
     runs-on: ubuntu-latest
