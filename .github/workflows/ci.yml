@@ -26,10 +26,11 @@ jobs:
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-      - name: Install pre-commit and run hooks
-        uses: pre-commit/action@v4.5.0
-        with:
-          extra_args: --all-files
+      - name: Install pre-commit
+        run: uv pip install pre-commit
+
+      - name: Run pre-commit hooks
+        run: uv pre-commit run --all-files
 
   test:
     runs-on: ubuntu-latest
