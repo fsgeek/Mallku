@@ -7,9 +7,8 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-
 from dbfacade import ObfuscatedModel  # Privacy-preserving base
+from pydantic import BaseModel, Field
 
 
 class InteractionType(str):
