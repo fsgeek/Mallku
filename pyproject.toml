@@ -62,10 +62,14 @@ ignore = [
   "N802",  # Allow lowercase function names
 ]
 
+[tool.ruff.lint.isort]
+known-first-party = ["src", "dbfacade"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
+
 
 [dependency-groups]
 dev = [
