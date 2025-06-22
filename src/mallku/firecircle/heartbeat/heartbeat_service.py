@@ -269,10 +269,7 @@ class FireCircleHeartbeat:
             return True
 
         # Check for high sustained consciousness
-        if all(score > 0.8 for score in recent_scores):
-            return True
-
-        return False
+        return bool(all(score > 0.8 for score in recent_scores))
 
     async def _heartbeat_loop(self) -> None:
         """Main heartbeat loop - maintains the rhythm."""
