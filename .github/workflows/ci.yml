@@ -26,12 +26,10 @@ jobs:
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-      - name: Install ruff
-        run: uv pip install ruff
-      - name: Lint with ruff
-        run: ruff check --config=pyproject.toml .
-      - name: Format with ruff
-        run: ruff format --config=pyproject.toml .
+      - name: Install pre-commit and run hooks
+        uses: pre-commit/action@v4.5.0
+        with:
+          extra_args: --all-files
 
   test:
     runs-on: ubuntu-latest
