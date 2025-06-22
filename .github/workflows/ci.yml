@@ -28,9 +28,14 @@ jobs:
           key: uv-${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
       - name: Install pre-commit
         run: uv pip install pre-commit
-
+      - name: Show versions
+        run: |
+          python --version
+          uv --version
+          pre-commit --version
+          ruff --version
       - name: Run pre-commit hooks
-        run: uv run --active pre-commit run --all-files
+        run: uv run --active pre-commit run --all-files --show-diff-on-failure
 
   test:
     runs-on: ubuntu-latest
