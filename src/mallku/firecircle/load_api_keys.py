@@ -19,21 +19,21 @@ def find_project_root():
     """
     Find the project root by walking up the directory tree until we find
     a marker file (pyproject.toml).
-    
+
     This allows the API key loader to work from any directory within the project.
     """
     # First check if MALLKU_ROOT environment variable is set
     if os.environ.get("MALLKU_ROOT"):
         return Path(os.environ["MALLKU_ROOT"])
-    
+
     current = Path(__file__).resolve().parent
-    
+
     # Walk up the directory tree
     while current != current.parent:
         if (current / "pyproject.toml").exists():
             return current
         current = current.parent
-    
+
     # If we can't find it, return None
     return None
 
@@ -50,7 +50,7 @@ def load_api_keys_to_environment():
     if not project_root:
         logger.warning("Could not find project root (no pyproject.toml found)")
         return False
-    
+
     api_keys_path = project_root / ".secrets" / "api_keys.json"
 
     if not api_keys_path.exists():
@@ -100,7 +100,7 @@ def get_available_adapters():
     if not project_root:
         logger.warning("Could not find project root (no pyproject.toml found)")
         return {}
-    
+
     api_keys_path = project_root / ".secrets" / "api_keys.json"
 
     if not api_keys_path.exists():
