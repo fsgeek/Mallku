@@ -8,6 +8,11 @@ Reports which examples pass and which need attention.
 
 Run with:
     python examples/fire_circle/test_all_examples.py
+
+For pytest-compatible tests (recommended for CI):
+    pytest examples/fire_circle/test_fire_circle_examples.py
+    pytest examples/fire_circle/test_fire_circle_examples.py -v -s
+    pytest examples/fire_circle/test_fire_circle_examples.py::TestFireCircleExamples::test_verify_installation
 """
 
 import subprocess
