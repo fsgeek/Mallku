@@ -59,9 +59,11 @@ jobs:
             ~/.cache/pip
           key: deps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
       - name: Install dependencies
-        run: uv pip install -r pyproject.toml
+        run: |
+          uv sync
+          uv pip install pytest pytest-asyncio pytest-mock
       - name: Run tests
-        run: pytest --maxfail=1 --disable-warnings -q
+        run: uv run pytest --maxfail=1 --disable-warnings -q
 
   coverage:
     runs-on: ubuntu-latest
@@ -76,9 +78,11 @@ jobs:
         run: |
           uv venv --python=3.12 .venv
           echo ".venv/bin" >> $GITHUB_PATH
-      - name: Install coverage
-        run: uv pip install coverage
+      - name: Install dependencies
+        run: |
+          uv sync
+          uv pip install coverage pytest pytest-asyncio pytest-mock
       - name: Run coverage
         run: |
-          coverage run -m pytest
-          coverage report
+          uv run coverage run -m pytest
+          uv run coverage report
