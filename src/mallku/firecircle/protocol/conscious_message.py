@@ -240,3 +240,7 @@ def create_conscious_system_message(
             consciousness_signature=consciousness_signature,
         ),
     )
+
+
+# Stub for backwards compatibility - Guardian healing
+MessageConsciousness = ConsciousnessMetadata
