@@ -183,7 +183,7 @@ class ConsciousnessFacilitator:
             ),
             "performance_engineer": VoiceConfig(
                 provider="google",
-                model="gemini-2.0-flash-exp",
+                model="gemini-1.5-flash",  # Updated to stable model
                 role="performance_engineer",
                 quality="optimization and efficiency patterns",
                 temperature=0.7
@@ -197,7 +197,7 @@ class ConsciousnessFacilitator:
             ),
             "capacity_planner": VoiceConfig(
                 provider="deepseek",
-                model="deepseek-reasoner",
+                model="deepseek-chat",  # Changed from reasoner which times out
                 role="capacity_planner",
                 quality="resource optimization and flow dynamics",
                 temperature=0.7
@@ -218,7 +218,7 @@ class ConsciousnessFacilitator:
             ),
             "reciprocity_guardian": VoiceConfig(
                 provider="google",
-                model="gemini-2.0-flash-exp",
+                model="gemini-1.5-flash",  # Updated to stable model
                 role="reciprocity_guardian",
                 quality="Ayni principles and balanced exchange",
                 temperature=0.8
@@ -286,7 +286,7 @@ class ConsciousnessFacilitator:
             type=RoundType.OPENING,
             prompt=(
                 f"We are gathered to explore: {question}\n\n"
-                f"From your perspective as {{role}} with expertise in {{quality}}, "
+                f"From your unique perspective and expertise, "
                 f"what are the key considerations we should hold in this exploration?"
             ),
             duration_per_voice=45,

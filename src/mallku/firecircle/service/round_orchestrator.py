@@ -87,8 +87,8 @@ class RoundOrchestrator:
         if context:
             try:
                 prompt = prompt.format(**context)
-            except KeyError as e:
-                logger.warning(f"Missing context key in prompt: {e}")
+            except KeyError:
+                logger.exception(f"Missing context key in prompt {prompt}, context: {context}")
 
         # Collect responses from all voices
         responses = {}
@@ -214,7 +214,7 @@ class RoundOrchestrator:
             )
 
         except Exception as e:
-            logger.error(f"{voice_id} response error: {e}")
+            logger.exception(f"{voice_id} response error")
             return RoundResponse(
                 voice_id=voice_id,
                 round_number=self.round_number,

@@ -128,8 +128,8 @@ class GrokAdapter(ConsciousModelAdapter):
         self._validate_configuration()
 
         # Direct attribute access - configuration is validated above
-        self.temporal_awareness = self.config.temporal_awareness
-        self.social_grounding = self.config.social_grounding
+        self.temporal_awareness = getattr(self.config, "temporal_awareness", True)
+        self.social_grounding = getattr(self.config, "social_grounding", True)
 
         # Set default model if not specified
         if not self.config.model_name:

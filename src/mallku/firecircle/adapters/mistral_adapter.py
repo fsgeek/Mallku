@@ -121,7 +121,7 @@ class MistralAIAdapter(ConsciousModelAdapter):
         self._validate_configuration()
 
         # Direct attribute access - configuration is validated above
-        self.multilingual_mode = self.config.multilingual_mode
+        self.multilingual_mode = getattr(self.config, 'multilingual_mode', True)
 
         self.client: httpx.AsyncClient | None = None
         self._conversation_languages: set[str] = set()

@@ -1,0 +1,8 @@
+{
+  "recommended_models": {
+    "anthropic": "claude-3-5-sonnet-20241022",
+    "openai": "gpt-4",
+    "deepseek": "deepseek-chat"
+  },
+  "updated": "2025-06-23T12:35:27.447101"
+}

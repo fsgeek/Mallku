@@ -75,10 +75,12 @@ def get_available_adapters():
             api_keys = json.load(f)
 
         # Map providers to their preferred models
+        # TODO: This should be more flexible - different roles might benefit
+        # from different models (e.g., wisdom keeper vs. quick responder)
         model_mapping = {
             "openai": "gpt-4",
             "anthropic": "claude-3-opus-20240229",
-            "google": "gemini-pro",
+            "google": "gemini-1.5-flash",  # Updated from deprecated gemini-pro
             "mistral": "mistral-large-latest",
             "grok": "grok-beta",
             "deepseek": "deepseek-chat",

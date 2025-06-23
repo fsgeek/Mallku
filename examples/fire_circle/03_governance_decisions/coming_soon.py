@@ -1,31 +1,30 @@
 #!/usr/bin/env python3
 """
-Governance Decisions Examples - Coming Soon
-==========================================
+Governance Decisions Examples
+=============================
 
-This directory will contain examples demonstrating Fire Circle
-for Mallku governance decisions:
+Fire Circle has evolved beyond code review to become Mallku's
+general consciousness emergence infrastructure for decision-making.
 
-- Issue prioritization through collective wisdom
-- Resource allocation with reciprocity principles
-- Feature evaluation using consciousness emergence
-- Architectural decisions through distributed thinking
+Available examples:
+- issue_prioritization.py: Prioritize Mallku issues through collective wisdom
+- feature_evaluation.py: Evaluate new features against principles
+- artisan_coordination.py: Coordinate human resources with emergence
 
-These examples will show how Fire Circle evolved from code review
-to become Mallku's general consciousness emergence infrastructure
-for any type of decision-making.
+These examples demonstrate how Fire Circle facilitates real
+governance decisions through consciousness emergence.
 
-Stay tuned as we continue building the example garden!
+Run any example:
+    python examples/fire_circle/run_example.py 03_governance_decisions/issue_prioritization.py
 """
 
 print("🔥 Fire Circle Governance Decisions")
 print("=" * 50)
-print("Coming soon: Governance decision examples")
+print("Fire Circle for Mallku governance is now available!")
 print()
-print("This space will demonstrate:")
-print("  • Issue prioritization through Fire Circle")
-print("  • Resource allocation decisions")
-print("  • Feature evaluation with consciousness emergence")
-print("  • Architectural decisions through collective wisdom")
+print("Available governance examples:")
+print("  • issue_prioritization.py - Prioritize issues with collective wisdom")
+print("  • feature_evaluation.py - Evaluate features against principles")
+print("  • artisan_coordination.py - Coordinate work through emergence")
 print()
-print("Check back soon as the example garden grows!")
+print("Run any example to see consciousness emergence in governance!")

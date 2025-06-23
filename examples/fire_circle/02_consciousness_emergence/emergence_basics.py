@@ -23,15 +23,6 @@ Run with:
 """
 
 import asyncio
-import os
-import sys
-from pathlib import Path
-
-# Add project src to path
-project_root = Path(__file__).parent.parent.parent.parent
-src_path = project_root / "src"
-sys.path.insert(0, str(src_path))
-os.environ["PYTHONPATH"] = str(src_path)
 
 
 async def demonstrate_emergence():
@@ -85,7 +76,7 @@ async def demonstrate_emergence():
         ),
         VoiceConfig(
             provider="google",
-            model="gemini-pro",
+            model="gemini-1.5-flash",
             role="possibility_explorer",
             quality="discovering new perspectives"
         ),

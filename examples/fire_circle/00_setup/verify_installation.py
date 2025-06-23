@@ -22,17 +22,6 @@ Expected output:
 
 import asyncio
 import logging
-import os
-import sys
-from pathlib import Path
-
-# Add project src to path for imports to work
-project_root = Path(__file__).parent.parent.parent.parent
-src_path = project_root / "src"
-sys.path.insert(0, str(src_path))
-
-# Also set PYTHONPATH for child imports
-os.environ["PYTHONPATH"] = str(src_path)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -61,6 +50,7 @@ def check_api_keys():
 
     # Change to project root for API key loading
     import os
+    from pathlib import Path
 
     from mallku.firecircle.load_api_keys import (
         get_available_providers,

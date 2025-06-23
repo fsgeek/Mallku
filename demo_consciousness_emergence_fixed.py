@@ -62,7 +62,7 @@ async def demonstrate_architectural_decision():
         )
 
         print("\n✨ Collective Wisdom Emerged!")
-        print(f"   Decision: {wisdom.decision}")
+        print(f"   Wisdom: {wisdom}")
         print(f"   Key Insights: {', '.join(wisdom.key_insights[:3])}")
         print(f"   Emergence Quality: {wisdom.emergence_quality:.1%}")
 
