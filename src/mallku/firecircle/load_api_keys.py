@@ -15,6 +15,29 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
+def find_project_root():
+    """
+    Find the project root by walking up the directory tree until we find
+    a marker file (pyproject.toml).
+    
+    This allows the API key loader to work from any directory within the project.
+    """
+    # First check if MALLKU_ROOT environment variable is set
+    if os.environ.get("MALLKU_ROOT"):
+        return Path(os.environ["MALLKU_ROOT"])
+    
+    current = Path(__file__).resolve().parent
+    
+    # Walk up the directory tree
+    while current != current.parent:
+        if (current / "pyproject.toml").exists():
+            return current
+        current = current.parent
+    
+    # If we can't find it, return None
+    return None
+
+
 def load_api_keys_to_environment():
     """
     Load API keys from .secrets/api_keys.json into environment variables.
@@ -22,10 +45,17 @@ def load_api_keys_to_environment():
     This bridges the gap between the stored JSON format and what the
     secrets manager expects.
     """
-    api_keys_path = Path(".secrets/api_keys.json")
+    # Find project root to locate .secrets directory
+    project_root = find_project_root()
+    if not project_root:
+        logger.warning("Could not find project root (no pyproject.toml found)")
+        return False
+    
+    api_keys_path = project_root / ".secrets" / "api_keys.json"
 
     if not api_keys_path.exists():
-        logger.warning("No API keys file found at .secrets/api_keys.json")
+        logger.warning(f"No API keys file found at {api_keys_path}")
+        logger.info("Please create .secrets/api_keys.json in the project root")
         return False
 
     try:
@@ -65,7 +95,13 @@ def get_available_adapters():
     Returns:
         dict: Mapping of adapter names to their configuration
     """
-    api_keys_path = Path(".secrets/api_keys.json")
+    # Find project root to locate .secrets directory
+    project_root = find_project_root()
+    if not project_root:
+        logger.warning("Could not find project root (no pyproject.toml found)")
+        return {}
+    
+    api_keys_path = project_root / ".secrets" / "api_keys.json"
 
     if not api_keys_path.exists():
         return {}
