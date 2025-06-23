@@ -17,14 +17,14 @@ import logging
 
 import pytest
 
-from src.mallku.orchestration.event_bus import ConsciousnessEventBus
-from src.mallku.services.memory_anchor_service import (
+from mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.services.memory_anchor_service import (
     CursorUpdate,
     MemoryAnchorService,
     ProviderInfo,
 )
-from src.mallku.wranglers.event_emitting_wrangler import EventEmittingWrangler
-from src.mallku.wranglers.memory_buffer_wrangler import MemoryBufferWrangler
+from mallku.wranglers.event_emitting_wrangler import EventEmittingWrangler
+from mallku.wranglers.memory_buffer_wrangler import MemoryBufferWrangler
 
 # Configure logging to see consciousness circulation
 logging.basicConfig(

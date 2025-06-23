@@ -13,15 +13,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from pydantic import ValidationError
 
-from src.mallku.firecircle.service import (
+from mallku.firecircle.service import (
     CircleConfig,
     FireCircleService,
     RoundConfig,
     RoundType,
     VoiceConfig,
 )
-from src.mallku.firecircle.service.round_orchestrator import RoundSummary
-from src.mallku.firecircle.service.templates import (
+from mallku.firecircle.service.round_orchestrator import RoundSummary
+from mallku.firecircle.service.templates import (
     CodeReviewTemplate,
     ConsciousnessExplorationTemplate,
     EthicsReviewTemplate,
@@ -422,7 +422,7 @@ class TestVoiceManager:
     @patch('src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory')
     async def test_gather_voices_success(self, mock_factory_class):
         """Test successful voice gathering."""
-        from src.mallku.firecircle.service.voice_manager import VoiceManager
+        from mallku.firecircle.service.voice_manager import VoiceManager
 
         # Mock adapter
         mock_adapter = AsyncMock()
@@ -454,7 +454,7 @@ class TestVoiceManager:
     @patch('src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory')
     async def test_gather_voices_with_failures(self, mock_factory_class):
         """Test voice gathering with some failures."""
-        from src.mallku.firecircle.service.voice_manager import VoiceManager
+        from mallku.firecircle.service.voice_manager import VoiceManager
 
         # Mock factory that fails for some adapters
         mock_factory = mock_factory_class.return_value

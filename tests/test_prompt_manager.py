@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.mallku.llm.multi_llm_layer import LLMProvider, LLMRequest, LLMResponse, PromptCategory
-from src.mallku.prompt.manager import (
+from mallku.llm.multi_llm_layer import LLMProvider, LLMRequest, LLMResponse, PromptCategory
+from mallku.prompt.manager import (
     ContractViolationError,
     PromptManager,
 )

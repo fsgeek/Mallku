@@ -3,7 +3,7 @@
 This file ensures that the repository root is present on ``sys.path``
 *before* any test modules are imported.  Several tests perform
 
-    import src.mallku ...
+    import mallku ...
 
 and those imports can fail when the working directory during test
 collection is a nested directory (e.g. ``tests/`` or
@@ -24,7 +24,7 @@ SRC_DIR = ROOT_DIR / "src"
 
 # Prepend to ``sys.path`` so it takes precedence over installed packages
 # Ensure both root and ``src`` are importable, with ``src`` first so that
-# ``import mallku`` works without needing ``import src.mallku`` indirection.
+# ``import mallku`` works without needing ``import mallku`` indirection.
 sys.path.insert(0, str(SRC_DIR))
 sys.path.insert(0, str(ROOT_DIR))
 

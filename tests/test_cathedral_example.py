@@ -16,8 +16,8 @@ from uuid import uuid4
 
 import pytest
 
-from src.mallku.core.database import get_secured_database
-from src.mallku.reciprocity import InteractionRecord, ReciprocityTracker
+from mallku.core.database import get_secured_database
+from mallku.reciprocity import InteractionRecord, ReciprocityTracker
 
 
 class TestCathedralExample:
@@ -156,7 +156,7 @@ class TestCathedralExample:
         # The fact that this test even exists demonstrates
         # that we're building for builders, not just users
 
-        from src.mallku.core.database.factory import get_security_status
+        from mallku.core.database.factory import get_security_status
 
         status = get_security_status()
 

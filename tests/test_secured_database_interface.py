@@ -9,14 +9,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.mallku.core.database.secured_interface import (
+from mallku.core.database.secured_interface import (
     CollectionSecurityPolicy,
     SecuredCollectionWrapper,
     SecuredDatabaseInterface,
     SecurityViolationError,
 )
-from src.mallku.core.security.field_strategies import FieldObfuscationLevel
-from src.mallku.core.security.secured_model import SecuredField, SecuredModel
+from mallku.core.security.field_strategies import FieldObfuscationLevel
+from mallku.core.security.secured_model import SecuredField, SecuredModel
 
 
 class TestSecuredModel(SecuredModel):
@@ -182,7 +182,7 @@ class TestSecuredCollectionWrapper:
     @pytest.fixture
     def secured_wrapper(self, mock_collection, collection_policy):
         """Secured collection wrapper."""
-        from src.mallku.core.security.registry import SecurityRegistry
+        from mallku.core.security.registry import SecurityRegistry
 
         registry = SecurityRegistry()
         return SecuredCollectionWrapper(mock_collection, collection_policy, registry)
@@ -266,7 +266,7 @@ class TestSecurityEnforcement:
 
     def test_no_bypass_possible_through_wrapper(self, mock_database):
         """Test that no bypass is possible through the wrapper layer."""
-        from src.mallku.core.security.registry import SecurityRegistry
+        from mallku.core.security.registry import SecurityRegistry
 
         policy = CollectionSecurityPolicy(
             collection_name="test", allowed_model_types=[TestSecuredModel], requires_security=True
