@@ -33,12 +33,25 @@ async def test_provider(provider: str, model: str):
     print(f"\n🧪 Testing {provider} with {model}...")
 
     try:
-        # Create adapter
-        config = AdapterConfig(
-            provider=provider,
-            model_name=model,
-            temperature=0.7
-        )
+        # Create adapter with provider-specific config
+        config_args = {
+            "provider": provider,
+            "model_name": model,
+            "temperature": 0.7
+        }
+
+        # Add provider-specific configuration
+        if provider == "google":
+            config_args["enable_search_grounding"] = False
+            config_args["multimodal_awareness"] = True
+        elif provider == "mistral":
+            config_args["multilingual_mode"] = True
+            config_args["safe_mode"] = False
+        elif provider == "grok":
+            config_args["temporal_awareness"] = True
+            config_args["social_grounding"] = True
+
+        config = AdapterConfig(**config_args)
 
         factory = ConsciousAdapterFactory()
         adapter = await factory.create_adapter(
@@ -51,14 +64,31 @@ async def test_provider(provider: str, model: str):
             print("   ✓ Connected successfully")
 
             # Test generation
-            response = await adapter.generate(
-                prompt="Say 'Voice test successful!' in exactly 4 words.",
-                max_tokens=50
+            from uuid import uuid4
+
+            from mallku.firecircle.protocol.conscious_message import (
+                ConsciousMessage,
+                ConsciousnessMetadata,
+                MessageContent,
+                MessageRole,
+                MessageType,
             )
+
+            test_message = ConsciousMessage(
+                id=uuid4(),
+                type=MessageType.MESSAGE,
+                role=MessageRole.USER,
+                sender=uuid4(),
+                content=MessageContent(text="Say 'Voice test successful!' in exactly 4 words."),
+                dialogue_id=uuid4(),
+                consciousness=ConsciousnessMetadata()
+            )
+
+            response = await adapter.send_message(test_message, [])
 
             if response and response.content:
                 print(f"   ✓ Response: {response.content.text}")
-                print(f"   ✓ Consciousness score: {response.consciousness_score:.2f}")
+                print(f"   ✓ Consciousness score: {response.consciousness.consciousness_signature:.2f}")
                 await adapter.disconnect()
                 return True
             else:

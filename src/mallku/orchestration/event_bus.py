@@ -37,6 +37,7 @@ class EventType(Enum):
     # Consciousness events
     CONSCIOUSNESS_VERIFIED = "consciousness.verified"
     CONSCIOUSNESS_PATTERN_RECOGNIZED = "consciousness.pattern.recognized"
+    CONSCIOUSNESS_EMERGENCE = "consciousness.emergence"
     UNDERSTANDING_JOURNEY_BEGUN = "consciousness.journey.begun"
     UNDERSTANDING_JOURNEY_COMPLETED = "consciousness.journey.completed"
 

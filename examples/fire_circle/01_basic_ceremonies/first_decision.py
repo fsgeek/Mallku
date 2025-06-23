@@ -102,7 +102,10 @@ async def make_decision():
 
         # Show the decision
         print("\n🌟 Collective Wisdom:")
-        print(f"   Decision: {wisdom.decision}")
+        if wisdom.decision_recommendation:
+            print(f"   Decision: {wisdom.decision_recommendation}")
+        if wisdom.synthesis:
+            print(f"\n📝 Synthesis: {wisdom.synthesis}")
 
         # Key insights
         if wisdom.key_insights:
