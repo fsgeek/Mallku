@@ -11,8 +11,6 @@ Twenty-Eighth Artisan - Service Weaver
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from pydantic import ValidationError
-
 from mallku.firecircle.service import (
     CircleConfig,
     FireCircleService,
@@ -28,6 +26,7 @@ from mallku.firecircle.service.templates import (
     GovernanceDecisionTemplate,
     load_template,
 )
+from pydantic import ValidationError
 
 
 class TestCircleConfig:

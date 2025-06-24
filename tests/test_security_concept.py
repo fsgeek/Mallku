@@ -8,7 +8,6 @@ full infrastructure setup.
 from unittest.mock import MagicMock
 
 import pytest
-
 from mallku.core.database.secured_interface import (
     CollectionSecurityPolicy,
     SecurityViolationError,

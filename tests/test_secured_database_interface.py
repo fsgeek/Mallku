@@ -8,7 +8,6 @@ and prevents the bypass scenarios that were discovered.
 from unittest.mock import MagicMock
 
 import pytest
-
 from mallku.core.database.secured_interface import (
     CollectionSecurityPolicy,
     SecuredCollectionWrapper,

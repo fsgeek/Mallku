@@ -10,7 +10,6 @@ import contextlib
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from mallku.firecircle.fire_circle_review import (
     ChapterReview,
     CodebaseChapter,

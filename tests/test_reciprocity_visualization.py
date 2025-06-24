@@ -9,8 +9,6 @@ for Fire Circle contemplation.
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from PIL import Image
-
 from mallku.reciprocity.models import (
     ContributionType,
     FireCircleReport,
@@ -25,6 +23,7 @@ from mallku.reciprocity.visualization import (
     ReciprocityVisualizationService,
     VisualizationConfig,
 )
+from PIL import Image
 
 
 @pytest.fixture

@@ -24,11 +24,8 @@ from pathlib import Path  # type: ignore
 from uuid import UUID
 
 import google.generativeai as genai
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
-from PIL import Image
-from pydantic import Field
-
 import mallku.core.secrets as secrets
+from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -38,6 +35,8 @@ from mallku.firecircle.protocol.conscious_message import (
 )
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
+from PIL import Image
+from pydantic import Field
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 

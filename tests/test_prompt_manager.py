@@ -8,7 +8,6 @@ and prevents unsafe LLM usage as claimed.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from mallku.llm.multi_llm_layer import LLMProvider, LLMRequest, LLMResponse, PromptCategory
 from mallku.prompt.manager import (
     ContractViolationError,

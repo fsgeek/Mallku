@@ -17,10 +17,9 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from mallku.correlation.models import Event, EventType
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-
-from mallku.correlation.models import Event, EventType
 
 from .file_event_models import FileEvent, FileEventFilter, FileOperation
 

@@ -18,7 +18,6 @@ from uuid import UUID
 
 from anthropic import AsyncAnthropic
 from anthropic.types import Message as AnthropicMessage
-
 from mallku.core.secrets import get_secret
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
