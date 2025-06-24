@@ -8,13 +8,12 @@ full infrastructure setup.
 from unittest.mock import MagicMock
 
 import pytest
-
-from src.mallku.core.database.secured_interface import (
+from mallku.core.database.secured_interface import (
     CollectionSecurityPolicy,
     SecurityViolationError,
 )
-from src.mallku.core.security.field_strategies import FieldObfuscationLevel
-from src.mallku.core.security.secured_model import SecuredField, SecuredModel
+from mallku.core.security.field_strategies import FieldObfuscationLevel
+from mallku.core.security.secured_model import SecuredField, SecuredModel
 
 
 class TestSecuredModel(SecuredModel):
@@ -136,8 +135,8 @@ class TestArchitecturalEnforcement:
 
     def test_wrapper_blocks_direct_operations(self):
         """Test that wrapper can block direct operations."""
-        from src.mallku.core.database.secured_interface import SecuredCollectionWrapper
-        from src.mallku.core.security.registry import SecurityRegistry
+        from mallku.core.database.secured_interface import SecuredCollectionWrapper
+        from mallku.core.security.registry import SecurityRegistry
 
         # Create mock collection
         mock_collection = MagicMock()
@@ -162,8 +161,8 @@ class TestArchitecturalEnforcement:
 
     def test_safe_operations_still_work(self):
         """Test that safe operations still work through wrapper."""
-        from src.mallku.core.database.secured_interface import SecuredCollectionWrapper
-        from src.mallku.core.security.registry import SecurityRegistry
+        from mallku.core.database.secured_interface import SecuredCollectionWrapper
+        from mallku.core.security.registry import SecurityRegistry
 
         # Create mock collection
         mock_collection = MagicMock()

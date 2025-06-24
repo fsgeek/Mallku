@@ -9,8 +9,8 @@ making the system itself embody reciprocity rather than just teaching it.
 import asyncio
 import logging
 
-from src.mallku.llm.multi_llm_layer import LLMProvider, LLMResponse, PromptCategory
-from src.mallku.prompt.manager import PromptManager
+from mallku.llm.multi_llm_layer import LLMProvider, LLMResponse, PromptCategory
+from mallku.prompt.manager import PromptManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

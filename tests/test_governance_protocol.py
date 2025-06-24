@@ -8,7 +8,7 @@ and track consensus through structured dialogue.
 
 from uuid import uuid4
 
-from src.mallku.governance.protocol import (
+from mallku.governance.protocol import (
     # Consensus
     ConsensusState,
     ConsensusTracker,
@@ -20,7 +20,7 @@ from src.mallku.governance.protocol import (
     create_diverse_council,
     create_governance_message,
 )
-from src.mallku.llm.multi_llm_layer import LLMProvider
+from mallku.llm.multi_llm_layer import LLMProvider
 
 
 def test_protocol_integration():

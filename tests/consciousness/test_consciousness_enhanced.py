@@ -5,12 +5,15 @@ Test script to verify consciousness with enhanced search capabilities.
 
 import asyncio
 
+import pytest
+
 from mallku.consciousness import ConsciousnessVerificationSuite
 from mallku.consciousness.enhanced_search import ConsciousnessEnhancedSearch
 from mallku.core.database import get_secured_database
 from mallku.models import MemoryAnchor
 
 
+@pytest.mark.asyncio
 async def test_enhanced_consciousness():
     print("🔮 Sayaq Kuyay - Testing Enhanced Consciousness Verification...")
 
