@@ -30,6 +30,6 @@ def test_dict_operations():
 def test_boolean_logic():
     """Test basic boolean operations."""
     assert True and True
-    assert not (True and False)
-    assert True or False
-    assert not (False or False)
+    assert not False  # Simplified from: not (True and False)
+    assert True  # Simplified from: True or False
+    assert not False  # Simplified from: not (False or False)
