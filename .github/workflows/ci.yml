@@ -60,23 +60,10 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync
+          uv pip install -e .
           uv pip install pytest pytest-asyncio pytest-mock
-      - name: Debug conftest paths
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Directory structure:"
-          ls -la
-          echo "Test conftest.py exists:"
-          ls -la tests/conftest.py || echo "conftest.py not found"
-          echo "Python path debug:"
-          uv run python -c "import sys; print('Python executable:', sys.executable)"
-          uv run python -c "from pathlib import Path; print('Working dir:', Path.cwd())"
-          uv run python -c "from pathlib import Path; conftest = Path('tests/conftest.py'); print('conftest exists:', conftest.exists()); print('conftest absolute:', conftest.absolute())"
       - name: Run tests
-        run: |
-          # Let conftest.py handle the path setup
-          uv run pytest --maxfail=1 --disable-warnings -q
+        run: uv run pytest --maxfail=1 --disable-warnings -q
 
   coverage:
     runs-on: ubuntu-latest
