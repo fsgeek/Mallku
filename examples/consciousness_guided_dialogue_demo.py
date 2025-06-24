@@ -20,6 +20,11 @@ import asyncio
 import random
 from uuid import uuid4
 
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+
 from mallku.firecircle.orchestrator.conscious_dialogue_manager import ConsciousDialogueManager
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousDialogueConfig,
@@ -30,10 +35,6 @@ from mallku.firecircle.protocol.conscious_message import (
     TurnPolicy,
 )
 from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
 
 console = Console()
 

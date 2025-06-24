@@ -7,13 +7,13 @@ from pathlib import Path
 def test_check_mallku_installation():
     """Check if mallku is properly installed."""
     print("\n=== Checking mallku installation ===")
-    
+
     # Check site-packages
     for path in sys.path:
         if 'site-packages' in str(path):
             site_packages = Path(path)
             print(f"\nChecking site-packages: {site_packages}")
-            
+
             # Look for mallku
             mallku_paths = list(site_packages.glob("mallku*"))
             if mallku_paths:
@@ -29,14 +29,14 @@ def test_check_mallku_installation():
                             print(f"    Error reading: {e}")
             else:
                 print("  No mallku files found")
-    
+
     # Check if there's a .pth file
     print("\n=== Checking for .pth files ===")
     pth_files = []
     for path in sys.path:
         if Path(path).exists():
             pth_files.extend(Path(path).glob("*.pth"))
-    
+
     if pth_files:
         print("Found .pth files:")
         for pth in pth_files:
@@ -48,5 +48,5 @@ def test_check_mallku_installation():
                 pass
     else:
         print("No .pth files found")
-    
+
     assert True  # Always pass to see output

@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
+
 from mallku.firecircle.adapters import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig, ConsciousModelAdapter
 from mallku.firecircle.protocol.conscious_message import (

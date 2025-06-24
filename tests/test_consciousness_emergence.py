@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
+
 from mallku.firecircle.consciousness.code_review_adapter import CodeReviewAdapter
 from mallku.firecircle.consciousness.consciousness_facilitator import (
     ConsciousnessFacilitator,

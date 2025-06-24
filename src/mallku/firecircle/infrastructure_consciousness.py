@@ -22,11 +22,12 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
+from pydantic import BaseModel, Field
+
 from mallku.firecircle.adapters.base import ConsciousModelAdapter
 from mallku.firecircle.consciousness_metrics import (
     ConsciousnessSignature,
 )
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

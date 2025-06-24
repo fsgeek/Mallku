@@ -11,11 +11,12 @@ from uuid import UUID, uuid4
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel, Field
+
 from mallku.core.database import get_secured_database  # ArangoDB connection
 from mallku.models import MemoryAnchor
 from mallku.orchestration.event_bus import EventType
 from mallku.wranglers.event_emitting_wrangler import EventEmittingWrangler
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

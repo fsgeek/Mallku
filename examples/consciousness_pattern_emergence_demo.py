@@ -17,9 +17,6 @@ The 29th Builder - Kawsay Ñan
 import asyncio
 from datetime import UTC, datetime
 
-from mallku.consciousness.flow_monitor import ConsciousnessFlowMonitor
-from mallku.consciousness.flow_orchestrator import ConsciousnessFlowOrchestrator
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
@@ -27,6 +24,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
+
+from mallku.consciousness.flow_monitor import ConsciousnessFlowMonitor
+from mallku.consciousness.flow_orchestrator import ConsciousnessFlowOrchestrator
+from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
 
 class PatternEmergenceVisualizer:

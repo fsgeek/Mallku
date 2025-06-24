@@ -17,10 +17,11 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
+from pydantic import BaseModel, Field
+
 from mallku.firecircle.consciousness_metrics import ConsciousnessMetricsCollector
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.reciprocity import ReciprocityTracker
-from pydantic import BaseModel, Field
 
 from .config import CircleConfig, RoundConfig, VoiceConfig
 from .round_orchestrator import RoundOrchestrator, RoundSummary

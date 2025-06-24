@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.orchestration.providers.base_provider import ActivityType
 from mallku.orchestration.providers.sound_provider import SoundActivityProvider

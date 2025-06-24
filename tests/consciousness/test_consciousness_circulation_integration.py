@@ -16,6 +16,7 @@ import asyncio
 import logging
 
 import pytest
+
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 from mallku.services.memory_anchor_service import (
     CursorUpdate,
