@@ -2,7 +2,7 @@
 
 ## Test Categories
 
-### ✅ Active Tests (28 passing)
+### ✅ Active Tests (36 passing)
 These tests run successfully in CI:
 - `test_simple.py` - Basic Python functionality
 - `test_minimal_ci.py` - Minimal CI verification
@@ -11,6 +11,7 @@ These tests run successfully in CI:
 - `test_no_imports.py` - Tests without mallku imports
 - `test_consciousness_interface_simple.py` - Simplified consciousness tests
 - `test_simple_security.py` - Security concepts without imports
+- `test_system_health.py` - Guardian health checks for vital systems
 
 ### 🚧 Quarantined Tests
 Tests that fail due to import issues but may be healed:

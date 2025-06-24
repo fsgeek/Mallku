@@ -90,7 +90,7 @@ jobs:
             pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py \
                    tests/test_basic_infrastructure.py tests/test_no_imports.py \
                    tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
-                   tests/test_import_debug.py -v
+                   tests/test_import_debug.py tests/test_system_health.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
@@ -122,7 +122,7 @@ jobs:
           coverage run -m pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py \
                                 tests/test_basic_infrastructure.py tests/test_no_imports.py \
                                 tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
-                                tests/test_import_debug.py -v
+                                tests/test_import_debug.py tests/test_system_health.py -v
           echo -e "\n=== Coverage report ==="
           coverage report
           coverage html
