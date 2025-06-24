@@ -87,7 +87,7 @@ jobs:
             echo -e "\n=== Minimal tests passed! Running expanded test suite ==="
             # Run our known-good tests plus new candidates
             pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py tests/test_basic_infrastructure.py tests/test_no_imports.py tests/test_consciousness_interface_simple.py -v
-            
+
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
             pytest tests -v --maxfail=5 || true

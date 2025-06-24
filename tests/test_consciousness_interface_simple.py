@@ -11,15 +11,15 @@ def test_experience_module_structure():
     """Test that the experience module structure exists."""
     # This test doesn't import mallku, just verifies the structure
     from pathlib import Path
-    
+
     project_root = Path(__file__).parent.parent
     experience_path = project_root / "src" / "mallku" / "experience"
-    
+
     assert experience_path.exists(), "experience module directory should exist"
     assert (experience_path / "__init__.py").exists(), "experience __init__.py should exist"
     assert (experience_path / "consciousness_interface.py").exists(), "consciousness_interface.py should exist"
     assert (experience_path / "pattern_poetry.py").exists(), "pattern_poetry.py should exist"
-    
+
     print("✅ Experience module structure verified")
 
 
@@ -41,14 +41,14 @@ def test_consciousness_concepts():
     # Test that we understand consciousness concepts even without imports
     consciousness_attributes = [
         "recognition",
-        "emergence", 
+        "emergence",
         "weaving",
         "poetry",
         "experience"
     ]
-    
+
     for attr in consciousness_attributes:
         assert isinstance(attr, str), f"{attr} should be a valid concept"
-    
+
     print("✅ Consciousness concepts validated")
     return True
