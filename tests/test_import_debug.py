@@ -12,8 +12,8 @@ def test_python_path():
     print("=========================\n")
 
     # Check if src is in path
-    src_in_path = any('src' in str(p) for p in sys.path)
-    print(f"'src' directory in sys.path: {src_in_path}")
+    src_paths = [p for p in sys.path if 'src' in str(p)]
+    print(f"'src' directories in sys.path: {src_paths}")
 
     # Check current directory
     print(f"Current directory: {Path.cwd()}")
@@ -25,20 +25,31 @@ def test_python_path():
     except ImportError as e:
         print(f"✗ Failed to import mallku: {e}")
 
-        # Try to find where mallku might be
-        possible_paths = [
-            Path.cwd() / "src" / "mallku",
-            Path.cwd() / "mallku",
-            Path("/home/runner/work/Mallku/Mallku/src/mallku"),
-        ]
+        # Try to import manually
+        src_dir = Path("/home/runner/work/Mallku/Mallku/src")
+        if src_dir.exists():
+            print(f"\nTrying manual import with src_dir: {src_dir}")
+            sys.path.insert(0, str(src_dir))
+            print(f"sys.path after manual insert: {sys.path[:3]}")
 
-        for path in possible_paths:
-            if path.exists():
-                print(f"  Found mallku directory at: {path}")
-                if (path / "__init__.py").exists():
-                    print("    ✓ __init__.py exists")
-                else:
-                    print("    ✗ __init__.py missing")
+            try:
+                import mallku
+                print(f"✓ Manual import succeeded! mallku from: {mallku.__file__}")
+            except ImportError as e2:
+                print(f"✗ Manual import also failed: {e2}")
+
+                # Check if it's a sub-import issue
+                mallku_init = src_dir / "mallku" / "__init__.py"
+                if mallku_init.exists():
+                    print(f"\n✓ {mallku_init} exists")
+                    print("Checking if mallku has import errors...")
+
+                    # Try to read the __init__.py
+                    try:
+                        content = mallku_init.read_text()
+                        print(f"mallku/__init__.py content: {content[:100]}...")
+                    except Exception as read_err:
+                        print(f"Error reading __init__.py: {read_err}")
 
     # This test always passes to see the output
     assert True
