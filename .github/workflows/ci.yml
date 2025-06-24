@@ -60,13 +60,11 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync
-          uv pip install -e .
           uv pip install pytest pytest-asyncio pytest-mock
       - name: Run tests
         run: |
-          # First run debug test to understand the environment
-          uv run pytest tests/test_import_debug.py -xvs || true
-          # Then run all tests
+          # Run tests with PYTHONPATH set
+          export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
           uv run pytest --maxfail=1 --disable-warnings -q
 
   coverage:
