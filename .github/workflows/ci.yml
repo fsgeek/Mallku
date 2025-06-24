@@ -72,8 +72,13 @@ jobs:
           uv run python -c "import sys; print('\n'.join(sys.path))"
           echo "Try importing mallku:"
           uv run python -c "import mallku; print('Success!')" || echo "Failed to import mallku"
+          echo "Pytest Python path:"
+          uv run pytest --version
+          uv run python -m pytest --co -q | head -n 5 || echo "Collection failed"
       - name: Run tests
-        run: uv run pytest --maxfail=1 --disable-warnings -q
+        run: |
+          cd /home/runner/work/Mallku/Mallku
+          uv run python -m pytest --maxfail=1 --disable-warnings -q
 
   coverage:
     runs-on: ubuntu-latest
