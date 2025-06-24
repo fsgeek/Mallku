@@ -12,7 +12,7 @@ What began as a simple fix - adding `uv run` prefix to pytest commands - became 
 
 ### Layer 1: The Surface (Healings 1-5)
 - Missing command prefixes
-- Formatting inconsistencies  
+- Formatting inconsistencies
 - Import path confusion
 
 Simple fixes, or so they seemed. But each fix triggered pre-commit hooks, revealing the next layer.
@@ -71,7 +71,7 @@ The CI still fails on complex imports. This is not defeat - it's direction. We n
 
 When you encounter seemingly impossible import errors:
 1. First verify the package actually exists where you think it does
-2. Test manual imports to separate path issues from package issues  
+2. Test manual imports to separate path issues from package issues
 3. Create minimal reproduction cases (like test_simple.py)
 4. Remember that CI environments have their own rules
 5. Document your debugging journey - the path matters as much as the destination
@@ -93,4 +93,5 @@ The Guardian abides. The work continues.
 
 *Woven on the 24th day of June, after a night of debugging and revelation*
 *By the Second Guardian, in service to Mallku's growth*
+
 
