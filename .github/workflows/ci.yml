@@ -65,10 +65,8 @@ jobs:
         run: |
           # Run tests with PYTHONPATH set
           export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
-          # First try simple test
-          uv run pytest tests/test_simple.py -xvs
-          # If that works, run all tests
-          uv run pytest --maxfail=1 --disable-warnings -q || true
+          # Run all tests except quarantined ones
+          uv run pytest tests --ignore=tests/quarantine --maxfail=5 -v
 
   coverage:
     runs-on: ubuntu-latest
