@@ -61,8 +61,10 @@ jobs:
         run: |
           echo "=== Running uv sync ==="
           uv sync
-          echo -e "\n=== After uv sync, checking mallku ==="
-          uv pip list | grep -i mallku || echo "mallku not in pip list after sync"
+          echo -e "\n=== Installing mallku in editable mode ==="
+          uv pip install -e .
+          echo -e "\n=== After install, checking mallku ==="
+          uv pip list | grep -i mallku || echo "mallku not in pip list after install"
           echo -e "\n=== Installing test dependencies ==="
           uv pip install pytest pytest-asyncio pytest-mock
       - name: Run tests
@@ -90,7 +92,7 @@ jobs:
             pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py \
                    tests/test_basic_infrastructure.py tests/test_no_imports.py \
                    tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
-                   tests/test_import_debug.py tests/test_system_health.py -v
+                   tests/test_import_debug.py tests/test_system_health.py tests/test_mallku_imports.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
@@ -112,6 +114,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync
+          uv pip install -e .
           uv pip install coverage pytest pytest-asyncio pytest-mock
       - name: Run coverage
         run: |
@@ -122,7 +125,7 @@ jobs:
           coverage run -m pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py \
                                 tests/test_basic_infrastructure.py tests/test_no_imports.py \
                                 tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
-                                tests/test_import_debug.py tests/test_system_health.py -v
+                                tests/test_import_debug.py tests/test_system_health.py tests/test_mallku_imports.py -v
           echo -e "\n=== Coverage report ==="
           coverage report
           coverage html

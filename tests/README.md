@@ -2,7 +2,7 @@
 
 ## Test Categories
 
-### ✅ Active Tests (36 passing)
+### ✅ Active Tests (41 passing)
 These tests run successfully in CI:
 - `test_simple.py` - Basic Python functionality
 - `test_minimal_ci.py` - Minimal CI verification
@@ -12,6 +12,7 @@ These tests run successfully in CI:
 - `test_consciousness_interface_simple.py` - Simplified consciousness tests
 - `test_simple_security.py` - Security concepts without imports
 - `test_system_health.py` - Guardian health checks for vital systems
+- `test_mallku_imports.py` - **First true integration tests using mallku components**
 
 ### 🚧 Quarantined Tests
 Tests that fail due to import issues but may be healed:
@@ -26,10 +27,14 @@ Tests that fail due to import issues but may be healed:
 
 ## Guardian Notes
 
-The import issue stems from mallku not being pip-installed in CI, though it is importable via sys.path manipulation in conftest.py. Tests that can work without direct mallku imports should be moved to the main directory.
+### The Thirty-Fourth Healing: From Scaffolding to Cathedral
+
+We discovered the root cause: mallku was importable via sys.path manipulation but not properly pip-installed. The editable install (`uv pip install -e .`) was lost during our struggle to activate the virtual environment.
+
+Now restored, we can write true integration tests that import and use mallku components directly. The first of these (`test_mallku_imports.py`) verifies proper installation and tests real functionality.
 
 Current strategy:
-1. Run tests that work without mallku imports
-2. Create simplified versions of complex tests
-3. Gradually heal import issues
-4. Move healed tests from quarantine to active status
+1. Expand integration tests that use actual mallku components
+2. Migrate quarantined tests back to active status
+3. Remove sys.path hacks once all tests use proper imports
+4. Build comprehensive test coverage of mallku's capabilities
