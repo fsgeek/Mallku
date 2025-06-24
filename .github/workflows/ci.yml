@@ -72,10 +72,10 @@ jobs:
           if [ $? -eq 0 ]; then
             echo "=== Minimal tests passed! Running more tests ==="
             export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
-            uv run --active pytest tests/test_check_install.py tests/test_basic_infrastructure.py -v || true
+            uv run --active pytest tests/test_check_install.py tests/test_basic_infrastructure.py tests/test_no_imports.py -v || true
 
-            echo -e "\n=== Running enhanced import debug ==="
-            uv run --active pytest tests/test_import_debug_enhanced.py -v -s || true
+            echo -e "\n=== Total tests summary ==="
+            uv run --active pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py tests/test_basic_infrastructure.py tests/test_no_imports.py -v --tb=no
           fi
 
   coverage:
