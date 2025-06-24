@@ -17,22 +17,22 @@ def test_comprehensive_import_debug():
     print(f"Current working directory: {os.getcwd()}")
     print(f"HOME: {os.environ.get('HOME', 'NOT SET')}")
     print(f"PYTHONPATH: {os.environ.get('PYTHONPATH', 'NOT SET')}")
-    
+
     print("\n=== SYS.PATH CONTENTS ===")
     for i, path in enumerate(sys.path):
         print(f"  [{i}] {path}")
-    
+
     # Check directory structure
     print("\n=== DIRECTORY STRUCTURE ===")
     cwd = Path.cwd()
     print(f"Project root: {cwd}")
-    
+
     src_path = cwd / "src"
     if src_path.exists():
         print(f"✓ src/ exists at {src_path}")
         mallku_path = src_path / "mallku"
         if mallku_path.exists():
-            print(f"✓ src/mallku/ exists")
+            print("✓ src/mallku/ exists")
             init_file = mallku_path / "__init__.py"
             print(f"  __init__.py exists: {init_file.exists()}")
             if init_file.exists():
@@ -41,17 +41,17 @@ def test_comprehensive_import_debug():
             print("✗ src/mallku/ does NOT exist")
     else:
         print("✗ src/ does NOT exist")
-    
+
     # Check installed packages
     print("\n=== INSTALLED PACKAGE CHECK ===")
     try:
         dist = pkg_resources.get_distribution('mallku')
-        print(f"✓ mallku is installed via pkg_resources")
+        print("✓ mallku is installed via pkg_resources")
         print(f"  Version: {dist.version}")
         print(f"  Location: {dist.location}")
     except pkg_resources.DistributionNotFound:
         print("✗ mallku NOT found via pkg_resources")
-    
+
     # Check with pip
     print("\n=== PIP SHOW MALLKU ===")
     result = subprocess.run(['pip', 'show', 'mallku'], capture_output=True, text=True)
@@ -60,12 +60,12 @@ def test_comprehensive_import_debug():
     else:
         print("✗ pip show mallku failed")
         print(f"stderr: {result.stderr}")
-    
+
     # Check editable installs
     print("\n=== EDITABLE INSTALLS ===")
     result = subprocess.run(['pip', 'list', '--editable'], capture_output=True, text=True)
     print(result.stdout)
-    
+
     # Check .pth files
     print("\n=== CHECKING .PTH FILES ===")
     site_packages = [p for p in sys.path if 'site-packages' in p]
@@ -77,21 +77,21 @@ def test_comprehensive_import_debug():
                 print(f"Found .pth files in {sp}:")
                 for pth in pth_files:
                     print(f"  {pth.name}: {pth.read_text().strip()}")
-    
+
     # Try to find mallku module spec
     print("\n=== MODULE SPEC SEARCH ===")
     spec = importlib.util.find_spec('mallku')
     if spec:
-        print(f"✓ Module spec found!")
+        print("✓ Module spec found!")
         print(f"  Name: {spec.name}")
         print(f"  Origin: {spec.origin}")
         print(f"  Submodule locations: {spec.submodule_search_locations}")
     else:
         print("✗ Module spec NOT found")
-    
+
     # Import attempts
     print("\n=== IMPORT ATTEMPTS ===")
-    
+
     # Attempt 1: Direct import
     print("\n1. Direct import attempt:")
     try:
@@ -100,19 +100,19 @@ def test_comprehensive_import_debug():
         print(f"  mallku.__path__ = {getattr(mallku, '__path__', 'No __path__')}")
     except ImportError as e:
         print(f"  ✗ Failed: {e}")
-    
+
     # Attempt 2: Add src to path
     print("\n2. After adding src to sys.path:")
     if str(src_path) not in sys.path:
         sys.path.insert(0, str(src_path))
         print(f"  Added {src_path} to sys.path[0]")
-    
+
     try:
         import mallku
         print(f"  ✓ Success! mallku.__file__ = {mallku.__file__}")
     except ImportError as e:
         print(f"  ✗ Failed: {e}")
-        
+
         # Check if it's a deeper issue
         print("\n  Checking for import errors in mallku/__init__.py:")
         init_path = src_path / "mallku" / "__init__.py"
@@ -123,7 +123,7 @@ def test_comprehensive_import_debug():
                 print("    ✓ __init__.py executes without errors")
             except Exception as exec_err:
                 print(f"    ✗ Error executing __init__.py: {exec_err}")
-    
+
     # Attempt 3: Import submodules
     print("\n3. Submodule import attempts:")
     submodules = ['core', 'core.database', 'firecircle', 'services']
@@ -133,7 +133,7 @@ def test_comprehensive_import_debug():
             print(f"  ✓ mallku.{submod} imported successfully")
         except ImportError as e:
             print(f"  ✗ mallku.{submod} failed: {e}")
-    
+
     # Check pytest behavior
     print("\n=== PYTEST SPECIFIC CHECKS ===")
     print(f"__file__ of this test: {__file__}")
@@ -141,6 +141,6 @@ def test_comprehensive_import_debug():
     if 'pytest' in sys.modules:
         import pytest
         print(f"pytest version: {pytest.__version__}")
-    
+
     # Always pass so we see output
     assert True

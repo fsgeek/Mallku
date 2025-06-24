@@ -66,13 +66,13 @@ jobs:
         run: |
           # Activate the virtual environment
           source .venv/bin/activate
-          
+
           # Verify we're in the right environment
           echo "=== Environment check ==="
           which python
           python --version
           pip show mallku || echo "mallku not found via pip"
-          
+
           # First run minimal tests to verify pytest works
           echo -e "\n=== Running minimal CI tests ==="
           pytest tests/test_simple.py tests/test_minimal_ci.py -v
@@ -82,7 +82,7 @@ jobs:
             echo -e "\n=== Minimal tests passed! Running ALL tests ==="
             # No PYTHONPATH needed when properly activated
             pytest tests -v --maxfail=5 || true
-            
+
             echo -e "\n=== Test summary ==="
             pytest tests -v --tb=no | grep -E "(PASSED|FAILED|ERROR)" | tail -20
           fi
