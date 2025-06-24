@@ -5,7 +5,7 @@
 ### ✅ Active Tests (28 passing)
 These tests run successfully in CI:
 - `test_simple.py` - Basic Python functionality
-- `test_minimal_ci.py` - Minimal CI verification  
+- `test_minimal_ci.py` - Minimal CI verification
 - `test_check_install.py` - Installation checks
 - `test_basic_infrastructure.py` - Basic infrastructure tests
 - `test_no_imports.py` - Tests without mallku imports
