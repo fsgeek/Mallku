@@ -60,25 +60,11 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync
-          uv pip install -e .
           uv pip install pytest pytest-asyncio pytest-mock
-      - name: Debug installation
-        run: |
-          echo "Python executable:"
-          uv run which python
-          echo "Installed packages:"
-          uv pip list | grep -i mallku || echo "Mallku not found in pip list"
-          echo "Python path:"
-          uv run python -c "import sys; print('\n'.join(sys.path))"
-          echo "Try importing mallku:"
-          uv run python -c "import mallku; print('Success!')" || echo "Failed to import mallku"
-          echo "Pytest Python path:"
-          uv run pytest --version
-          uv run python -m pytest --co -q | head -n 5 || echo "Collection failed"
       - name: Run tests
         run: |
-          cd /home/runner/work/Mallku/Mallku
-          uv run python -m pytest --maxfail=1 --disable-warnings -q
+          export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
+          uv run pytest --maxfail=1 --disable-warnings -q
 
   coverage:
     runs-on: ubuntu-latest
