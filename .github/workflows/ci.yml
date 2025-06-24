@@ -73,6 +73,9 @@ jobs:
             echo "=== Minimal tests passed! Running more tests ==="
             export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
             uv run --active pytest tests/test_check_install.py tests/test_basic_infrastructure.py -v || true
+            
+            echo -e "\n=== Running enhanced import debug ==="
+            uv run --active pytest tests/test_import_debug_enhanced.py -v -s || true
           fi
 
   coverage:

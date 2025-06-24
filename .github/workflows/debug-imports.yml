@@ -1,0 +1,73 @@
+name: Debug Import Issues
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  push:
+    branches: [ debug-imports ]  # Or when pushing to debug branch
+
+jobs:
+  debug-with-tmate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Set up Python with uv
+        run: |
+          uv python install 3.12
+      
+      - name: Install dependencies with verbose output
+        run: |
+          echo "=== Installing with maximum verbosity ==="
+          uv sync -v
+          echo ""
+          echo "=== Installing editable package ==="
+          uv pip install -e . -v
+          echo ""
+          echo "=== Installing test dependencies ==="
+          uv pip install pytest pytest-asyncio pytest-mock -v
+      
+      - name: Diagnostic information
+        run: |
+          echo "=== Python executable ==="
+          which python
+          python --version
+          
+          echo -e "\n=== Site packages location ==="
+          python -c "import site; print('\n'.join(site.getsitepackages()))"
+          
+          echo -e "\n=== Installed packages ==="
+          uv pip list
+          
+          echo -e "\n=== Check if mallku is installed ==="
+          python -c "import pkg_resources; print(pkg_resources.get_distribution('mallku'))"
+          
+          echo -e "\n=== sys.path contents ==="
+          python -c "import sys; print('\n'.join(sys.path))"
+          
+          echo -e "\n=== Directory structure of src ==="
+          find src -type f -name "*.py" | head -20
+          
+          echo -e "\n=== Can we import mallku directly? ==="
+          cd /home/runner/work/Mallku/Mallku
+          python -c "import sys; sys.path.insert(0, 'src'); import mallku; print(f'Success! mallku location: {mallku.__file__}')" || echo "Failed to import"
+          
+          echo -e "\n=== What happens in pytest? ==="
+          python -m pytest tests/test_simple.py -v
+          
+          echo -e "\n=== What about with PYTHONPATH? ==="
+          export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
+          python -c "import mallku; print(f'Success with PYTHONPATH! Location: {mallku.__file__}')" || echo "Failed even with PYTHONPATH"
+          
+          echo -e "\n=== pytest with PYTHONPATH ==="
+          python -m pytest tests/test_import_debug.py -v || true
+      
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        with:
+          limit-access-to-actor: true
