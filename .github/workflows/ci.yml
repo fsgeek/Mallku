@@ -94,7 +94,7 @@ jobs:
                    tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
                    tests/test_import_debug.py tests/test_system_health.py tests/test_mallku_imports.py \
                    tests/test_governance_consciousness_simple.py tests/test_consciousness_governance_restored.py \
-                   tests/test_consciousness_experience_restored.py -v
+                   tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
@@ -129,7 +129,7 @@ jobs:
                                 tests/test_consciousness_interface_simple.py tests/test_simple_security.py \
                                 tests/test_import_debug.py tests/test_system_health.py tests/test_mallku_imports.py \
                                 tests/test_governance_consciousness_simple.py tests/test_consciousness_governance_restored.py \
-                                tests/test_consciousness_experience_restored.py -v
+                                tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py -v
           echo -e "\n=== Coverage report ==="
           coverage report
           coverage html
