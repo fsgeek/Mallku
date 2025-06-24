@@ -59,8 +59,11 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
       - name: Install dependencies
         run: |
+          echo "=== Running uv sync ==="
           uv sync
-          uv pip install -e .
+          echo -e "\n=== After uv sync, checking mallku ==="
+          uv pip list | grep -i mallku || echo "mallku not in pip list after sync"
+          echo -e "\n=== Installing test dependencies ==="
           uv pip install pytest pytest-asyncio pytest-mock
       - name: Run tests
         run: |
@@ -71,7 +74,9 @@ jobs:
           echo "=== Environment check ==="
           which python
           python --version
-          pip show mallku || echo "mallku not found via pip"
+          echo -e "\n=== Checking mallku installation ==="
+          pip list | grep -i mallku || echo "mallku not in pip list"
+          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
 
           # First run minimal tests to verify pytest works
           echo -e "\n=== Running minimal CI tests ==="
