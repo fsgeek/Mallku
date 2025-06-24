@@ -10,7 +10,7 @@ from typing import Any
 
 class CorrelationEngine:
     """Stub implementation to prevent import errors."""
-    
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Accept any arguments to prevent errors."""
         pass
