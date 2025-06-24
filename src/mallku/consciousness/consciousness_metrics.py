@@ -10,7 +10,7 @@ from typing import Any
 
 class ConsciousnessMetrics:
     """Stub implementation to prevent import errors."""
-    
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Accept any arguments to prevent errors."""
         pass
@@ -18,7 +18,7 @@ class ConsciousnessMetrics:
 
 class ConsciousnessEvent:
     """Stub implementation for ConsciousnessEvent to prevent import errors."""
-    
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Accept any arguments to prevent errors."""
         pass

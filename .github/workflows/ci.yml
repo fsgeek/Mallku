@@ -47,10 +47,9 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - name: Ensure Python 3.12+ with uv
+      - name: Set up Python with uv
         run: |
-          uv venv --python=3.12 .venv
-          echo ".venv/bin" >> $GITHUB_PATH
+          uv python install 3.12
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -75,10 +74,9 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - name: Ensure Python 3.12+ with uv
+      - name: Set up Python with uv
         run: |
-          uv venv --python=3.12 .venv
-          echo ".venv/bin" >> $GITHUB_PATH
+          uv python install 3.12
       - name: Install dependencies
         run: |
           uv sync
