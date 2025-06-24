@@ -61,36 +61,22 @@ jobs:
         run: |
           uv sync
           uv pip install pytest pytest-asyncio pytest-mock
-      - name: Create test runner script
+      - name: Debug conftest paths
         run: |
-          cat > run_tests.py << 'EOF'
-          import sys
-          import subprocess
-          import os
-
-          # Add src to path
-          sys.path.insert(0, '/home/runner/work/Mallku/Mallku/src')
-
-          # Verify import works
-          try:
-              import mallku
-              print("✓ Successfully imported mallku")
-          except ImportError as e:
-              print(f"✗ Failed to import mallku: {e}")
-              sys.exit(1)
-
-          # Set PYTHONPATH for subprocess
-          env = os.environ.copy()
-          env['PYTHONPATH'] = '/home/runner/work/Mallku/Mallku/src:' + env.get('PYTHONPATH', '')
-
-          # Run pytest
-          result = subprocess.run([sys.executable, '-m', 'pytest', '--maxfail=1', '--disable-warnings', '-q'],
-                                  cwd='/home/runner/work/Mallku/Mallku',
-                                  env=env)
-          sys.exit(result.returncode)
-          EOF
+          echo "Current directory:"
+          pwd
+          echo "Directory structure:"
+          ls -la
+          echo "Test conftest.py exists:"
+          ls -la tests/conftest.py || echo "conftest.py not found"
+          echo "Python path debug:"
+          uv run python -c "import sys; print('Python executable:', sys.executable)"
+          uv run python -c "from pathlib import Path; print('Working dir:', Path.cwd())"
+          uv run python -c "from pathlib import Path; conftest = Path('tests/conftest.py'); print('conftest exists:', conftest.exists()); print('conftest absolute:', conftest.absolute())"
       - name: Run tests
-        run: uv run python run_tests.py
+        run: |
+          # Let conftest.py handle the path setup
+          uv run pytest --maxfail=1 --disable-warnings -q
 
   coverage:
     runs-on: ubuntu-latest
