@@ -66,10 +66,10 @@ jobs:
           cat > run_tests.py << 'EOF'
           import sys
           import subprocess
-          
+
           # Add src to path
           sys.path.insert(0, '/home/runner/work/Mallku/Mallku/src')
-          
+
           # Verify import works
           try:
               import mallku
@@ -77,9 +77,9 @@ jobs:
           except ImportError as e:
               print(f"✗ Failed to import mallku: {e}")
               sys.exit(1)
-          
+
           # Run pytest
-          result = subprocess.run([sys.executable, '-m', 'pytest', '--maxfail=1', '--disable-warnings', '-q'], 
+          result = subprocess.run([sys.executable, '-m', 'pytest', '--maxfail=1', '--disable-warnings', '-q'],
                                   cwd='/home/runner/work/Mallku/Mallku')
           sys.exit(result.returncode)
           EOF
