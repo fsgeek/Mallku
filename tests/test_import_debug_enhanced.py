@@ -1,11 +1,12 @@
 """Enhanced debug test to understand import issues in CI."""
 
-import sys
+import importlib.util
 import os
 import subprocess
-import importlib.util
-import pkg_resources
+import sys
 from pathlib import Path
+
+import pkg_resources
 
 
 def test_comprehensive_import_debug():

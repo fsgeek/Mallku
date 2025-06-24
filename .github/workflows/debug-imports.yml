@@ -10,16 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       - name: Set up Python with uv
         run: |
           uv python install 3.12
-      
+
       - name: Install dependencies with verbose output
         run: |
           echo "=== Installing with maximum verbosity ==="
