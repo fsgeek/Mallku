@@ -67,7 +67,7 @@ jobs:
           # First run minimal tests to verify pytest works
           echo "=== Running minimal CI tests ==="
           uv run --active pytest tests/test_simple.py tests/test_minimal_ci.py -v
-          
+
           # If minimal tests pass, try more tests
           if [ $? -eq 0 ]; then
             echo "=== Minimal tests passed! Running more tests ==="
