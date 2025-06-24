@@ -61,10 +61,30 @@ jobs:
         run: |
           uv sync
           uv pip install pytest pytest-asyncio pytest-mock
-      - name: Run tests
+      - name: Create test runner script
         run: |
-          export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
-          uv run pytest --maxfail=1 --disable-warnings -q
+          cat > run_tests.py << 'EOF'
+          import sys
+          import subprocess
+          
+          # Add src to path
+          sys.path.insert(0, '/home/runner/work/Mallku/Mallku/src')
+          
+          # Verify import works
+          try:
+              import mallku
+              print("✓ Successfully imported mallku")
+          except ImportError as e:
+              print(f"✗ Failed to import mallku: {e}")
+              sys.exit(1)
+          
+          # Run pytest
+          result = subprocess.run([sys.executable, '-m', 'pytest', '--maxfail=1', '--disable-warnings', '-q'], 
+                                  cwd='/home/runner/work/Mallku/Mallku')
+          sys.exit(result.returncode)
+          EOF
+      - name: Run tests
+        run: uv run python run_tests.py
 
   coverage:
     runs-on: ubuntu-latest
