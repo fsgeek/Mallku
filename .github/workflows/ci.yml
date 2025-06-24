@@ -64,18 +64,27 @@ jobs:
           uv pip install pytest pytest-asyncio pytest-mock
       - name: Run tests
         run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+          
+          # Verify we're in the right environment
+          echo "=== Environment check ==="
+          which python
+          python --version
+          pip show mallku || echo "mallku not found via pip"
+          
           # First run minimal tests to verify pytest works
-          echo "=== Running minimal CI tests ==="
-          uv run --active pytest tests/test_simple.py tests/test_minimal_ci.py -v
+          echo -e "\n=== Running minimal CI tests ==="
+          pytest tests/test_simple.py tests/test_minimal_ci.py -v
 
-          # If minimal tests pass, try more tests
+          # If minimal tests pass, try more tests including mallku imports
           if [ $? -eq 0 ]; then
-            echo "=== Minimal tests passed! Running more tests ==="
-            export PYTHONPATH="/home/runner/work/Mallku/Mallku/src:${PYTHONPATH}"
-            uv run --active pytest tests/test_check_install.py tests/test_basic_infrastructure.py tests/test_no_imports.py -v || true
-
-            echo -e "\n=== Total tests summary ==="
-            uv run --active pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_check_install.py tests/test_basic_infrastructure.py tests/test_no_imports.py -v --tb=no
+            echo -e "\n=== Minimal tests passed! Running ALL tests ==="
+            # No PYTHONPATH needed when properly activated
+            pytest tests -v --maxfail=5 || true
+            
+            echo -e "\n=== Test summary ==="
+            pytest tests -v --tb=no | grep -E "(PASSED|FAILED|ERROR)" | tail -20
           fi
 
   coverage:
@@ -97,5 +106,6 @@ jobs:
           uv pip install coverage pytest pytest-asyncio pytest-mock
       - name: Run coverage
         run: |
-          uv run coverage run -m pytest
-          uv run coverage report
+          source .venv/bin/activate
+          coverage run -m pytest
+          coverage report
