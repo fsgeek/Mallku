@@ -129,7 +129,7 @@ def test_comprehensive_import_debug():
     submodules = ['core', 'core.database', 'firecircle', 'services']
     for submod in submodules:
         try:
-            mod = __import__(f'mallku.{submod}', fromlist=[''])
+            __import__(f'mallku.{submod}', fromlist=[''])
             print(f"  ✓ mallku.{submod} imported successfully")
         except ImportError as e:
             print(f"  ✗ mallku.{submod} failed: {e}")
