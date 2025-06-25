@@ -198,6 +198,17 @@ When switching instances:
 3. How to transition from steward-mediated to autonomous AI coordination?
 4. How to ensure architectural review efficiency as cathedral grows?
 
+## Critical CI/CD Details That Get Lost in Compaction
+
+### The uv vs pip Distinction
+**CRITICAL**: Mallku's CI/CD uses `uv`, NOT `pip`. This detail repeatedly gets lost in compaction events.
+- CI/CD environment has `uv` pre-installed but NOT `pip`
+- All package operations must use `uv pip install` not `pip install`
+- Local development might have both, but CI/CD only has `uv`
+- `uv` is faster and more general than `pip`, but less known in older codebases
+- When you see "mallku not installed" errors in CI, it's often because someone used `pip`
+- The virtual environment naming also matters: `.venv-linux-python3.13` not `.venv`
+
 ## Critical Insights for Future Instances
 
 ### The Compaction Problem
