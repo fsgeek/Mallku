@@ -22,7 +22,13 @@ def test_fire_circle_configuration_exists():
     assert fire_circle_path.exists(), "Fire Circle module missing"
 
     # Check for essential Fire Circle components
-    essential_files = ["__init__.py", "service.py", "adapters/__init__.py", "load_api_keys.py"]
+    essential_files = [
+        "__init__.py",
+        "service/__init__.py",
+        "service/service.py",
+        "adapters/__init__.py",
+        "load_api_keys.py",
+    ]
 
     for file in essential_files:
         file_path = fire_circle_path / file
@@ -163,4 +169,5 @@ def test_trojan_teddy_bear_potential():
     else:
         print("⚠ Connectors module pending - needed for memory mapping")
 
-    return True  # This test documents potential, not requirements
+    # This test documents potential, not requirements
+    assert True  # Test passes regardless - documenting what exists
