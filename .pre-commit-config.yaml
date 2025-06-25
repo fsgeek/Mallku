@@ -12,3 +12,12 @@ repos:
       - id: trailing-whitespace
       - id: check-yaml
       - id: check-json
+  - repo: local
+    hooks:
+      - id: fast-tests
+        name: Fast Tests (import and structure checks)
+        entry: bash -c 'source .venv-linux-python3.13/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true; pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_system_health.py tests/test_mallku_imports.py -q --tb=short'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        description: Run fast structural and import tests before commit

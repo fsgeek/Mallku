@@ -1,0 +1,40 @@
+# Full pre-commit configuration with extended tests
+# Usage: pre-commit run --config .pre-commit-config-full.yaml --all-files
+#
+# This configuration includes slower tests that you may want to run
+# before pushing or creating a PR, but not on every commit.
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.12  # Match version in pyproject.toml
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-json
+  - repo: local
+    hooks:
+      - id: fast-tests
+        name: Fast Tests (import and structure checks)
+        entry: bash -c 'source .venv-linux-python3.13/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true; pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_system_health.py tests/test_mallku_imports.py -v'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: integration-tests
+        name: Integration Tests (Fire Circle and consciousness)
+        entry: bash -c 'source .venv-linux-python3.13/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true; pytest tests/test_fire_circle_integration.py tests/test_consciousness_* -v'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: memory-tests
+        name: Memory Architecture Tests
+        entry: bash -c 'source .venv-linux-python3.13/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true; pytest tests/test_episodic_memory.py tests/test_memory_retrieval_strategies.py -v'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
