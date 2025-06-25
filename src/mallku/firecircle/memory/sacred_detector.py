@@ -87,9 +87,8 @@ class SacredMomentDetector:
             reasons.append("Breakthrough pattern recognized")
 
         # Special case: architectural insights
-        if (
-            memory.memory_type == MemoryType.ARCHITECTURAL_INSIGHT
-            and any("cathedral" in insight.lower() for insight in memory.key_insights)
+        if memory.memory_type == MemoryType.ARCHITECTURAL_INSIGHT and any(
+            "cathedral" in insight.lower() for insight in memory.key_insights
         ):
             sacred_score += 1
             reasons.append("Cathedral-building wisdom preserved")

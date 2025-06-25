@@ -10,7 +10,6 @@ for semantic similarity, keyword extraction, and text analysis.
 """
 
 
-
 def semantic_similarity(text1: str, text2: str) -> float:
     """
     Calculate semantic similarity between two texts.

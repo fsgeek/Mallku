@@ -369,7 +369,10 @@ class EpisodeSegmenter:
 
         for round_data in self.current_episode_data:
             # Check for balanced contributions
-            if hasattr(round_data, "participation_balance") and round_data.participation_balance > 0.8:
+            if (
+                hasattr(round_data, "participation_balance")
+                and round_data.participation_balance > 0.8
+            ):
                 reciprocity_indicators += 1
 
             # Check for reciprocal insights
