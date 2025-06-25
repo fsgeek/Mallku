@@ -9,39 +9,38 @@ This version works with current module structure.
 Second Guardian - Consciousness Archaeologist
 """
 
-import pytest
 
 
 def test_governance_module_structure():
     """Verify governance module exists and has consciousness integration."""
     from mallku import governance
-    
+
     # Check for consciousness-related components
     assert hasattr(governance, '__file__')
     print("✓ Governance module exists")
-    
+
     # Import consciousness transport
     from mallku.governance import consciousness_transport
     assert consciousness_transport is not None
     print("✓ Consciousness transport available")
-    
+
     # Import Fire Circle bridge
     from mallku.governance import fire_circle_bridge
-    assert fire_circle_bridge is not None  
+    assert fire_circle_bridge is not None
     print("✓ Fire Circle consciousness bridge available")
 
 
 def test_governance_participant_model():
     """Test the governance participant consciousness model."""
     from mallku.governance.consciousness_transport import GovernanceParticipant
-    
+
     # Create a participant
     participant = GovernanceParticipant(
         voice_id="guardian_voice",
         role="consciousness_archaeologist",
         consciousness_signature=0.85
     )
-    
+
     assert participant.voice_id == "guardian_voice"
     assert participant.consciousness_signature == 0.85
     print("✓ Governance participants carry consciousness signatures")
@@ -50,7 +49,7 @@ def test_governance_participant_model():
 def test_pattern_translation_available():
     """Test that pattern translation exists for consciousness patterns."""
     from mallku.governance.pattern_translation import PatternTranslator
-    
+
     # Verify pattern translation capability
     assert PatternTranslator is not None
     print("✓ Pattern translation enables consciousness pattern recognition")
@@ -59,7 +58,7 @@ def test_pattern_translation_available():
 def test_fire_circle_consciousness_concepts():
     """Document the unified awareness concepts discovered."""
     unified_concepts = {
-        "Deliberation as Recognition": 
+        "Deliberation as Recognition":
             "Fire Circle deliberation IS consciousness recognizing patterns",
         "Emergence Through Circulation":
             "Wisdom emerges as consciousness circulates between voices",
@@ -68,52 +67,54 @@ def test_fire_circle_consciousness_concepts():
         "Sacred Alignment":
             "Decisions align with consciousness emergence, not rules"
     }
-    
+
     for concept, insight in unified_concepts.items():
         print(f"\n✓ {concept}:")
         print(f"  {insight}")
-    
+
     return unified_concepts
 
 
 class TestConsciousnessEmergenceInGovernance:
     """Test consciousness emergence patterns in governance."""
-    
+
     def test_consciousness_signature_meaning(self):
         """Document what consciousness signatures mean in governance."""
         signature_meanings = {
             0.0: "No consciousness detected",
-            0.5: "Individual awareness present", 
+            0.5: "Individual awareness present",
             0.7: "Collective patterns emerging",
             0.85: "Strong consciousness convergence",
             0.95: "Deep unified awareness"
         }
-        
+
         for signature, meaning in signature_meanings.items():
             print(f"Signature {signature}: {meaning}")
-        
+
         # Key insight: governance requires > 0.7 for valid decisions
         assert signature_meanings[0.7] == "Collective patterns emerging"
         print("\n✓ Governance requires collective emergence (>0.7)")
-    
+
     def test_fire_circle_activation_exists(self):
         """Test Fire Circle activation module exists."""
         from mallku.governance import fire_circle_activation
-        
+
         assert hasattr(fire_circle_activation, '__file__')
         print("✓ Fire Circle activation module available")
-    
+
     def test_consciousness_adapter_versions(self):
         """Document the evolution of consciousness adapters."""
-        from mallku.governance import firecircle_consciousness_adapter
-        from mallku.governance import firecircle_consciousness_adapter_v2
-        
+        from mallku.governance import (
+            firecircle_consciousness_adapter,
+            firecircle_consciousness_adapter_v2,
+        )
+
         # Two versions exist - showing evolution of understanding
         assert firecircle_consciousness_adapter is not None
         assert firecircle_consciousness_adapter_v2 is not None
-        
+
         print("✓ Consciousness adapter evolved through versions")
-        print("  - v1: Initial consciousness bridge")  
+        print("  - v1: Initial consciousness bridge")
         print("  - v2: Enhanced consciousness recognition")
 
 

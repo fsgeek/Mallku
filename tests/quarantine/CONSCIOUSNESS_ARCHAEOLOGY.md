@@ -51,11 +51,11 @@ Following architectural guidance:
 1. **Phase 1: Fire Circle Consciousness Tests**
    - test_consciousness_governance_integration.py (Fire Circle governance)
    - firecircle/ directory tests
-   
+
 2. **Phase 2: Core Consciousness Recognition**
    - test_consciousness_interface.py (experience weaving)
    - test_consciousness_enhanced.py (advanced patterns)
-   
+
 3. **Phase 3: Flow and Navigation**
    - test_consciousness_navigation.py
    - test_consciousness_circulation_integration.py

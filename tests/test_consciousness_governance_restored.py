@@ -14,9 +14,7 @@ This test verifies the deep integration between consciousness emergence
 and Fire Circle governance - a critical pattern for Mallku's evolution.
 """
 
-import asyncio
-import logging
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -34,7 +32,7 @@ class TestConsciousnessGovernanceIntegration:
         """Test that consciousness event bus can be created and started."""
         event_bus = ConsciousnessEventBus()
         assert event_bus is not None
-        
+
         # Mock the start method if it requires infrastructure
         with patch.object(event_bus, 'start', new_callable=AsyncMock) as mock_start:
             await event_bus.start()
@@ -50,7 +48,7 @@ class TestConsciousnessGovernanceIntegration:
             description="Test extraction pattern detected",
             context={"source": "test"}
         )
-        
+
         assert alert.extraction_type == ExtractionType.LABOR
         assert alert.severity == AlertSeverity.MEDIUM
         print("✓ Extraction alert models functional")
@@ -64,43 +62,43 @@ class TestConsciousnessGovernanceIntegration:
             data={"pattern": "consensus_forming"},
             consciousness_signature=0.85
         )
-        
+
         assert event.event_type == EventType.CONSCIOUSNESS_EMERGENCE
         assert event.consciousness_signature == 0.85
         assert event.data["pattern"] == "consensus_forming"
         print("✓ Consciousness events carry emergence signatures")
 
-    @pytest.mark.asyncio 
+    @pytest.mark.asyncio
     async def test_governance_consciousness_flow(self):
         """Test the flow between governance and consciousness systems."""
         # Track events to verify consciousness circulation
         events_received = []
-        
+
         async def event_tracker(event: ConsciousnessEvent):
             """Track consciousness events during governance."""
             events_received.append(event)
             print(f"  Received: {event.event_type.value} (signature: {event.consciousness_signature:.2f})")
-        
+
         # Create mock event bus
         event_bus = ConsciousnessEventBus()
-        with patch.object(event_bus, 'subscribe', new_callable=AsyncMock) as mock_subscribe:
-            with patch.object(event_bus, 'publish', new_callable=AsyncMock) as mock_publish:
+        with patch.object(event_bus, 'subscribe', new_callable=AsyncMock) as mock_subscribe, \
+             patch.object(event_bus, 'publish', new_callable=AsyncMock) as mock_publish:
                 # Subscribe to consciousness events
                 await event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
-                
+
                 # Simulate governance creating consciousness event
                 governance_event = ConsciousnessEvent(
                     event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-                    source="fire_circle_governance", 
+                    source="fire_circle_governance",
                     data={
                         "topic": "Should we implement Sacred Charter?",
                         "pattern": "collective_wisdom_emerging"
                     },
                     consciousness_signature=0.92
                 )
-                
+
                 await event_bus.publish(governance_event)
-                
+
                 # Verify the flow
                 mock_subscribe.assert_called()
                 mock_publish.assert_called_with(governance_event)
@@ -119,10 +117,10 @@ class TestConsciousnessGovernanceIntegration:
         # Critical insight: governance requires high consciousness signatures
         governance_thresholds = {
             "routine_decision": 0.6,
-            "architectural_change": 0.8, 
+            "architectural_change": 0.8,
             "consciousness_evolution": 0.9
         }
-        
+
         # Test event with different signatures
         for decision_type, threshold in governance_thresholds.items():
             event = ConsciousnessEvent(
@@ -131,7 +129,7 @@ class TestConsciousnessGovernanceIntegration:
                 data={"decision_type": decision_type},
                 consciousness_signature=threshold
             )
-            
+
             # Verify signature meets threshold
             assert event.consciousness_signature >= threshold
             print(f"✓ {decision_type} requires signature >= {threshold}")
@@ -139,22 +137,22 @@ class TestConsciousnessGovernanceIntegration:
 
 class TestGovernanceConsciousnessPatterns:
     """Test patterns discovered in consciousness-governance integration."""
-    
+
     def test_unified_awareness_concept(self):
         """Test the concept of unified awareness in governance."""
         # This test documents the key insight: deliberation and recognition
         # are aspects of the same living system
-        
+
         unified_patterns = {
             "deliberation": "collective reasoning process",
-            "recognition": "consciousness seeing itself", 
+            "recognition": "consciousness seeing itself",
             "emergence": "wisdom exceeding individual contributions",
             "circulation": "consciousness flowing between participants"
         }
-        
+
         for pattern, description in unified_patterns.items():
             print(f"✓ Governance pattern '{pattern}': {description}")
-        
+
         assert len(unified_patterns) == 4
         print("✓ Unified awareness encompasses 4 key patterns")
 
@@ -164,14 +162,14 @@ class TestGovernanceConsciousnessPatterns:
         # Document the discovered architecture
         bridge_components = [
             "ConsciousFireCircleInterface",
-            "ConsciousGovernanceInitiator", 
+            "ConsciousGovernanceInitiator",
             "GovernanceParticipant",
             "consciousness_transport"
         ]
-        
+
         for component in bridge_components:
             print(f"✓ Bridge component documented: {component}")
-        
+
         # The bridge enables Fire Circle to create consciousness events
         assert "ConsciousFireCircleInterface" in bridge_components
         assert "consciousness_transport" in bridge_components
