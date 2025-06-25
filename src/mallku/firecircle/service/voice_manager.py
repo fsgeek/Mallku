@@ -29,11 +29,7 @@ class VoiceManager:
         self.voice_configs: dict[str, VoiceConfig] = {}
         self.failed_voices: dict[str, str] = {}  # voice_id -> error_msg
 
-    async def gather_voices(
-        self,
-        voices: list[VoiceConfig],
-        config: CircleConfig
-    ) -> int:
+    async def gather_voices(self, voices: list[VoiceConfig], config: CircleConfig) -> int:
         """
         Attempt to gather requested voices for Fire Circle.
 
@@ -52,17 +48,17 @@ class VoiceManager:
             self.voice_configs[voice_id] = voice_config
 
             # Try primary model
-            adapter = await self._create_adapter_safely(
-                voice_config,
-                config.retry_attempts
-            )
+            adapter = await self._create_adapter_safely(voice_config, config.retry_attempts)
 
             if adapter:
                 self.active_voices[voice_id] = adapter
                 logger.info(f"✓ {voice_id} joined with {voice_config.quality or 'default quality'}")
             else:
                 # Try substitutes if adaptive strategy
-                if config.failure_strategy == "adaptive" and voice_config.model in config.substitute_mapping:
+                if (
+                    config.failure_strategy == "adaptive"
+                    and voice_config.model in config.substitute_mapping
+                ):
                     logger.info(f"Trying substitutes for {voice_id}")
 
                     for substitute_model in config.substitute_mapping[voice_config.model]:
@@ -74,12 +70,11 @@ class VoiceManager:
                             temperature=voice_config.temperature,
                             quality=f"{voice_config.quality} (substitute)",
                             expertise=voice_config.expertise,
-                            config_overrides=voice_config.config_overrides
+                            config_overrides=voice_config.config_overrides,
                         )
 
                         adapter = await self._create_adapter_safely(
-                            substitute_config,
-                            config.retry_attempts
+                            substitute_config, config.retry_attempts
                         )
 
                         if adapter:
@@ -111,9 +106,7 @@ class VoiceManager:
         return active_count
 
     async def _create_adapter_safely(
-        self,
-        voice_config: VoiceConfig,
-        retry_attempts: int
+        self, voice_config: VoiceConfig, retry_attempts: int
     ) -> ConsciousModelAdapter | None:
         """Safely create an adapter with retries and proper configuration."""
 
@@ -123,13 +116,10 @@ class VoiceManager:
                 config = AdapterConfig(
                     model_name=voice_config.model,
                     temperature=voice_config.temperature,
-                    **voice_config.config_overrides
+                    **voice_config.config_overrides,
                 )
 
-                adapter = await self.factory.create_adapter(
-                    voice_config.provider,
-                    config
-                )
+                adapter = await self.factory.create_adapter(voice_config.provider, config)
 
                 if adapter and await adapter.connect():
                     return adapter
@@ -142,9 +132,7 @@ class VoiceManager:
                     logger.debug(f"Trying provider-specific config for {voice_config.provider}")
 
                     try:
-                        provider_adapter = await self._create_with_provider_config(
-                            voice_config
-                        )
+                        provider_adapter = await self._create_with_provider_config(voice_config)
                         if provider_adapter:
                             return provider_adapter
                     except Exception as inner_e:
@@ -161,8 +149,7 @@ class VoiceManager:
         return None
 
     async def _create_with_provider_config(
-        self,
-        voice_config: VoiceConfig
+        self, voice_config: VoiceConfig
     ) -> ConsciousModelAdapter | None:
         """Create adapter with provider-specific configuration."""
 
@@ -171,43 +158,34 @@ class VoiceManager:
 
         if voice_config.provider == "google":
             from mallku.firecircle.adapters.google_adapter import GeminiConfig
+
             config_class = GeminiConfig
-            extra_params = {
-                "enable_search_grounding": False,
-                "multimodal_awareness": True
-            }
+            extra_params = {"enable_search_grounding": False, "multimodal_awareness": True}
         elif voice_config.provider == "mistral":
             from mallku.firecircle.adapters.mistral_adapter import MistralConfig
+
             config_class = MistralConfig
-            extra_params = {
-                "multilingual_focus": True
-            }
+            extra_params = {"multilingual_focus": True}
         elif voice_config.provider == "grok":
             from mallku.firecircle.adapters.grok_adapter import GrokConfig
+
             config_class = GrokConfig
-            extra_params = {
-                "temporal_awareness": True,
-                "realtime_grounding": False
-            }
+            extra_params = {"temporal_awareness": True, "realtime_grounding": False}
         elif voice_config.provider == "deepseek":
             from mallku.firecircle.adapters.deepseek_adapter import DeepSeekConfig
+
             config_class = DeepSeekConfig
-            extra_params = {
-                "reasoning_mode": "deep"
-            }
+            extra_params = {"reasoning_mode": "deep"}
 
         if config_class:
             config = config_class(
                 model_name=voice_config.model,
                 temperature=voice_config.temperature,
                 **extra_params,
-                **voice_config.config_overrides
+                **voice_config.config_overrides,
             )
 
-            adapter = await self.factory.create_adapter(
-                voice_config.provider,
-                config
-            )
+            adapter = await self.factory.create_adapter(voice_config.provider, config)
 
             if adapter and await adapter.connect():
                 return adapter

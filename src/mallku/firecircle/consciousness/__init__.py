@@ -34,7 +34,6 @@ __all__ = [
     # Original components
     "DialoguePatternWeaver",
     "FireCircleUnifiedAwareness",
-
     # General consciousness framework
     "ConsciousnessFacilitator",
     "facilitate_mallku_decision",

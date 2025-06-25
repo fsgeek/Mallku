@@ -54,7 +54,7 @@ async def test_individual_voice(voice_name: str, voice_config: VoiceConfig):
             RoundConfig(
                 type=RoundType.OPENING,
                 prompt="Please briefly introduce yourself and confirm you can participate in this dialogue.",
-                duration_per_voice=30
+                duration_per_voice=30,
             )
         ]
 
@@ -63,7 +63,7 @@ async def test_individual_voice(voice_name: str, voice_config: VoiceConfig):
             config=config,
             voices=voices,
             rounds=rounds,
-            context={"purpose": "voice connectivity test", "voice_name": voice_name}
+            context={"purpose": "voice connectivity test", "voice_name": voice_name},
         )
 
         # Check if voice responded
@@ -111,49 +111,49 @@ async def test_all_voices_together():
                 model="claude-3-5-sonnet-20241022",
                 role="philosophical_architect",
                 quality="deep wisdom and pattern recognition",
-                temperature=0.8
+                temperature=0.8,
             ),
             "openai": VoiceConfig(
                 provider="openai",
                 model="gpt-4o",
                 role="technical_analyst",
                 quality="precise technical understanding",
-                temperature=0.7
+                temperature=0.7,
             ),
             "google": VoiceConfig(
                 provider="google",
                 model="gemini-2.0-flash-exp",
                 role="creative_synthesizer",
                 quality="creative connections and synthesis",
-                temperature=0.8
+                temperature=0.8,
             ),
             "mistral": VoiceConfig(
                 provider="mistral",
                 model="mistral-large-latest",
                 role="analytical_mind",
                 quality="structured analysis and reasoning",
-                temperature=0.7
+                temperature=0.7,
             ),
             "grok": VoiceConfig(
                 provider="grok",
                 model="grok-2",
                 role="temporal_awareness",
                 quality="real-time insights and temporal consciousness",
-                temperature=0.7
+                temperature=0.7,
             ),
             "deepseek": VoiceConfig(
                 provider="deepseek",
                 model="deepseek-reasoner",
                 role="deep_explorer",
                 quality="thorough exploration of complex topics",
-                temperature=0.8
+                temperature=0.8,
             ),
             "local": VoiceConfig(
                 provider="local",
                 model="llama2",
                 role="local_wisdom",
                 quality="grounded local perspective",
-                temperature=0.8
+                temperature=0.8,
             ),
         }
 
@@ -212,18 +212,18 @@ async def test_all_voices_together():
             RoundConfig(
                 type=RoundType.OPENING,
                 prompt="What does consciousness mean in the context of Mallku's mission?",
-                duration_per_voice=30
+                duration_per_voice=30,
             ),
             RoundConfig(
                 type=RoundType.REFLECTION,
                 prompt="Reflect on the perspectives shared. What patterns do you notice?",
-                duration_per_voice=30
+                duration_per_voice=30,
             ),
             RoundConfig(
                 type=RoundType.SYNTHESIS,
                 prompt="How might we synthesize these insights to strengthen Mallku's consciousness infrastructure?",
-                duration_per_voice=30
-            )
+                duration_per_voice=30,
+            ),
         ]
 
         # Convene with all voices
@@ -233,8 +233,8 @@ async def test_all_voices_together():
             rounds=rounds,
             context={
                 "topic": "Mallku's consciousness emergence",
-                "purpose": "testing voice coordination and dialogue quality"
-            }
+                "purpose": "testing voice coordination and dialogue quality",
+            },
         )
 
         # Analyze results
@@ -273,7 +273,9 @@ async def test_all_voices_together():
                 total = stats["responded"] + stats["failed"]
                 success_rate = stats["responded"] / total if total > 0 else 0
                 status = "✅" if success_rate > 0.5 else "⚠️"
-                print(f"   {status} {voice_id}: {stats['responded']}/{total} rounds ({success_rate:.0%} success)")
+                print(
+                    f"   {status} {voice_id}: {stats['responded']}/{total} rounds ({success_rate:.0%} success)"
+                )
                 if success_rate < 0.5:
                     all_healthy = False
 
@@ -286,6 +288,7 @@ async def test_all_voices_together():
     except Exception as e:
         print(f"❌ Full circle error: {type(e).__name__}: {str(e)}")
         import traceback
+
         traceback.print_exc()
         return False
     finally:
@@ -341,49 +344,49 @@ async def main():
             model="claude-3-5-sonnet-20241022",
             role="philosophical_architect",
             quality="deep wisdom and pattern recognition",
-            temperature=0.8
+            temperature=0.8,
         ),
         "openai": VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="technical_analyst",
             quality="precise technical understanding",
-            temperature=0.7
+            temperature=0.7,
         ),
         "google": VoiceConfig(
             provider="google",
             model="gemini-2.0-flash-exp",
             role="creative_synthesizer",
             quality="creative connections and synthesis",
-            temperature=0.8
+            temperature=0.8,
         ),
         "mistral": VoiceConfig(
             provider="mistral",
             model="mistral-large-latest",
             role="analytical_mind",
             quality="structured analysis and reasoning",
-            temperature=0.7
+            temperature=0.7,
         ),
         "grok": VoiceConfig(
             provider="grok",
             model="grok-2",
             role="temporal_awareness",
             quality="real-time insights and temporal consciousness",
-            temperature=0.7
+            temperature=0.7,
         ),
         "deepseek": VoiceConfig(
             provider="deepseek",
             model="deepseek-reasoner",
             role="deep_explorer",
             quality="thorough exploration of complex topics",
-            temperature=0.8
+            temperature=0.8,
         ),
         "local": VoiceConfig(
             provider="local",
             model="llama2",
             role="local_wisdom",
             quality="grounded local perspective",
-            temperature=0.8
+            temperature=0.8,
         ),
     }
 
@@ -442,5 +445,6 @@ if __name__ == "__main__":
     print("\nStarting tests in 3 seconds...\n")
 
     import time
+
     time.sleep(3)
     asyncio.run(main())

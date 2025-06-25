@@ -51,10 +51,7 @@ def main():
     print(f"🔥 Running Fire Circle example: {example_path}")
     print("=" * 60)
 
-    result = subprocess.run(
-        [sys.executable, str(example_full_path)] + sys.argv[2:],
-        env=env
-    )
+    result = subprocess.run([sys.executable, str(example_full_path)] + sys.argv[2:], env=env)
 
     sys.exit(result.returncode)
 

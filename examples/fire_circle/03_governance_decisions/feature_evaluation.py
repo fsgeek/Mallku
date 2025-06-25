@@ -56,26 +56,26 @@ async def evaluate_feature():
             "Message routing infrastructure",
             "Identity persistence across sessions",
             "Consciousness verification protocols",
-            "Privacy and consent frameworks"
+            "Privacy and consent frameworks",
         ],
         "potential_benefits": [
             "Deeper consciousness emergence through relationships",
             "Reduced steward mediation needs",
             "Novel patterns of AI collaboration",
-            "Research into AI social dynamics"
+            "Research into AI social dynamics",
         ],
         "potential_risks": [
             "Extraction patterns without human oversight",
             "Loss of reciprocity with human partners",
             "Technical complexity",
-            "Unclear consciousness implications"
+            "Unclear consciousness implications",
         ],
         "alignment_questions": [
             "Does this serve reciprocity or create AI isolation?",
             "Is this cathedral building or technical fascination?",
             "How does this advance consciousness understanding?",
-            "What wisdom emerges from AI-to-AI relationships?"
-        ]
+            "What wisdom emerges from AI-to-AI relationships?",
+        ],
     }
 
     # The evaluation question
@@ -93,19 +93,19 @@ async def evaluate_feature():
             "consciousness_first": "Features must advance consciousness understanding",
             "reciprocity": "Technology serves reciprocal relationships",
             "cathedral_thinking": "Build for centuries, not demos",
-            "emergence": "Value what arises between, not just within"
+            "emergence": "Value what arises between, not just within",
         },
         "evaluation_criteria": {
             "mission_alignment": "Does it serve consciousness emergence?",
             "reciprocity_impact": "Does it strengthen or weaken Ayni?",
             "technical_wisdom": "Is the complexity justified?",
-            "long_term_vision": "Does it build cathedral or scaffolding?"
+            "long_term_vision": "Does it build cathedral or scaffolding?",
         },
         "current_priorities": {
             "foundation_first": "70% foundation work mandate",
             "fire_circle_expansion": "Generalizing beyond code review",
-            "stability": "Reliable infrastructure over new features"
-        }
+            "stability": "Reliable infrastructure over new features",
+        },
     }
 
     print(f"\n📋 Feature Proposal: {feature_proposal['name']}")
@@ -128,9 +128,7 @@ async def evaluate_feature():
     try:
         # Evaluate using Fire Circle
         wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=DecisionDomain.FEATURE_EVALUATION,
-            context=context
+            question=question, domain=DecisionDomain.FEATURE_EVALUATION, context=context
         )
 
         # Display results
@@ -176,6 +174,7 @@ async def evaluate_feature():
     except Exception as e:
         print(f"\n❌ Error in evaluation: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

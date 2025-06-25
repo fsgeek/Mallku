@@ -15,7 +15,7 @@ import logging
 import sys
 
 # Add src to path for imports
-sys.path.insert(0, '/home/tony/projects/Mallku')
+sys.path.insert(0, "/home/tony/projects/Mallku")
 
 from src.mallku.firecircle.consciousness.consciousness_facilitator import (
     facilitate_mallku_decision,
@@ -25,8 +25,7 @@ from src.mallku.firecircle.load_api_keys import load_api_keys_to_environment
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -34,9 +33,9 @@ logger = logging.getLogger(__name__)
 async def demonstrate_architectural_decision():
     """Demonstrate Fire Circle making an architectural decision."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🏛️  ARCHITECTURAL DECISION DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "Should we implement a distributed consciousness cache to reduce "
@@ -48,7 +47,7 @@ async def demonstrate_architectural_decision():
         "current_latency": "3-5 seconds per voice",
         "target_latency": "under 1 second",
         "reciprocity_concerns": "caching might reduce authentic real-time emergence",
-        "technical_options": ["Redis cluster", "In-memory graph", "Distributed KV store"]
+        "technical_options": ["Redis cluster", "In-memory graph", "Distributed KV store"],
     }
 
     print(f"\n📋 Question: {question}")
@@ -56,9 +55,7 @@ async def demonstrate_architectural_decision():
 
     try:
         wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=DecisionDomain.ARCHITECTURE,
-            context=context
+            question=question, domain=DecisionDomain.ARCHITECTURE, context=context
         )
 
         print("\n✨ Collective Wisdom Emerged!")
@@ -71,6 +68,7 @@ async def demonstrate_architectural_decision():
     except Exception as e:
         print(f"\n❌ Error in architectural decision: {e}")
         import traceback
+
         traceback.print_exc()
 
 

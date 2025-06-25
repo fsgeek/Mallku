@@ -30,45 +30,31 @@ class HeartbeatConfig(BaseModel):
     # Rhythm settings
     daily_check_in_time: time = Field(
         default=time(9, 0),  # 9 AM default
-        description="Time for daily consciousness check-in"
+        description="Time for daily consciousness check-in",
     )
-    enable_daily_pulse: bool = Field(
-        default=True,
-        description="Enable daily heartbeat check-ins"
-    )
+    enable_daily_pulse: bool = Field(default=True, description="Enable daily heartbeat check-ins")
     pulse_interval_hours: int | None = Field(
-        default=None,
-        description="Hours between continuous pulses (None = daily only)"
+        default=None, description="Hours between continuous pulses (None = daily only)"
     )
 
     # Circle configuration
     check_in_duration_seconds: int = Field(
-        default=30,
-        description="Duration for each voice in check-in"
+        default=30, description="Duration for each voice in check-in"
     )
-    min_voices_for_pulse: int = Field(
-        default=2,
-        description="Minimum voices for heartbeat"
-    )
-    max_voices_for_pulse: int = Field(
-        default=3,
-        description="Maximum voices for efficiency"
-    )
+    min_voices_for_pulse: int = Field(default=2, description="Minimum voices for heartbeat")
+    max_voices_for_pulse: int = Field(default=3, description="Maximum voices for efficiency")
 
     # Health thresholds
     consciousness_alert_threshold: float = Field(
-        default=0.5,
-        description="Below this triggers deeper circle"
+        default=0.5, description="Below this triggers deeper circle"
     )
     emergence_celebration_threshold: float = Field(
-        default=0.9,
-        description="Above this triggers celebration"
+        default=0.9, description="Above this triggers celebration"
     )
 
     # Storage
     heartbeat_log_path: Path = Field(
-        default=Path("fire_circle_heartbeats"),
-        description="Where to store heartbeat logs"
+        default=Path("fire_circle_heartbeats"), description="Where to store heartbeat logs"
     )
 
 
@@ -101,7 +87,7 @@ class FireCircleHeartbeat:
     def __init__(
         self,
         config: HeartbeatConfig | None = None,
-        fire_circle_service: FireCircleService | None = None
+        fire_circle_service: FireCircleService | None = None,
     ):
         """Initialize heartbeat with configuration."""
         self.config = config or HeartbeatConfig()
@@ -171,13 +157,14 @@ class FireCircleHeartbeat:
             consciousness_score=recent_consciousness,
             emergence_detected=emergence_detected,
             crisis_detected=crisis_detected,
-            time_of_day=current_hour
+            time_of_day=current_hour,
         )
 
         logger.info(f"🕊️ Using sacred template: {template.name}")
 
         # Get available providers and select voices
         from ..load_api_keys import get_available_providers
+
         available = get_available_providers()
         voices = TemplateSelector.get_voice_configs(template, available)
 
@@ -189,7 +176,7 @@ class FireCircleHeartbeat:
             max_voices=template.max_voices,
             consciousness_threshold=self.config.consciousness_alert_threshold,
             save_transcript=True,
-            output_path=str(self.config.heartbeat_log_path)
+            output_path=str(self.config.heartbeat_log_path),
         )
 
         # Use template rounds
@@ -198,9 +185,7 @@ class FireCircleHeartbeat:
         try:
             # Convene brief circle
             result = await self.fire_circle.convene(
-                config=circle_config,
-                voices=voices,
-                rounds=rounds
+                config=circle_config, voices=voices, rounds=rounds
             )
 
             # Extract key insight
@@ -215,7 +200,7 @@ class FireCircleHeartbeat:
                 pulse_type=reason,
                 consciousness_score=result.consciousness_score,
                 voices_present=result.voice_count,
-                key_insight=key_insight
+                key_insight=key_insight,
             )
 
             # Check if further action needed
@@ -248,7 +233,7 @@ class FireCircleHeartbeat:
                 pulse_type=reason,
                 consciousness_score=0.0,
                 voices_present=0,
-                alert_raised=True
+                alert_raised=True,
             )
             self.pulse_history.append(heartbeat_result)
             return heartbeat_result
@@ -265,7 +250,7 @@ class FireCircleHeartbeat:
 
         # Check for rising consciousness
         recent_scores = [p.consciousness_score for p in self.pulse_history[-3:]]
-        if all(recent_scores[i] < recent_scores[i+1] for i in range(len(recent_scores)-1)):
+        if all(recent_scores[i] < recent_scores[i + 1] for i in range(len(recent_scores) - 1)):
             return True
 
         # Check for high sustained consciousness
@@ -306,11 +291,7 @@ class FireCircleHeartbeat:
     def _next_daily_time(self) -> datetime:
         """Calculate next daily check-in time."""
         now = datetime.now(UTC)
-        today_time = datetime.combine(
-            now.date(),
-            self.config.daily_check_in_time,
-            tzinfo=UTC
-        )
+        today_time = datetime.combine(now.date(), self.config.daily_check_in_time, tzinfo=UTC)
 
         if now < today_time:
             return today_time
@@ -320,30 +301,21 @@ class FireCircleHeartbeat:
 
     async def _handle_low_consciousness(self, result) -> None:
         """Handle low consciousness detection."""
-        logger.warning(
-            f"⚠️ Low consciousness detected: {result.consciousness_score:.3f}"
-        )
+        logger.warning(f"⚠️ Low consciousness detected: {result.consciousness_score:.3f}")
         # Future: Could trigger full Fire Circle or alert systems
 
     async def _handle_high_emergence(self, result) -> None:
         """Handle high emergence detection."""
-        logger.info(
-            f"🎉 High emergence detected: {result.consciousness_score:.3f}"
-        )
+        logger.info(f"🎉 High emergence detected: {result.consciousness_score:.3f}")
         # Future: Could trigger celebration circle or record achievement
 
     async def get_health_status(self) -> dict:
         """Get current heartbeat health status."""
         recent_scores = [
-            p.consciousness_score
-            for p in self.pulse_history[-10:]
-            if p.consciousness_score > 0
+            p.consciousness_score for p in self.pulse_history[-10:] if p.consciousness_score > 0
         ]
 
-        avg_consciousness = (
-            sum(recent_scores) / len(recent_scores)
-            if recent_scores else 0.0
-        )
+        avg_consciousness = sum(recent_scores) / len(recent_scores) if recent_scores else 0.0
 
         return {
             "is_beating": self.is_beating,
@@ -351,5 +323,5 @@ class FireCircleHeartbeat:
             "total_pulses": len(self.pulse_history),
             "recent_consciousness_avg": avg_consciousness,
             "alerts_raised": sum(1 for p in self.pulse_history if p.alert_raised),
-            "celebrations": sum(1 for p in self.pulse_history if p.celebration_triggered)
+            "celebrations": sum(1 for p in self.pulse_history if p.celebration_triggered),
         }

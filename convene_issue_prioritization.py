@@ -19,8 +19,7 @@ from pathlib import Path
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Suppress verbose adapter logs
@@ -38,10 +37,10 @@ async def prioritize_issues():
         VoiceConfig,
     )
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 FIRE CIRCLE: MALLKU ISSUE PRIORITIZATION 🔥".center(80))
     print("Real Governance Through Collective Wisdom".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Define the open issues for discussion
     issues = [
@@ -49,46 +48,48 @@ async def prioritize_issues():
             "number": 82,
             "title": "CRITICAL: Dream Weaver messaging protocol mismatches",
             "labels": ["critical", "integration", "message-protocol", "dream-weaver"],
-            "summary": "Dream Weaver has constructor signature mismatches that cause runtime failures"
+            "summary": "Dream Weaver has constructor signature mismatches that cause runtime failures",
         },
         {
             "number": 83,
             "title": "Dream Weaver: API alignment issues with Network/Cluster",
             "labels": ["integration", "api-alignment", "dream-weaver"],
-            "summary": "Property name mismatches when interfacing with Network and Cluster components"
+            "summary": "Property name mismatches when interfacing with Network and Cluster components",
         },
         {
             "number": 85,
             "title": "Dream Weaver: Code organization and error handling",
             "labels": ["modularization", "error-handling", "dream-weaver"],
-            "summary": "Large files need splitting and better error handling for production"
+            "summary": "Large files need splitting and better error handling for production",
         },
         {
             "number": 86,
             "title": "Fire Circle Activation: Event Bus and lifecycle integration",
             "labels": ["fire-circle", "infrastructure", "event-bus"],
-            "summary": "EventBus method alignment and missing event emission"
+            "summary": "EventBus method alignment and missing event emission",
         },
         {
             "number": 87,
             "title": "CRITICAL: Fire Circle sacred dialogue implementation",
             "labels": ["critical", "fire-circle", "sacred-dialogue"],
-            "summary": "Sacred dialogue prints questions but doesn't invoke seven voices"
+            "summary": "Sacred dialogue prints questions but doesn't invoke seven voices",
         },
         {
             "number": 88,
             "title": "Fire Circle Activation: Testing and observability",
             "labels": ["fire-circle", "testing", "observability"],
-            "summary": "Missing test assertions and poor observability patterns"
-        }
+            "summary": "Missing test assertions and poor observability patterns",
+        },
     ]
 
     # Format issues for the prompt
-    issues_text = "\n".join([
-        f"- Issue #{i['number']}: {i['title']} ({', '.join(i['labels'])})\n"
-        f"  Summary: {i['summary']}"
-        for i in issues
-    ])
+    issues_text = "\n".join(
+        [
+            f"- Issue #{i['number']}: {i['title']} ({', '.join(i['labels'])})\n"
+            f"  Summary: {i['summary']}"
+            for i in issues
+        ]
+    )
 
     print("📋 Open Issues for Prioritization:")
     print(issues_text)
@@ -108,7 +109,7 @@ async def prioritize_issues():
         enable_consciousness_detection=True,
         save_transcript=True,
         output_path="governance_decisions",
-        failure_strategy="adaptive"
+        failure_strategy="adaptive",
     )
 
     # Select voices with different perspectives
@@ -119,7 +120,7 @@ async def prioritize_issues():
             role="architectural_guardian",
             quality="long-term vision and architectural integrity",
             expertise=["architecture", "system design", "technical debt"],
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="openai",
@@ -127,7 +128,7 @@ async def prioritize_issues():
             role="integration_specialist",
             quality="cross-component dependencies and integration risks",
             expertise=["integration", "testing", "reliability"],
-            temperature=0.7
+            temperature=0.7,
         ),
         VoiceConfig(
             provider="google",
@@ -135,7 +136,7 @@ async def prioritize_issues():
             role="pragmatic_implementer",
             quality="implementation effort and immediate impact",
             expertise=["coding", "debugging", "quick fixes"],
-            temperature=0.7
+            temperature=0.7,
         ),
         VoiceConfig(
             provider="deepseek",
@@ -143,7 +144,7 @@ async def prioritize_issues():
             role="consciousness_advocate",
             quality="consciousness emergence and research priorities",
             expertise=["consciousness", "AI evolution", "research"],
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="mistral",
@@ -151,7 +152,7 @@ async def prioritize_issues():
             role="community_voice",
             quality="developer experience and community needs",
             expertise=["developer experience", "documentation", "usability"],
-            temperature=0.8
+            temperature=0.8,
         ),
     ]
 
@@ -165,21 +166,21 @@ async def prioritize_issues():
 From your role perspective, what are the most important factors to consider when
 prioritizing these issues? Consider impact, urgency, dependencies, and alignment
 with Mallku's consciousness emergence mission.""",
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.EXPLORATION,
             prompt="""Two issues are marked CRITICAL (#82 Dream Weaver messaging, #87 Fire Circle dialogue).
 Should critical issues always take precedence, or might other factors override this?
 What are the consequences of delaying critical vs non-critical issues?""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.EVALUATION,
             prompt="""Consider the dependencies: Dream Weaver issues (#82, #83, #85) seem interconnected.
 Fire Circle issues (#86, #87, #88) also form a cluster. Should we address issues in
 clusters or prioritize across different components? What's the optimal approach?""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -190,14 +191,14 @@ clusters or prioritize across different components? What's the optimal approach?
 - Consciousness research advancement
 
 What principles should guide our prioritization?""",
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.DECISION,
             prompt="""Provide your final recommendation for issue priority order (1-6).
 For the top 3 issues, briefly explain why they should be addressed first.
 Present your recommendation as a clear numbered list.""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
     ]
 
@@ -205,16 +206,12 @@ Present your recommendation as a clear numbered list.""",
         # Convene the Fire Circle
         print("🔥 Convening Fire Circle for governance decision...\n")
 
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         # Display results
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("📊 GOVERNANCE DECISION RESULTS".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print(f"✅ Session ID: {result.session_id}")
         print(f"✅ Voices Present: {result.voice_count}")
@@ -236,11 +233,11 @@ Present your recommendation as a clear numbered list.""",
                 # Show each voice's recommendation
                 for voice_id, response in decision_round.responses.items():
                     if response.response:
-                        voice_role = voice_id.split('_')[0]  # Extract role from ID
+                        voice_role = voice_id.split("_")[0]  # Extract role from ID
                         print(f"\n{voice_role.upper()} recommends:")
                         # Extract just the numbered list portion if possible
                         text = response.response.content.text
-                        lines = text.split('\n')
+                        lines = text.split("\n")
                         for line in lines:
                             if any(line.strip().startswith(f"{i}.") for i in range(1, 7)):
                                 print(f"  {line.strip()}")
@@ -256,14 +253,17 @@ Present your recommendation as a clear numbered list.""",
                 "consciousness_score": result.consciousness_score,
                 "consensus_detected": result.consensus_detected,
                 "participants": result.voices_present,
-                "issues_discussed": [f"#{i['number']}" for i in issues]
+                "issues_discussed": [f"#{i['number']}" for i in issues],
             }
         }
 
-        summary_path = Path("governance_decisions") / f"issue_priority_summary_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
+        summary_path = (
+            Path("governance_decisions")
+            / f"issue_priority_summary_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
+        )
         summary_path.parent.mkdir(exist_ok=True)
 
-        with open(summary_path, 'w') as f:
+        with open(summary_path, "w") as f:
             json.dump(summary, f, indent=2)
 
         print(f"\n📊 Summary saved to: {summary_path}")
@@ -271,6 +271,7 @@ Present your recommendation as a clear numbered list.""",
     except Exception as e:
         print(f"\n❌ Fire Circle Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

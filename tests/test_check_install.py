@@ -10,7 +10,7 @@ def test_check_mallku_installation():
 
     # Check site-packages
     for path in sys.path:
-        if 'site-packages' in str(path):
+        if "site-packages" in str(path):
             site_packages = Path(path)
             print(f"\nChecking site-packages: {site_packages}")
 
@@ -20,7 +20,7 @@ def test_check_mallku_installation():
                 print("Found mallku-related files:")
                 for p in mallku_paths:
                     print(f"  - {p.name}")
-                    if p.name.endswith('.pth'):
+                    if p.name.endswith(".pth"):
                         # Read .pth file
                         try:
                             content = p.read_text().strip()

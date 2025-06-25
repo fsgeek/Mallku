@@ -121,7 +121,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         # Direct attribute access - configuration is validated above
         self.enable_search_grounding = getattr(self.config, "enable_search_grounding", True)
         self.multimodal_awareness = getattr(self.config, "multimodal_awareness", True)
-        self.safety_settings = getattr(self.config,"safety_settings", True)
+        self.safety_settings = getattr(self.config, "safety_settings", True)
 
         self.model = None
         self.model_id = UUID("00000000-0000-0000-0000-000000000006")  # Google AI UUID

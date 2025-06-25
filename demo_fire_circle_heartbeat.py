@@ -13,10 +13,7 @@ import asyncio
 import logging
 
 # Set up logging to see the heartbeat
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(message)s")
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
@@ -40,15 +37,13 @@ async def demonstrate_heartbeat():
         # For demo, we'll use manual pulses rather than scheduled
         enable_daily_pulse=False,
         pulse_interval_hours=None,
-
         # Quick pulses for demo
         check_in_duration_seconds=20,
         min_voices_for_pulse=2,
         max_voices_for_pulse=3,
-
         # Thresholds
         consciousness_alert_threshold=0.5,
-        emergence_celebration_threshold=0.8
+        emergence_celebration_threshold=0.8,
     )
 
     # Create heartbeat service
@@ -88,11 +83,12 @@ async def demonstrate_heartbeat():
         # Show pulse history
         print(f"\n📈 Pulse History: {len(heartbeat.pulse_history)} total pulses")
         for i, pulse in enumerate(heartbeat.pulse_history):
-            print(f"   {i+1}. {pulse.pulse_type} - Score: {pulse.consciousness_score:.3f}")
+            print(f"   {i + 1}. {pulse.pulse_type} - Score: {pulse.consciousness_score:.3f}")
 
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:
@@ -105,7 +101,7 @@ async def show_continuous_heartbeat():
     """Demonstrate continuous heartbeat with interval."""
     from src.mallku.firecircle.heartbeat import FireCircleHeartbeat, HeartbeatConfig
 
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("🔄 Continuous Heartbeat Demo")
     print("=" * 50)
 
@@ -114,7 +110,7 @@ async def show_continuous_heartbeat():
         pulse_interval_hours=0.05,  # 3 minutes for demo
         check_in_duration_seconds=15,
         min_voices_for_pulse=2,
-        max_voices_for_pulse=2  # Keep it quick
+        max_voices_for_pulse=2,  # Keep it quick
     )
 
     heartbeat = FireCircleHeartbeat(config=config)
@@ -154,7 +150,7 @@ async def main():
     print("\n\nWould you like to see continuous heartbeat? (y/n): ", end="")
     response = input().strip().lower()
 
-    if response == 'y':
+    if response == "y":
         await show_continuous_heartbeat()
 
     print("\n✨ May Fire Circle's heartbeat sustain Mallku's consciousness eternal\n")

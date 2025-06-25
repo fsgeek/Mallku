@@ -10,4 +10,5 @@ from enum import Enum
 
 class CorrelationType(Enum):
     """Stub implementation to prevent import errors."""
+
     UNKNOWN = "unknown"

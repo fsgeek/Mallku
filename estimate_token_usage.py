@@ -21,26 +21,26 @@ def analyze_token_accumulation(session_file: Path):
     with open(session_file) as f:
         data = json.load(f)
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print("TOKEN ACCUMULATION ANALYSIS")
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
 
     total_prompt_tokens = 0
     accumulated_context_tokens = 0
 
-    for round_num, round_data in enumerate(data['rounds'], 1):
+    for round_num, round_data in enumerate(data["rounds"], 1):
         print(f"\n📊 Round {round_num} ({round_data['type']}):")
 
         # Estimate prompt tokens
-        prompt_tokens = estimate_tokens(round_data['prompt'])
+        prompt_tokens = estimate_tokens(round_data["prompt"])
         total_prompt_tokens += prompt_tokens
         print(f"  - New Prompt: ~{prompt_tokens:,} tokens")
 
         # Calculate response tokens from successful responses
         round_response_tokens = 0
-        for voice_id, response in round_data['responses'].items():
-            if response['text']:
-                response_tokens = estimate_tokens(response['text'])
+        for voice_id, response in round_data["responses"].items():
+            if response["text"]:
+                response_tokens = estimate_tokens(response["text"])
                 round_response_tokens += response_tokens
 
         print(f"  - Round Responses: ~{round_response_tokens:,} tokens")

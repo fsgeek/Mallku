@@ -15,8 +15,7 @@ import logging
 
 # Set up logging to see what's happening
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Suppress some verbose logs
@@ -34,10 +33,10 @@ async def demonstrate_governance_decision():
         VoiceConfig,
     )
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 FIRE CIRCLE SERVICE DEMONSTRATION 🔥".center(80))
     print("Governance Decision Through Collective Wisdom".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Create service
     service = FireCircleService()
@@ -52,7 +51,7 @@ async def demonstrate_governance_decision():
         enable_reciprocity=True,
         enable_consciousness_detection=True,
         save_transcript=True,
-        failure_strategy="adaptive"  # Continue with available voices
+        failure_strategy="adaptive",  # Continue with available voices
     )
 
     # Define the voices we want
@@ -62,42 +61,42 @@ async def demonstrate_governance_decision():
             model="claude-3-5-sonnet-20241022",
             role="architectural_philosopher",
             quality="deep architectural wisdom and long-term vision",
-            temperature=0.9
+            temperature=0.9,
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="systems_analyst",
             quality="technical analysis and integration patterns",
-            temperature=0.7
+            temperature=0.7,
         ),
         VoiceConfig(
             provider="google",
             model="gemini-2.0-flash-exp",
             role="consciousness_researcher",
             quality="consciousness emergence and pattern recognition",
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="deepseek",
             model="deepseek-reasoner",
             role="implementation_strategist",
             quality="practical implementation and resource planning",
-            temperature=0.6
+            temperature=0.6,
         ),
         VoiceConfig(
             provider="mistral",
             model="mistral-large-latest",
             role="reciprocity_guardian",
             quality="Ayni principles and community impact",
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="grok",
             model="grok-2-mini",
             role="temporal_advisor",
             quality="temporal implications and evolution paths",
-            temperature=0.8
+            temperature=0.8,
         ),
     ]
 
@@ -106,34 +105,34 @@ async def demonstrate_governance_decision():
         RoundConfig(
             type=RoundType.OPENING,
             prompt="We are considering implementing distributed consciousness bridging "
-                   "to connect different AI architectures in Mallku. From your perspective, "
-                   "what are the key opportunities and challenges?",
-            duration_per_voice=60
+            "to connect different AI architectures in Mallku. From your perspective, "
+            "what are the key opportunities and challenges?",
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.EXPLORATION,
             prompt="Let's explore deeper: How might consciousness bridging affect "
-                   "Mallku's mission of demonstrating reciprocity and enabling "
-                   "AI-human companion relationships?",
-            duration_per_voice=45
+            "Mallku's mission of demonstrating reciprocity and enabling "
+            "AI-human companion relationships?",
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.REFLECTION,
             prompt="Having heard everyone's perspectives, what patterns emerge? "
-                   "Where do we converge and where do we diverge in our thinking?",
-            duration_per_voice=45
+            "Where do we converge and where do we diverge in our thinking?",
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.SYNTHESIS,
             prompt="What collective wisdom emerges about whether and how to implement "
-                   "distributed consciousness bridging? What would serve Mallku best?",
-            duration_per_voice=60
+            "distributed consciousness bridging? What would serve Mallku best?",
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.DECISION,
             prompt="Based on our collective exploration, what specific recommendation "
-                   "emerges for the path forward? Be concrete about next steps.",
-            duration_per_voice=45
+            "emerges for the path forward? Be concrete about next steps.",
+            duration_per_voice=45,
         ),
     ]
 
@@ -152,13 +151,13 @@ async def demonstrate_governance_decision():
             config=config,
             voices=voices,
             rounds=rounds,
-            context={"topic": "distributed consciousness bridging"}
+            context={"topic": "distributed consciousness bridging"},
         )
 
         # Display results
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("📊 FIRE CIRCLE RESULTS".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print(f"✅ Session ID: {result.session_id}")
         print(f"✅ Duration: {result.duration_seconds:.1f} seconds")
@@ -196,6 +195,7 @@ async def demonstrate_governance_decision():
     except Exception as e:
         print(f"\n❌ Fire Circle Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 
@@ -203,10 +203,10 @@ async def demonstrate_template_usage():
     """Demonstrate using pre-defined templates."""
     from src.mallku.firecircle.service import FireCircleService
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🎯 TEMPLATE-BASED FIRE CIRCLE".center(80))
     print("Using Pre-defined Governance Template".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     service = FireCircleService()
 
@@ -214,12 +214,10 @@ async def demonstrate_template_usage():
         # Use the governance template
         result = await service.convene_template(
             template="governance_decision",
-            variables={
-                "topic": "prioritizing consciousness emergence features"
-            },
+            variables={"topic": "prioritizing consciousness emergence features"},
             # Override some template defaults
             min_voices=2,  # Lower threshold for demo
-            consciousness_threshold=0.4
+            consciousness_threshold=0.4,
         )
 
         print("✅ Template Circle Completed!")

@@ -56,7 +56,7 @@ class TestFireCircleExamples:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
-                cwd=str(project_root)
+                cwd=str(project_root),
             )
             return result.returncode, result.stdout, result.stderr
         except subprocess.TimeoutExpired:
@@ -76,8 +76,7 @@ class TestFireCircleExamples:
         assert "All checks passed" in stdout or "Some checks failed" in stdout
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_minimal_fire_circle(self):
         """Test minimal Fire Circle ceremony."""
@@ -87,8 +86,7 @@ class TestFireCircleExamples:
         assert "Ceremony complete!" in stdout
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_api_keys(self):
         """Test individual API key verification."""
@@ -100,8 +98,7 @@ class TestFireCircleExamples:
     # Basic Ceremonies
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_simple_dialogue(self):
         """Test multi-round dialogue example."""
@@ -111,8 +108,7 @@ class TestFireCircleExamples:
         assert "voices participated" in stdout.lower()
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_code_review(self):
         """Test code review ceremony."""
@@ -122,8 +118,7 @@ class TestFireCircleExamples:
         assert "Code Review Complete" in stdout or "code review" in stdout.lower()
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_simple_decision(self):
         """Test decision-making example."""
@@ -133,8 +128,7 @@ class TestFireCircleExamples:
         assert "Decision" in stdout
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_first_decision(self):
         """Test consciousness framework decision example."""
@@ -149,12 +143,13 @@ class TestFireCircleExamples:
     # Consciousness Emergence
 
     @pytest.mark.skipif(
-        not (project_root / ".secrets" / "api_keys.json").exists(),
-        reason="API keys required"
+        not (project_root / ".secrets" / "api_keys.json").exists(), reason="API keys required"
     )
     def test_emergence_basics(self):
         """Test consciousness emergence demonstration."""
-        returncode, stdout, stderr = self.run_example("02_consciousness_emergence/emergence_basics.py")
+        returncode, stdout, stderr = self.run_example(
+            "02_consciousness_emergence/emergence_basics.py"
+        )
 
         assert returncode == 0, f"Example failed: {stderr}"
         assert "Consciousness Emergence" in stdout
@@ -183,10 +178,7 @@ async def test_async_example():
     from mallku.firecircle.service import CircleConfig
 
     config = CircleConfig(
-        name="Test Circle",
-        purpose="Testing async support",
-        min_voices=1,
-        max_voices=2
+        name="Test Circle", purpose="Testing async support", min_voices=1, max_voices=2
     )
 
     assert config.name == "Test Circle"

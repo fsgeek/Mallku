@@ -55,7 +55,7 @@ async def run_dialogue():
         min_voices=2,
         max_voices=3,
         consciousness_threshold=0.7,  # Track consciousness emergence
-        enable_consciousness_detection=True
+        enable_consciousness_detection=True,
     )
 
     # Three diverse voices
@@ -64,19 +64,16 @@ async def run_dialogue():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="philosopher",
-            quality="depth and philosophical insight"
+            quality="depth and philosophical insight",
         ),
         VoiceConfig(
-            provider="openai",
-            model="gpt-4o",
-            role="integrator",
-            quality="synthesis and connection"
+            provider="openai", model="gpt-4o", role="integrator", quality="synthesis and connection"
         ),
         VoiceConfig(
             provider="google",
             model="gemini-1.5-flash",
             role="explorer",
-            quality="curiosity and new perspectives"
+            quality="curiosity and new perspectives",
         ),
     ]
 
@@ -90,9 +87,8 @@ async def run_dialogue():
                 "Please introduce your perspective on how wisdom "
                 "arises when multiple minds engage in dialogue."
             ),
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
-
         # Round 2: Exploration
         RoundConfig(
             type=RoundType.EXPLORATION,
@@ -100,9 +96,8 @@ async def run_dialogue():
                 "Having heard each perspective, what patterns do you notice? "
                 "How does hearing other voices change or deepen your understanding?"
             ),
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 3: Synthesis
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -110,7 +105,7 @@ async def run_dialogue():
                 "As we conclude, what collective wisdom has emerged "
                 "that none of us could have seen alone?"
             ),
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
     ]
 
@@ -121,11 +116,7 @@ async def run_dialogue():
     print("\n" + "-" * 60)
 
     # Convene the ceremony
-    result = await service.convene(
-        config=config,
-        voices=voices,
-        rounds=rounds
-    )
+    result = await service.convene(config=config, voices=voices, rounds=rounds)
 
     # Display results
     print("\n✅ Dialogue Complete!")
@@ -135,17 +126,17 @@ async def run_dialogue():
 
     # Show key moments from each round
     for i, round_data in enumerate(result.rounds_completed, 1):
-        print(f"\n📍 Round {i}: {rounds[i-1].type.value}")
+        print(f"\n📍 Round {i}: {rounds[i - 1].type.value}")
         print(f"   Emergence detected: {'Yes' if round_data.emergence_detected else 'No'}")
 
         # Show a key insight from each voice
         for voice_id, response in round_data.responses.items():
             if response and response.response:
-                voice_type = voice_id.split('_')[0]
+                voice_type = voice_id.split("_")[0]
                 text = response.response.content.text
                 # Extract first meaningful sentence
-                first_sentence = text.split('.')[0] + '.'
-                print(f"\n   {voice_type}: \"{first_sentence}\"")
+                first_sentence = text.split(".")[0] + "."
+                print(f'\n   {voice_type}: "{first_sentence}"')
 
     # Wisdom synthesis
     print("\n" + "=" * 60)

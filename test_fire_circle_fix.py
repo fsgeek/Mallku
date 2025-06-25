@@ -12,7 +12,7 @@ import os
 import sys
 
 # Ensure we have the right path
-sys.path.insert(0, '/home/tony/projects/Mallku/src')
+sys.path.insert(0, "/home/tony/projects/Mallku/src")
 
 # Set dummy API keys if not present
 if not os.environ.get("ANTHROPIC_API_KEY"):
@@ -22,8 +22,7 @@ if not os.environ.get("OPENAI_API_KEY"):
 
 # Configure logging to see what's happening
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Reduce noise
@@ -33,9 +32,9 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 async def test_minimal_fire_circle():
     """Test Fire Circle with minimal configuration."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING FIRE CIRCLE WITH CONTEXT FIX")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     try:
         from mallku.firecircle.service import (
@@ -69,7 +68,9 @@ async def test_minimal_fire_circle():
 
             async def send_message(self, message, dialogue_context):
                 self.round_count += 1
-                print(f"   MockAdapter round {self.round_count}, context size: {len(dialogue_context)}")
+                print(
+                    f"   MockAdapter round {self.round_count}, context size: {len(dialogue_context)}"
+                )
 
                 # Check if context contains None
                 none_count = sum(1 for msg in dialogue_context if msg is None)
@@ -100,7 +101,7 @@ async def test_minimal_fire_circle():
                     consciousness=ConsciousnessMetadata(
                         consciousness_signature=0.8,
                         detected_patterns=["test_pattern"],
-                    )
+                    ),
                 )
 
             async def stream_message(self, message, dialogue_context):
@@ -130,7 +131,7 @@ async def test_minimal_fire_circle():
             max_voices=2,
             consciousness_threshold=0.5,
             save_transcript=False,
-            failure_strategy="adaptive"
+            failure_strategy="adaptive",
         )
 
         voices = [
@@ -139,41 +140,33 @@ async def test_minimal_fire_circle():
                 model="test-model",
                 role="voice1",
                 quality="testing",
-                temperature=0.7
+                temperature=0.7,
             ),
             VoiceConfig(
                 provider="mock2",
                 model="test-model",
                 role="voice2",
                 quality="testing",
-                temperature=0.7
+                temperature=0.7,
             ),
         ]
 
         rounds = [
-            RoundConfig(
-                type=RoundType.OPENING,
-                prompt="Test round 1",
-                duration_per_voice=10
-            ),
+            RoundConfig(type=RoundType.OPENING, prompt="Test round 1", duration_per_voice=10),
             RoundConfig(
                 type=RoundType.REFLECTION,
                 prompt="Test round 2 - should see failures",
-                duration_per_voice=10
+                duration_per_voice=10,
             ),
             RoundConfig(
                 type=RoundType.SYNTHESIS,
                 prompt="Test round 3 - context should be clean",
-                duration_per_voice=10
+                duration_per_voice=10,
             ),
         ]
 
         print("\n🎯 Running Fire Circle...")
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         print("\n✅ Fire Circle completed!")
         print(f"   - Rounds completed: {len(result.rounds_completed)}")
@@ -181,7 +174,9 @@ async def test_minimal_fire_circle():
 
         # Analyze results
         for i, round_summary in enumerate(result.rounds_completed, 1):
-            success_count = sum(1 for r in round_summary.responses.values() if r.response is not None)
+            success_count = sum(
+                1 for r in round_summary.responses.values() if r.response is not None
+            )
             fail_count = sum(1 for r in round_summary.responses.values() if r.response is None)
             print(f"\n   Round {i}: {success_count} success, {fail_count} failed")
 
@@ -193,6 +188,7 @@ async def test_minimal_fire_circle():
     except Exception as e:
         print(f"\n❌ Test failed: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
 
 

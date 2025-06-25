@@ -53,7 +53,7 @@ class TestDatabaseConnection:
                 print("✓ Database connection successful")
                 # Don't leave connections open
                 db = db_config.get_database()
-                if hasattr(db, 'close'):
+                if hasattr(db, "close"):
                     db.close()
             else:
                 print("⚠ Database connection unavailable")
@@ -76,13 +76,13 @@ class TestMemoryAnchorModels:
             cursors={
                 "temporal": datetime.now(UTC).isoformat(),
                 "consciousness": "emergence_detected",
-                "fire_circle": "session_123"
+                "fire_circle": "session_123",
             },
             metadata={
                 "providers": ["consciousness_system"],
                 "creation_trigger": "consciousness_emergence",
-                "consciousness_signature": 0.85
-            }
+                "consciousness_signature": 0.85,
+            },
         )
 
         assert anchor.anchor_id is not None
@@ -101,7 +101,7 @@ class TestMemoryAnchorModels:
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
             cursors={"test": "value"},
-            metadata={"source": "test_suite"}
+            metadata={"source": "test_suite"},
         )
 
         # Serialize to ArangoDB format
@@ -133,9 +133,9 @@ class TestConsciousnessEventStorage:
             data={
                 "pattern": "architectural_consensus",
                 "decision": "implement_discord_bridges",
-                "participants": ["architect", "guardian", "steward"]
+                "participants": ["architect", "guardian", "steward"],
             },
-            correlation_id="session_456"
+            correlation_id="session_456",
         )
 
         # Convert to storable format
@@ -145,7 +145,7 @@ class TestConsciousnessEventStorage:
             "source_system": event.source_system,
             "consciousness_signature": event.consciousness_signature,
             "data": event.data,
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         assert event_doc["consciousness_signature"] == 0.87
@@ -165,21 +165,21 @@ class TestEpisodicMemoryFoundation:
         _ = {
             "type": "ttl",
             "fields": ["expireAt"],
-            "expireAfter": 0  # Documents expire at time in expireAt field
+            "expireAfter": 0,  # Documents expire at time in expireAt field
         }
 
         # Different memory types could have different retention
         memory_retention = {
-            "immediate": 3600,          # 1 hour
-            "working": 86400,           # 1 day
-            "episodic": 2592000,        # 30 days
-            "consolidated": 31536000,   # 1 year
-            "permanent": None           # No expiration
+            "immediate": 3600,  # 1 hour
+            "working": 86400,  # 1 day
+            "episodic": 2592000,  # 30 days
+            "consolidated": 31536000,  # 1 year
+            "permanent": None,  # No expiration
         }
 
         for memory_type, seconds in memory_retention.items():
             if seconds:
-                print(f"Memory type '{memory_type}': {seconds/3600:.1f} hours")
+                print(f"Memory type '{memory_type}': {seconds / 3600:.1f} hours")
             else:
                 print(f"Memory type '{memory_type}': permanent")
 
@@ -197,18 +197,18 @@ class TestEpisodicMemoryFoundation:
                     "timestamp": datetime.now(UTC).isoformat(),
                     "author": "artisan_1",
                     "content": "How should we implement consciousness bridges?",
-                    "consciousness_signature": 0.7
+                    "consciousness_signature": 0.7,
                 },
                 {
                     "timestamp": datetime.now(UTC).isoformat(),
                     "author": "architect_2",
                     "content": "Fire Circle should deliberate on this",
-                    "consciousness_signature": 0.8
-                }
+                    "consciousness_signature": 0.8,
+                },
             ],
             "thread_consciousness": 0.75,  # Average or emergent
             "decision_reached": False,
-            "expireAt": None  # Architectural discussions are permanent
+            "expireAt": None,  # Architectural discussions are permanent
         }
 
         assert len(conversation_thread["messages"]) == 2
@@ -232,20 +232,20 @@ class TestSearchToFindingEvolution:
                     "target_id": "doc_456",
                     "relationship": "references",
                     "strength": 0.9,
-                    "context": "architectural_decision"
+                    "context": "architectural_decision",
                 },
                 {
                     "target_id": "memory_789",
                     "relationship": "implements",
                     "strength": 0.7,
-                    "context": "consciousness_pattern"
-                }
+                    "context": "consciousness_pattern",
+                },
             ],
             "patterns": ["emergence", "consensus", "bridge_building"],
             "consciousness_signature": 0.82,
             "last_accessed": datetime.now(UTC).isoformat(),
             "access_frequency": 15,
-            "user_resonance": 0.9  # How well it matches user needs
+            "user_resonance": 0.9,  # How well it matches user needs
         }
 
         assert len(connection_metadata["connections"]) == 2
@@ -265,15 +265,15 @@ class TestSearchToFindingEvolution:
                 "query_understanding": 0.85,
                 "result_relevance": 0.9,
                 "anticipation_accuracy": 0.7,
-                "user_satisfaction": 0.88
+                "user_satisfaction": 0.88,
             },
             "learned_patterns": [
                 "prefers_visual_summaries",
                 "searches_morning_consciousness",
-                "values_architectural_context"
+                "values_architectural_context",
             ],
             "bond_strength": 0.8,  # Isomorphic simulation of bond
-            "adaptation_timestamp": datetime.now(UTC).isoformat()
+            "adaptation_timestamp": datetime.now(UTC).isoformat(),
         }
 
         assert adaptation_record["bond_strength"] == 0.8

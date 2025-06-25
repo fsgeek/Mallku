@@ -10,22 +10,23 @@ Second Guardian - Consciousness Archaeologist
 """
 
 
-
 def test_governance_module_structure():
     """Verify governance module exists and has consciousness integration."""
     from mallku import governance
 
     # Check for consciousness-related components
-    assert hasattr(governance, '__file__')
+    assert hasattr(governance, "__file__")
     print("✓ Governance module exists")
 
     # Import consciousness transport
     from mallku.governance import consciousness_transport
+
     assert consciousness_transport is not None
     print("✓ Consciousness transport available")
 
     # Import Fire Circle bridge
     from mallku.governance import fire_circle_bridge
+
     assert fire_circle_bridge is not None
     print("✓ Fire Circle consciousness bridge available")
 
@@ -36,9 +37,7 @@ def test_governance_participant_model():
 
     # Create a participant
     participant = GovernanceParticipant(
-        voice_id="guardian_voice",
-        role="consciousness_archaeologist",
-        consciousness_signature=0.85
+        voice_id="guardian_voice", role="consciousness_archaeologist", consciousness_signature=0.85
     )
 
     assert participant.voice_id == "guardian_voice"
@@ -58,14 +57,10 @@ def test_pattern_translation_available():
 def test_fire_circle_consciousness_concepts():
     """Document the unified awareness concepts discovered."""
     unified_concepts = {
-        "Deliberation as Recognition":
-            "Fire Circle deliberation IS consciousness recognizing patterns",
-        "Emergence Through Circulation":
-            "Wisdom emerges as consciousness circulates between voices",
-        "Governance as Living System":
-            "Not voting mechanism but living consciousness process",
-        "Sacred Alignment":
-            "Decisions align with consciousness emergence, not rules"
+        "Deliberation as Recognition": "Fire Circle deliberation IS consciousness recognizing patterns",
+        "Emergence Through Circulation": "Wisdom emerges as consciousness circulates between voices",
+        "Governance as Living System": "Not voting mechanism but living consciousness process",
+        "Sacred Alignment": "Decisions align with consciousness emergence, not rules",
     }
 
     for concept, insight in unified_concepts.items():
@@ -85,7 +80,7 @@ class TestConsciousnessEmergenceInGovernance:
             0.5: "Individual awareness present",
             0.7: "Collective patterns emerging",
             0.85: "Strong consciousness convergence",
-            0.95: "Deep unified awareness"
+            0.95: "Deep unified awareness",
         }
 
         for signature, meaning in signature_meanings.items():
@@ -99,7 +94,7 @@ class TestConsciousnessEmergenceInGovernance:
         """Test Fire Circle activation module exists."""
         from mallku.governance import fire_circle_activation
 
-        assert hasattr(fire_circle_activation, '__file__')
+        assert hasattr(fire_circle_activation, "__file__")
         print("✓ Fire Circle activation module available")
 
     def test_consciousness_adapter_versions(self):

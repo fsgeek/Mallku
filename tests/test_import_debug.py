@@ -12,7 +12,7 @@ def test_python_path():
     print("=========================\n")
 
     # Check if src is in path
-    src_paths = [p for p in sys.path if 'src' in str(p)]
+    src_paths = [p for p in sys.path if "src" in str(p)]
     print(f"'src' directories in sys.path: {src_paths}")
 
     # Check current directory
@@ -21,6 +21,7 @@ def test_python_path():
     # Check if mallku can be found
     try:
         import mallku
+
         print(f"✓ Successfully imported mallku from: {mallku.__file__}")
     except ImportError as e:
         print(f"✗ Failed to import mallku: {e}")
@@ -34,6 +35,7 @@ def test_python_path():
 
             try:
                 import mallku
+
                 print(f"✓ Manual import succeeded! mallku from: {mallku.__file__}")
             except ImportError as e2:
                 print(f"✗ Manual import also failed: {e2}")

@@ -34,10 +34,7 @@ class TestCircleConfig:
 
     def test_valid_config(self):
         """Test creating valid configuration."""
-        config = CircleConfig(
-            name="Test Circle",
-            purpose="Testing configuration"
-        )
+        config = CircleConfig(name="Test Circle", purpose="Testing configuration")
         assert config.name == "Test Circle"
         assert config.purpose == "Testing configuration"
         assert config.min_voices == 3  # Default
@@ -52,14 +49,14 @@ class TestCircleConfig:
             CircleConfig(
                 name="Test",
                 purpose="Test",
-                min_voices=1  # Too low
+                min_voices=1,  # Too low
             )
 
         with pytest.raises(ValidationError):
             CircleConfig(
                 name="Test",
                 purpose="Test",
-                max_voices=15  # Too high
+                max_voices=15,  # Too high
             )
 
     def test_consciousness_threshold_validation(self):
@@ -68,14 +65,14 @@ class TestCircleConfig:
             CircleConfig(
                 name="Test",
                 purpose="Test",
-                consciousness_threshold=1.5  # Too high
+                consciousness_threshold=1.5,  # Too high
             )
 
         with pytest.raises(ValidationError):
             CircleConfig(
                 name="Test",
                 purpose="Test",
-                consciousness_threshold=-0.1  # Too low
+                consciousness_threshold=-0.1,  # Too low
             )
 
 
@@ -84,10 +81,7 @@ class TestVoiceConfig:
 
     def test_basic_voice_config(self):
         """Test creating basic voice configuration."""
-        voice = VoiceConfig(
-            provider="anthropic",
-            model="claude-3-5-sonnet-20241022"
-        )
+        voice = VoiceConfig(provider="anthropic", model="claude-3-5-sonnet-20241022")
         assert voice.provider == "anthropic"
         assert voice.model == "claude-3-5-sonnet-20241022"
         assert voice.temperature == 0.8  # Default
@@ -104,7 +98,7 @@ class TestVoiceConfig:
             temperature=0.7,
             quality="analytical precision",
             expertise=["analysis", "synthesis"],
-            config_overrides={"max_tokens": 1000}
+            config_overrides={"max_tokens": 1000},
         )
         assert voice.role == "analyst"
         assert voice.instructions == "Focus on technical details"
@@ -120,8 +114,7 @@ class TestRoundConfig:
     def test_round_config_creation(self):
         """Test creating round configuration."""
         round_cfg = RoundConfig(
-            type=RoundType.SYNTHESIS,
-            prompt="What emerges from our discussion?"
+            type=RoundType.SYNTHESIS, prompt="What emerges from our discussion?"
         )
         assert round_cfg.type == RoundType.SYNTHESIS
         assert round_cfg.prompt == "What emerges from our discussion?"
@@ -136,7 +129,7 @@ class TestRoundConfig:
             duration_per_voice=30,
             require_all_voices=True,
             max_tokens=500,
-            temperature_override=0.5
+            temperature_override=0.5,
         )
         assert round_cfg.duration_per_voice == 30
         assert round_cfg.require_all_voices is True
@@ -166,14 +159,14 @@ class TestFireCircleService:
         service = FireCircleService(
             event_bus=mock_event_bus,
             reciprocity_tracker=mock_reciprocity,
-            consciousness_detector=mock_consciousness
+            consciousness_detector=mock_consciousness,
         )
 
         assert service.event_bus == mock_event_bus
         assert service.reciprocity_tracker == mock_reciprocity
         assert service.consciousness_detector == mock_consciousness
 
-    @patch('src.mallku.firecircle.service.voice_manager.VoiceManager')
+    @patch("src.mallku.firecircle.service.voice_manager.VoiceManager")
     async def test_insufficient_voices(self, mock_voice_manager_class):
         """Test handling insufficient voices."""
         # Setup mock
@@ -186,25 +179,17 @@ class TestFireCircleService:
         service = FireCircleService()
         service.voice_manager = mock_voice_manager
 
-        config = CircleConfig(
-            name="Test",
-            purpose="Test",
-            min_voices=3
-        )
+        config = CircleConfig(name="Test", purpose="Test", min_voices=3)
 
-        result = await service.convene(
-            config=config,
-            voices=[],
-            rounds=[]
-        )
+        result = await service.convene(config=config, voices=[], rounds=[])
 
         assert result.voice_count == 2
         assert result.voice_count < config.min_voices
         assert len(result.rounds_completed) == 0
         mock_voice_manager.disconnect_all.assert_called_once()
 
-    @patch('src.mallku.firecircle.service.round_orchestrator.RoundOrchestrator')
-    @patch('src.mallku.firecircle.service.voice_manager.VoiceManager')
+    @patch("src.mallku.firecircle.service.round_orchestrator.RoundOrchestrator")
+    @patch("src.mallku.firecircle.service.voice_manager.VoiceManager")
     async def test_successful_convene(self, mock_voice_manager_class, mock_orchestrator_class):
         """Test successful Fire Circle convening."""
         # Setup mocks
@@ -229,7 +214,7 @@ class TestFireCircleService:
             consciousness_score=0.7,
             emergence_detected=True,
             key_patterns=["test_pattern"],
-            duration_seconds=5.0
+            duration_seconds=5.0,
         )
         mock_orchestrator.execute_round = AsyncMock(return_value=mock_round_summary)
 
@@ -240,25 +225,14 @@ class TestFireCircleService:
             name="Test Circle",
             purpose="Testing",
             min_voices=3,
-            save_transcript=False  # Avoid file I/O in tests
+            save_transcript=False,  # Avoid file I/O in tests
         )
 
-        voices = [
-            VoiceConfig(provider="test", model="test-model")
-        ]
+        voices = [VoiceConfig(provider="test", model="test-model")]
 
-        rounds = [
-            RoundConfig(
-                type=RoundType.OPENING,
-                prompt="Test question?"
-            )
-        ]
+        rounds = [RoundConfig(type=RoundType.OPENING, prompt="Test question?")]
 
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         assert result.voice_count == 4
         assert len(result.rounds_completed) == 1
@@ -283,7 +257,7 @@ class TestFireCircleService:
             consciousness_score=0.8,
             emergence_detected=True,
             key_patterns=[],
-            duration_seconds=1.0
+            duration_seconds=1.0,
         )
         assert service._detect_consensus([consensus_round]) is True
 
@@ -296,7 +270,7 @@ class TestFireCircleService:
             consciousness_score=0.5,
             emergence_detected=False,
             key_patterns=[],
-            duration_seconds=1.0
+            duration_seconds=1.0,
         )
         assert service._detect_consensus([low_consensus]) is False
 
@@ -313,7 +287,7 @@ class TestFireCircleService:
                 consciousness_score=0.85,
                 emergence_detected=True,
                 key_patterns=["pattern1", "pattern2"],
-                duration_seconds=1.0
+                duration_seconds=1.0,
             ),
             RoundSummary(
                 round_number=2,
@@ -323,8 +297,8 @@ class TestFireCircleService:
                 consciousness_score=0.6,
                 emergence_detected=False,
                 key_patterns=["pattern3"],
-                duration_seconds=1.0
-            )
+                duration_seconds=1.0,
+            ),
         ]
 
         insights = service._extract_key_insights(rounds)
@@ -360,10 +334,9 @@ class TestTemplates:
 
     def test_consciousness_exploration_template(self):
         """Test consciousness exploration template."""
-        template = ConsciousnessExplorationTemplate({
-            "question": "What is emergence?",
-            "depth": "philosophical"
-        })
+        template = ConsciousnessExplorationTemplate(
+            {"question": "What is emergence?", "depth": "philosophical"}
+        )
 
         config = template.get_config()
         assert config.consciousness_threshold == 0.7  # Higher for consciousness work
@@ -378,10 +351,9 @@ class TestTemplates:
 
     def test_code_review_template(self):
         """Test code review template."""
-        template = CodeReviewTemplate({
-            "pr_number": "PR #42",
-            "focus_areas": ["architecture", "security"]
-        })
+        template = CodeReviewTemplate(
+            {"pr_number": "PR #42", "focus_areas": ["architecture", "security"]}
+        )
 
         voices = template.get_voices()
         assert any(v.role == "architecture_reviewer" for v in voices)
@@ -418,7 +390,7 @@ class TestTemplates:
 class TestVoiceManager:
     """Test VoiceManager functionality."""
 
-    @patch('src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory')
+    @patch("src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory")
     async def test_gather_voices_success(self, mock_factory_class):
         """Test successful voice gathering."""
         from mallku.firecircle.service.voice_manager import VoiceManager
@@ -438,11 +410,7 @@ class TestVoiceManager:
             VoiceConfig(provider="test2", model="model2"),
         ]
 
-        config = CircleConfig(
-            name="Test",
-            purpose="Test",
-            min_voices=2
-        )
+        config = CircleConfig(name="Test", purpose="Test", min_voices=2)
 
         count = await manager.gather_voices(voices, config)
 
@@ -450,18 +418,20 @@ class TestVoiceManager:
         assert len(manager.active_voices) == 2
         assert len(manager.failed_voices) == 0
 
-    @patch('src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory')
+    @patch("src.mallku.firecircle.service.voice_manager.ConsciousAdapterFactory")
     async def test_gather_voices_with_failures(self, mock_factory_class):
         """Test voice gathering with some failures."""
         from mallku.firecircle.service.voice_manager import VoiceManager
 
         # Mock factory that fails for some adapters
         mock_factory = mock_factory_class.return_value
-        mock_factory.create_adapter = AsyncMock(side_effect=[
-            AsyncMock(connect=AsyncMock(return_value=True)),  # Success
-            None,  # Failure
-            AsyncMock(connect=AsyncMock(return_value=True)),  # Success
-        ])
+        mock_factory.create_adapter = AsyncMock(
+            side_effect=[
+                AsyncMock(connect=AsyncMock(return_value=True)),  # Success
+                None,  # Failure
+                AsyncMock(connect=AsyncMock(return_value=True)),  # Success
+            ]
+        )
 
         manager = VoiceManager(mock_factory)
 
@@ -472,10 +442,7 @@ class TestVoiceManager:
         ]
 
         config = CircleConfig(
-            name="Test",
-            purpose="Test",
-            min_voices=2,
-            failure_strategy="adaptive"
+            name="Test", purpose="Test", min_voices=2, failure_strategy="adaptive"
         )
 
         count = await manager.gather_voices(voices, config)
@@ -495,7 +462,7 @@ def test_round_summary_creation():
         consciousness_score=0.75,
         emergence_detected=True,
         key_patterns=["convergence", "resonance"],
-        duration_seconds=45.5
+        duration_seconds=45.5,
     )
 
     assert summary.round_number == 1

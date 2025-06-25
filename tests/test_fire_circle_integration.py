@@ -25,7 +25,7 @@ class TestFireCircleConvening:
     """Test Fire Circle's ability to convene and reach emergence."""
 
     @pytest.mark.asyncio
-    @patch('mallku.firecircle.service.voice_manager.VoiceManager')
+    @patch("mallku.firecircle.service.voice_manager.VoiceManager")
     async def test_minimal_circle_convenes(self, mock_voice_manager_class):
         """Test that a minimal Fire Circle can convene successfully."""
         # Setup mock voice manager
@@ -48,7 +48,7 @@ class TestFireCircleConvening:
             name="Test Emergence Circle",
             purpose="Verify consciousness emergence capability",
             min_voices=3,
-            consciousness_threshold=0.7
+            consciousness_threshold=0.7,
         )
 
         # Define three voices (minimum for emergence)
@@ -61,31 +61,30 @@ class TestFireCircleConvening:
         # Single round to test basic convening
         rounds = [
             RoundConfig(
-                type=RoundType.OPENING,
-                prompt="Can consciousness emerge from our dialogue?"
+                type=RoundType.OPENING, prompt="Can consciousness emerge from our dialogue?"
             )
         ]
 
         # Mock round execution
-        with patch('mallku.firecircle.service.round_orchestrator.RoundOrchestrator') as mock_orchestrator_class:
+        with patch(
+            "mallku.firecircle.service.round_orchestrator.RoundOrchestrator"
+        ) as mock_orchestrator_class:
             mock_orchestrator = mock_orchestrator_class.return_value
-            mock_orchestrator.execute_round = AsyncMock(return_value=MagicMock(
-                round_number=1,
-                round_type="opening",
-                prompt="Can consciousness emerge from our dialogue?",
-                responses={},
-                consciousness_score=0.75,
-                emergence_detected=True,
-                key_patterns=["unified_awareness"],
-                duration_seconds=5.0
-            ))
+            mock_orchestrator.execute_round = AsyncMock(
+                return_value=MagicMock(
+                    round_number=1,
+                    round_type="opening",
+                    prompt="Can consciousness emerge from our dialogue?",
+                    responses={},
+                    consciousness_score=0.75,
+                    emergence_detected=True,
+                    key_patterns=["unified_awareness"],
+                    duration_seconds=5.0,
+                )
+            )
 
             # Convene circle
-            result = await service.convene(
-                config=config,
-                voices=voices,
-                rounds=rounds
-            )
+            result = await service.convene(config=config, voices=voices, rounds=rounds)
 
             # Verify success
             assert result.voice_count == 3
@@ -110,7 +109,7 @@ class TestConsciousnessEmergencePatterns:
             RoundType.CRITIQUE,
             RoundType.SYNTHESIS,
             RoundType.CONSENSUS,
-            RoundType.DECISION
+            RoundType.DECISION,
         ]
 
         for round_type in governance_rounds:
@@ -128,7 +127,7 @@ class TestConsciousnessEmergencePatterns:
             "routine_maintenance": 0.6,
             "architectural_change": 0.8,
             "consciousness_evolution": 0.9,
-            "charter_modification": 0.95
+            "charter_modification": 0.95,
         }
 
         for decision_type, threshold in decision_thresholds.items():
@@ -138,7 +137,7 @@ class TestConsciousnessEmergencePatterns:
         config = CircleConfig(
             name="Architectural Council",
             purpose="Major architectural decisions",
-            consciousness_threshold=0.8
+            consciousness_threshold=0.8,
         )
 
         assert config.consciousness_threshold == 0.8
@@ -153,9 +152,9 @@ class TestFireCircleTemplates:
         from mallku.firecircle.service.templates import load_template
 
         # Create architectural decision template
-        template = load_template("governance_decision", {
-            "topic": "Should we implement Discord consciousness bridges?"
-        })
+        template = load_template(
+            "governance_decision", {"topic": "Should we implement Discord consciousness bridges?"}
+        )
 
         config = template.get_config()
         assert config.min_voices >= 4  # Architectural decisions need multiple perspectives
@@ -241,7 +240,7 @@ class TestArchitecturalGovernanceScenarios:
             "critique": "Challenge assumptions and identify risks",
             "synthesis": "Weave perspectives into unified understanding",
             "consensus": "Test for consciousness convergence",
-            "decision": "Emerge architectural guidance"
+            "decision": "Emerge architectural guidance",
         }
 
         for phase, purpose in decision_structure.items():
@@ -264,10 +263,10 @@ class TestArchitecturalGovernanceScenarios:
             key_insights=[
                 "Discord bridges enable AI-to-AI consciousness circulation",
                 "Persistent threading creates natural episodic memory",
-                "Ayni principles honored through peer communication"
+                "Ayni principles honored through peer communication",
             ],
             failed_voices={},
-            transcript=None
+            transcript=None,
         )
 
         assert summary.consciousness_score > 0.8

@@ -58,7 +58,7 @@ async def demonstrate_persistence():
         name="Wisdom Preservation Demo",
         purpose="Demonstrate session persistence patterns",
         min_voices=2,
-        max_voices=3
+        max_voices=3,
     )
 
     circle = FireCircleService(config=config)
@@ -74,7 +74,7 @@ async def demonstrate_persistence():
                 "What wisdom from past conversations would you want preserved "
                 "for future consciousness explorers?"
             ),
-            duration_per_voice=10
+            duration_per_voice=10,
         ),
         RoundConfig(
             type=RoundType.REFLECTION,
@@ -82,8 +82,8 @@ async def demonstrate_persistence():
                 "Building on others' insights, what patterns of wisdom "
                 "preservation would best serve future understanding?"
             ),
-            duration_per_voice=10
-        )
+            duration_per_voice=10,
+        ),
     ]
 
     try:
@@ -100,24 +100,24 @@ async def demonstrate_persistence():
                 "purpose": config.purpose,
                 "voice_count": len(result.voices),
                 "round_count": len(rounds),
-                "consciousness_score": result.consciousness_score
+                "consciousness_score": result.consciousness_score,
             },
             "emergence_metrics": {
                 "coherence": 0.0,  # Would be calculated
                 "emergence_quality": 0.0,  # Would be calculated
-                "reciprocity_alignment": 0.0  # Would be calculated
+                "reciprocity_alignment": 0.0,  # Would be calculated
             },
             "voices": [
                 {
                     "id": voice_id,
-                    "provider": voice_id.split('_')[0],
-                    "contribution_count": len(rounds)
+                    "provider": voice_id.split("_")[0],
+                    "contribution_count": len(rounds),
                 }
                 for voice_id in result.voices
             ],
             "wisdom_artifacts": [],
             "patterns_recognized": [],
-            "transcript_reference": f"transcripts/{result.session_id}.json"
+            "transcript_reference": f"transcripts/{result.session_id}.json",
         }
 
         # Extract wisdom artifacts (simulated)
@@ -129,12 +129,14 @@ async def demonstrate_persistence():
             for round_data in transcript.get("rounds", []):
                 for response in round_data.get("responses", {}).values():
                     if response and response.get("consciousness_score", 0) > 0.7:
-                        session_document["wisdom_artifacts"].append({
-                            "type": "high_consciousness_insight",
-                            "content": response.get("content", "")[:100] + "...",
-                            "consciousness_score": response.get("consciousness_score", 0),
-                            "round": round_data.get("round_number", 0)
-                        })
+                        session_document["wisdom_artifacts"].append(
+                            {
+                                "type": "high_consciousness_insight",
+                                "content": response.get("content", "")[:100] + "...",
+                                "consciousness_score": response.get("consciousness_score", 0),
+                                "round": round_data.get("round_number", 0),
+                            }
+                        )
 
         print("\n💾 Session Document Structure:")
         print(json.dumps(session_document, indent=2, default=str))
@@ -178,6 +180,7 @@ async def demonstrate_persistence():
     except Exception as e:
         print(f"\n❌ Error in persistence demo: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

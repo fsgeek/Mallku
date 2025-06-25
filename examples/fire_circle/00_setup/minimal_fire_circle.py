@@ -54,23 +54,14 @@ async def minimal_ceremony():
 
     # Two voices - the minimum for emergence
     voices = [
-        VoiceConfig(
-            provider="anthropic",
-            model="claude-3-5-sonnet-20241022",
-            role="first_voice"
-        ),
-        VoiceConfig(
-            provider="openai",
-            model="gpt-4o",
-            role="second_voice"
-        ),
+        VoiceConfig(provider="anthropic", model="claude-3-5-sonnet-20241022", role="first_voice"),
+        VoiceConfig(provider="openai", model="gpt-4o", role="second_voice"),
     ]
 
     # Single round - just one exchange
     rounds = [
         RoundConfig(
-            type=RoundType.OPENING,
-            prompt="In one sentence, what makes Fire Circle special?"
+            type=RoundType.OPENING, prompt="In one sentence, what makes Fire Circle special?"
         )
     ]
 
@@ -80,11 +71,7 @@ async def minimal_ceremony():
     print("   • Basic configuration only")
 
     # Convene the ceremony
-    result = await service.convene(
-        config=config,
-        voices=voices,
-        rounds=rounds
-    )
+    result = await service.convene(config=config, voices=voices, rounds=rounds)
 
     # Show results
     print("\n✅ Ceremony complete!")
@@ -97,10 +84,10 @@ async def minimal_ceremony():
         round_data = result.rounds_completed[0]
         for voice_id, response in round_data.responses.items():
             if response and response.response:
-                voice_name = voice_id.split('_')[0]  # Extract provider name
+                voice_name = voice_id.split("_")[0]  # Extract provider name
                 text = response.response.content.text
                 print(f"\n   {voice_name}:")
-                print(f"   \"{text}\"")
+                print(f'   "{text}"')
 
     print("\n" + "=" * 50)
     print("🌟 This is Fire Circle at its simplest:")

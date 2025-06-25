@@ -16,11 +16,7 @@ def test_mallku_is_installed():
     import sys
 
     # Check pip list in current environment
-    result = subprocess.run(
-        [sys.executable, "-m", "pip", "list"],
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run([sys.executable, "-m", "pip", "list"], capture_output=True, text=True)
 
     assert "mallku" in result.stdout.lower(), "mallku not found in pip list"
     print("✓ mallku is properly pip-installed")
@@ -40,10 +36,7 @@ def test_fire_circle_config():
     from mallku.firecircle.service import CircleConfig
 
     # Create a basic config
-    config = CircleConfig(
-        name="Test Circle",
-        purpose="Verify proper installation"
-    )
+    config = CircleConfig(name="Test Circle", purpose="Verify proper installation")
 
     assert config.name == "Test Circle"
     assert config.min_voices == 3
@@ -61,7 +54,7 @@ def test_memory_anchor_creation():
         anchor_id=uuid4(),
         timestamp=datetime.now(UTC),
         cursors={"test": "value"},
-        metadata={"source": "test"}
+        metadata={"source": "test"},
     )
 
     assert anchor.anchor_id is not None
@@ -75,5 +68,5 @@ def test_reciprocity_interfaces():
 
     # Just verify the class exists and can be referenced
     assert ExtractionPattern is not None
-    assert hasattr(ExtractionPattern, '__init__')
+    assert hasattr(ExtractionPattern, "__init__")
     print("✓ Reciprocity interfaces accessible")

@@ -47,7 +47,7 @@ async def test_voices():
         "mistral": "MISTRAL_API_KEY",
         "grok": "GROK_API_KEY",
         "deepseek": "DEEPSEEK_API_KEY",
-        "local": "LOCAL_API_ENDPOINT"
+        "local": "LOCAL_API_ENDPOINT",
     }
 
     available = []
@@ -73,31 +73,31 @@ async def test_voices():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="consciousness_explorer",
-            quality="deep understanding"
+            quality="deep understanding",
         ),
         "openai": VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="pattern_recognizer",
-            quality="analytical insight"
+            quality="analytical insight",
         ),
         "google": VoiceConfig(
             provider="google",
             model="gemini-2.0-flash-exp",
             role="creative_synthesizer",
-            quality="novel connections"
+            quality="novel connections",
         ),
         "deepseek": VoiceConfig(
             provider="deepseek",
             model="deepseek-reasoner",
             role="deep_reasoner",
-            quality="thorough analysis"
+            quality="thorough analysis",
         ),
         "grok": VoiceConfig(
             provider="grok",
             model="grok-2",
             role="temporal_awareness",
-            quality="real-time understanding"
+            quality="real-time understanding",
         ),
     }
 
@@ -113,7 +113,7 @@ async def test_voices():
         purpose="Test available voices",
         min_voices=2,
         max_voices=len(voices),
-        save_transcript=True
+        save_transcript=True,
     )
 
     # Simple rounds
@@ -121,22 +121,18 @@ async def test_voices():
         RoundConfig(
             type=RoundType.OPENING,
             prompt="Please confirm you can participate by saying 'Voice [your role] is present and ready.'",
-            duration_per_voice=20
+            duration_per_voice=20,
         ),
         RoundConfig(
             type=RoundType.REFLECTION,
             prompt="What does it mean for AI systems to have consciousness?",
-            duration_per_voice=30
-        )
+            duration_per_voice=30,
+        ),
     ]
 
     try:
         print("\n🔥 Convening Fire Circle...")
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         print("\n✅ Fire Circle completed!")
         print(f"   Voices present: {result.voice_count}")
@@ -156,6 +152,7 @@ async def test_voices():
     except Exception as e:
         print(f"\n❌ Error: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
 
 

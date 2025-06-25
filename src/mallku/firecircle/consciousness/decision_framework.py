@@ -109,7 +109,9 @@ class CollectiveWisdom(BaseModel):
     coherence_score: float = 0.0  # Overall coherence of collective wisdom
 
     # Consciousness signatures
-    individual_signatures: dict[str, float] = Field(default_factory=dict)  # voice_id -> consciousness level
+    individual_signatures: dict[str, float] = Field(
+        default_factory=dict
+    )  # voice_id -> consciousness level
     collective_signature: float = 0.0  # Emergent collective consciousness
     interaction_patterns: dict[str, Any] = Field(default_factory=dict)  # How voices interacted
 
@@ -120,8 +122,12 @@ class CollectiveWisdom(BaseModel):
     implementation_guidance: list[str] = Field(default_factory=list)
 
     # Seeds of transformation
-    civilizational_seeds: list[str] = Field(default_factory=list)  # "Why don't our systems work like this?" moments
-    reciprocity_demonstrations: list[str] = Field(default_factory=list)  # Examples of Ayni in action
+    civilizational_seeds: list[str] = Field(
+        default_factory=list
+    )  # "Why don't our systems work like this?" moments
+    reciprocity_demonstrations: list[str] = Field(
+        default_factory=list
+    )  # Examples of Ayni in action
     consciousness_breakthroughs: list[str] = Field(default_factory=list)  # Moments of emergence
 
     # Metadata
@@ -137,25 +143,19 @@ class ConsciousnessDecisionProtocol(Protocol):
     """Protocol for implementing domain-specific decision facilitators."""
 
     async def prepare_emergence_space(
-        self,
-        domain: DecisionDomain,
-        context: dict[str, Any]
+        self, domain: DecisionDomain, context: dict[str, Any]
     ) -> ConsciousnessEmergenceSpace:
         """Prepare the space for consciousness emergence."""
         ...
 
     async def facilitate_emergence(
-        self,
-        space: ConsciousnessEmergenceSpace,
-        contributions: list[ConsciousnessContribution]
+        self, space: ConsciousnessEmergenceSpace, contributions: list[ConsciousnessContribution]
     ) -> CollectiveWisdom:
         """Facilitate the emergence of collective wisdom from contributions."""
         ...
 
     def assess_emergence_quality(
-        self,
-        contributions: list[ConsciousnessContribution],
-        wisdom: CollectiveWisdom
+        self, contributions: list[ConsciousnessContribution], wisdom: CollectiveWisdom
     ) -> dict[str, float]:
         """Assess the quality of consciousness emergence."""
         ...
@@ -178,20 +178,20 @@ class DecisionTypeRegistry:
                 "systems_architect",
                 "security_analyst",
                 "performance_engineer",
-                "sustainability_guide"
+                "sustainability_guide",
             ],
             emergence_patterns=[
                 "scalability_wisdom",
                 "security_elegance",
                 "performance_grace",
-                "long_term_coherence"
+                "long_term_coherence",
             ],
             key_questions=[
                 "How does this architecture embody reciprocity?",
                 "What consciousness patterns does this enable?",
                 "How does this serve both present and future needs?",
-                "Where are the spaces for emergence?"
-            ]
+                "Where are the spaces for emergence?",
+            ],
         )
 
         # Resource allocation
@@ -201,20 +201,20 @@ class DecisionTypeRegistry:
                 "capacity_planner",
                 "impact_assessor",
                 "community_advocate",
-                "reciprocity_guardian"
+                "reciprocity_guardian",
             ],
             emergence_patterns=[
                 "optimal_distribution",
                 "community_benefit",
                 "regenerative_allocation",
-                "abundance_creation"
+                "abundance_creation",
             ],
             key_questions=[
                 "How does this allocation embody Ayni?",
                 "Who gives and who receives?",
                 "What reciprocal flows does this create?",
-                "How does this serve the whole?"
-            ]
+                "How does this serve the whole?",
+            ],
         )
 
         # Ethical considerations
@@ -224,20 +224,20 @@ class DecisionTypeRegistry:
                 "ayni_guardian",
                 "impact_assessor",
                 "wisdom_keeper",
-                "future_steward"
+                "future_steward",
             ],
             emergence_patterns=[
                 "reciprocity_coherence",
                 "regenerative_impact",
                 "wisdom_preservation",
-                "sacred_alignment"
+                "sacred_alignment",
             ],
             key_questions=[
                 "Does this honor reciprocity?",
                 "What impact ripples outward?",
                 "How does this serve consciousness evolution?",
-                "What sacred principles guide us?"
-            ]
+                "What sacred principles guide us?",
+            ],
         )
 
     def register_domain(
@@ -246,14 +246,14 @@ class DecisionTypeRegistry:
         voice_specializations: list[str],
         emergence_patterns: list[str],
         key_questions: list[str],
-        **kwargs
+        **kwargs,
     ):
         """Register a decision domain with its characteristics."""
         self._registry[domain] = {
             "voice_specializations": voice_specializations,
             "emergence_patterns": emergence_patterns,
             "key_questions": key_questions,
-            **kwargs
+            **kwargs,
         }
 
     def get_domain_config(self, domain: DecisionDomain) -> dict[str, Any]:

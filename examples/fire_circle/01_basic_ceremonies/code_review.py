@@ -90,7 +90,7 @@ async def code_review_ceremony():
         max_voices=4,
         consciousness_threshold=0.7,
         enable_consciousness_detection=True,
-        enable_reciprocity=True  # Track reciprocity in the review itself
+        enable_reciprocity=True,  # Track reciprocity in the review itself
     )
 
     # Voices with different technical perspectives
@@ -99,19 +99,19 @@ async def code_review_ceremony():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="architecture_reviewer",
-            quality="system design and patterns"
+            quality="system design and patterns",
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="code_quality_reviewer",
-            quality="clean code and best practices"
+            quality="clean code and best practices",
         ),
         VoiceConfig(
             provider="google",
             model="gemini-1.5-flash",
             role="reciprocity_expert",
-            quality="Ayni principles and balance"
+            quality="Ayni principles and balance",
         ),
     ]
 
@@ -130,9 +130,8 @@ async def code_review_ceremony():
             Share your initial thoughts on design, implementation, and
             alignment with Mallku's reciprocity principles.
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 2: Deeper analysis
         RoundConfig(
             type=RoundType.EXPLORATION,
@@ -142,9 +141,8 @@ async def code_review_ceremony():
             - How could this better embody reciprocity principles?
             - What wisdom emerges between our different viewpoints?
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 3: Consensus and recommendations
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -154,7 +152,7 @@ async def code_review_ceremony():
             - How do we balance technical excellence with reciprocity?
             - What consensus emerges from our dialogue?
             """,
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
     ]
 
@@ -176,8 +174,8 @@ async def code_review_ceremony():
         context={
             "code_type": "reciprocity_tracker",
             "importance": "high",
-            "affects": "core_infrastructure"
-        }
+            "affects": "core_infrastructure",
+        },
     )
 
     # Display review results
@@ -194,13 +192,13 @@ async def code_review_ceremony():
         print("\n🔍 Key Recommendations:")
         for voice_id, response in synthesis_round.responses.items():
             if response and response.response:
-                voice_type = voice_id.split('_')[0]
+                voice_type = voice_id.split("_")[0]
                 text = response.response.content.text
 
                 # Extract first recommendation (simplified)
-                lines = text.split('\n')
+                lines = text.split("\n")
                 for line in lines:
-                    if any(word in line.lower() for word in ['recommend', 'suggest', 'should']):
+                    if any(word in line.lower() for word in ["recommend", "suggest", "should"]):
                         print(f"   • {voice_type}: {line.strip()}")
                         break
 

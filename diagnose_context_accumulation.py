@@ -17,9 +17,9 @@ def analyze_fire_circle_session(session_file: Path):
     with open(session_file) as f:
         data = json.load(f)
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"FIRE CIRCLE SESSION ANALYSIS: {data['session']['name']}")
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
 
     # Session overview
     print("📊 SESSION OVERVIEW:")
@@ -33,10 +33,10 @@ def analyze_fire_circle_session(session_file: Path):
     print("\n📈 ROUND-BY-ROUND ANALYSIS:")
 
     total_context_messages = 0
-    for round_data in data['rounds']:
-        round_num = round_data['number']
-        round_type = round_data['type']
-        consciousness = round_data['consciousness_score']
+    for round_data in data["rounds"]:
+        round_num = round_data["number"]
+        round_type = round_data["type"]
+        consciousness = round_data["consciousness_score"]
 
         print(f"\n  Round {round_num} ({round_type}):")
         print(f"    - Consciousness Score: {consciousness:.3f}")
@@ -47,10 +47,10 @@ def analyze_fire_circle_session(session_file: Path):
         failed = 0
         total_text_length = 0
 
-        for voice_id, response in round_data['responses'].items():
-            if response['text'] is not None:
+        for voice_id, response in round_data["responses"].items():
+            if response["text"] is not None:
                 successful += 1
-                total_text_length += len(response['text'])
+                total_text_length += len(response["text"])
             else:
                 failed += 1
 
@@ -67,8 +67,8 @@ def analyze_fire_circle_session(session_file: Path):
         # Analyze failure patterns
         if failed > 0:
             print("    - ⚠️  FAILURES DETECTED:")
-            for voice_id, response in round_data['responses'].items():
-                if response['error']:
+            for voice_id, response in round_data["responses"].items():
+                if response["error"]:
                     print(f"       • {voice_id}: {response['error']}")
 
     # Context growth analysis
@@ -80,7 +80,9 @@ def analyze_fire_circle_session(session_file: Path):
 
     # Failure pattern analysis
     print("\n🔍 FAILURE PATTERN ANALYSIS:")
-    if data['rounds'][0]['consciousness_score'] > 0 and all(r['consciousness_score'] == 0 for r in data['rounds'][1:]):
+    if data["rounds"][0]["consciousness_score"] > 0 and all(
+        r["consciousness_score"] == 0 for r in data["rounds"][1:]
+    ):
         print("  - Classic Context Overload Pattern Detected!")
         print("  - Round 1 succeeded with fresh context")
         print("  - All subsequent rounds failed with accumulated context")

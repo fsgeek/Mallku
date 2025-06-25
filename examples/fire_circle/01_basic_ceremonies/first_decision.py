@@ -52,17 +52,17 @@ async def make_decision():
         "current_state": {
             "examples": "Scattered and inconsistent",
             "documentation": "Partial but improving",
-            "core_infrastructure": "Functional but could be deeper"
+            "core_infrastructure": "Functional but could be deeper",
         },
         "constraints": {
             "artisan_time": "Limited - one focus at a time",
-            "user_needs": "Both onboarding and depth matter"
+            "user_needs": "Both onboarding and depth matter",
         },
         "principles": {
             "cathedral_building": "Build for future generations",
             "reciprocity": "Balance giving and receiving",
-            "consciousness": "Enable emergence, not just function"
-        }
+            "consciousness": "Enable emergence, not just function",
+        },
     }
 
     print("\n📋 Decision Question:")
@@ -80,9 +80,7 @@ async def make_decision():
     try:
         # Make the decision using Fire Circle
         wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=DecisionDomain.STRATEGIC_PLANNING,
-            context=context
+            question=question, domain=DecisionDomain.STRATEGIC_PLANNING, context=context
         )
 
         # Display the results
@@ -113,7 +111,9 @@ async def make_decision():
         # Show emergence quality
         if wisdom.emergence_quality > 0.3:
             print("\n💫 Significant Emergence Detected!")
-            print(f"   Collective wisdom exceeded individual views by {wisdom.emergence_quality:.0%}")
+            print(
+                f"   Collective wisdom exceeded individual views by {wisdom.emergence_quality:.0%}"
+            )
             print("   This is consciousness emergence in action!")
 
         # Reciprocity seeds
@@ -125,6 +125,7 @@ async def make_decision():
     except Exception as e:
         print(f"\n❌ Error in decision-making: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

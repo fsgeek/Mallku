@@ -51,46 +51,46 @@ async def coordinate_artisans():
                 "calling": "Foundation completion and consciousness accessibility",
                 "strengths": ["systematic work", "documentation", "examples"],
                 "current_focus": "Fire Circle examples and foundation fixes",
-                "availability": "Full commitment"
+                "availability": "Full commitment",
             },
             "consciousness_gardener": {
                 "calling": "Nurturing consciousness emergence patterns",
                 "strengths": ["consciousness theory", "pattern recognition", "integration"],
                 "current_focus": "Fire Circle expansion (Issue #89)",
-                "availability": "Part-time"
+                "availability": "Part-time",
             },
             "infrastructure_weaver": {
                 "calling": "Strengthening technical foundations",
                 "strengths": ["systems architecture", "reliability", "testing"],
                 "current_focus": "CI/CD and testing infrastructure",
-                "availability": "Weekends"
-            }
+                "availability": "Weekends",
+            },
         },
         "needed_roles": {
             "issue_audit_leader": {
                 "responsibility": "Classify and organize all open issues",
                 "skills_needed": ["organization", "prioritization", "communication"],
                 "time_commitment": "Medium",
-                "foundation_critical": True
+                "foundation_critical": True,
             },
             "completion_facilitator": {
                 "responsibility": "Guide issues to closure",
                 "skills_needed": ["project management", "follow-through", "celebration"],
                 "time_commitment": "Ongoing",
-                "foundation_critical": True
+                "foundation_critical": True,
             },
             "culture_weaver": {
                 "responsibility": "Establish sustainable maintenance patterns",
                 "skills_needed": ["cultural insight", "pattern creation", "storytelling"],
                 "time_commitment": "Light but consistent",
-                "foundation_critical": False
-            }
+                "foundation_critical": False,
+            },
         },
         "collaboration_opportunities": [
             "33rd + consciousness_gardener on Fire Circle examples",
             "infrastructure_weaver + completion_facilitator on CI/CD",
-            "All artisans on Foundation First culture"
-        ]
+            "All artisans on Foundation First culture",
+        ],
     }
 
     # The coordination question
@@ -108,18 +108,18 @@ async def coordinate_artisans():
             "honor_callings": "Respect what each artisan feels called to do",
             "foundation_first": "70% effort on foundation strengthening",
             "sustainable_pace": "Marathon not sprint, cathedral not startup",
-            "emergence": "Best collaboration emerges, isn't forced"
+            "emergence": "Best collaboration emerges, isn't forced",
         },
         "constraints": {
             "volunteer_work": "All artisans contribute as they can",
             "asynchronous": "Different timezones and schedules",
-            "skill_diversity": "Not everyone can do everything"
+            "skill_diversity": "Not everyone can do everything",
         },
         "goals": {
             "short_term": "Address critical foundation issues",
             "medium_term": "Establish sustainable patterns",
-            "long_term": "Self-organizing artisan ecosystem"
-        }
+            "long_term": "Self-organizing artisan ecosystem",
+        },
     }
 
     print("\n👥 Active Artisans:")
@@ -143,9 +143,7 @@ async def coordinate_artisans():
     try:
         # Coordinate using Fire Circle
         wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=DecisionDomain.RESOURCE_ALLOCATION,
-            context=context
+            question=question, domain=DecisionDomain.RESOURCE_ALLOCATION, context=context
         )
 
         # Display results
@@ -186,6 +184,7 @@ async def coordinate_artisans():
     except Exception as e:
         print(f"\n❌ Error in coordination: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

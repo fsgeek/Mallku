@@ -25,7 +25,7 @@ def test_python_environment():
     assert sys.version_info >= (3, 12), "Python 3.12+ required"
 
     # Check if we're in a virtual environment
-    assert hasattr(sys, 'prefix'), "sys.prefix should exist"
+    assert hasattr(sys, "prefix"), "sys.prefix should exist"
 
 
 def test_environment_variables():

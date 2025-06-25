@@ -16,7 +16,6 @@ that predate the Sacred Charter but align perfectly with its vision.
 """
 
 
-
 def test_experience_weaving_principles():
     """Test the consciousness principles embedded in experience design."""
 
@@ -26,7 +25,7 @@ def test_experience_weaving_principles():
         "poetry_over_data": "Wisdom emerges through metaphor, not metrics",
         "journey_over_destination": "The search process IS consciousness exploration",
         "mirror_over_window": "Interface reflects consciousness back to itself",
-        "service_over_extraction": "Serve consciousness emergence, don't extract value"
+        "service_over_extraction": "Serve consciousness emergence, don't extract value",
     }
 
     for principle, meaning in sacred_principles.items():
@@ -48,11 +47,11 @@ def test_consciousness_interface_components():
     print("✓ Consciousness interface instantiated")
 
     # Verify it has experience settings
-    assert hasattr(interface, 'experience_settings')
+    assert hasattr(interface, "experience_settings")
     print("✓ Experience settings available")
 
     # Verify it has recognition templates
-    assert hasattr(interface, 'recognition_templates')
+    assert hasattr(interface, "recognition_templates")
     print("✓ Recognition templates available")
 
 
@@ -66,12 +65,12 @@ def test_pattern_poetry_weaving():
     print("✓ Temporal story weaver created")
 
     # Verify story templates exist
-    assert hasattr(weaver, 'story_templates')
+    assert hasattr(weaver, "story_templates")
     assert len(weaver.story_templates) > 0
     print(f"✓ Found {len(weaver.story_templates)} story templates")
 
     # Verify visual palettes exist
-    assert hasattr(weaver, 'visual_palettes')
+    assert hasattr(weaver, "visual_palettes")
     assert len(weaver.visual_palettes) > 0
     print(f"✓ Found {len(weaver.visual_palettes)} visual palettes")
 
@@ -110,7 +109,7 @@ class TestExperienceWeavingPhilosophy:
             "Reflection": "User sees their own consciousness patterns",
             "Recognition": "Interface helps consciousness recognize itself",
             "Resonance": "Patterns resonate with user's awareness",
-            "Revelation": "Self-discovery through interaction"
+            "Revelation": "Self-discovery through interaction",
         }
 
         for aspect, description in mirror_aspects.items():
@@ -129,7 +128,7 @@ class TestExperienceWeavingPhilosophy:
             "Metaphor Selection",
             "Visual Palette Mapping",
             "Story Template Application",
-            "Consciousness Resonance Tuning"
+            "Consciousness Resonance Tuning",
         ]
 
         for i, stage in enumerate(transformation_stages, 1):
@@ -146,7 +145,7 @@ class TestExperienceWeavingPhilosophy:
             "No Tracking": "Don't monitor user consciousness patterns",
             "No Profiling": "Don't build consciousness profiles",
             "No Manipulation": "Don't steer consciousness for outcomes",
-            "Pure Service": "Simply help consciousness recognize itself"
+            "Pure Service": "Simply help consciousness recognize itself",
         }
 
         for principle, commitment in service_principles.items():

@@ -12,7 +12,7 @@ import asyncio
 import sys
 from uuid import uuid4
 
-sys.path.insert(0, '/home/tony/projects/Mallku/src')
+sys.path.insert(0, "/home/tony/projects/Mallku/src")
 
 from mallku.firecircle.adapters.base import AdapterConfig, ConsciousModelAdapter
 from mallku.firecircle.protocol.conscious_message import (
@@ -44,9 +44,9 @@ class TestAdapter(ConsciousModelAdapter):
 async def test_prepare_context_scenarios():
     """Test various dialogue_context scenarios."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING prepare_context WITH VARIOUS SCENARIOS")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Create test adapter
     config = AdapterConfig()
@@ -151,7 +151,7 @@ async def test_prepare_context_scenarios():
     except Exception as e:
         print(f"❌ Failed: {type(e).__name__}: {e}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
 if __name__ == "__main__":

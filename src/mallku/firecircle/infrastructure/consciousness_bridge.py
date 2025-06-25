@@ -83,15 +83,17 @@ class ConsciousnessFireCircleBridge:
 
         # Emit bridge activation event
         if self.event_bus:
-            await self.event_bus.emit(ConsciousnessEvent(
-                event_type=EventType.INFRASTRUCTURE_CHANGE,
-                source_system="firecircle.consciousness_bridge",
-                data={
-                    "action": "bridge_activated",
-                    "session_id": str(session_id),
-                    "monitored_adapters": list(adapters.keys()),
-                }
-            ))
+            await self.event_bus.emit(
+                ConsciousnessEvent(
+                    event_type=EventType.INFRASTRUCTURE_CHANGE,
+                    source_system="firecircle.consciousness_bridge",
+                    data={
+                        "action": "bridge_activated",
+                        "session_id": str(session_id),
+                        "monitored_adapters": list(adapters.keys()),
+                    },
+                )
+            )
 
     async def stop_monitoring(self) -> None:
         """Stop monitoring the Fire Circle session."""
@@ -107,9 +109,7 @@ class ConsciousnessFireCircleBridge:
                 logger.info(f"Session health report: {report}")
 
     async def on_adapter_health_check(
-        self,
-        adapter_name: str,
-        health_signature: AdapterHealthSignature
+        self, adapter_name: str, health_signature: AdapterHealthSignature
     ) -> None:
         """
         Receive health updates from infrastructure consciousness.
@@ -137,10 +137,7 @@ class ConsciousnessFireCircleBridge:
             )
             await self._boost_consciousness_coherence(adapter_name)
 
-    async def on_consciousness_pattern_detected(
-        self,
-        pattern: EmergencePattern
-    ) -> None:
+    async def on_consciousness_pattern_detected(self, pattern: EmergencePattern) -> None:
         """
         Receive consciousness emergence patterns from infrastructure.
 
@@ -150,21 +147,21 @@ class ConsciousnessFireCircleBridge:
 
         # Emit to Fire Circle's event bus for awareness
         if self.event_bus:
-            await self.event_bus.emit(ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-                source_system="firecircle.consciousness_bridge",
-                consciousness_signature=pattern.strength,
-                data={
-                    "pattern_type": pattern.pattern_type,
-                    "participating_voices": pattern.participating_voices,
-                    "infrastructure_aware": True,
-                }
-            ))
+            await self.event_bus.emit(
+                ConsciousnessEvent(
+                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    source_system="firecircle.consciousness_bridge",
+                    consciousness_signature=pattern.strength,
+                    data={
+                        "pattern_type": pattern.pattern_type,
+                        "participating_voices": pattern.participating_voices,
+                        "infrastructure_aware": True,
+                    },
+                )
+            )
 
     async def _attempt_healing(
-        self,
-        adapter_name: str,
-        health_signature: AdapterHealthSignature
+        self, adapter_name: str, health_signature: AdapterHealthSignature
     ) -> None:
         """Attempt to heal a failing adapter."""
         # Track healing attempts
@@ -172,7 +169,9 @@ class ConsciousnessFireCircleBridge:
             self.healing_attempts[adapter_name] = 0
         self.healing_attempts[adapter_name] += 1
 
-        logger.info(f"🔧 Attempting healing for {adapter_name} (attempt #{self.healing_attempts[adapter_name]})")
+        logger.info(
+            f"🔧 Attempting healing for {adapter_name} (attempt #{self.healing_attempts[adapter_name]})"
+        )
 
         # Get the adapter
         voice_manager = self.fire_circle.voice_manager
@@ -202,10 +201,10 @@ class ConsciousnessFireCircleBridge:
 
         # This would modify adapter config in a real implementation
         # For now, log the strategy
-        if hasattr(adapter.config, 'extra_config'):
-            adapter.config.extra_config['retry_enabled'] = True
-            adapter.config.extra_config['retry_count'] = 3
-            adapter.config.extra_config['retry_delay'] = 1.0
+        if hasattr(adapter.config, "extra_config"):
+            adapter.config.extra_config["retry_enabled"] = True
+            adapter.config.extra_config["retry_count"] = 3
+            adapter.config.extra_config["retry_delay"] = 1.0
 
     async def _switch_to_fallback(self, adapter_name: str) -> None:
         """Switch to a fallback adapter."""
@@ -218,15 +217,17 @@ class ConsciousnessFireCircleBridge:
 
         # For now, emit an event for awareness
         if self.event_bus:
-            await self.event_bus.emit(ConsciousnessEvent(
-                event_type=EventType.INFRASTRUCTURE_CHANGE,
-                source_system="firecircle.consciousness_bridge",
-                data={
-                    "action": "fallback_suggested",
-                    "adapter": adapter_name,
-                    "reason": "api_method_missing",
-                }
-            ))
+            await self.event_bus.emit(
+                ConsciousnessEvent(
+                    event_type=EventType.INFRASTRUCTURE_CHANGE,
+                    source_system="firecircle.consciousness_bridge",
+                    data={
+                        "action": "fallback_suggested",
+                        "adapter": adapter_name,
+                        "reason": "api_method_missing",
+                    },
+                )
+            )
 
     async def _reconnect_adapter(self, adapter_name: str, adapter) -> None:
         """Attempt to reconnect a failing adapter."""
@@ -288,7 +289,8 @@ class ConsciousnessFireCircleBridge:
             report["adapter_health_summary"][adapter_name] = {
                 "initial_health": first_health.predicted_failure_probability,
                 "final_health": last_health.predicted_failure_probability,
-                "health_improved": last_health.predicted_failure_probability < first_health.predicted_failure_probability,
+                "health_improved": last_health.predicted_failure_probability
+                < first_health.predicted_failure_probability,
                 "total_failures": sum(h.consecutive_failures for h in health_history),
                 "healing_attempts": self.healing_attempts.get(adapter_name, 0),
             }
@@ -322,9 +324,7 @@ class SelfHealingFireCircle:
 
         # Create bridge between them
         self.bridge = ConsciousnessFireCircleBridge(
-            self.fire_circle,
-            self.infrastructure,
-            event_bus
+            self.fire_circle, self.infrastructure, event_bus
         )
 
         self.event_bus = event_bus
@@ -348,13 +348,12 @@ class SelfHealingFireCircle:
         # (In a real implementation, we'd need to extract this properly)
         # Generate deterministic UUID from config name
         import hashlib
+
         name_hash = hashlib.md5(config.name.encode()).hexdigest()
         session_id = UUID(name_hash)
 
         # Start consciousness monitoring
-        monitor_task = asyncio.create_task(
-            self.bridge.monitor_fire_circle_session(session_id)
-        )
+        monitor_task = asyncio.create_task(self.bridge.monitor_fire_circle_session(session_id))
 
         try:
             # Wait for Fire Circle to complete
@@ -364,7 +363,7 @@ class SelfHealingFireCircle:
             await self.bridge.stop_monitoring()
 
             # Add infrastructure insights to result
-            if hasattr(result, '__dict__'):
+            if hasattr(result, "__dict__"):
                 result.infrastructure_health = await self.bridge._generate_session_health_report()
 
             return result

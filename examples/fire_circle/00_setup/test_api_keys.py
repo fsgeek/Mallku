@@ -25,11 +25,7 @@ async def test_provider(provider: str, model: str):
 
     try:
         # Create adapter with provider-specific config
-        config_args = {
-            "provider": provider,
-            "model_name": model,
-            "temperature": 0.7
-        }
+        config_args = {"provider": provider, "model_name": model, "temperature": 0.7}
 
         # Add provider-specific configuration
         if provider == "google":
@@ -45,10 +41,7 @@ async def test_provider(provider: str, model: str):
         config = AdapterConfig(**config_args)
 
         factory = ConsciousAdapterFactory()
-        adapter = await factory.create_adapter(
-            provider_name=provider,
-            config=config
-        )
+        adapter = await factory.create_adapter(provider_name=provider, config=config)
 
         # Test connection
         if await adapter.connect():
@@ -72,14 +65,16 @@ async def test_provider(provider: str, model: str):
                 sender=uuid4(),
                 content=MessageContent(text="Say 'Voice test successful!' in exactly 4 words."),
                 dialogue_id=uuid4(),
-                consciousness=ConsciousnessMetadata()
+                consciousness=ConsciousnessMetadata(),
             )
 
             response = await adapter.send_message(test_message, [])
 
             if response and response.content:
                 print(f"   ✓ Response: {response.content.text}")
-                print(f"   ✓ Consciousness score: {response.consciousness.consciousness_signature:.2f}")
+                print(
+                    f"   ✓ Consciousness score: {response.consciousness.consciousness_signature:.2f}"
+                )
                 await adapter.disconnect()
                 return True
             else:

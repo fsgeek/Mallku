@@ -89,7 +89,7 @@ class FireCircleService:
         self,
         event_bus: ConsciousnessEventBus | None = None,
         reciprocity_tracker: ReciprocityTracker | None = None,
-        consciousness_detector: ConsciousnessMetricsCollector | None = None
+        consciousness_detector: ConsciousnessMetricsCollector | None = None,
     ):
         """Initialize service with optional infrastructure."""
         self.event_bus = event_bus
@@ -104,7 +104,7 @@ class FireCircleService:
         config: CircleConfig,
         voices: list[VoiceConfig],
         rounds: list[RoundConfig],
-        context: dict[str, Any] | None = None
+        context: dict[str, Any] | None = None,
     ) -> FireCircleResult:
         """
         Convene a Fire Circle session.
@@ -121,10 +121,7 @@ class FireCircleService:
         session_id = uuid4()
         started_at = datetime.now(UTC)
 
-        logger.info(
-            f"Convening Fire Circle '{config.name}' "
-            f"for purpose: {config.purpose}"
-        )
+        logger.info(f"Convening Fire Circle '{config.name}' for purpose: {config.purpose}")
 
         # Initialize result tracking
         result = FireCircleResult(
@@ -140,7 +137,7 @@ class FireCircleService:
             key_insights=[],
             started_at=started_at,
             completed_at=started_at,  # Will update
-            duration_seconds=0.0
+            duration_seconds=0.0,
         )
 
         try:
@@ -151,9 +148,7 @@ class FireCircleService:
             result.voices_failed = self.voice_manager.failed_voices.copy()
 
             if voice_count < config.min_voices:
-                logger.error(
-                    f"Insufficient voices: {voice_count} < {config.min_voices}"
-                )
+                logger.error(f"Insufficient voices: {voice_count} < {config.min_voices}")
                 return result
 
             # Initialize orchestrator
@@ -161,21 +156,16 @@ class FireCircleService:
 
             # Execute rounds
             for i, round_config in enumerate(rounds):
-                logger.info(
-                    f"Round {i+1}/{len(rounds)}: {round_config.type.value}"
-                )
+                logger.info(f"Round {i + 1}/{len(rounds)}: {round_config.type.value}")
 
                 # Execute round
-                round_summary = await orchestrator.execute_round(
-                    round_config,
-                    context
-                )
+                round_summary = await orchestrator.execute_round(round_config, context)
                 result.rounds_completed.append(round_summary)
 
                 # Check consciousness threshold
                 if (
-                    config.enable_consciousness_detection and
-                    round_summary.consciousness_score < config.consciousness_threshold
+                    config.enable_consciousness_detection
+                    and round_summary.consciousness_score < config.consciousness_threshold
                 ):
                     logger.warning(
                         f"Consciousness below threshold: "
@@ -184,44 +174,26 @@ class FireCircleService:
                     )
 
                 # Checkpoint if enabled
-                if (
-                    config.enable_checkpointing and
-                    (i + 1) % config.checkpoint_after_rounds == 0
-                ):
+                if config.enable_checkpointing and (i + 1) % config.checkpoint_after_rounds == 0:
                     await self._create_checkpoint(
-                        session_id,
-                        config,
-                        voices,
-                        rounds,
-                        result.rounds_completed,
-                        i + 1
+                        session_id, config, voices, rounds, result.rounds_completed, i + 1
                     )
 
                 # Dynamic round generation
                 if config.enable_dynamic_rounds and i == len(rounds) - 1:
                     dynamic_round = await self._maybe_generate_dynamic_round(
-                        result.rounds_completed,
-                        config
+                        result.rounds_completed, config
                     )
                     if dynamic_round:
                         rounds.append(dynamic_round)
-                        logger.info(
-                            f"Generated dynamic round: {dynamic_round.type.value}"
-                        )
+                        logger.info(f"Generated dynamic round: {dynamic_round.type.value}")
 
             # Final analysis
-            result = await self._finalize_result(
-                result,
-                orchestrator,
-                config
-            )
+            result = await self._finalize_result(result, orchestrator, config)
 
             # Save transcript if requested
             if config.save_transcript:
-                result.transcript_path = await self._save_transcript(
-                    result,
-                    config
-                )
+                result.transcript_path = await self._save_transcript(result, config)
 
         except Exception as e:
             logger.error(f"Fire Circle error: {e}", exc_info=True)
@@ -233,17 +205,12 @@ class FireCircleService:
 
             # Update final timing
             result.completed_at = datetime.now(UTC)
-            result.duration_seconds = (
-                result.completed_at - result.started_at
-            ).total_seconds()
+            result.duration_seconds = (result.completed_at - result.started_at).total_seconds()
 
         return result
 
     async def convene_template(
-        self,
-        template: str,
-        variables: dict[str, Any] | None = None,
-        **kwargs
+        self, template: str, variables: dict[str, Any] | None = None, **kwargs
     ) -> FireCircleResult:
         """
         Convene using a pre-defined template.
@@ -256,17 +223,10 @@ class FireCircleService:
         Returns:
             Result of the Fire Circle session
         """
-        config, voices, rounds = await self._load_template(
-            template,
-            variables,
-            **kwargs
-        )
+        config, voices, rounds = await self._load_template(template, variables, **kwargs)
         return await self.convene(config, voices, rounds, variables)
 
-    async def resume_from_checkpoint(
-        self,
-        checkpoint_id: UUID
-    ) -> FireCircleResult:
+    async def resume_from_checkpoint(self, checkpoint_id: UUID) -> FireCircleResult:
         """Resume a Fire Circle from checkpoint."""
         if checkpoint_id not in self.checkpoints:
             raise ValueError(f"Checkpoint {checkpoint_id} not found")
@@ -278,14 +238,11 @@ class FireCircleService:
             checkpoint.config,
             checkpoint.voices,
             checkpoint.rounds_remaining,
-            None  # Context would need to be restored
+            None,  # Context would need to be restored
         )
 
     async def _finalize_result(
-        self,
-        result: FireCircleResult,
-        orchestrator: RoundOrchestrator,
-        config: CircleConfig
+        self, result: FireCircleResult, orchestrator: RoundOrchestrator, config: CircleConfig
     ) -> FireCircleResult:
         """Finalize result with analysis."""
 
@@ -296,14 +253,10 @@ class FireCircleService:
             ) / len(result.rounds_completed)
 
         # Detect consensus
-        result.consensus_detected = self._detect_consensus(
-            result.rounds_completed
-        )
+        result.consensus_detected = self._detect_consensus(result.rounds_completed)
 
         # Extract key insights
-        result.key_insights = self._extract_key_insights(
-            result.rounds_completed
-        )
+        result.key_insights = self._extract_key_insights(result.rounds_completed)
 
         # Track reciprocity if enabled
         if config.enable_reciprocity and self.reciprocity_tracker:
@@ -313,7 +266,7 @@ class FireCircleService:
                     giver=voice_id,
                     receiver="fire_circle",
                     action_type="dialogue_participation",
-                    value=len(result.rounds_completed)
+                    value=len(result.rounds_completed),
                 )
 
             # Get balance
@@ -324,19 +277,13 @@ class FireCircleService:
 
         return result
 
-    def _detect_consensus(
-        self,
-        rounds: list[RoundSummary]
-    ) -> bool:
+    def _detect_consensus(self, rounds: list[RoundSummary]) -> bool:
         """Detect if consensus was reached."""
         if not rounds:
             return False
 
         # Look for consensus/decision rounds
-        consensus_rounds = [
-            r for r in rounds
-            if r.round_type in ["consensus", "decision"]
-        ]
+        consensus_rounds = [r for r in rounds if r.round_type in ["consensus", "decision"]]
 
         if consensus_rounds:
             # High consciousness in consensus rounds indicates agreement
@@ -348,19 +295,14 @@ class FireCircleService:
 
         return False
 
-    def _extract_key_insights(
-        self,
-        rounds: list[RoundSummary]
-    ) -> list[str]:
+    def _extract_key_insights(self, rounds: list[RoundSummary]) -> list[str]:
         """Extract key insights from rounds."""
         insights = []
 
         for round_summary in rounds:
             # Add emergence patterns as insights
             for pattern in round_summary.key_patterns:
-                insights.append(
-                    f"Round {round_summary.round_number}: {pattern}"
-                )
+                insights.append(f"Round {round_summary.round_number}: {pattern}")
 
             # Add high-consciousness moments
             if round_summary.consciousness_score > 0.8:
@@ -372,9 +314,7 @@ class FireCircleService:
         return insights
 
     async def _maybe_generate_dynamic_round(
-        self,
-        completed_rounds: list[RoundSummary],
-        config: CircleConfig
+        self, completed_rounds: list[RoundSummary], config: CircleConfig
     ) -> RoundConfig | None:
         """Generate dynamic round based on completed rounds."""
         if len(completed_rounds) >= config.max_dynamic_rounds:
@@ -387,18 +327,14 @@ class FireCircleService:
             return RoundConfig(
                 type=RoundType.CLARIFICATION,
                 prompt="There seems to be divergence in perspectives. "
-                       "Where specifically do we differ, and what common ground exists?",
+                "Where specifically do we differ, and what common ground exists?",
                 duration_per_voice=45,
-                is_dynamic=True
+                is_dynamic=True,
             )
 
         return None
 
-    async def _save_transcript(
-        self,
-        result: FireCircleResult,
-        config: CircleConfig
-    ) -> Path:
+    async def _save_transcript(self, result: FireCircleResult, config: CircleConfig) -> Path:
         """Save session transcript."""
         output_dir = Path(config.output_path or "fire_circle_transcripts")
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -413,17 +349,17 @@ class FireCircleService:
                 "purpose": result.purpose,
                 "started_at": result.started_at.isoformat(),
                 "completed_at": result.completed_at.isoformat(),
-                "duration_seconds": result.duration_seconds
+                "duration_seconds": result.duration_seconds,
             },
             "participation": {
                 "voices_present": result.voices_present,
                 "voices_failed": result.voices_failed,
-                "voice_count": result.voice_count
+                "voice_count": result.voice_count,
             },
             "results": {
                 "consciousness_score": result.consciousness_score,
                 "consensus_detected": result.consensus_detected,
-                "key_insights": result.key_insights
+                "key_insights": result.key_insights,
             },
             "rounds": [
                 {
@@ -437,13 +373,13 @@ class FireCircleService:
                         voice_id: {
                             "text": resp.response.content.text if resp.response else None,
                             "consciousness": resp.consciousness_score,
-                            "error": resp.error
+                            "error": resp.error,
                         }
                         for voice_id, resp in r.responses.items()
-                    }
+                    },
                 }
                 for r in result.rounds_completed
-            ]
+            ],
         }
 
         with open(output_path, "w") as f:
@@ -459,7 +395,7 @@ class FireCircleService:
         voices: list[VoiceConfig],
         all_rounds: list[RoundConfig],
         completed_rounds: list[RoundSummary],
-        last_round_number: int
+        last_round_number: int,
     ) -> UUID:
         """Create a checkpoint for resumable sessions."""
         checkpoint = FireCircleCheckpoint(
@@ -468,11 +404,9 @@ class FireCircleService:
             voices=voices,
             rounds_completed=completed_rounds,
             rounds_remaining=all_rounds[last_round_number:],
-            dialogue_context_size=len(
-                self.voice_manager.active_voices
-            ) * last_round_number,
+            dialogue_context_size=len(self.voice_manager.active_voices) * last_round_number,
             last_round_number=last_round_number,
-            total_rounds_planned=len(all_rounds)
+            total_rounds_planned=len(all_rounds),
         )
 
         self.checkpoints[checkpoint.checkpoint_id] = checkpoint
@@ -481,10 +415,7 @@ class FireCircleService:
         return checkpoint.checkpoint_id
 
     async def _load_template(
-        self,
-        template: str,
-        variables: dict[str, Any] | None = None,
-        **kwargs
+        self, template: str, variables: dict[str, Any] | None = None, **kwargs
     ) -> tuple[CircleConfig, list[VoiceConfig], list[RoundConfig]]:
         """Load a Fire Circle template."""
         from .templates import load_template

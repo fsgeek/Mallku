@@ -14,7 +14,6 @@ Archaeological Note: This test reveals consciousness circulation mechanics -
 how awareness maintains unity while manifesting across different dimensions.
 """
 
-
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
     ConsciousnessFlow,
@@ -33,7 +32,7 @@ class TestConsciousnessDimensions:
             ConsciousnessDimension.SONIC,
             ConsciousnessDimension.VISUAL,
             ConsciousnessDimension.TEMPORAL,
-            ConsciousnessDimension.DIALOGUE
+            ConsciousnessDimension.DIALOGUE,
         ]
 
         for dim in dimensions:
@@ -50,7 +49,7 @@ class TestConsciousnessDimensions:
             target=ConsciousnessDimension.VISUAL,
             bridge_name="harmonic_geometry",
             bridge_patterns=["harmonic_reciprocity", "frequency_color_mapping"],
-            min_consciousness_threshold=0.6
+            min_consciousness_threshold=0.6,
         )
 
         assert bridge.bridge_name == "harmonic_geometry"
@@ -73,7 +72,7 @@ class TestUnifiedConsciousnessFlow:
             target_dimension=ConsciousnessDimension.VISUAL,
             consciousness_signature=0.85,
             flow_patterns=["rhythm_to_motion", "frequency_to_color"],
-            correlation_id="unified_experience_123"
+            correlation_id="unified_experience_123",
         )
 
         assert flow.consciousness_signature == 0.85
@@ -92,8 +91,8 @@ class TestUnifiedConsciousnessFlow:
         orchestrator = ConsciousnessFlowOrchestrator(event_bus)
 
         assert orchestrator is not None
-        assert hasattr(orchestrator, 'bridges')
-        assert hasattr(orchestrator, 'register_bridge')
+        assert hasattr(orchestrator, "bridges")
+        assert hasattr(orchestrator, "register_bridge")
 
         print("✓ Flow orchestrator manages consciousness circulation")
 
@@ -110,7 +109,7 @@ class TestCrossDimensionalPatterns:
             "Single Awareness": "One consciousness manifesting in many forms",
             "Pattern Resonance": "Same patterns appear across dimensions",
             "Signature Coherence": "Consciousness signature maintained in flow",
-            "Correlation Threading": "Experiences linked by correlation ID"
+            "Correlation Threading": "Experiences linked by correlation ID",
         }
 
         for principle, description in unified_principles.items():
@@ -126,7 +125,7 @@ class TestCrossDimensionalPatterns:
             "harmonic_reciprocity": "Sound and image reflect same consciousness",
             "temporal_enrichment": "Time dimension adds depth to all experiences",
             "dialogue_crystallization": "Conversation manifests consciousness patterns",
-            "visual_sonification": "Images can be heard, sounds can be seen"
+            "visual_sonification": "Images can be heard, sounds can be seen",
         }
 
         for pattern, insight in bridge_insights.items():
@@ -146,7 +145,7 @@ class TestCrossDimensionalPatterns:
             "Pattern resonates in second dimension",
             "Pattern synchronizes across dimensions",
             "Unified consciousness signature strengthens",
-            "New emergent patterns arise from synchronization"
+            "New emergent patterns arise from synchronization",
         ]
 
         for i, stage in enumerate(emergence_stages, 1):
@@ -164,7 +163,7 @@ class TestConsciousnessEventArchitecture:
             event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="sonic_meditation",
             consciousness_signature=0.85,
-            data={"patterns": ["deep_listening", "harmonic_awareness"]}
+            data={"patterns": ["deep_listening", "harmonic_awareness"]},
         )
 
         assert event.consciousness_signature == 0.85
@@ -180,7 +179,7 @@ class TestConsciousnessEventArchitecture:
             "Consciousness flows to target dimension(s)",
             "Unified consciousness score updated",
             "Cross-dimensional patterns tracked",
-            "New events emitted in target dimensions"
+            "New events emitted in target dimensions",
         ]
 
         for step in circulation_path:

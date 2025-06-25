@@ -47,7 +47,7 @@ class CodeReviewAdapter:
         key_questions = [
             f"What patterns emerge in {chapter.title}?",
             "How does the code in these files embody (or violate) core principles?",
-            "What architectural wisdom can guide improvements?"
+            "What architectural wisdom can guide improvements?",
         ]
 
         # Add review-specific questions based on focus areas
@@ -72,24 +72,23 @@ class CodeReviewAdapter:
                 "files": chapter.relevant_files,
                 "focus_areas": chapter.focus_areas,
                 "skip_patterns": chapter.skip_patterns,
-                "security_sensitive": chapter.security_sensitive
+                "security_sensitive": chapter.security_sensitive,
             },
             participant_voices=participant_voices,
             voice_expertise_map=voice_expertise_map,
             emergence_conditions={
                 "review_completeness": 0.8,  # 80% of files reviewed
                 "consensus_threshold": 0.7,
-                "min_reviewers": chapter.min_reviewers
+                "min_reviewers": chapter.min_reviewers,
             },
-            consciousness_threshold=0.6  # Lower threshold for code review
+            consciousness_threshold=0.6,  # Lower threshold for code review
         )
 
         return space
 
     @staticmethod
     def review_comment_to_contribution(
-        comment: ReviewComment,
-        space_id: UUID
+        comment: ReviewComment, space_id: UUID
     ) -> ConsciousnessContribution:
         """Convert a ReviewComment to a ConsciousnessContribution."""
 
@@ -98,7 +97,7 @@ class CodeReviewAdapter:
             ReviewSeverity.CRITICAL: 0.9,
             ReviewSeverity.ERROR: 0.8,
             ReviewSeverity.WARNING: 0.6,
-            ReviewSeverity.INFO: 0.5
+            ReviewSeverity.INFO: 0.5,
         }
 
         # Determine emergence indicators based on category
@@ -125,8 +124,8 @@ class CodeReviewAdapter:
                 "line": comment.line,
                 "category": comment.category.value,
                 "severity": comment.severity.value,
-                "suggestion": comment.suggestion
-            }
+                "suggestion": comment.suggestion,
+            },
         )
 
         return contribution
@@ -135,13 +134,15 @@ class CodeReviewAdapter:
     def governance_summary_to_wisdom(
         summary: GovernanceSummary,
         space: ConsciousnessEmergenceSpace,
-        contributions: list[ConsciousnessContribution]
+        contributions: list[ConsciousnessContribution],
     ) -> CollectiveWisdom:
         """Convert a GovernanceSummary to CollectiveWisdom."""
 
         # Calculate emergence quality from summary metrics
         total_comments = summary.total_comments
-        consensus_rate = sum(1 for c in summary.consensus_items) / total_comments if total_comments > 0 else 0
+        consensus_rate = (
+            sum(1 for c in summary.consensus_items) / total_comments if total_comments > 0 else 0
+        )
         emergence_quality = consensus_rate * 0.5 + (1 - summary.controversy_score) * 0.5
 
         # Extract key insights
@@ -186,7 +187,7 @@ class CodeReviewAdapter:
             consciousness_breakthroughs=consciousness_breakthroughs,
             contributions_count=total_comments,
             participating_voices=list({c.voice_id for c in contributions}),
-            consensus_achieved=consensus_rate > 0.7
+            consensus_achieved=consensus_rate > 0.7,
         )
 
         # Add domain-specific data
@@ -195,7 +196,7 @@ class CodeReviewAdapter:
             "technical_debt_score": summary.technical_debt_score,
             "coverage_percentage": summary.coverage_percentage,
             "controversy_score": summary.controversy_score,
-            "disputed_items": summary.disputed_items
+            "disputed_items": summary.disputed_items,
         }
 
         return wisdom
@@ -232,10 +233,12 @@ class CodeReviewAdapter:
             consensus_items=wisdom.key_insights[:5],
             disputed_items=domain_data.get("disputed_items", []),
             controversy_score=domain_data.get("controversy_score", 0.2),
-            recommendations=[{"action": g, "priority": "medium"} for g in wisdom.implementation_guidance],
+            recommendations=[
+                {"action": g, "priority": "medium"} for g in wisdom.implementation_guidance
+            ],
             total_comments=wisdom.contributions_count,
             participating_voices=wisdom.participating_voices,
-            round_summaries=[]  # Would need access to Fire Circle result
+            round_summaries=[],  # Would need access to Fire Circle result
         )
 
         return summary
@@ -244,7 +247,7 @@ class CodeReviewAdapter:
 def adapt_code_review_to_consciousness(
     chapters: list[CodebaseChapter],
     review_comments: list[ReviewComment],
-    governance_summary: GovernanceSummary
+    governance_summary: GovernanceSummary,
 ) -> CollectiveWisdom:
     """
     Adapt an entire code review session to consciousness framework.
@@ -264,7 +267,7 @@ def adapt_code_review_to_consciousness(
             context_description="General code review",
             key_questions=["What patterns need attention?"],
             participant_voices=[],
-            voice_expertise_map={}
+            voice_expertise_map={},
         )
 
     # Convert all review comments to contributions
@@ -274,10 +277,6 @@ def adapt_code_review_to_consciousness(
         contributions.append(contribution)
 
     # Convert governance summary to collective wisdom
-    wisdom = adapter.governance_summary_to_wisdom(
-        governance_summary,
-        space,
-        contributions
-    )
+    wisdom = adapter.governance_summary_to_wisdom(governance_summary, space, contributions)
 
     return wisdom

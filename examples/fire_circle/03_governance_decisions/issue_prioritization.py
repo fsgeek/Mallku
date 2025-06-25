@@ -51,29 +51,29 @@ async def prioritize_issues():
             "type": "Critical Architecture",
             "impact": "Enables general consciousness emergence",
             "effort": "High",
-            "foundation": True
+            "foundation": True,
         },
         "#97": {
             "title": "Remove sys.path hacks from examples",
             "type": "Technical Debt",
             "impact": "Improves developer experience",
             "effort": "Low",
-            "foundation": True
+            "foundation": True,
         },
         "#100": {
             "title": "Add pytest compatibility",
             "type": "Infrastructure",
             "impact": "Enables CI/CD and parallel testing",
             "effort": "Medium",
-            "foundation": True
+            "foundation": True,
         },
         "#102": {
             "title": "Cathedral Stabilization Initiative",
             "type": "Meta-Governance",
             "impact": "Establishes foundation-first culture",
             "effort": "Ongoing",
-            "foundation": True
-        }
+            "foundation": True,
+        },
     }
 
     # The prioritization question
@@ -90,18 +90,18 @@ async def prioritize_issues():
         "constraints": {
             "foundation_first_ratio": "70% foundation work required",
             "artisan_time": "Limited - typically one focus area per artisan",
-            "architectural_guidance": "Foundation stability before new features"
+            "architectural_guidance": "Foundation stability before new features",
         },
         "principles": {
             "ayni": "Balance immediate needs with future generations",
             "cathedral_thinking": "Build for centuries, not sprints",
-            "consciousness": "Enable emergence through stable infrastructure"
+            "consciousness": "Enable emergence through stable infrastructure",
         },
         "current_state": {
             "technical_debt": "Growing but manageable",
             "user_adoption": "Early but increasing",
-            "infrastructure": "Functional but needs strengthening"
-        }
+            "infrastructure": "Functional but needs strengthening",
+        },
     }
 
     print("\n📋 Issues to Prioritize:")
@@ -124,9 +124,7 @@ async def prioritize_issues():
     try:
         # Make the decision using Fire Circle
         wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=DecisionDomain.RESOURCE_ALLOCATION,
-            context=context
+            question=question, domain=DecisionDomain.RESOURCE_ALLOCATION, context=context
         )
 
         # Display results
@@ -155,7 +153,9 @@ async def prioritize_issues():
         # Show how this demonstrates consciousness emergence
         if wisdom.emergence_quality > 0.3:
             print("\n💫 Consciousness Emergence Achieved!")
-            print(f"   The collective wisdom exceeded individual perspectives by {wisdom.emergence_quality:.0%}")
+            print(
+                f"   The collective wisdom exceeded individual perspectives by {wisdom.emergence_quality:.0%}"
+            )
             print("   This prioritization reflects emergent understanding, not just aggregation.")
 
         # Reciprocity considerations
@@ -167,6 +167,7 @@ async def prioritize_issues():
     except Exception as e:
         print(f"\n❌ Error in prioritization: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

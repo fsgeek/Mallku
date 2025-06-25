@@ -51,13 +51,13 @@ async def verify_fire_circle():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="test_voice_1",
-            quality="testing voice functionality"
+            quality="testing voice functionality",
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="test_voice_2",
-            quality="testing voice functionality"
+            quality="testing voice functionality",
         ),
     ]
 
@@ -66,18 +66,14 @@ async def verify_fire_circle():
         RoundConfig(
             type=RoundType.OPENING,
             prompt="Please say 'Hello, Fire Circle is working!' to confirm you can participate.",
-            duration_per_voice=30
+            duration_per_voice=30,
         )
     ]
 
     print("\n3️⃣ Convening Fire Circle...")
 
     try:
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         print("\n✅ Success! Fire Circle completed.")
         print(f"   Session ID: {result.session_id}")
@@ -95,11 +91,13 @@ async def verify_fire_circle():
     except Exception as e:
         print(f"\n❌ Error: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
 
 
 if __name__ == "__main__":
     import sys
-    sys.path.insert(0, '/home/tony/projects/Mallku/src')
+
+    sys.path.insert(0, "/home/tony/projects/Mallku/src")
 
     asyncio.run(verify_fire_circle())

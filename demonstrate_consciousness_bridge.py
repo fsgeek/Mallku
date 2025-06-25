@@ -141,7 +141,7 @@ async def demonstrate_consciousness_bridge():
 
     # Mock voice manager methods
     voice_manager.get_active_voices = lambda: adapters
-    voice_manager.get_voice_config = lambda name: type('Config', (), {'temperature': 0.9})()
+    voice_manager.get_voice_config = lambda name: type("Config", (), {"temperature": 0.9})()
 
     print("\n3️⃣ Starting infrastructure consciousness monitoring...")
 
@@ -150,9 +150,7 @@ async def demonstrate_consciousness_bridge():
     session_id = uuid4()
 
     # Start monitoring
-    asyncio.create_task(
-        bridge.monitor_fire_circle_session(session_id)
-    )
+    asyncio.create_task(bridge.monitor_fire_circle_session(session_id))
 
     # Simulate Fire Circle rounds
     print("\n4️⃣ Simulating Fire Circle dialogue rounds...\n")

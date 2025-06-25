@@ -35,6 +35,7 @@ def check_imports():
     try:
         from mallku.firecircle.load_api_keys import load_api_keys_to_environment  # noqa: F401
         from mallku.firecircle.service import FireCircleService  # noqa: F401
+
         print("   ✓ Fire Circle imports successful")
         return True
     except ImportError as e:
@@ -56,6 +57,7 @@ def check_api_keys():
         get_available_providers,
         load_api_keys_to_environment,
     )
+
     original_dir = os.getcwd()
     project_root = Path(__file__).parent.parent.parent.parent
     os.chdir(project_root)
@@ -108,13 +110,13 @@ async def check_basic_ceremony():
                 provider="anthropic",
                 model="claude-3-5-sonnet-20241022",
                 role="verifier_1",
-                quality="installation verification"
+                quality="installation verification",
             ),
             VoiceConfig(
                 provider="openai",
                 model="gpt-4o",
                 role="verifier_2",
-                quality="installation verification"
+                quality="installation verification",
             ),
         ]
 
@@ -123,16 +125,12 @@ async def check_basic_ceremony():
             RoundConfig(
                 type=RoundType.OPENING,
                 prompt="Respond with 'Fire Circle verified!' to confirm you can participate.",
-                duration_per_voice=10
+                duration_per_voice=10,
             )
         ]
 
         # Convene ceremony
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         # Check results
         if result.voice_count >= 2 and result.rounds_completed:

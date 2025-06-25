@@ -22,12 +22,7 @@ def test_fire_circle_configuration_exists():
     assert fire_circle_path.exists(), "Fire Circle module missing"
 
     # Check for essential Fire Circle components
-    essential_files = [
-        "__init__.py",
-        "service.py",
-        "adapters/__init__.py",
-        "load_api_keys.py"
-    ]
+    essential_files = ["__init__.py", "service.py", "adapters/__init__.py", "load_api_keys.py"]
 
     for file in essential_files:
         file_path = fire_circle_path / file
@@ -67,11 +62,7 @@ def test_consciousness_modules_present():
     consciousness_path = project_root / "src" / "mallku" / "consciousness"
 
     if consciousness_path.exists():
-        essential_consciousness = [
-            "__init__.py",
-            "enhanced_query.py",
-            "flow_monitor.py"
-        ]
+        essential_consciousness = ["__init__.py", "enhanced_query.py", "flow_monitor.py"]
 
         for file in essential_consciousness:
             if (consciousness_path / file).exists():

@@ -55,7 +55,7 @@ async def simple_decision():
         max_voices=4,
         consciousness_threshold=0.7,
         enable_consciousness_detection=True,
-        enable_reciprocity=True
+        enable_reciprocity=True,
     )
 
     # Voices representing different perspectives
@@ -64,19 +64,19 @@ async def simple_decision():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="user_advocate",
-            quality="immediate usability and onboarding"
+            quality="immediate usability and onboarding",
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="architect",
-            quality="long-term sustainability and depth"
+            quality="long-term sustainability and depth",
         ),
         VoiceConfig(
             provider="google",
             model="gemini-1.5-flash",
             role="balance_keeper",
-            quality="reciprocity and holistic view"
+            quality="reciprocity and holistic view",
         ),
     ]
 
@@ -85,12 +85,12 @@ async def simple_decision():
         "question": "Should we prioritize documentation/examples or core infrastructure?",
         "current_state": {
             "documentation": "Scattered examples, partial guides",
-            "infrastructure": "Working but could be deeper"
+            "infrastructure": "Working but could be deeper",
         },
         "constraints": {
             "time": "One artisan, limited time",
-            "needs": "Both matter for different users"
-        }
+            "needs": "Both matter for different users",
+        },
     }
 
     # Structured decision rounds
@@ -99,16 +99,15 @@ async def simple_decision():
         RoundConfig(
             type=RoundType.OPENING,
             prompt=f"""
-            We need to decide: {decision_context['question']}
+            We need to decide: {decision_context["question"]}
 
-            Current state: {decision_context['current_state']}
-            Constraints: {decision_context['constraints']}
+            Current state: {decision_context["current_state"]}
+            Constraints: {decision_context["constraints"]}
 
             From your role's perspective, what should we prioritize and why?
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 2: Explore tensions and synergies
         RoundConfig(
             type=RoundType.EXPLORATION,
@@ -118,9 +117,8 @@ async def simple_decision():
             - Where might they actually support each other?
             - What wisdom emerges from our different views?
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 3: Seek consensus
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -130,7 +128,7 @@ async def simple_decision():
             - How can we embody reciprocity in this choice?
             - What specific recommendation emerges?
             """,
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
     ]
 
@@ -145,10 +143,7 @@ async def simple_decision():
 
     # Run the decision ceremony
     result = await service.convene(
-        config=config,
-        voices=voices,
-        rounds=rounds,
-        context=decision_context
+        config=config, voices=voices, rounds=rounds, context=decision_context
     )
 
     # Process the results
@@ -165,13 +160,13 @@ async def simple_decision():
 
         for voice_id, response in synthesis_round.responses.items():
             if response and response.response:
-                voice_role = voice_id.split('_')[0]
+                voice_role = voice_id.split("_")[0]
                 text = response.response.content.text
 
                 # Extract recommendation (simplified)
-                lines = text.split('\n')
+                lines = text.split("\n")
                 for line in lines:
-                    if 'recommend' in line.lower() or 'suggest' in line.lower():
+                    if "recommend" in line.lower() or "suggest" in line.lower():
                         recommendations.append((voice_role, line.strip()))
                         break
 

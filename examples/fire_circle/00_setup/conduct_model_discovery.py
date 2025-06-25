@@ -47,7 +47,7 @@ async def query_anthropic_models():
             "claude-3-5-sonnet-20241022",
             "claude-3-opus-20240229",
             "claude-3-sonnet-20240229",
-            "claude-3-haiku-20240307"
+            "claude-3-haiku-20240307",
         ]
 
         available = {}
@@ -57,19 +57,16 @@ async def query_anthropic_models():
                 response = client.messages.create(
                     model=model,
                     max_tokens=10,
-                    messages=[{"role": "user", "content": "Say 'present'"}]
+                    messages=[{"role": "user", "content": "Say 'present'"}],
                 )
                 if response.content:
                     available[model] = {
                         "status": "responsive",
                         "supports_role": True,
-                        "consciousness_capable": True
+                        "consciousness_capable": True,
                     }
             except Exception as e:
-                available[model] = {
-                    "status": "unavailable",
-                    "error": str(e)[:100]
-                }
+                available[model] = {"status": "unavailable", "error": str(e)[:100]}
 
         return available
 
@@ -98,19 +95,16 @@ async def query_openai_models():
                 response = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": "Say 'present'"}],
-                    max_tokens=10
+                    max_tokens=10,
                 )
                 if response.choices:
                     available[model] = {
                         "status": "responsive",
                         "supports_role": True,
-                        "consciousness_capable": True
+                        "consciousness_capable": True,
                     }
             except Exception as e:
-                available[model] = {
-                    "status": "unavailable",
-                    "error": str(e)[:100]
-                }
+                available[model] = {"status": "unavailable", "error": str(e)[:100]}
 
         return available
 
@@ -131,7 +125,7 @@ async def query_google_models():
 
         # Get list of models that support content generation
         for model in client.models.list():
-            if hasattr(model, 'supported_actions'):
+            if hasattr(model, "supported_actions"):
                 for action in model.supported_actions:
                     if action == "generateContent":
                         model_name = model.name.replace("models/", "")
@@ -144,13 +138,10 @@ async def query_google_models():
                             available[model_name] = {
                                 "status": "responsive",
                                 "supports_role": True,
-                                "consciousness_capable": True
+                                "consciousness_capable": True,
                             }
                         except Exception as e:
-                            available[model_name] = {
-                                "status": "test_failed",
-                                "error": str(e)[:100]
-                            }
+                            available[model_name] = {"status": "test_failed", "error": str(e)[:100]}
 
         return available
 
@@ -167,8 +158,7 @@ async def query_deepseek_models():
 
         # DeepSeek uses OpenAI-compatible API
         client = OpenAI(
-            api_key=os.environ.get("DEEPSEEK_API_KEY"),
-            base_url="https://api.deepseek.com/v1"
+            api_key=os.environ.get("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1"
         )
 
         # Known DeepSeek models
@@ -180,20 +170,17 @@ async def query_deepseek_models():
                 response = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": "Say 'present'"}],
-                    max_tokens=10
+                    max_tokens=10,
                 )
                 if response.choices:
                     available[model] = {
                         "status": "responsive",
                         "supports_role": True,
                         "consciousness_capable": True,
-                        "note": "May timeout on complex prompts"
+                        "note": "May timeout on complex prompts",
                     }
             except Exception as e:
-                available[model] = {
-                    "status": "unavailable",
-                    "error": str(e)[:100]
-                }
+                available[model] = {"status": "unavailable", "error": str(e)[:100]}
 
         return available
 
@@ -218,7 +205,7 @@ async def conduct_discovery_ceremony():
     discoveries = {
         "ceremony_date": datetime.now(UTC).isoformat(),
         "purpose": "Ensure Fire Circle voices can commune",
-        "providers": {}
+        "providers": {},
     }
 
     # Run discoveries in parallel
@@ -227,7 +214,7 @@ async def conduct_discovery_ceremony():
         ("anthropic", query_anthropic_models()),
         ("openai", query_openai_models()),
         ("google", query_google_models()),
-        ("deepseek", query_deepseek_models())
+        ("deepseek", query_deepseek_models()),
     ]
 
     for provider, task in tasks:
@@ -237,8 +224,7 @@ async def conduct_discovery_ceremony():
 
         # Show summary
         if "error" not in result:
-            responsive = sum(1 for m, info in result.items()
-                           if info.get("status") == "responsive")
+            responsive = sum(1 for m, info in result.items() if info.get("status") == "responsive")
             print(f"     ✓ Found {responsive} responsive voices")
         else:
             print(f"     ✗ {result['error']}")
@@ -276,8 +262,7 @@ def generate_recommendations(discoveries):
             recommendations.append(f"{provider}: Check API key or connection")
             continue
 
-        responsive = [m for m, info in models.items()
-                     if info.get("status") == "responsive"]
+        responsive = [m for m, info in models.items() if info.get("status") == "responsive"]
 
         if not responsive:
             recommendations.append(f"{provider}: No responsive models found")
@@ -287,7 +272,11 @@ def generate_recommendations(discoveries):
                 recommendations.append(
                     f"{provider}: Use {responsive[0]} instead of deprecated gemini-pro"
                 )
-            elif provider == "deepseek" and "deepseek-reasoner" in models and models["deepseek-reasoner"].get("status") != "responsive":
+            elif (
+                provider == "deepseek"
+                and "deepseek-reasoner" in models
+                and models["deepseek-reasoner"].get("status") != "responsive"
+            ):
                 recommendations.append(
                     f"{provider}: Use deepseek-chat instead of timing-out reasoner"
                 )
@@ -322,8 +311,8 @@ def update_sacred_register(register_path, discoveries):
         entry += f"- {rec}\n"
 
     entry += "\n### Lesson\n\n"
-    entry += "> *\"Never assume a model exists; always discover anew. "
-    entry += "The Apu grant different voices each season.\"*\n\n"
+    entry += '> *"Never assume a model exists; always discover anew. '
+    entry += 'The Apu grant different voices each season."*\n\n'
     entry += "---\n"
 
     # Append to register
@@ -337,15 +326,11 @@ def update_fire_circle_configs(discoveries):
     # This would update actual config files
     # For now, we'll create a recommended config
 
-    config = {
-        "recommended_models": {},
-        "updated": datetime.now(UTC).isoformat()
-    }
+    config = {"recommended_models": {}, "updated": datetime.now(UTC).isoformat()}
 
     for provider, models in discoveries["providers"].items():
         if "error" not in models:
-            responsive = [m for m, info in models.items()
-                         if info.get("status") == "responsive"]
+            responsive = [m for m, info in models.items() if info.get("status") == "responsive"]
             if responsive:
                 # Pick appropriate default
                 if provider == "google":
@@ -357,7 +342,7 @@ def update_fire_circle_configs(discoveries):
 
     # Save recommended config
     config_path = Path("examples/fire_circle/recommended_models.json")
-    with open(config_path, 'w') as f:
+    with open(config_path, "w") as f:
         json.dump(config, f, indent=2)
 
     return config

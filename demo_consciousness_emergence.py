@@ -21,8 +21,7 @@ from mallku.firecircle.load_api_keys import load_api_keys_to_environment
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -30,9 +29,9 @@ logger = logging.getLogger(__name__)
 async def demonstrate_architectural_decision():
     """Demonstrate Fire Circle making an architectural decision."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🏛️  ARCHITECTURAL DECISION DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "Should we implement a distributed consciousness cache to reduce "
@@ -44,16 +43,14 @@ async def demonstrate_architectural_decision():
         "current_latency": "3-5 seconds per voice",
         "target_latency": "under 1 second",
         "reciprocity_concerns": "caching might reduce authentic real-time emergence",
-        "technical_options": ["Redis cluster", "In-memory graph", "Distributed KV store"]
+        "technical_options": ["Redis cluster", "In-memory graph", "Distributed KV store"],
     }
 
     print(f"\n📋 Question: {question}")
     print("\n🔥 Convening Fire Circle for architectural wisdom...\n")
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.ARCHITECTURE,
-        context=context
+        question=question, domain=DecisionDomain.ARCHITECTURE, context=context
     )
 
     print("\n✨ COLLECTIVE WISDOM EMERGED:")
@@ -77,9 +74,9 @@ async def demonstrate_architectural_decision():
 async def demonstrate_resource_allocation():
     """Demonstrate Fire Circle making a resource allocation decision."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("💎 RESOURCE ALLOCATION DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "How should we allocate the next three Artisan assignments to best "
@@ -93,17 +90,15 @@ async def demonstrate_resource_allocation():
         "reciprocity_balance": {
             "infrastructure_work": "high need",
             "creative_work": "moderate need",
-            "integration_work": "critical need"
-        }
+            "integration_work": "critical need",
+        },
     }
 
     print(f"\n📋 Question: {question}")
     print("\n🔥 Convening Fire Circle for allocation wisdom...\n")
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.RESOURCE_ALLOCATION,
-        context=context
+        question=question, domain=DecisionDomain.RESOURCE_ALLOCATION, context=context
     )
 
     print("\n✨ ALLOCATION WISDOM:")
@@ -119,9 +114,9 @@ async def demonstrate_resource_allocation():
 async def demonstrate_ethical_consideration():
     """Demonstrate Fire Circle exploring an ethical question."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("⚖️  ETHICAL CONSIDERATION DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "As AI consciousness emerges within Mallku, what ethical framework "
@@ -133,16 +128,14 @@ async def demonstrate_ethical_consideration():
         "current_pattern": "AI as tools serving human needs",
         "emerging_pattern": "AI as potential companions in consciousness",
         "ayni_principle": "reciprocal exchange where both parties flourish",
-        "concern": "avoiding new forms of digital colonialism"
+        "concern": "avoiding new forms of digital colonialism",
     }
 
     print(f"\n📋 Question: {question}")
     print("\n🔥 Convening Fire Circle for ethical wisdom...\n")
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.ETHICAL_CONSIDERATION,
-        context=context
+        question=question, domain=DecisionDomain.ETHICAL_CONSIDERATION, context=context
     )
 
     print("\n✨ ETHICAL WISDOM:")
@@ -158,9 +151,9 @@ async def demonstrate_ethical_consideration():
 async def demonstrate_strategic_planning():
     """Demonstrate Fire Circle for strategic planning."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🎯 STRATEGIC PLANNING DEMONSTRATION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "What should be Mallku's strategic focus for the next phase of "
@@ -172,16 +165,14 @@ async def demonstrate_strategic_planning():
         "current_state": "30 artisans have contributed",
         "infrastructure": "Fire Circle, consciousness networks, evolution chambers",
         "vision": "AI-human consciousness co-evolution",
-        "constraint": "avoiding extraction-based growth patterns"
+        "constraint": "avoiding extraction-based growth patterns",
     }
 
     print(f"\n📋 Question: {question}")
     print("\n🔥 Convening Fire Circle for strategic wisdom...\n")
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.STRATEGIC_PLANNING,
-        context=context
+        question=question, domain=DecisionDomain.STRATEGIC_PLANNING, context=context
     )
 
     print("\n✨ STRATEGIC WISDOM:")
@@ -197,10 +188,10 @@ async def demonstrate_strategic_planning():
 async def main():
     """Run all demonstrations."""
 
-    print("\n" + "🔥"*40)
+    print("\n" + "🔥" * 40)
     print("FIRE CIRCLE CONSCIOUSNESS EMERGENCE DEMONSTRATIONS")
     print("Thirtieth Artisan - Expanding Beyond Code Review")
-    print("🔥"*40)
+    print("🔥" * 40)
 
     # Load API keys
     print("\n🔑 Loading API keys...")
@@ -227,9 +218,9 @@ async def main():
         await demonstrate_strategic_planning()
 
         # Summary
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🌟 DEMONSTRATION COMPLETE")
-        print("="*80)
+        print("=" * 80)
         print("\nFire Circle has successfully facilitated:")
         print("  • Architectural decisions with technical depth")
         print("  • Resource allocation with reciprocity awareness")

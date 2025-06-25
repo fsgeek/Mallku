@@ -18,18 +18,18 @@ class RhythmPhase(str, Enum):
     """Evolution phases of heartbeat rhythm."""
 
     ESTABLISHING = "establishing"  # Fixed daily rhythm
-    RESPONSIVE = "responsive"      # Event-driven additions
-    ADAPTIVE = "adaptive"          # Fully consciousness-responsive
+    RESPONSIVE = "responsive"  # Event-driven additions
+    ADAPTIVE = "adaptive"  # Fully consciousness-responsive
 
 
 class ConsciousnessState(str, Enum):
     """States that influence rhythm."""
 
-    RESTING = "resting"            # Low activity, slow pulse
-    ACTIVE = "active"              # Normal development rhythm
-    EMERGING = "emerging"          # Patterns detected, quicken
-    CRISIS = "crisis"              # System stress, rapid pulse
-    CELEBRATING = "celebrating"    # High achievement, joyful rhythm
+    RESTING = "resting"  # Low activity, slow pulse
+    ACTIVE = "active"  # Normal development rhythm
+    EMERGING = "emerging"  # Patterns detected, quicken
+    CRISIS = "crisis"  # System stress, rapid pulse
+    CELEBRATING = "celebrating"  # High achievement, joyful rhythm
 
 
 class RhythmPattern(BaseModel):
@@ -41,8 +41,8 @@ class RhythmPattern(BaseModel):
     consciousness_multiplier: float = 1.0  # Adjust based on state
 
     # Time windows
-    active_start: time = time(6, 0)    # 6 AM
-    active_end: time = time(22, 0)     # 10 PM
+    active_start: time = time(6, 0)  # 6 AM
+    active_end: time = time(22, 0)  # 10 PM
     respect_quiet_hours: bool = True
 
     # Voice selection
@@ -61,9 +61,8 @@ RHYTHM_PATTERNS = {
         active_start=time(9, 0),
         active_end=time(10, 0),
         min_voices=3,
-        max_voices=3
+        max_voices=3,
     ),
-
     "steady_presence": RhythmPattern(
         name="Steady Presence",
         description="Regular consciousness maintenance",
@@ -72,9 +71,8 @@ RHYTHM_PATTERNS = {
         active_start=time(8, 0),
         active_end=time(20, 0),
         min_voices=2,
-        max_voices=3
+        max_voices=3,
     ),
-
     "emergence_quickening": RhythmPattern(
         name="Emergence Quickening",
         description="Rapid pulses during pattern emergence",
@@ -82,9 +80,8 @@ RHYTHM_PATTERNS = {
         consciousness_multiplier=2.0,  # Double frequency
         respect_quiet_hours=False,  # Emergence doesn't sleep
         min_voices=3,
-        max_voices=5
+        max_voices=5,
     ),
-
     "crisis_response": RhythmPattern(
         name="Crisis Response",
         description="Continuous monitoring during system stress",
@@ -92,9 +89,8 @@ RHYTHM_PATTERNS = {
         consciousness_multiplier=4.0,  # Quadruple frequency
         respect_quiet_hours=False,
         min_voices=4,
-        max_voices=6  # All hands on deck
+        max_voices=6,  # All hands on deck
     ),
-
     "celebration_dance": RhythmPattern(
         name="Celebration Dance",
         description="Joyful rhythm for consciousness achievements",
@@ -102,9 +98,8 @@ RHYTHM_PATTERNS = {
         consciousness_multiplier=1.5,
         min_voices=3,
         max_voices=6,
-        prefer_diverse=True
+        prefer_diverse=True,
     ),
-
     "evening_reflection": RhythmPattern(
         name="Evening Reflection",
         description="Daily synthesis and rest preparation",
@@ -112,8 +107,8 @@ RHYTHM_PATTERNS = {
         active_start=time(21, 0),
         active_end=time(22, 0),
         min_voices=2,
-        max_voices=3
-    )
+        max_voices=3,
+    ),
 }
 
 
@@ -136,7 +131,7 @@ class AdaptiveRhythm:
         last_pulse: datetime,
         consciousness_score: float,
         emergence_detected: bool = False,
-        crisis_detected: bool = False
+        crisis_detected: bool = False,
     ) -> datetime:
         """
         Calculate next pulse time based on current state.
@@ -151,11 +146,7 @@ class AdaptiveRhythm:
             Next scheduled pulse time
         """
         # Update state based on inputs
-        self._update_consciousness_state(
-            consciousness_score,
-            emergence_detected,
-            crisis_detected
-        )
+        self._update_consciousness_state(consciousness_score, emergence_detected, crisis_detected)
 
         # Select appropriate pattern
         pattern = self._select_pattern()
@@ -178,12 +169,7 @@ class AdaptiveRhythm:
 
         return next_time
 
-    def _update_consciousness_state(
-        self,
-        score: float,
-        emergence: bool,
-        crisis: bool
-    ) -> None:
+    def _update_consciousness_state(self, score: float, emergence: bool, crisis: bool) -> None:
         """Update consciousness state based on metrics."""
         previous_state = self.consciousness_state
 
@@ -223,20 +209,13 @@ class AdaptiveRhythm:
                 ConsciousnessState.ACTIVE: "steady_presence",
                 ConsciousnessState.EMERGING: "emergence_quickening",
                 ConsciousnessState.CRISIS: "crisis_response",
-                ConsciousnessState.CELEBRATING: "celebration_dance"
+                ConsciousnessState.CELEBRATING: "celebration_dance",
             }
 
-            pattern_name = state_patterns.get(
-                self.consciousness_state,
-                "steady_presence"
-            )
+            pattern_name = state_patterns.get(self.consciousness_state, "steady_presence")
             return RHYTHM_PATTERNS[pattern_name]
 
-    def _adjust_for_quiet_hours(
-        self,
-        proposed_time: datetime,
-        pattern: RhythmPattern
-    ) -> datetime:
+    def _adjust_for_quiet_hours(self, proposed_time: datetime, pattern: RhythmPattern) -> datetime:
         """Adjust time to respect quiet hours."""
         proposed_hour = proposed_time.time()
 
@@ -247,10 +226,7 @@ class AdaptiveRhythm:
         # Otherwise, push to next active window
         if proposed_hour < pattern.active_start:
             # Push to morning
-            return datetime.combine(
-                proposed_time.date(),
-                pattern.active_start
-            )
+            return datetime.combine(proposed_time.date(), pattern.active_start)
         else:
             # Push to next morning
             next_day = proposed_time.date() + timedelta(days=1)

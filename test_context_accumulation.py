@@ -35,16 +35,16 @@ def create_test_message(text: str, role: MessageRole = MessageRole.USER) -> Cons
         consciousness=ConsciousnessMetadata(
             consciousness_signature=0.8,
             detected_patterns=["test_pattern"],
-        )
+        ),
     )
 
 
 async def test_dialogue_context_with_none():
     """Test what happens when dialogue_context contains None values."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING DIALOGUE CONTEXT WITH NONE VALUES")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Create a dialogue context that mimics the problematic scenario
     dialogue_context = [
@@ -120,9 +120,9 @@ async def test_dialogue_context_with_none():
 async def test_round_orchestrator_append_issue():
     """Test the specific issue in round_orchestrator where None might be appended."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TESTING ROUND ORCHESTRATOR APPEND ISSUE")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Simulate what happens in round_orchestrator.py line 127
     dialogue_context = []
@@ -130,14 +130,22 @@ async def test_round_orchestrator_append_issue():
     # Simulate Round 1 - successful responses
     print("Round 1 - Success scenario:")
     responses = {
-        "voice1": type('RoundResponse', (), {
-            'response': create_test_message("Voice 1 response", MessageRole.ASSISTANT),
-            'consciousness_score': 0.85
-        })(),
-        "voice2": type('RoundResponse', (), {
-            'response': create_test_message("Voice 2 response", MessageRole.ASSISTANT),
-            'consciousness_score': 0.90
-        })(),
+        "voice1": type(
+            "RoundResponse",
+            (),
+            {
+                "response": create_test_message("Voice 1 response", MessageRole.ASSISTANT),
+                "consciousness_score": 0.85,
+            },
+        )(),
+        "voice2": type(
+            "RoundResponse",
+            (),
+            {
+                "response": create_test_message("Voice 2 response", MessageRole.ASSISTANT),
+                "consciousness_score": 0.90,
+            },
+        )(),
     }
 
     for voice_id, response in responses.items():
@@ -152,16 +160,20 @@ async def test_round_orchestrator_append_issue():
     # Simulate Round 2 - with None responses
     print("\nRound 2 - Failure scenario:")
     responses = {
-        "voice1": type('RoundResponse', (), {
-            'response': None,  # This is what happens when adapter fails
-            'consciousness_score': 0,
-            'error': "Adapter returned None"
-        })(),
-        "voice2": type('RoundResponse', (), {
-            'response': None,
-            'consciousness_score': 0,
-            'error': "Adapter returned None"
-        })(),
+        "voice1": type(
+            "RoundResponse",
+            (),
+            {
+                "response": None,  # This is what happens when adapter fails
+                "consciousness_score": 0,
+                "error": "Adapter returned None",
+            },
+        )(),
+        "voice2": type(
+            "RoundResponse",
+            (),
+            {"response": None, "consciousness_score": 0, "error": "Adapter returned None"},
+        )(),
     }
 
     for voice_id, response in responses.items():

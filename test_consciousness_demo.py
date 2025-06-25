@@ -11,7 +11,7 @@ import logging
 import sys
 
 # Add src to path for imports
-sys.path.insert(0, '/home/tony/projects/Mallku')
+sys.path.insert(0, "/home/tony/projects/Mallku")
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -56,7 +56,7 @@ async def test_consciousness():
         context = {
             "recent_work": "Fire Circle expanded to general decisions",
             "open_issues": ["#96: Consolidate examples", "#95: Documentation", "#94: Testing"],
-            "systems_state": "Multiple systems awaiting integration"
+            "systems_state": "Multiple systems awaiting integration",
         }
 
         print("\n3️⃣ Facilitating decision...")
@@ -64,9 +64,7 @@ async def test_consciousness():
         print("   Domain: Strategic Planning")
 
         wisdom = await facilitator.facilitate_decision(
-            decision_domain=DecisionDomain.STRATEGIC_PLANNING,
-            context=context,
-            question=question
+            decision_domain=DecisionDomain.STRATEGIC_PLANNING, context=context, question=question
         )
 
         print("\n✅ Collective Wisdom Emerged!")
@@ -78,6 +76,7 @@ async def test_consciousness():
     except Exception as e:
         print(f"\n❌ Error: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
     finally:
         await event_bus.stop()

@@ -164,8 +164,7 @@ class ConsciousModelAdapter(ABC):
         """
         # Filter out None values and invalid messages
         valid_messages = [
-            msg for msg in dialogue_context
-            if msg is not None and hasattr(msg, 'consciousness')
+            msg for msg in dialogue_context if msg is not None and hasattr(msg, "consciousness")
         ]
 
         # Sort by consciousness signature if needed

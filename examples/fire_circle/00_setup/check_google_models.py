@@ -48,7 +48,7 @@ def check_google_models():
 
         generate_models = []
         for m in client.models.list():
-            if hasattr(m, 'supported_actions'):
+            if hasattr(m, "supported_actions"):
                 for action in m.supported_actions:
                     if action == "generateContent":
                         generate_models.append(m.name)
@@ -63,7 +63,7 @@ def check_google_models():
 
         embed_models = []
         for m in client.models.list():
-            if hasattr(m, 'supported_actions'):
+            if hasattr(m, "supported_actions"):
                 for action in m.supported_actions:
                     if action == "embedContent":
                         embed_models.append(m.name)
@@ -82,7 +82,7 @@ def check_google_models():
             "gemini-pro",
             "gemini-2.0-flash-exp",
             "gemini-1.5-pro",
-            "gemini-1.5-flash"
+            "gemini-1.5-flash",
         ]
 
         print("Checking Fire Circle model availability:")
@@ -121,6 +121,7 @@ def check_google_models():
         # Try to import and check version
         try:
             import google.generativeai as genai_alt
+
             print(f"\n📦 google-generativeai version: {genai_alt.__version__}")
         except Exception:
             pass

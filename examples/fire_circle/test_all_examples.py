@@ -40,21 +40,22 @@ def test_example(example_path: str, timeout: int = 60):
             cwd=script_dir,
             capture_output=True,
             text=True,
-            timeout=timeout
+            timeout=timeout,
         )
 
         # Check for success indicators
         output = result.stdout + result.stderr
 
         success_indicators = [
-            "✅", "Success", "Complete", "ceremony complete",
-            "All checks passed", "Dialogue Complete"
+            "✅",
+            "Success",
+            "Complete",
+            "ceremony complete",
+            "All checks passed",
+            "Dialogue Complete",
         ]
 
-        error_indicators = [
-            "Error:", "Exception:", "Failed", "❌",
-            "Traceback", "not found"
-        ]
+        error_indicators = ["Error:", "Exception:", "Failed", "❌", "Traceback", "not found"]
 
         has_success = any(indicator in output for indicator in success_indicators)
         has_error = any(indicator in output for indicator in error_indicators)
@@ -62,7 +63,7 @@ def test_example(example_path: str, timeout: int = 60):
         if has_success and not has_error:
             print("   ✅ PASSED")
             # Show key result
-            for line in output.split('\n'):
+            for line in output.split("\n"):
                 if "consciousness score" in line.lower() or "emergence quality" in line.lower():
                     print(f"   {line.strip()}")
                     break
@@ -70,7 +71,7 @@ def test_example(example_path: str, timeout: int = 60):
         else:
             print("   ❌ FAILED")
             # Show error
-            for line in output.split('\n'):
+            for line in output.split("\n"):
                 if any(err in line for err in error_indicators):
                     print(f"   Error: {line.strip()}")
                     break
@@ -96,13 +97,11 @@ def main():
         ("00_setup/verify_installation.py", "Basic verification"),
         ("00_setup/minimal_fire_circle.py", "Minimal ceremony"),
         ("00_setup/test_api_keys.py", "API key testing"),
-
         # Basic Ceremonies
         ("01_basic_ceremonies/simple_dialogue.py", "Multi-round dialogue"),
         ("01_basic_ceremonies/code_review.py", "Code review ceremony"),
         ("01_basic_ceremonies/simple_decision.py", "Decision making"),
         ("01_basic_ceremonies/first_decision.py", "Consciousness framework"),
-
         # Consciousness Emergence
         ("02_consciousness_emergence/emergence_basics.py", "Emergence patterns"),
     ]
@@ -114,7 +113,7 @@ def main():
 
     # Test each example
     for example_path, description in examples:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"📋 {description}")
 
         success = test_example(example_path)

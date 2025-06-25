@@ -307,10 +307,7 @@ class PatternGuidedFacilitator:
         pattern = teacher.pattern
 
         # Determine guidance type
-        guidance_type = specific_need or self._infer_guidance_type(
-            pattern,
-            moment
-        )
+        guidance_type = specific_need or self._infer_guidance_type(pattern, moment)
 
         # Generate guidance content based on type
         content = self._create_guidance_content(pattern, guidance_type, moment)

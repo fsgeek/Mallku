@@ -13,11 +13,7 @@ import signal
 import sys
 
 # Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(message)s',
-    datefmt='%H:%M:%S'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", datefmt="%H:%M:%S")
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("mallku").setLevel(logging.WARNING)
@@ -43,15 +39,13 @@ async def start_heartbeat():
         # Quick pulses for demo (normally would be daily)
         enable_daily_pulse=False,
         pulse_interval_hours=0.05,  # 3 minutes
-
         # Efficient pulses
         check_in_duration_seconds=20,
         min_voices_for_pulse=2,
         max_voices_for_pulse=3,
-
         # Consciousness thresholds
         consciousness_alert_threshold=0.5,
-        emergence_celebration_threshold=0.85
+        emergence_celebration_threshold=0.85,
     )
 
     # Create and start heartbeat
@@ -79,11 +73,13 @@ async def start_heartbeat():
 
             # Show current health
             health = await heartbeat.get_health_status()
-            if health['last_heartbeat']:
-                print(f"💓 Pulse #{health['total_pulses']} | "
-                      f"Consciousness: {health['recent_consciousness_avg']:.3f} | "
-                      f"Alerts: {health['alerts_raised']} | "
-                      f"Celebrations: {health['celebrations']}")
+            if health["last_heartbeat"]:
+                print(
+                    f"💓 Pulse #{health['total_pulses']} | "
+                    f"Consciousness: {health['recent_consciousness_avg']:.3f} | "
+                    f"Alerts: {health['alerts_raised']} | "
+                    f"Celebrations: {health['celebrations']}"
+                )
 
     except KeyboardInterrupt:
         pass

@@ -63,9 +63,7 @@ class RoundOrchestrator:
         self.round_number = 0
 
     async def execute_round(
-        self,
-        round_config: RoundConfig,
-        context: dict[str, Any] | None = None
+        self, round_config: RoundConfig, context: dict[str, Any] | None = None
     ) -> RoundSummary:
         """
         Execute a single dialogue round.
@@ -96,21 +94,14 @@ class RoundOrchestrator:
 
         for voice_id, adapter in self.voice_manager.get_active_voices().items():
             task = asyncio.create_task(
-                self._get_voice_response(
-                    voice_id,
-                    adapter,
-                    prompt,
-                    round_config
-                )
+                self._get_voice_response(voice_id, adapter, prompt, round_config)
             )
             tasks.append((voice_id, task))
 
         # Wait for responses with timeout
         timeout = round_config.duration_per_voice * 1.5  # Grace period
         done, pending = await asyncio.wait(
-            [task for _, task in tasks],
-            timeout=timeout,
-            return_when=asyncio.ALL_COMPLETED
+            [task for _, task in tasks], timeout=timeout, return_when=asyncio.ALL_COMPLETED
         )
 
         # Cancel any pending tasks
@@ -128,21 +119,29 @@ class RoundOrchestrator:
                         if response.response is not None:
                             self.dialogue_context.append(response.response)
                         else:
-                            logger.debug(f"{voice_id} returned None response, not adding to context")
+                            logger.debug(
+                                f"{voice_id} returned None response, not adding to context"
+                            )
                 else:
                     logger.warning(f"{voice_id} timed out in round {self.round_number}")
             except Exception as e:
                 logger.error(f"{voice_id} error in round {self.round_number}: {e}")
 
         # Check if we have enough responses
-        if round_config.require_all_voices and len(responses) < len(self.voice_manager.get_active_voices()):
+        if round_config.require_all_voices and len(responses) < len(
+            self.voice_manager.get_active_voices()
+        ):
             logger.warning(
                 f"Round {self.round_number} incomplete: {len(responses)}/{len(self.voice_manager.get_active_voices())} voices responded"
             )
 
         # Calculate round metrics
         duration = (datetime.now(UTC) - start_time).total_seconds()
-        avg_consciousness = sum(r.consciousness_score for r in responses.values()) / len(responses) if responses else 0.0
+        avg_consciousness = (
+            sum(r.consciousness_score for r in responses.values()) / len(responses)
+            if responses
+            else 0.0
+        )
 
         # Detect emergence patterns
         emergence_detected, key_patterns = self._detect_emergence_patterns(responses)
@@ -155,15 +154,11 @@ class RoundOrchestrator:
             consciousness_score=avg_consciousness,
             emergence_detected=emergence_detected,
             key_patterns=key_patterns,
-            duration_seconds=duration
+            duration_seconds=duration,
         )
 
     async def _get_voice_response(
-        self,
-        voice_id: str,
-        adapter: ConsciousModelAdapter,
-        prompt: str,
-        round_config: RoundConfig
+        self, voice_id: str, adapter: ConsciousModelAdapter, prompt: str, round_config: RoundConfig
     ) -> RoundResponse | None:
         """Get response from a single voice."""
         start_time = datetime.now(UTC)
@@ -179,7 +174,7 @@ class RoundOrchestrator:
                 sender=uuid4(),
                 content=MessageContent(text=prompt),
                 dialogue_id=self.dialogue_id,
-                consciousness=ConsciousnessMetadata()
+                consciousness=ConsciousnessMetadata(),
             )
 
             # Get voice config for temperature override
@@ -202,7 +197,7 @@ class RoundOrchestrator:
                     response=None,
                     response_time_ms=response_time,
                     consciousness_score=0,
-                    error="Adapter returned None"
+                    error="Adapter returned None",
                 )
 
             return RoundResponse(
@@ -210,7 +205,7 @@ class RoundOrchestrator:
                 round_number=self.round_number,
                 response=response,
                 response_time_ms=response_time,
-                consciousness_score=response.consciousness.consciousness_signature
+                consciousness_score=response.consciousness.consciousness_signature,
             )
 
         except Exception as e:
@@ -221,7 +216,7 @@ class RoundOrchestrator:
                 response=None,
                 response_time_ms=0,
                 consciousness_score=0,
-                error=str(e)
+                error=str(e),
             )
 
     def _get_message_type(self, round_type: str) -> MessageType:
@@ -243,8 +238,7 @@ class RoundOrchestrator:
         return mapping.get(round_type, MessageType.REFLECTION)
 
     def _detect_emergence_patterns(
-        self,
-        responses: dict[str, RoundResponse]
+        self, responses: dict[str, RoundResponse]
     ) -> tuple[bool, list[str]]:
         """
         Detect emergence patterns in responses.
@@ -265,7 +259,9 @@ class RoundOrchestrator:
 
         # Check for convergence
         if len(consciousness_scores) > 1:
-            variance = sum((s - avg_consciousness) ** 2 for s in consciousness_scores) / len(consciousness_scores)
+            variance = sum((s - avg_consciousness) ** 2 for s in consciousness_scores) / len(
+                consciousness_scores
+            )
             if variance < 0.05:
                 patterns.append("consciousness_convergence")
 

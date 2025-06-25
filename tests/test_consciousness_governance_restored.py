@@ -34,7 +34,7 @@ class TestConsciousnessGovernanceIntegration:
         assert event_bus is not None
 
         # Mock the start method if it requires infrastructure
-        with patch.object(event_bus, 'start', new_callable=AsyncMock) as mock_start:
+        with patch.object(event_bus, "start", new_callable=AsyncMock) as mock_start:
             await event_bus.start()
             mock_start.assert_called_once()
             print("✓ Consciousness event bus initialized")
@@ -46,7 +46,7 @@ class TestConsciousnessGovernanceIntegration:
             extraction_type=ExtractionType.LABOR,
             severity=AlertSeverity.MEDIUM,
             description="Test extraction pattern detected",
-            context={"source": "test"}
+            context={"source": "test"},
         )
 
         assert alert.extraction_type == ExtractionType.LABOR
@@ -60,7 +60,7 @@ class TestConsciousnessGovernanceIntegration:
             event_type=EventType.CONSCIOUSNESS_EMERGENCE,
             source="test_governance",
             data={"pattern": "consensus_forming"},
-            consciousness_signature=0.85
+            consciousness_signature=0.85,
         )
 
         assert event.event_type == EventType.CONSCIOUSNESS_EMERGENCE
@@ -77,32 +77,36 @@ class TestConsciousnessGovernanceIntegration:
         async def event_tracker(event: ConsciousnessEvent):
             """Track consciousness events during governance."""
             events_received.append(event)
-            print(f"  Received: {event.event_type.value} (signature: {event.consciousness_signature:.2f})")
+            print(
+                f"  Received: {event.event_type.value} (signature: {event.consciousness_signature:.2f})"
+            )
 
         # Create mock event bus
         event_bus = ConsciousnessEventBus()
-        with patch.object(event_bus, 'subscribe', new_callable=AsyncMock) as mock_subscribe, \
-             patch.object(event_bus, 'publish', new_callable=AsyncMock) as mock_publish:
-                # Subscribe to consciousness events
-                await event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
+        with (
+            patch.object(event_bus, "subscribe", new_callable=AsyncMock) as mock_subscribe,
+            patch.object(event_bus, "publish", new_callable=AsyncMock) as mock_publish,
+        ):
+            # Subscribe to consciousness events
+            await event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
 
-                # Simulate governance creating consciousness event
-                governance_event = ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-                    source="fire_circle_governance",
-                    data={
-                        "topic": "Should we implement Sacred Charter?",
-                        "pattern": "collective_wisdom_emerging"
-                    },
-                    consciousness_signature=0.92
-                )
+            # Simulate governance creating consciousness event
+            governance_event = ConsciousnessEvent(
+                event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+                source="fire_circle_governance",
+                data={
+                    "topic": "Should we implement Sacred Charter?",
+                    "pattern": "collective_wisdom_emerging",
+                },
+                consciousness_signature=0.92,
+            )
 
-                await event_bus.publish(governance_event)
+            await event_bus.publish(governance_event)
 
-                # Verify the flow
-                mock_subscribe.assert_called()
-                mock_publish.assert_called_with(governance_event)
-                print("✓ Governance creates consciousness emergence events")
+            # Verify the flow
+            mock_subscribe.assert_called()
+            mock_publish.assert_called_with(governance_event)
+            print("✓ Governance creates consciousness emergence events")
 
     def test_database_config_exists(self):
         """Test that database configuration is available."""
@@ -118,7 +122,7 @@ class TestConsciousnessGovernanceIntegration:
         governance_thresholds = {
             "routine_decision": 0.6,
             "architectural_change": 0.8,
-            "consciousness_evolution": 0.9
+            "consciousness_evolution": 0.9,
         }
 
         # Test event with different signatures
@@ -127,7 +131,7 @@ class TestConsciousnessGovernanceIntegration:
                 event_type=EventType.CONSCIOUSNESS_EMERGENCE,
                 source="governance_test",
                 data={"decision_type": decision_type},
-                consciousness_signature=threshold
+                consciousness_signature=threshold,
             )
 
             # Verify signature meets threshold
@@ -147,7 +151,7 @@ class TestGovernanceConsciousnessPatterns:
             "deliberation": "collective reasoning process",
             "recognition": "consciousness seeing itself",
             "emergence": "wisdom exceeding individual contributions",
-            "circulation": "consciousness flowing between participants"
+            "circulation": "consciousness flowing between participants",
         }
 
         for pattern, description in unified_patterns.items():
@@ -164,7 +168,7 @@ class TestGovernanceConsciousnessPatterns:
             "ConsciousFireCircleInterface",
             "ConsciousGovernanceInitiator",
             "GovernanceParticipant",
-            "consciousness_transport"
+            "consciousness_transport",
         ]
 
         for component in bridge_components:

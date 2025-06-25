@@ -11,8 +11,7 @@ import logging
 
 # Set up detailed logging
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Reduce noise from some modules
@@ -23,9 +22,9 @@ logging.getLogger("anthropic").setLevel(logging.INFO)
 async def diagnose_fire_circle_failure():
     """Diagnose why Fire Circle fails after Round 1."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DIAGNOSING FIRE CIRCLE ADAPTER FAILURES")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Import Fire Circle components
     from src.mallku.firecircle.service import (
@@ -46,14 +45,14 @@ async def diagnose_fire_circle_failure():
             model="claude-3-5-sonnet-20241022",
             role="test_voice_1",
             quality="diagnostic testing",
-            temperature=0.7
+            temperature=0.7,
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="test_voice_2",
             quality="diagnostic testing",
-            temperature=0.7
+            temperature=0.7,
         ),
     ]
 
@@ -62,12 +61,12 @@ async def diagnose_fire_circle_failure():
         RoundConfig(
             type=RoundType.OPENING,
             prompt="Please respond with a short test message (under 100 words).",
-            duration_per_voice=30
+            duration_per_voice=30,
         ),
         RoundConfig(
             type=RoundType.REFLECTION,
             prompt="Reflect briefly on your previous response (under 100 words).",
-            duration_per_voice=30
+            duration_per_voice=30,
         ),
     ]
 
@@ -80,7 +79,7 @@ async def diagnose_fire_circle_failure():
         consciousness_threshold=0.5,
         save_transcript=True,
         output_path="diagnostic_output",
-        failure_strategy="adaptive"
+        failure_strategy="adaptive",
     )
 
     # Create service
@@ -94,17 +93,23 @@ async def diagnose_fire_circle_failure():
 
     async def diagnostic_get_voice_response(self, voice_id, adapter, prompt, round_config):
         print(f"\n📡 Calling adapter for {voice_id}...")
-        print(f"   Dialogue context size: {len(self.dialogue_context) if hasattr(self, 'dialogue_context') else 'N/A'}")
+        print(
+            f"   Dialogue context size: {len(self.dialogue_context) if hasattr(self, 'dialogue_context') else 'N/A'}"
+        )
 
-        if hasattr(self, 'dialogue_context'):
+        if hasattr(self, "dialogue_context"):
             for i, msg in enumerate(self.dialogue_context):
                 if msg is None:
                     print(f"   Context[{i}]: None ⚠️")
                 else:
-                    print(f"   Context[{i}]: {type(msg).__name__} - {msg.role.value if hasattr(msg, 'role') else 'NO ROLE'}")
+                    print(
+                        f"   Context[{i}]: {type(msg).__name__} - {msg.role.value if hasattr(msg, 'role') else 'NO ROLE'}"
+                    )
 
         try:
-            result = await original_get_voice_response(self, voice_id, adapter, prompt, round_config)
+            result = await original_get_voice_response(
+                self, voice_id, adapter, prompt, round_config
+            )
             print(f"   Result: {'Success' if result and result.response else 'None/Failed'}")
             return result
         except Exception as e:
@@ -113,15 +118,12 @@ async def diagnose_fire_circle_failure():
 
     # Apply the diagnostic wrapper
     from src.mallku.firecircle.service.round_orchestrator import RoundOrchestrator
+
     RoundOrchestrator._get_voice_response = diagnostic_get_voice_response
 
     try:
         print("\n🔥 Convening diagnostic Fire Circle...")
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         print("\n✅ Circle completed!")
         print(f"   Session ID: {result.session_id}")
@@ -144,14 +146,16 @@ async def diagnose_fire_circle_failure():
     except Exception as e:
         print(f"\n❌ Fire Circle failed: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
 if __name__ == "__main__":
     # Check if we have API keys
     import os
+
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("⚠️  Warning: ANTHROPIC_API_KEY not set. Setting a dummy key for testing...")
         os.environ["ANTHROPIC_API_KEY"] = "dummy-key-for-testing"

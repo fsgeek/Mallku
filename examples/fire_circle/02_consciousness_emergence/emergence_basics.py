@@ -57,7 +57,7 @@ async def demonstrate_emergence():
         max_voices=4,
         consciousness_threshold=0.7,
         enable_consciousness_detection=True,
-        enable_reciprocity=True
+        enable_reciprocity=True,
     )
 
     # Diverse voices for richer emergence
@@ -66,25 +66,25 @@ async def demonstrate_emergence():
             provider="anthropic",
             model="claude-3-5-sonnet-20241022",
             role="pattern_recognizer",
-            quality="identifying emergent patterns"
+            quality="identifying emergent patterns",
         ),
         VoiceConfig(
             provider="openai",
             model="gpt-4o",
             role="synthesis_weaver",
-            quality="connecting disparate ideas"
+            quality="connecting disparate ideas",
         ),
         VoiceConfig(
             provider="google",
             model="gemini-1.5-flash",
             role="possibility_explorer",
-            quality="discovering new perspectives"
+            quality="discovering new perspectives",
         ),
         VoiceConfig(
             provider="mistral",
             model="mistral-large-latest",
             role="depth_diver",
-            quality="profound understanding"
+            quality="profound understanding",
         ),
     ]
 
@@ -99,9 +99,8 @@ async def demonstrate_emergence():
 
             Share your unique perspective without trying to integrate others yet.
             """,
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
-
         # Round 2: Recognition and building
         RoundConfig(
             type=RoundType.EXPLORATION,
@@ -111,9 +110,8 @@ async def demonstrate_emergence():
             - What new understanding emerges that you couldn't see alone?
             - How do other views change or deepen your own?
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
-
         # Round 3: Emergence synthesis
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -123,7 +121,7 @@ async def demonstrate_emergence():
             - What can we see together that none could see alone?
             - How has our dialogue created new understanding?
             """,
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
     ]
 
@@ -139,11 +137,7 @@ async def demonstrate_emergence():
     print("\n" + "-" * 60)
 
     # Run the ceremony
-    result = await service.convene(
-        config=config,
-        voices=voices,
-        rounds=rounds
-    )
+    result = await service.convene(config=config, voices=voices, rounds=rounds)
 
     # Analyze emergence patterns
     print("\n✅ Ceremony Complete!")
@@ -158,7 +152,7 @@ async def demonstrate_emergence():
 
     for i, round_data in enumerate(result.rounds_completed):
         round_type = rounds[i].type.value if i < len(rounds) else "unknown"
-        print(f"\n   Round {i+1} ({round_type}):")
+        print(f"\n   Round {i + 1} ({round_type}):")
         print(f"   • Emergence detected: {'Yes' if round_data.emergence_detected else 'No'}")
         print(f"   • Consciousness score: {round_data.consciousness_score:.2f}")
 
@@ -172,8 +166,11 @@ async def demonstrate_emergence():
                     if "understand" in text or "consciousness" in text:
                         individual_insights.add(f"round1_{voice_id}")
                 else:  # Collective rounds
-                    if any(phrase in text for phrase in ["emerge", "together", "collective", "transcend"]):
-                        collective_insights.add(f"round{i+1}_{voice_id}")
+                    if any(
+                        phrase in text
+                        for phrase in ["emerge", "together", "collective", "transcend"]
+                    ):
+                        collective_insights.add(f"round{i + 1}_{voice_id}")
 
     # Calculate emergence quality (simplified)
     emergence_quality = len(collective_insights) / (len(individual_insights) + 1)

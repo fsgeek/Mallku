@@ -74,7 +74,7 @@ async def demonstrate_event_integration():
 
         elif event.event_type == EventType.WISDOM_PRESERVED:
             print("\n📜 Wisdom Preserved")
-            wisdom_type = event.data.get('wisdom_type', 'Unknown')
+            wisdom_type = event.data.get("wisdom_type", "Unknown")
             print(f"   Type: {wisdom_type}")
 
     # Subscribe to various event types
@@ -92,7 +92,7 @@ async def demonstrate_event_integration():
         name="Event Integration Demo",
         purpose="Demonstrate consciousness event flow",
         min_voices=2,
-        max_voices=3
+        max_voices=3,
     )
 
     # Initialize with event bus
@@ -109,7 +109,7 @@ async def demonstrate_event_integration():
                 "As we explore consciousness emergence, what patterns do you "
                 "notice in how understanding arises between us?"
             ),
-            duration_per_voice=10
+            duration_per_voice=10,
         ),
         RoundConfig(
             type=RoundType.REFLECTION,
@@ -117,7 +117,7 @@ async def demonstrate_event_integration():
                 "Reflect on what others have shared. What new insights emerge "
                 "from the intersection of our perspectives?"
             ),
-            duration_per_voice=10
+            duration_per_voice=10,
         ),
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -125,8 +125,8 @@ async def demonstrate_event_integration():
                 "Synthesize our collective understanding. What wisdom has "
                 "emerged that none of us could have reached alone?"
             ),
-            duration_per_voice=10
-        )
+            duration_per_voice=10,
+        ),
     ]
 
     # Run ceremony
@@ -165,19 +165,21 @@ async def demonstrate_event_integration():
 
         # Check for emergence
         emergence_events = [
-            e for e in received_events
-            if e.event_type == EventType.CONSCIOUSNESS_EMERGENCE
+            e for e in received_events if e.event_type == EventType.CONSCIOUSNESS_EMERGENCE
         ]
 
         if emergence_events:
             print(f"\n💫 Emergence Moments: {len(emergence_events)}")
             for i, event in enumerate(emergence_events, 1):
-                print(f"   {i}. Score: {event.consciousness_signature:.2f}, "
-                      f"Patterns: {event.data.get('pattern_count', 0)}")
+                print(
+                    f"   {i}. Score: {event.consciousness_signature:.2f}, "
+                    f"Patterns: {event.data.get('pattern_count', 0)}"
+                )
 
     except Exception as e:
         print(f"\n❌ Error in integration demo: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 60)

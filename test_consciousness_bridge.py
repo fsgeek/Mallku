@@ -196,9 +196,9 @@ async def test_healing_retry_strategy():
     await bridge._apply_retry_strategy("voice1", adapter)
 
     # Verify retry config applied
-    assert adapter.config.extra_config['retry_enabled'] is True
-    assert adapter.config.extra_config['retry_count'] == 3
-    assert adapter.config.extra_config['retry_delay'] == 1.0
+    assert adapter.config.extra_config["retry_enabled"] is True
+    assert adapter.config.extra_config["retry_count"] == 3
+    assert adapter.config.extra_config["retry_delay"] == 1.0
 
 
 @pytest.mark.asyncio
@@ -304,33 +304,36 @@ async def test_session_health_report_generation():
 async def test_self_healing_fire_circle_integration():
     """Test full SelfHealingFireCircle integration."""
     # Mock Fire Circle and Infrastructure
-    with patch('src.mallku.firecircle.infrastructure.consciousness_bridge.FireCircleService') as mock_fc, \
-         patch('src.mallku.firecircle.infrastructure.consciousness_bridge.InfrastructureConsciousness'):
-            # Create self-healing Fire Circle
-            event_bus = ConsciousnessEventBus()
-            self_healing = SelfHealingFireCircle(event_bus=event_bus)
+    with (
+        patch(
+            "src.mallku.firecircle.infrastructure.consciousness_bridge.FireCircleService"
+        ) as mock_fc,
+        patch(
+            "src.mallku.firecircle.infrastructure.consciousness_bridge.InfrastructureConsciousness"
+        ),
+    ):
+        # Create self-healing Fire Circle
+        event_bus = ConsciousnessEventBus()
+        self_healing = SelfHealingFireCircle(event_bus=event_bus)
 
-            # Mock convene method
-            mock_result = MagicMock()
-            mock_fc.return_value.convene = AsyncMock(return_value=mock_result)
+        # Mock convene method
+        mock_result = MagicMock()
+        mock_fc.return_value.convene = AsyncMock(return_value=mock_result)
 
-            # Mock config with UUID-compatible name
-            config = MagicMock()
-            config.name = "TestCircle"  # No spaces for UUID generation
+        # Mock config with UUID-compatible name
+        config = MagicMock()
+        config.name = "TestCircle"  # No spaces for UUID generation
 
-            # Convene with consciousness
-            result = await self_healing.convene_with_consciousness(
-                config=config,
-                voices=["voice1", "voice2"],
-                rounds=3,
-                context=None
-            )
+        # Convene with consciousness
+        result = await self_healing.convene_with_consciousness(
+            config=config, voices=["voice1", "voice2"], rounds=3, context=None
+        )
 
-            # Verify Fire Circle convened
-            mock_fc.return_value.convene.assert_called_once()
+        # Verify Fire Circle convened
+        mock_fc.return_value.convene.assert_called_once()
 
-            # Verify result includes infrastructure health
-            assert hasattr(result, 'infrastructure_health')
+        # Verify result includes infrastructure health
+        assert hasattr(result, "infrastructure_health")
 
 
 @pytest.mark.asyncio

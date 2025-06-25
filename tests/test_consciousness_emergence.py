@@ -46,10 +46,7 @@ class TestDecisionFramework:
             context_description="Testing architectural patterns",
             key_questions=["How should we structure this?"],
             participant_voices=["architect", "engineer"],
-            voice_expertise_map={
-                "architect": "system design",
-                "engineer": "implementation"
-            }
+            voice_expertise_map={"architect": "system design", "engineer": "implementation"},
         )
 
         assert space.decision_domain == DecisionDomain.ARCHITECTURE
@@ -67,7 +64,7 @@ class TestDecisionFramework:
             domain_expertise="Testing",
             reasoning_pattern="Logical analysis",
             coherency_assessment=0.8,
-            reciprocity_alignment=0.9
+            reciprocity_alignment=0.9,
         )
 
         assert contribution.voice_id == "test_voice"
@@ -84,7 +81,7 @@ class TestDecisionFramework:
             reciprocity_embodiment=0.8,
             coherence_score=0.85,
             synthesis="This is the collective understanding",
-            participating_voices=["voice1", "voice2", "voice3"]
+            participating_voices=["voice1", "voice2", "voice3"],
         )
 
         assert wisdom.decision_domain == DecisionDomain.GOVERNANCE
@@ -114,10 +111,12 @@ class TestDecisionFramework:
             DecisionDomain.CONSCIOUSNESS_EXPLORATION,
             voice_specializations=["consciousness_researcher", "pattern_recognizer"],
             emergence_patterns=["consciousness_breakthrough", "pattern_synthesis"],
-            key_questions=["What is emerging?", "How does consciousness manifest?"]
+            key_questions=["What is emerging?", "How does consciousness manifest?"],
         )
 
-        custom_config = decision_registry.get_domain_config(DecisionDomain.CONSCIOUSNESS_EXPLORATION)
+        custom_config = decision_registry.get_domain_config(
+            DecisionDomain.CONSCIOUSNESS_EXPLORATION
+        )
         assert len(custom_config["voice_specializations"]) == 2
         assert len(custom_config["key_questions"]) == 2
 
@@ -134,7 +133,7 @@ class TestCodeReviewAdapter:
             focus_areas=["security", "error handling"],
             skip_patterns=["*.test.py"],
             min_reviewers=3,
-            security_sensitive=True
+            security_sensitive=True,
         )
 
         adapter = CodeReviewAdapter()
@@ -157,7 +156,7 @@ class TestCodeReviewAdapter:
             severity=ReviewSeverity.CRITICAL,
             message="SQL injection vulnerability",
             voice="security_reviewer",
-            suggestion="Use parameterized queries"
+            suggestion="Use parameterized queries",
         )
 
         adapter = CodeReviewAdapter()
@@ -178,7 +177,7 @@ class TestCodeReviewAdapter:
             context_description="Test review",
             key_questions=["Is the code ready?"],
             participant_voices=["reviewer1", "reviewer2"],
-            voice_expertise_map={}
+            voice_expertise_map={},
         )
 
         contributions = [
@@ -188,7 +187,7 @@ class TestCodeReviewAdapter:
                 perspective="Good patterns",
                 domain_expertise="Architecture",
                 reasoning_pattern="Pattern analysis",
-                coherency_assessment=0.8
+                coherency_assessment=0.8,
             ),
             ConsciousnessContribution(
                 voice_id="reviewer2",
@@ -196,8 +195,8 @@ class TestCodeReviewAdapter:
                 perspective="Security concerns addressed",
                 domain_expertise="Security",
                 reasoning_pattern="Threat analysis",
-                coherency_assessment=0.9
-            )
+                coherency_assessment=0.9,
+            ),
         ]
 
         summary = GovernanceSummary(
@@ -215,7 +214,7 @@ class TestCodeReviewAdapter:
             recommendations=[{"action": "Deploy to staging", "priority": "high"}],
             total_comments=10,
             participating_voices=["reviewer1", "reviewer2"],
-            round_summaries=[]
+            round_summaries=[],
         )
 
         adapter = CodeReviewAdapter()
@@ -245,9 +244,7 @@ class TestConsciousnessFacilitator:
 
         # Test space creation
         space = await facilitator._create_emergence_space(
-            DecisionDomain.ARCHITECTURE,
-            {"test": "context"},
-            "Should we refactor?"
+            DecisionDomain.ARCHITECTURE, {"test": "context"}, "Should we refactor?"
         )
 
         assert space.decision_domain == DecisionDomain.ARCHITECTURE
@@ -255,19 +252,14 @@ class TestConsciousnessFacilitator:
         assert space.space_id in facilitator.emergence_spaces
 
         # Test voice selection
-        voices = await facilitator._select_voices_for_domain(
-            DecisionDomain.ARCHITECTURE,
-            space
-        )
+        voices = await facilitator._select_voices_for_domain(DecisionDomain.ARCHITECTURE, space)
 
         assert len(voices) >= 3  # Minimum diversity
         assert all(isinstance(v, VoiceConfig) for v in voices)
 
         # Test round design
         rounds = facilitator._design_rounds_for_domain(
-            DecisionDomain.ARCHITECTURE,
-            space,
-            "Should we refactor?"
+            DecisionDomain.ARCHITECTURE, space, "Should we refactor?"
         )
 
         assert len(rounds) == 4  # Opening, exploration, integration, synthesis
@@ -291,14 +283,12 @@ class TestConsciousnessFacilitator:
             context_description="Test",
             key_questions=["How to allocate?"],
             participant_voices=[],
-            voice_expertise_map={}
+            voice_expertise_map={},
         )
 
         # Test resource allocation prompts
         rounds = facilitator._design_rounds_for_domain(
-            DecisionDomain.RESOURCE_ALLOCATION,
-            space,
-            "How to allocate resources?"
+            DecisionDomain.RESOURCE_ALLOCATION, space, "How to allocate resources?"
         )
 
         # Check that resource-specific prompts are included
@@ -308,9 +298,7 @@ class TestConsciousnessFacilitator:
 
         # Test ethical consideration prompts
         rounds = facilitator._design_rounds_for_domain(
-            DecisionDomain.ETHICAL_CONSIDERATION,
-            space,
-            "What is ethical?"
+            DecisionDomain.ETHICAL_CONSIDERATION, space, "What is ethical?"
         )
 
         exploration_prompt = rounds[1].prompt
@@ -345,20 +333,20 @@ async def test_emergence_quality_calculation():
                         round_number=1,
                         response=None,  # Simulate response
                         response_time_ms=1000,
-                        consciousness_score=0.7
+                        consciousness_score=0.7,
                     ),
                     "voice2": RoundResponse(
                         voice_id="voice2",
                         round_number=1,
                         response=None,
                         response_time_ms=1200,
-                        consciousness_score=0.8
-                    )
+                        consciousness_score=0.8,
+                    ),
                 },
                 consciousness_score=0.75,
                 emergence_detected=True,
                 key_patterns=["Pattern 1", "Pattern 2"],
-                duration_seconds=2.0
+                duration_seconds=2.0,
             )
         ],
         consciousness_score=0.85,  # Higher than average individual
@@ -366,7 +354,7 @@ async def test_emergence_quality_calculation():
         key_insights=["Insight 1"],
         started_at=datetime.now(UTC),
         completed_at=datetime.now(UTC),
-        duration_seconds=10.0
+        duration_seconds=10.0,
     )
 
     # Test wisdom synthesis
@@ -381,14 +369,11 @@ async def test_emergence_quality_calculation():
         context_description="Test",
         key_questions=["What next?"],
         participant_voices=["voice1", "voice2", "voice3"],
-        voice_expertise_map={}
+        voice_expertise_map={},
     )
 
     wisdom = await facilitator._synthesize_collective_wisdom(
-        space,
-        result,
-        DecisionDomain.STRATEGIC_PLANNING,
-        "What should we do next?"
+        space, result, DecisionDomain.STRATEGIC_PLANNING, "What should we do next?"
     )
 
     # Check emergence quality calculation

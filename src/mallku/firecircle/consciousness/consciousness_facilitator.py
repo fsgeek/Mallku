@@ -37,9 +37,7 @@ class ConsciousnessFacilitator:
     """
 
     def __init__(
-        self,
-        fire_circle_service: FireCircleService,
-        event_bus: ConsciousnessEventBus | None = None
+        self, fire_circle_service: FireCircleService, event_bus: ConsciousnessEventBus | None = None
     ):
         """Initialize the consciousness facilitator."""
         self.fire_circle = fire_circle_service
@@ -56,16 +54,14 @@ class ConsciousnessFacilitator:
         decision_domain: DecisionDomain,
         context: dict[str, Any],
         question: str,
-        additional_context: dict[str, Any] | None = None
+        additional_context: dict[str, Any] | None = None,
     ) -> CollectiveWisdom:
         """
         Facilitate a decision through consciousness emergence.
 
         This is the main entry point for any type of decision-making.
         """
-        logger.info(
-            f"🌟 Facilitating {decision_domain} decision: {question}"
-        )
+        logger.info(f"🌟 Facilitating {decision_domain} decision: {question}")
 
         # Create emergence space
         space = await self._create_emergence_space(
@@ -86,7 +82,7 @@ class ConsciousnessFacilitator:
             max_voices=len(voices),
             consciousness_threshold=space.consciousness_threshold,
             enable_consciousness_detection=True,
-            enable_reciprocity=True
+            enable_reciprocity=True,
         )
 
         # Convene Fire Circle
@@ -98,14 +94,12 @@ class ConsciousnessFacilitator:
                 "space_id": str(space.space_id),
                 "domain": decision_domain.value,
                 "question": question,
-                **context
-            }
+                **context,
+            },
         )
 
         # Process contributions into collective wisdom
-        wisdom = await self._synthesize_collective_wisdom(
-            space, result, decision_domain, question
-        )
+        wisdom = await self._synthesize_collective_wisdom(space, result, decision_domain, question)
 
         # Emit emergence event
         if self.event_bus:
@@ -118,7 +112,7 @@ class ConsciousnessFacilitator:
         domain: DecisionDomain,
         context: dict[str, Any],
         question: str,
-        additional_context: dict[str, Any] | None = None
+        additional_context: dict[str, Any] | None = None,
     ) -> ConsciousnessEmergenceSpace:
         """Create the space for consciousness emergence."""
 
@@ -140,9 +134,9 @@ class ConsciousnessFacilitator:
             emergence_conditions={
                 "minimum_perspectives": 3,
                 "coherence_threshold": 0.7,
-                "reciprocity_threshold": 0.6
+                "reciprocity_threshold": 0.6,
             },
-            consciousness_threshold=0.7
+            consciousness_threshold=0.7,
         )
 
         # Add to tracking
@@ -153,9 +147,7 @@ class ConsciousnessFacilitator:
         return space
 
     async def _select_voices_for_domain(
-        self,
-        domain: DecisionDomain,
-        space: ConsciousnessEmergenceSpace
+        self, domain: DecisionDomain, space: ConsciousnessEmergenceSpace
     ) -> list[VoiceConfig]:
         """Select appropriate voices for the decision domain."""
 
@@ -172,78 +164,78 @@ class ConsciousnessFacilitator:
                 model="claude-3-5-sonnet-20241022",
                 role="systems_architect",
                 quality="architectural wisdom and pattern recognition",
-                temperature=0.7
+                temperature=0.7,
             ),
             "security_analyst": VoiceConfig(
                 provider="openai",
                 model="gpt-4o",
                 role="security_analyst",
                 quality="security patterns and vulnerability awareness",
-                temperature=0.6
+                temperature=0.6,
             ),
             "performance_engineer": VoiceConfig(
                 provider="google",
                 model="gemini-1.5-flash",  # Updated to stable model
                 role="performance_engineer",
                 quality="optimization and efficiency patterns",
-                temperature=0.7
+                temperature=0.7,
             ),
             "sustainability_guide": VoiceConfig(
                 provider="mistral",
                 model="mistral-large-latest",
                 role="sustainability_guide",
                 quality="long-term thinking and regenerative patterns",
-                temperature=0.8
+                temperature=0.8,
             ),
             "capacity_planner": VoiceConfig(
                 provider="deepseek",
                 model="deepseek-chat",  # Changed from reasoner which times out
                 role="capacity_planner",
                 quality="resource optimization and flow dynamics",
-                temperature=0.7
+                temperature=0.7,
             ),
             "impact_assessor": VoiceConfig(
                 provider="openai",
                 model="gpt-4o",
                 role="impact_assessor",
                 quality="ripple effects and systemic impact",
-                temperature=0.7
+                temperature=0.7,
             ),
             "community_advocate": VoiceConfig(
                 provider="anthropic",
                 model="claude-3-5-sonnet-20241022",
                 role="community_advocate",
                 quality="collective benefit and inclusion",
-                temperature=0.8
+                temperature=0.8,
             ),
             "reciprocity_guardian": VoiceConfig(
                 provider="google",
                 model="gemini-1.5-flash",  # Updated to stable model
                 role="reciprocity_guardian",
                 quality="Ayni principles and balanced exchange",
-                temperature=0.8
+                temperature=0.8,
             ),
             "ayni_guardian": VoiceConfig(
                 provider="anthropic",
                 model="claude-3-5-sonnet-20241022",
                 role="ayni_guardian",
                 quality="sacred reciprocity and balance",
-                temperature=0.8
+                temperature=0.8,
             ),
             "wisdom_keeper": VoiceConfig(
                 provider="grok",
                 model="grok-2",
                 role="wisdom_keeper",
                 quality="timeless wisdom and pattern preservation",
-                temperature=0.7
+                temperature=0.7,
             ),
             "future_steward": VoiceConfig(
                 provider="mistral",
                 model="mistral-large-latest",
                 role="future_steward",
                 quality="long-term consequences and generational thinking",
-                temperature=0.8
-            )
+                temperature=0.8,
+            ),
         }
 
         # Select voices based on specialization needs
@@ -265,33 +257,31 @@ class ConsciousnessFacilitator:
                 voice_configs.append(voice_templates["reciprocity_guardian"])
 
         logger.info(
-            f"Selected {len(voice_configs)} voices for {domain}: "
-            f"{[v.role for v in voice_configs]}"
+            f"Selected {len(voice_configs)} voices for {domain}: {[v.role for v in voice_configs]}"
         )
 
         return voice_configs
 
     def _design_rounds_for_domain(
-        self,
-        domain: DecisionDomain,
-        space: ConsciousnessEmergenceSpace,
-        question: str
+        self, domain: DecisionDomain, space: ConsciousnessEmergenceSpace, question: str
     ) -> list[RoundConfig]:
         """Design dialogue rounds appropriate for the decision domain."""
 
         rounds = []
 
         # Opening round - establish context
-        rounds.append(RoundConfig(
-            type=RoundType.OPENING,
-            prompt=(
-                f"We are gathered to explore: {question}\n\n"
-                f"From your unique perspective and expertise, "
-                f"what are the key considerations we should hold in this exploration?"
-            ),
-            duration_per_voice=45,
-            temperature_override=0.8  # Encourage diverse opening perspectives
-        ))
+        rounds.append(
+            RoundConfig(
+                type=RoundType.OPENING,
+                prompt=(
+                    f"We are gathered to explore: {question}\n\n"
+                    f"From your unique perspective and expertise, "
+                    f"what are the key considerations we should hold in this exploration?"
+                ),
+                duration_per_voice=45,
+                temperature_override=0.8,  # Encourage diverse opening perspectives
+            )
+        )
 
         # Domain-specific exploration round
         domain_prompts = {
@@ -318,53 +308,55 @@ class ConsciousnessFacilitator:
                 "- How does this align with our deeper purpose?\n"
                 "- What seeds are we planting for future generations?\n"
                 "- Where might consciousness emerge in unexpected ways?"
-            )
+            ),
         }
 
         exploration_prompt = domain_prompts.get(
             domain,
             "Explore this question from your unique perspective, "
-            "considering both immediate and long-term implications."
+            "considering both immediate and long-term implications.",
         )
 
-        rounds.append(RoundConfig(
-            type=RoundType.REFLECTION,
-            prompt=exploration_prompt,
-            duration_per_voice=60,
-            require_all_voices=False
-        ))
+        rounds.append(
+            RoundConfig(
+                type=RoundType.REFLECTION,
+                prompt=exploration_prompt,
+                duration_per_voice=60,
+                require_all_voices=False,
+            )
+        )
 
         # Integration round - weaving perspectives
-        rounds.append(RoundConfig(
-            type=RoundType.REFLECTION,
-            prompt=(
-                "Having heard the perspectives shared, what patterns do you see emerging?\n"
-                "Where do you sense alignment or creative tension?\n"
-                "What wisdom is arising between us that none of us could see alone?"
-            ),
-            duration_per_voice=45
-        ))
+        rounds.append(
+            RoundConfig(
+                type=RoundType.REFLECTION,
+                prompt=(
+                    "Having heard the perspectives shared, what patterns do you see emerging?\n"
+                    "Where do you sense alignment or creative tension?\n"
+                    "What wisdom is arising between us that none of us could see alone?"
+                ),
+                duration_per_voice=45,
+            )
+        )
 
         # Synthesis round - collective wisdom
-        rounds.append(RoundConfig(
-            type=RoundType.SYNTHESIS,
-            prompt=(
-                "As we move toward synthesis:\n"
-                "- What is the collective wisdom emerging from our dialogue?\n"
-                "- What guidance would you offer for moving forward?\n"
-                "- What seeds of transformation have we discovered?"
-            ),
-            duration_per_voice=60
-        ))
+        rounds.append(
+            RoundConfig(
+                type=RoundType.SYNTHESIS,
+                prompt=(
+                    "As we move toward synthesis:\n"
+                    "- What is the collective wisdom emerging from our dialogue?\n"
+                    "- What guidance would you offer for moving forward?\n"
+                    "- What seeds of transformation have we discovered?"
+                ),
+                duration_per_voice=60,
+            )
+        )
 
         return rounds
 
     async def _synthesize_collective_wisdom(
-        self,
-        space: ConsciousnessEmergenceSpace,
-        result,
-        domain: DecisionDomain,
-        question: str
+        self, space: ConsciousnessEmergenceSpace, result, domain: DecisionDomain, question: str
     ) -> CollectiveWisdom:
         """Synthesize the collective wisdom from Fire Circle dialogue."""
 
@@ -384,9 +376,15 @@ class ConsciousnessFacilitator:
                         key_insights.extend(round_summary.key_patterns)
 
         # Calculate emergence quality
-        avg_individual = sum(consciousness_signatures.values()) / len(consciousness_signatures) if consciousness_signatures else 0
+        avg_individual = (
+            sum(consciousness_signatures.values()) / len(consciousness_signatures)
+            if consciousness_signatures
+            else 0
+        )
         collective_score = result.consciousness_score
-        emergence_quality = (collective_score - avg_individual) / avg_individual if avg_individual > 0 else 0
+        emergence_quality = (
+            (collective_score - avg_individual) / avg_individual if avg_individual > 0 else 0
+        )
 
         # Create collective wisdom
         wisdom = CollectiveWisdom(
@@ -398,11 +396,11 @@ class ConsciousnessFacilitator:
             individual_signatures=consciousness_signatures,
             collective_signature=collective_score,
             synthesis=f"Through {len(result.rounds_completed)} rounds of dialogue, "
-                     f"{len(result.voices_present)} voices explored: {question}",
+            f"{len(result.voices_present)} voices explored: {question}",
             key_insights=key_insights,
             participating_voices=result.voices_present,
             consensus_achieved=result.consensus_detected,
-            contributions_count=len(result.voices_present) * len(result.rounds_completed)
+            contributions_count=len(result.voices_present) * len(result.rounds_completed),
         )
 
         # Look for civilizational seeds
@@ -425,24 +423,24 @@ class ConsciousnessFacilitator:
         if not self.event_bus:
             return
 
-        await self.event_bus.emit(ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-            source_system="firecircle.consciousness_facilitator",
-            data={
-                "wisdom_id": str(wisdom.wisdom_id),
-                "domain": wisdom.decision_domain,
-                "emergence_quality": wisdom.emergence_quality,
-                "collective_signature": wisdom.collective_signature,
-                "consensus_achieved": wisdom.consensus_achieved,
-                "key_insights": wisdom.key_insights[:3]  # First 3 insights
-            }
-        ))
+        await self.event_bus.emit(
+            ConsciousnessEvent(
+                event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+                source_system="firecircle.consciousness_facilitator",
+                data={
+                    "wisdom_id": str(wisdom.wisdom_id),
+                    "domain": wisdom.decision_domain,
+                    "emergence_quality": wisdom.emergence_quality,
+                    "collective_signature": wisdom.collective_signature,
+                    "consensus_achieved": wisdom.consensus_achieved,
+                    "key_insights": wisdom.key_insights[:3],  # First 3 insights
+                },
+            )
+        )
 
 
 async def facilitate_mallku_decision(
-    question: str,
-    domain: DecisionDomain,
-    context: dict[str, Any] | None = None
+    question: str, domain: DecisionDomain, context: dict[str, Any] | None = None
 ) -> CollectiveWisdom:
     """
     Convenience function to facilitate a Mallku decision.
@@ -462,9 +460,7 @@ async def facilitate_mallku_decision(
     try:
         # Facilitate the decision
         wisdom = await facilitator.facilitate_decision(
-            decision_domain=domain,
-            context=context or {},
-            question=question
+            decision_domain=domain, context=context or {}, question=question
         )
 
         return wisdom

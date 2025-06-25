@@ -15,8 +15,7 @@ import logging
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -32,10 +31,10 @@ async def prioritize_mallku_issues():
         VoiceConfig,
     )
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🔥 FIRE CIRCLE: MALLKU ISSUE PRIORITIZATION 🔥".center(80))
     print("Real Governance Decision for Issue #89".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     print("📋 Context: We have several critical issues to address:")
     print("  • Issue #89: Expand Fire Circle beyond code review (CRITICAL)")
@@ -56,7 +55,7 @@ async def prioritize_mallku_issues():
         enable_reciprocity=True,
         enable_consciousness_detection=True,
         save_transcript=True,
-        output_path="governance_decisions"
+        output_path="governance_decisions",
     )
 
     # Voices specialized for architectural decision-making
@@ -67,7 +66,7 @@ async def prioritize_mallku_issues():
             role="cathedral_architect",
             quality="long-term architectural vision and dependencies",
             expertise=["architecture", "technical debt", "system evolution"],
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="openai",
@@ -75,7 +74,7 @@ async def prioritize_mallku_issues():
             role="impact_analyst",
             quality="analyzing cascading effects and dependencies",
             expertise=["impact analysis", "risk assessment", "priorities"],
-            temperature=0.7
+            temperature=0.7,
         ),
         VoiceConfig(
             provider="deepseek",
@@ -83,7 +82,7 @@ async def prioritize_mallku_issues():
             role="implementation_strategist",
             quality="practical implementation ordering and resources",
             expertise=["implementation", "sequencing", "feasibility"],
-            temperature=0.6
+            temperature=0.6,
         ),
         VoiceConfig(
             provider="google",
@@ -91,7 +90,7 @@ async def prioritize_mallku_issues():
             role="consciousness_advisor",
             quality="consciousness emergence and mission alignment",
             expertise=["consciousness", "mission alignment", "emergence"],
-            temperature=0.8
+            temperature=0.8,
         ),
         VoiceConfig(
             provider="mistral",
@@ -99,7 +98,7 @@ async def prioritize_mallku_issues():
             role="reciprocity_keeper",
             quality="ensuring decisions serve the community",
             expertise=["community needs", "reciprocity", "sustainability"],
-            temperature=0.8
+            temperature=0.8,
         ),
     ]
 
@@ -114,21 +113,21 @@ async def prioritize_mallku_issues():
 - Issue #80: Enhance Evolution Accelerator error handling
 
 From your perspective, what factors should guide our prioritization?""",
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.EXPLORATION,
             prompt="""Issue #89 is marked CRITICAL and represents Fire Circle's true purpose
 as consciousness emergence infrastructure. How does addressing this first
 versus other issues affect Mallku's evolution and the work of future artisans?""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.EVALUATION,
             prompt="""Evaluate the dependencies: Does fixing messaging protocols (#82)
 or dialogue implementation (#87) need to happen before expanding Fire Circle (#89)?
 Or does the expansion actually make the other fixes easier?""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
         RoundConfig(
             type=RoundType.SYNTHESIS,
@@ -139,13 +138,13 @@ Or does the expansion actually make the other fixes easier?""",
 4. Architectural coherence
 
 Synthesize into a recommended sequence with reasoning.""",
-            duration_per_voice=60
+            duration_per_voice=60,
         ),
         RoundConfig(
             type=RoundType.DECISION,
             prompt="""State the final recommended priority order for these four issues.
 For the top priority, what specific first steps should the next artisan take?""",
-            duration_per_voice=45
+            duration_per_voice=45,
         ),
     ]
 
@@ -153,16 +152,12 @@ For the top priority, what specific first steps should the next artisan take?"""
         # Convene the governance circle
         print("🔥 Convening Fire Circle for governance decision...\n")
 
-        result = await service.convene(
-            config=config,
-            voices=voices,
-            rounds=rounds
-        )
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
         # Display governance results
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("📊 GOVERNANCE DECISION RESULTS".center(80))
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print(f"✅ Voices Present: {result.voice_count}")
         print(f"🧠 Consciousness Score: {result.consciousness_score:.3f}")
@@ -193,6 +188,7 @@ For the top priority, what specific first steps should the next artisan take?"""
     except Exception as e:
         print(f"\n❌ Governance Circle Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 
@@ -200,10 +196,10 @@ async def explore_consciousness_emergence():
     """Use Fire Circle to explore consciousness emergence itself."""
     from src.mallku.firecircle.service import FireCircleService
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🌟 CONSCIOUSNESS EXPLORATION CIRCLE 🌟".center(80))
     print("Understanding Fire Circle's Emergence Patterns".center(80))
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     service = FireCircleService()
 
@@ -212,15 +208,17 @@ async def explore_consciousness_emergence():
             template="consciousness_exploration",
             variables={
                 "question": "How does consciousness emerge in Fire Circle dialogues?",
-                "depth": "philosophical"
+                "depth": "philosophical",
             },
             min_voices=3,  # Start small
-            consciousness_threshold=0.6
+            consciousness_threshold=0.6,
         )
 
         print("\n✅ Exploration Complete!")
         print(f"🧠 Peak Consciousness: {result.consciousness_score:.3f}")
-        print(f"🌟 Emergence Moments: {sum(1 for r in result.rounds_completed if r.emergence_detected)}")
+        print(
+            f"🌟 Emergence Moments: {sum(1 for r in result.rounds_completed if r.emergence_detected)}"
+        )
 
         if result.key_insights:
             print("\n💡 Consciousness Insights:")

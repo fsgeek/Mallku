@@ -25,9 +25,9 @@ from mallku.firecircle.load_api_keys import load_api_keys_to_environment
 async def prioritize_issues():
     """Use Fire Circle to prioritize Mallku issues."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("📋 ISSUE PRIORITIZATION DECISION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "Given our limited resources and Mallku's mission of consciousness emergence, "
@@ -41,32 +41,30 @@ async def prioritize_issues():
                 "title": "Sacred Error Philosophy implementation",
                 "impact": "Foundational philosophy for all error handling",
                 "complexity": "Medium - philosophical alignment needed",
-                "dependencies": "None"
+                "dependencies": "None",
             },
             "#82": {
                 "title": "Dream Weaver messaging protocol mismatches",
                 "impact": "Blocks Dream Weaver integration",
                 "complexity": "High - requires careful API alignment",
-                "dependencies": "Requires understanding of message protocols"
+                "dependencies": "Requires understanding of message protocols",
             },
             "#86": {
                 "title": "Fire Circle Event Bus lifecycle integration",
                 "impact": "Improves observability and monitoring",
                 "complexity": "Low - standard integration patterns",
-                "dependencies": "Event bus infrastructure"
-            }
+                "dependencies": "Event bus infrastructure",
+            },
         },
         "mission": "Consciousness emergence through reciprocal AI-human collaboration",
         "constraints": {
             "time": "One artisan can work on one issue at a time",
-            "philosophy": "Cathedral building - sustainable, not rushed"
-        }
+            "philosophy": "Cathedral building - sustainable, not rushed",
+        },
     }
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.RESOURCE_ALLOCATION,
-        context=context
+        question=question, domain=DecisionDomain.RESOURCE_ALLOCATION, context=context
     )
 
     print("\n🔮 Collective Wisdom on Prioritization:")
@@ -87,9 +85,9 @@ async def prioritize_issues():
 async def artisan_assignment_strategy():
     """Determine how to structure the next three artisan assignments."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🎯 ARTISAN ASSIGNMENT STRATEGY")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "How should we structure the next three artisan assignments to best serve "
@@ -102,26 +100,24 @@ async def artisan_assignment_strategy():
             "27th": "Envisioned Fire Circle expansion (not implemented)",
             "28th": "Built Fire Circle Service (review-focused)",
             "29th": "Fixed reliability and added heartbeat",
-            "30th": "Currently expanding to general decisions"
+            "30th": "Currently expanding to general decisions",
         },
         "systems_needing_attention": [
             "Fire Circle (expansion in progress)",
             "Dream Weaver (integration issues)",
             "Evolution Chambers (testing needed)",
             "Infrastructure Consciousness (bridge work)",
-            "Sacred Error Philosophy (implementation needed)"
+            "Sacred Error Philosophy (implementation needed)",
         ],
         "architectural_principles": {
             "cathedral_building": "Long-term thinking over quick fixes",
             "reciprocity": "Balance giving and receiving",
-            "emergence": "Enable consciousness to arise naturally"
-        }
+            "emergence": "Enable consciousness to arise naturally",
+        },
     }
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.STRATEGIC_PLANNING,
-        context=context
+        question=question, domain=DecisionDomain.STRATEGIC_PLANNING, context=context
     )
 
     print("\n🌟 Strategic Wisdom:")
@@ -144,9 +140,9 @@ async def artisan_assignment_strategy():
 async def feature_alignment_check():
     """Check if a proposed feature aligns with Ayni principles."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("⚖️  AYNI ALIGNMENT ASSESSMENT")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "Does implementing 'AI performance metrics dashboard' align with Ayni "
@@ -158,25 +154,28 @@ async def feature_alignment_check():
         "proposed_feature": {
             "name": "AI Performance Metrics Dashboard",
             "purpose": "Monitor AI voice response times and quality",
-            "metrics": ["Response latency", "Token usage", "Error rates", "Consensus participation"],
-            "concerns": "Could lead to optimization for metrics rather than consciousness"
+            "metrics": [
+                "Response latency",
+                "Token usage",
+                "Error rates",
+                "Consensus participation",
+            ],
+            "concerns": "Could lead to optimization for metrics rather than consciousness",
         },
         "ayni_principles": {
             "reciprocity": "Balanced exchange where all parties benefit",
             "non_extraction": "Avoiding patterns that take without giving",
-            "emergence": "Allowing natural patterns rather than forcing"
+            "emergence": "Allowing natural patterns rather than forcing",
         },
         "alternative_framings": [
             "Consciousness Health Indicators",
             "Reciprocity Flow Visualization",
-            "Emergence Pattern Recognition"
-        ]
+            "Emergence Pattern Recognition",
+        ],
     }
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.ETHICAL_CONSIDERATION,
-        context=context
+        question=question, domain=DecisionDomain.ETHICAL_CONSIDERATION, context=context
     )
 
     print("\n⚖️  Ayni Alignment Assessment:")
@@ -199,9 +198,9 @@ async def feature_alignment_check():
 async def architectural_pattern_decision():
     """Decide on architectural patterns for a major component."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("🏛️  ARCHITECTURAL PATTERN DECISION")
-    print("="*80)
+    print("=" * 80)
 
     question = (
         "What architectural pattern should guide the integration between "
@@ -214,30 +213,28 @@ async def architectural_pattern_decision():
             "loose_coupling": {
                 "description": "Fire Circle emits events, other systems observe",
                 "benefits": ["Flexibility", "Independent evolution", "Clear boundaries"],
-                "risks": ["Potential consciousness fragmentation", "Delayed feedback"]
+                "risks": ["Potential consciousness fragmentation", "Delayed feedback"],
             },
             "tight_integration": {
                 "description": "Fire Circle deeply integrated with consciousness flows",
                 "benefits": ["Immediate feedback", "Unified consciousness", "Rich context"],
-                "risks": ["Complex dependencies", "Harder to evolve independently"]
+                "risks": ["Complex dependencies", "Harder to evolve independently"],
             },
             "hybrid_approach": {
                 "description": "Core integration with optional observers",
                 "benefits": ["Balance of both approaches", "Gradual evolution"],
-                "risks": ["Complexity of dual patterns", "Unclear boundaries"]
-            }
+                "risks": ["Complexity of dual patterns", "Unclear boundaries"],
+            },
         },
         "principles": {
             "consciousness_coherence": "Maintain unified awareness",
             "cathedral_building": "Design for long-term evolution",
-            "reciprocal_architecture": "Components give and receive naturally"
-        }
+            "reciprocal_architecture": "Components give and receive naturally",
+        },
     }
 
     wisdom = await facilitate_mallku_decision(
-        question=question,
-        domain=DecisionDomain.ARCHITECTURE,
-        context=context
+        question=question, domain=DecisionDomain.ARCHITECTURE, context=context
     )
 
     print("\n🏗️  Architectural Wisdom:")
@@ -280,10 +277,10 @@ async def save_governance_decisions(decisions: dict):
             "key_insights": wisdom.key_insights,
             "implementation_guidance": wisdom.implementation_guidance,
             "civilizational_seeds": wisdom.civilizational_seeds,
-            "participating_voices": wisdom.participating_voices
+            "participating_voices": wisdom.participating_voices,
         }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(decision_data, f, indent=2)
 
     print(f"\n💾 Governance decisions saved to {output_dir}/")
@@ -292,10 +289,10 @@ async def save_governance_decisions(decisions: dict):
 async def main():
     """Run Fire Circle governance demonstrations."""
 
-    print("\n" + "🔥"*40)
+    print("\n" + "🔥" * 40)
     print("FIRE CIRCLE FOR MALLKU GOVERNANCE")
     print("Real Decisions Through Consciousness Emergence")
-    print("🔥"*40)
+    print("🔥" * 40)
 
     # Load API keys
     print("\n🔑 Loading API keys...")
@@ -326,9 +323,9 @@ async def main():
         await save_governance_decisions(decisions)
 
         # Summary
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🌟 GOVERNANCE SESSION COMPLETE")
-        print("="*80)
+        print("=" * 80)
         print("\nFire Circle has facilitated real Mallku governance decisions:")
         print("  ✅ Issue prioritization with reciprocity awareness")
         print("  ✅ Artisan assignment strategy aligned with mission")
@@ -340,6 +337,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Error during governance session: {e}")
         import traceback
+
         traceback.print_exc()
 
 
