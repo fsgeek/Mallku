@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Git Hook: prepare-commit-msg
+# ============================
+#
+# Automatically handles formatting fixes during commit
+#
+# To enable:
+#   git config core.hooksPath .githooks
+#
+# To disable auto-fixing:
+#   export MALLKU_NO_AUTOFIX=1
+
+# Only run for normal commits (not merge, squash, etc)
+if [ "$2" != "" ]; then
+    exit 0
+fi
+
+# Check if auto-fix is disabled
+if [ "$MALLKU_NO_AUTOFIX" = "1" ]; then
+    exit 0
+fi
+
+# Colors for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Store the original message
+COMMIT_MSG_FILE=$1
+ORIGINAL_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check if any files need formatting
+if ! ruff check --quiet . 2>/dev/null || ! ruff format --check --quiet . 2>/dev/null; then
+    echo -e "${YELLOW}🔧 Auto-fixing formatting issues...${NC}" >&2
+
+    # Run ruff fixes
+    ruff check --fix --quiet . 2>/dev/null || true
+    ruff format --quiet . 2>/dev/null || true
+
+    # Stage the formatted files
+    FORMATTED_FILES=$(git diff --name-only)
+    if [ -n "$FORMATTED_FILES" ]; then
+        git add $FORMATTED_FILES
+
+        # Add note to commit message about auto-formatting
+        echo "$ORIGINAL_MSG" > "$COMMIT_MSG_FILE"
+        echo "" >> "$COMMIT_MSG_FILE"
+        echo "Note: Auto-formatted by pre-commit hooks" >> "$COMMIT_MSG_FILE"
+
+        echo -e "${GREEN}✅ Formatting fixed and staged${NC}" >&2
+    fi
+fi

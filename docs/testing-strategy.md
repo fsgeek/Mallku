@@ -101,6 +101,36 @@ The GitHub Actions workflow runs all tests on:
 
 Failed tests will block merging and deployment.
 
+## Reducing Commit Friction
+
+### Option 1: Smart Commit Script (Recommended)
+```bash
+./scripts/smart-commit.sh "Your commit message"
+```
+This script:
+- Runs pre-commit hooks
+- Auto-stages formatting-only changes
+- Prompts for review if substantive changes detected
+- Shows what was auto-fixed
+
+### Option 2: Auto-fix Git Hook
+Enable automatic formatting during commit:
+```bash
+git config core.hooksPath .githooks
+```
+
+Disable when you want full control:
+```bash
+export MALLKU_NO_AUTOFIX=1
+```
+
+### Option 3: Manual Pre-commit with Fix
+```bash
+pre-commit run --all-files
+git add -u  # Stage formatting fixes
+git commit -m "Your message"
+```
+
 ## Philosophy
 
 "Test enough to catch breaks, not so much that development breaks"
