@@ -6,6 +6,8 @@ set -e  # Exit on any error
 
 echo "Installing pre-commit via uv..."
 uv pip install pre-commit
+uv build
+uv pip install -e .
 
 echo "Installing pre-commit hooks..."
 pre-commit install
