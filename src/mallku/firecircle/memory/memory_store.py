@@ -12,7 +12,7 @@ truth, enabling Fire Circle to accumulate wisdom across time.
 import json
 import logging
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -100,7 +100,6 @@ class MemoryStore:
         Uses semantic similarity and domain matching to find relevant memories,
         with sacred moments prioritized.
         """
-        relevant_memories = []
 
         # Get memories from relevant domain
         domain_memories = self.memories_by_domain.get(domain, [])
@@ -226,7 +225,7 @@ class MemoryStore:
 
         # Create consolidation
         consolidation = WisdomConsolidation(
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             source_episodes=source_episodes,
             source_clusters=source_clusters or [],
             core_insight=core_insight,
@@ -304,7 +303,7 @@ class MemoryStore:
             return None
 
         try:
-            with open(memory_file, "r") as f:
+            with open(memory_file) as f:
                 data = json.load(f)
             return EpisodicMemory(**data)
         except Exception as e:
@@ -334,7 +333,7 @@ class MemoryStore:
         if episodes_dir.exists():
             for memory_file in episodes_dir.glob("*.json"):
                 try:
-                    with open(memory_file, "r") as f:
+                    with open(memory_file) as f:
                         data = json.load(f)
                     memory = EpisodicMemory(**data)
                     self._update_indices(memory)
@@ -346,7 +345,7 @@ class MemoryStore:
         if clusters_dir.exists():
             for cluster_file in clusters_dir.glob("*.json"):
                 try:
-                    with open(cluster_file, "r") as f:
+                    with open(cluster_file) as f:
                         data = json.load(f)
                     cluster = MemoryCluster(**data)
                     self.memory_clusters[cluster.cluster_id] = cluster
@@ -358,7 +357,7 @@ class MemoryStore:
         if wisdom_dir.exists():
             for wisdom_file in wisdom_dir.glob("*.json"):
                 try:
-                    with open(wisdom_file, "r") as f:
+                    with open(wisdom_file) as f:
                         data = json.load(f)
                     consolidation = WisdomConsolidation(**data)
                     self.wisdom_consolidations[consolidation.consolidation_id] = consolidation
@@ -414,7 +413,7 @@ class MemoryStore:
                     break
 
         # Recency factor
-        age_days = (datetime.utcnow() - memory.timestamp).days
+        age_days = (datetime.now(UTC) - memory.timestamp).days
         recency_score = max(0, 1 - (age_days / 365))  # Decay over a year
         score += recency_score * 0.1
 

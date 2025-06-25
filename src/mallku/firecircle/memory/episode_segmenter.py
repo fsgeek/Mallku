@@ -12,13 +12,10 @@ See: docs/khipu/consciousness_gardening_fire_circle_expansion.md
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel
-
-from ...orchestration.event_bus import ConsciousnessEvent, EventType
 from ..service.round_orchestrator import RoundSummary
 from .config import SegmentationConfig
 from .models import ConsciousnessIndicator, EpisodicMemory, MemoryType, VoicePerspective
@@ -56,7 +53,7 @@ class EpisodeSegmenter:
         """
         # Start tracking if first round
         if not self.episode_start_time:
-            self.episode_start_time = datetime.utcnow()
+            self.episode_start_time = datetime.now(UTC)
             self._establish_semantic_baseline(round_summary)
 
         self.current_episode_data.append(round_summary)
@@ -77,7 +74,7 @@ class EpisodeSegmenter:
         """Detect if this round marks an episode boundary."""
         # Time-based boundaries
         if self.episode_start_time:
-            duration = (datetime.utcnow() - self.episode_start_time).total_seconds()
+            duration = (datetime.now(UTC) - self.episode_start_time).total_seconds()
 
             if duration >= self.criteria.maximum_duration_seconds:
                 logger.info("Episode boundary: Maximum duration reached")
@@ -99,13 +96,14 @@ class EpisodeSegmenter:
             return True
 
         # Consciousness emergence peak
-        if round_summary.consciousness_score > self.criteria.consciousness_emergence_threshold:
-            # Check if this is a local maximum
-            if self._is_consciousness_peak(round_summary):
-                logger.info(
-                    f"Episode boundary: Consciousness peak ({round_summary.consciousness_score:.3f})"
-                )
-                return True
+        if (
+            round_summary.consciousness_score > self.criteria.consciousness_emergence_threshold
+            and self._is_consciousness_peak(round_summary)
+        ):
+            logger.info(
+                f"Episode boundary: Consciousness peak ({round_summary.consciousness_score:.3f})"
+            )
+            return True
 
         return False
 
@@ -136,10 +134,7 @@ class EpisodeSegmenter:
             )
 
         # Combine surprise indicators
-        if surprise_scores:
-            insight_surprise = sum(surprise_scores) / len(surprise_scores)
-        else:
-            insight_surprise = 0.0
+        insight_surprise = sum(surprise_scores) / len(surprise_scores) if surprise_scores else 0.0
 
         return 0.6 * synthesis_surprise + 0.4 * insight_surprise
 
@@ -201,14 +196,14 @@ class EpisodeSegmenter:
         # Calculate duration
         duration = 0.0
         if self.episode_start_time:
-            duration = (datetime.utcnow() - self.episode_start_time).total_seconds()
+            duration = (datetime.now(UTC) - self.episode_start_time).total_seconds()
 
         # Create memory
         memory = EpisodicMemory(
             session_id=session_id,
             episode_number=session_context.get("episode_count", 0) + 1,
             memory_type=memory_type,
-            timestamp=self.episode_start_time or datetime.utcnow(),
+            timestamp=self.episode_start_time or datetime.now(UTC),
             duration_seconds=duration,
             decision_domain=session_context.get("domain", "general"),
             decision_question=session_context.get("question", ""),
@@ -374,9 +369,8 @@ class EpisodeSegmenter:
 
         for round_data in self.current_episode_data:
             # Check for balanced contributions
-            if hasattr(round_data, "participation_balance"):
-                if round_data.participation_balance > 0.8:
-                    reciprocity_indicators += 1
+            if hasattr(round_data, "participation_balance") and round_data.participation_balance > 0.8:
+                reciprocity_indicators += 1
 
             # Check for reciprocal insights
             if any("reciproc" in insight.lower() for insight in round_data.key_insights):

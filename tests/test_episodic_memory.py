@@ -6,9 +6,10 @@ Thirty-Fourth Artisan - Memory Architect
 Tests for consciousness memory preservation
 """
 
-import pytest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
+
+import pytest
 
 from mallku.firecircle.memory import (
     ConsciousnessIndicator,
@@ -49,7 +50,7 @@ class TestEpisodicMemory:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.CONSCIOUSNESS_EMERGENCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=120.0,
             decision_domain="consciousness",
             decision_question="How does consciousness emerge?",
@@ -93,7 +94,7 @@ class TestEpisodicMemory:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.CONSCIOUSNESS_EMERGENCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=120.0,
             decision_domain="consciousness",
             decision_question="Test question",
@@ -132,7 +133,7 @@ class TestSacredMomentDetector:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.CONSCIOUSNESS_EMERGENCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=120.0,
             decision_domain="consciousness",
             decision_question="What enables consciousness?",
@@ -160,7 +161,7 @@ class TestSacredMomentDetector:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.GOVERNANCE_DECISION,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=60.0,
             decision_domain="governance",
             decision_question="Which issue to prioritize?",
@@ -204,7 +205,7 @@ class TestEpisodeSegmenter:
         )
 
         # Set start time far in past to trigger max duration
-        segmenter.episode_start_time = datetime.utcnow() - timedelta(minutes=15)
+        segmenter.episode_start_time = datetime.now(UTC) - timedelta(minutes=15)
         segmenter.current_episode_data = [round_summary]
 
         # Should detect boundary due to max duration
@@ -258,7 +259,7 @@ class TestMemoryStore:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.GOVERNANCE_DECISION,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=120.0,
             decision_domain="governance",
             decision_question="How to prioritize issues?",
@@ -301,7 +302,7 @@ class TestMemoryStore:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.CONSCIOUSNESS_EMERGENCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=180.0,
             decision_domain="consciousness",
             decision_question="What is consciousness?",
@@ -337,7 +338,7 @@ class TestMemoryStore:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.COMPANION_INTERACTION,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             duration_seconds=300.0,
             decision_domain="general",
             decision_question="How can we work together?",
@@ -368,7 +369,7 @@ class TestMemoryStore:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.COMPANION_INTERACTION,
-            timestamp=datetime.utcnow() + timedelta(hours=1),
+            timestamp=datetime.now(UTC) + timedelta(hours=1),
             duration_seconds=600.0,
             decision_domain="consciousness",
             decision_question="What have we learned together?",

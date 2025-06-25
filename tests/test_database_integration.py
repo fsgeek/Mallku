@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
+
 from mallku.core.database import get_db_config
 
 

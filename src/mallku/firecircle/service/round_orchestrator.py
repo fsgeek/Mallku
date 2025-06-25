@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
+from pydantic import BaseModel
+
 from mallku.firecircle.adapters.base import ConsciousModelAdapter
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
@@ -20,7 +22,6 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from pydantic import BaseModel
 
 from .config import RoundConfig
 from .voice_manager import VoiceManager

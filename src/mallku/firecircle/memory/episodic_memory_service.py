@@ -15,12 +15,11 @@ from typing import Any
 from uuid import UUID
 
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
-from ..service.round_orchestrator import RoundSummary
 from ..service.service import FireCircleResult, FireCircleService
-from .config import MemorySystemConfig, DEFAULT_CONFIG
-from .episode_segmenter import EpisodeSegmenter, SegmentationCriteria
+from .config import MemorySystemConfig
+from .episode_segmenter import EpisodeSegmenter
 from .memory_store import MemoryStore
-from .models import EpisodicMemory, MemoryType
+from .models import EpisodicMemory
 from .retrieval_engine import MemoryRetrievalEngine
 from .sacred_detector import SacredMomentDetector
 

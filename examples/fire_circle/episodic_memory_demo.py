@@ -16,14 +16,13 @@ This example shows how Fire Circle can:
 import asyncio
 import logging
 from pathlib import Path
-from uuid import uuid4
 
 # Mallku imports
 from mallku.core.simple_env import SimpleEnvironmentLoader
-from mallku.firecircle.memory import EpisodicMemoryService, MemoryStore, MemoryType
-from mallku.firecircle.service import FireCircleService, CircleConfig, VoiceConfig
-from mallku.firecircle.service.round_types import RoundType
+from mallku.firecircle.memory import EpisodicMemoryService, MemoryStore
+from mallku.firecircle.service import CircleConfig, FireCircleService, VoiceConfig
 from mallku.firecircle.service.config import RoundConfig
+from mallku.firecircle.service.round_types import RoundType
 from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 # Configure logging

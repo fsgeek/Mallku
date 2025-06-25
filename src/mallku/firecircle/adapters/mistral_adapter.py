@@ -21,6 +21,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import httpx
+
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,

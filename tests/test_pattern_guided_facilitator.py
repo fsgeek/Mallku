@@ -15,6 +15,7 @@ from uuid import uuid4
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import pytest
+
 from mallku.firecircle.pattern_guided_facilitator import (
     DialogueMoment,
     GuidanceIntensity,

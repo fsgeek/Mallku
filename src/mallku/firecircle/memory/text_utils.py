@@ -9,7 +9,6 @@ Common text processing functions used across the memory system
 for semantic similarity, keyword extraction, and text analysis.
 """
 
-from typing import Set
 
 
 def semantic_similarity(text1: str, text2: str) -> float:
@@ -43,7 +42,7 @@ def semantic_similarity(text1: str, text2: str) -> float:
     return len(intersection) / len(union)
 
 
-def extract_keywords(text: str, min_length: int = 3) -> Set[str]:
+def extract_keywords(text: str, min_length: int = 3) -> set[str]:
     """
     Extract meaningful keywords from text.
 
@@ -99,7 +98,7 @@ def extract_keywords(text: str, min_length: int = 3) -> Set[str]:
     return keywords
 
 
-def keyword_overlap_score(keywords1: Set[str], keywords2: Set[str]) -> float:
+def keyword_overlap_score(keywords1: set[str], keywords2: set[str]) -> float:
     """
     Calculate overlap score between two keyword sets.
 
@@ -147,7 +146,7 @@ def contains_transformation_pattern(text: str) -> bool:
     return any(pattern in text_lower for pattern in transformation_patterns)
 
 
-def extract_question_focus(question: str) -> Set[str]:
+def extract_question_focus(question: str) -> set[str]:
     """
     Extract the main focus keywords from a question.
 

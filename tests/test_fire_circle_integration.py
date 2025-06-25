@@ -12,6 +12,7 @@ The Memory Keeper - Building foundations for collective wisdom
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from mallku.firecircle.service import (
     CircleConfig,
     FireCircleService,

@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from datetime import timedelta
 
 import pytest
+
 from mallku.firecircle.pattern_library import (
     DialoguePattern,
     PatternIndicator,

@@ -22,9 +22,10 @@ from enum import Enum  # type: ignore
 from typing import Any
 from uuid import UUID  # type: ignore
 
+from pydantic import BaseModel, Field
+
 from mallku.orchestration.event_bus import ConsciousnessEventBus  # Added import
 from mallku.reciprocity import ReciprocityTracker  # Added import
-from pydantic import BaseModel, Field
 
 from ..protocol.conscious_message import (
     ConsciousMessage,

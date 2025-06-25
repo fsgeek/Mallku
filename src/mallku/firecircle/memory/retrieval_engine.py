@@ -10,13 +10,12 @@ injecting wisdom from past consciousness emergence into present deliberation.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import UUID
 
 from .config import RetrievalConfig
 from .memory_store import MemoryStore
-from .models import EpisodicMemory, MemoryType
+from .models import EpisodicMemory
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +119,7 @@ class TemporalThreadStrategy(RetrievalStrategy):
         """Retrieve following temporal patterns."""
         # Look for recent related decisions
         time_window = context.get("time_window_days", 30)
-        cutoff = datetime.utcnow() - timedelta(days=time_window)
+        cutoff = datetime.now(UTC) - timedelta(days=time_window)
 
         domain = context.get("domain", "general")
 

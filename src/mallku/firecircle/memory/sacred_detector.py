@@ -87,10 +87,12 @@ class SacredMomentDetector:
             reasons.append("Breakthrough pattern recognized")
 
         # Special case: architectural insights
-        if memory.memory_type == MemoryType.ARCHITECTURAL_INSIGHT:
-            if any("cathedral" in insight.lower() for insight in memory.key_insights):
-                sacred_score += 1
-                reasons.append("Cathedral-building wisdom preserved")
+        if (
+            memory.memory_type == MemoryType.ARCHITECTURAL_INSIGHT
+            and any("cathedral" in insight.lower() for insight in memory.key_insights)
+        ):
+            sacred_score += 1
+            reasons.append("Cathedral-building wisdom preserved")
 
         # Determine if sacred using configured threshold
         is_sacred = sacred_score >= self.config.sacred_score_threshold
@@ -317,8 +319,7 @@ class SacredMomentDetector:
         }
 
         for domain, keywords in domain_keywords.items():
-            if any(keyword in content_lower for keyword in keywords):
-                if domain not in domains:
-                    domains.append(domain)
+            if any(keyword in content_lower for keyword in keywords) and domain not in domains:
+                domains.append(domain)
 
         return domains

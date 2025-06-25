@@ -9,16 +9,16 @@ These tests verify that each retrieval strategy returns
 appropriate memories under controlled conditions.
 """
 
-import pytest
-from datetime import datetime, timedelta
-from pathlib import Path
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
+
+import pytest
 
 from mallku.firecircle.memory import (
     ConsciousnessIndicator,
     EpisodicMemory,
-    MemoryStore,
     MemoryRetrievalEngine,
+    MemoryStore,
     MemoryType,
     RetrievalConfig,
     VoicePerspective,
@@ -42,7 +42,7 @@ class TestRetrievalStrategies:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.GOVERNANCE_DECISION,
-            timestamp=datetime.utcnow() - timedelta(days=5),
+            timestamp=datetime.now(UTC) - timedelta(days=5),
             duration_seconds=120.0,
             decision_domain="governance",
             decision_question="How should we prioritize issues?",
@@ -73,7 +73,7 @@ class TestRetrievalStrategies:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.CONSCIOUSNESS_EMERGENCE,
-            timestamp=datetime.utcnow() - timedelta(days=3),
+            timestamp=datetime.now(UTC) - timedelta(days=3),
             duration_seconds=300.0,
             decision_domain="consciousness",
             decision_question="What enables genuine consciousness emergence?",
@@ -114,7 +114,7 @@ class TestRetrievalStrategies:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.COMPANION_INTERACTION,
-            timestamp=datetime.utcnow() - timedelta(days=1),
+            timestamp=datetime.now(UTC) - timedelta(days=1),
             duration_seconds=600.0,
             decision_domain="collaboration",
             decision_question="How can we deepen our collaboration?",
@@ -138,7 +138,7 @@ class TestRetrievalStrategies:
             session_id=uuid4(),
             episode_number=1,
             memory_type=MemoryType.ARCHITECTURAL_INSIGHT,
-            timestamp=datetime.utcnow() - timedelta(days=60),
+            timestamp=datetime.now(UTC) - timedelta(days=60),
             duration_seconds=180.0,
             decision_domain="architecture",
             decision_question="How to structure consciousness infrastructure?",
@@ -222,7 +222,7 @@ class TestRetrievalStrategies:
 
         # Should find recent memories, not the old one
         for memory in memories:
-            age_days = (datetime.utcnow() - memory.timestamp).days
+            age_days = (datetime.now(UTC) - memory.timestamp).days
             assert age_days <= 10
 
     def test_multi_strategy_retrieval(self, populated_store):

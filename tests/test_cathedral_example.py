@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
+
 from mallku.core.database import get_secured_database
 from mallku.reciprocity import InteractionRecord, ReciprocityTracker
 

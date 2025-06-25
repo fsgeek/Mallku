@@ -16,6 +16,7 @@ Run with:
 import os
 
 from google import genai
+
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
 
 
