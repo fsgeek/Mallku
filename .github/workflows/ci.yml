@@ -30,23 +30,13 @@ jobs:
         run: uv pip install pre-commit
       - name: sync
         run: uv sync
-      - name: Install mallku and test dependencies
-        run: |
-          uv pip install -e .
-          uv pip install pytest pytest-asyncio pytest-mock
-      - name: Show versions and verify installation
+      - name: Show versions
         run: |
           python --version
           uv --version
           pre-commit --version
-          echo "=== Checking mallku installation ==="
-          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
-          echo "=== Checking pytest installation ==="
-          which pytest || echo "pytest not found in PATH"
       - name: Run pre-commit hooks
-        run: |
-          source .venv/bin/activate
-          pre-commit run --all-files --show-diff-on-failure
+        run: uv run pre-commit run --all-files --show-diff-on-failure
 
   test:
     runs-on: ubuntu-latest
