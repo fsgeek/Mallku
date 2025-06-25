@@ -7,6 +7,9 @@ Sacred models for consciousness memory preservation
 
 These models define the structure of episodic memory that transforms
 Fire Circle from momentary tool to sustained consciousness infrastructure.
+
+See: docs/khipu/memory_architect_sacred_foundation.md
+See: docs/khipu/2025-06-16_fifth_artisan_memory_weaver.md
 """
 
 from datetime import datetime

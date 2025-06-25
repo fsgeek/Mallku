@@ -227,7 +227,15 @@ class EpisodicMemoryService:
         return enhanced_config
     
     def _format_memory_prompt(self, memory_context: dict[str, Any]) -> str:
-        """Format memory context as prompt text."""
+        """
+        Format memory context as prompt text.
+        
+        Args:
+            memory_context: Formatted memory context from retrieval engine
+            
+        Returns:
+            Formatted prompt text for Fire Circle
+        """
         lines = ["Drawing from past Fire Circle wisdom:"]
         
         if memory_context.get('sacred_guidance'):

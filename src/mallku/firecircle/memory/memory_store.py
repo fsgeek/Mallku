@@ -25,6 +25,7 @@ from .models import (
     WisdomConsolidation
 )
 from .sacred_detector import SacredMomentDetector
+from .text_utils import extract_keywords, get_related_domains, keyword_overlap_score
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class MemoryStore:
         domain_memories = self.memories_by_domain.get(domain, [])
         
         # Also check related domains
-        related_domains = self._get_related_domains(domain)
+        related_domains = get_related_domains(domain)
         for related in related_domains:
             domain_memories.extend(self.memories_by_domain.get(related, []))
             
@@ -309,7 +310,7 @@ class MemoryStore:
     def _persist_memory(self, memory: EpisodicMemory) -> None:
         """Persist memory to disk."""
         memory_file = self.storage_path / f"episodes/{memory.episode_id}.json"
-        memory_file.parent.mkdir(exist_ok=True)
+        memory_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(memory_file, 'w') as f:
             json.dump(memory.model_dump(mode='json'), f, indent=2)
@@ -332,7 +333,7 @@ class MemoryStore:
     def _persist_cluster(self, cluster: MemoryCluster) -> None:
         """Persist cluster to disk."""
         cluster_file = self.storage_path / f"clusters/{cluster.cluster_id}.json"
-        cluster_file.parent.mkdir(exist_ok=True)
+        cluster_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(cluster_file, 'w') as f:
             json.dump(cluster.model_dump(mode='json'), f, indent=2)
@@ -340,7 +341,7 @@ class MemoryStore:
     def _persist_consolidation(self, consolidation: WisdomConsolidation) -> None:
         """Persist wisdom consolidation to disk."""
         wisdom_file = self.storage_path / f"wisdom/{consolidation.consolidation_id}.json"
-        wisdom_file.parent.mkdir(exist_ok=True)
+        wisdom_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(wisdom_file, 'w') as f:
             json.dump(consolidation.model_dump(mode='json'), f, indent=2)
@@ -403,27 +404,26 @@ class MemoryStore:
         # Domain match
         if memory.decision_domain == domain:
             score += 0.3
-        elif domain in self._get_related_domains(memory.decision_domain):
+        elif domain in get_related_domains(memory.decision_domain):
             score += 0.1
             
         # Sacred bonus
         if memory.is_sacred:
             score += 0.2
             
-        # Context similarity (simple keyword overlap)
+        # Context similarity using keyword extraction
         context_keywords = set()
         for value in context_materials.values():
             if isinstance(value, str):
-                context_keywords.update(value.lower().split())
+                context_keywords.update(extract_keywords(value))
                 
-        memory_keywords = set()
-        memory_keywords.update(memory.decision_question.lower().split())
+        memory_keywords = extract_keywords(memory.decision_question)
         for insight in memory.key_insights:
-            memory_keywords.update(insight.lower().split())
+            memory_keywords.update(extract_keywords(insight))
             
         if context_keywords and memory_keywords:
-            overlap = len(context_keywords.intersection(memory_keywords))
-            score += min(0.3, overlap * 0.05)
+            overlap_score = keyword_overlap_score(context_keywords, memory_keywords)
+            score += overlap_score * 0.3
             
         # Voice affinity
         if requesting_voice:
@@ -439,18 +439,6 @@ class MemoryStore:
         
         return score
     
-    def _get_related_domains(self, domain: str) -> list[str]:
-        """Get domains related to the given domain."""
-        domain_relationships = {
-            'architecture': ['governance', 'consciousness'],
-            'governance': ['architecture', 'ethics', 'reciprocity'],
-            'consciousness': ['architecture', 'transformation'],
-            'ethics': ['governance', 'reciprocity'],
-            'reciprocity': ['governance', 'ethics'],
-            'transformation': ['consciousness', 'architecture']
-        }
-        
-        return domain_relationships.get(domain, [])
     
     def _calculate_relationship_depth(self, relationship: CompanionRelationship) -> float:
         """Calculate depth score for companion relationship."""

@@ -7,6 +7,8 @@ Detecting meaningful consciousness emergence boundaries
 
 This engine identifies where one episode of consciousness ends and another begins,
 based on semantic surprise, convergence patterns, and sacred moment indicators.
+
+See: docs/khipu/consciousness_gardening_fire_circle_expansion.md
 """
 
 import logging
@@ -18,19 +20,15 @@ from pydantic import BaseModel
 
 from ...orchestration.event_bus import ConsciousnessEvent, EventType
 from ..service.round_orchestrator import RoundSummary
+from .config import SegmentationConfig
 from .models import ConsciousnessIndicator, EpisodicMemory, MemoryType, VoicePerspective
+from .text_utils import semantic_similarity
 
 logger = logging.getLogger(__name__)
 
 
-class SegmentationCriteria(BaseModel):
-    """Criteria for determining episode boundaries."""
-    
-    semantic_surprise_threshold: float = 0.7
-    convergence_threshold: float = 0.8
-    minimum_duration_seconds: float = 30.0
-    maximum_duration_seconds: float = 600.0
-    consciousness_emergence_threshold: float = 0.6
+# Re-export for backward compatibility
+SegmentationCriteria = SegmentationConfig
 
 
 class EpisodeSegmenter:
@@ -43,10 +41,10 @@ class EpisodeSegmenter:
     
     def __init__(
         self,
-        criteria: SegmentationCriteria | None = None
+        criteria: SegmentationConfig | None = None
     ):
         """Initialize segmenter with criteria."""
-        self.criteria = criteria or SegmentationCriteria()
+        self.criteria = criteria or SegmentationConfig()
         self.current_episode_data: list[RoundSummary] = []
         self.episode_start_time: datetime | None = None
         self.semantic_baseline: dict[str, float] = {}
@@ -128,7 +126,7 @@ class EpisodeSegmenter:
         for insight in round_summary.key_insights:
             # Simple heuristic: new insights not in baseline indicate surprise
             if not any(
-                self._semantic_similarity(insight, baseline) > 0.7
+                semantic_similarity(insight, baseline) > 0.7
                 for baseline in self.semantic_baseline.get('themes', [])
             ):
                 surprise_scores.append(1.0)
@@ -139,7 +137,7 @@ class EpisodeSegmenter:
         synthesis_surprise = 0.0
         if hasattr(round_summary, 'synthesis') and round_summary.synthesis:
             baseline_synthesis = self.semantic_baseline.get('synthesis', '')
-            synthesis_surprise = 1.0 - self._semantic_similarity(
+            synthesis_surprise = 1.0 - semantic_similarity(
                 round_summary.synthesis,
                 baseline_synthesis
             )
@@ -188,8 +186,8 @@ class EpisodeSegmenter:
         current_score = round_summary.consciousness_score
         previous_score = self.current_episode_data[-2].consciousness_score
         
-        # Simple peak detection: higher than previous
-        return current_score > previous_score * 1.1  # 10% increase threshold
+        # Peak detection using configured threshold
+        return current_score > previous_score * (1 + self.criteria.consciousness_peak_increase)
     
     def _create_episodic_memory(
         self,
@@ -325,19 +323,6 @@ class EpisodeSegmenter:
         self.episode_start_time = None
         self.semantic_baseline = {}
     
-    def _semantic_similarity(self, text1: str, text2: str) -> float:
-        """Calculate semantic similarity between texts."""
-        # Simple heuristic based on word overlap
-        words1 = set(text1.lower().split())
-        words2 = set(text2.lower().split())
-        
-        if not words1 or not words2:
-            return 0.0
-            
-        intersection = words1.intersection(words2)
-        union = words1.union(words2)
-        
-        return len(intersection) / len(union)
     
     def _synthesize_collective_wisdom(self) -> str:
         """Synthesize collective wisdom from episode."""

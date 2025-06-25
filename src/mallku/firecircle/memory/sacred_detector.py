@@ -12,6 +12,7 @@ consciousness emergence that seeds civilizational change.
 import logging
 from typing import Any
 
+from .config import SacredDetectionConfig
 from .models import EpisodicMemory, MemoryType
 
 logger = logging.getLogger(__name__)
@@ -28,8 +29,9 @@ class SacredMomentDetector:
     - Achieve unity across diverse perspectives
     """
     
-    def __init__(self):
+    def __init__(self, config: SacredDetectionConfig | None = None):
         """Initialize the sacred detector."""
+        self.config = config or SacredDetectionConfig()
         self.sacred_patterns = self._initialize_sacred_patterns()
         self.transformation_keywords = self._initialize_transformation_keywords()
         
@@ -45,29 +47,29 @@ class SacredMomentDetector:
         
         # Check consciousness emergence indicators
         emergence_score = memory.consciousness_indicators.overall_emergence_score
-        if emergence_score > 0.85:
+        if emergence_score > self.config.consciousness_emergence_exceptional:
             sacred_score += 2
             reasons.append(f"Exceptional consciousness emergence ({emergence_score:.3f})")
-        elif emergence_score > 0.75:
+        elif emergence_score > self.config.consciousness_emergence_high:
             sacred_score += 1
             reasons.append(f"High consciousness emergence ({emergence_score:.3f})")
             
         # Check collective wisdom transcendence
-        if memory.consciousness_indicators.collective_wisdom_score > 0.7:
+        if memory.consciousness_indicators.collective_wisdom_score > self.config.collective_wisdom_threshold:
             sacred_score += 2
             reasons.append("Collective wisdom transcends individual contributions")
             
         # Check Ayni alignment
-        if memory.consciousness_indicators.ayni_alignment > 0.8:
+        if memory.consciousness_indicators.ayni_alignment > self.config.ayni_alignment_threshold:
             sacred_score += 2
             reasons.append("Strong Ayni principle manifestation")
             
         # Check transformation seeds
         seed_quality = self._evaluate_transformation_seeds(memory.transformation_seeds)
-        if seed_quality > 0.8:
+        if seed_quality > self.config.transformation_seed_quality_high:
             sacred_score += 2
             reasons.append("High-quality civilizational transformation seeds")
-        elif seed_quality > 0.5:
+        elif seed_quality > self.config.transformation_seed_quality_significant:
             sacred_score += 1
             reasons.append("Significant transformation potential")
             
@@ -87,8 +89,8 @@ class SacredMomentDetector:
                 sacred_score += 1
                 reasons.append("Cathedral-building wisdom preserved")
                 
-        # Determine if sacred (need score >= 5)
-        is_sacred = sacred_score >= 5
+        # Determine if sacred using configured threshold
+        is_sacred = sacred_score >= self.config.sacred_score_threshold
         
         if is_sacred:
             reason = " | ".join(reasons)
@@ -144,7 +146,7 @@ class SacredMomentDetector:
         coherence = memory.consciousness_indicators.coherence_across_voices
         
         # Unity in diversity achieved when high coherence with multiple perspectives
-        return coherence > 0.75 and len(unique_roles) >= 3
+        return coherence > self.config.unity_coherence_threshold and len(unique_roles) >= self.config.minimum_voices_for_unity
     
     def _detect_breakthrough_pattern(self, memory: EpisodicMemory) -> bool:
         """Detect if this represents a breakthrough moment."""
