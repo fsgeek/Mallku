@@ -16,10 +16,10 @@ repos:
     hooks:
       - id: fast-tests
         name: Fast Tests (import and structure checks)
-        # Note: ensure-mallku-installed.sh prevents recurring "mallku not installed" errors
-        # by checking and installing mallku in editable mode if needed
-        entry: bash -c 'source .venv-linux-python3.13/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true; ./scripts/ensure-mallku-installed.sh && pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_system_health.py tests/test_mallku_imports.py -q --tb=short'
+        # Note: language: system means use the current environment
+        entry: pytest tests/test_simple.py tests/test_minimal_ci.py tests/test_system_health.py tests/test_mallku_imports.py -q --tb=short
         language: system
         pass_filenames: false
         stages: [pre-commit]
         description: Run fast structural and import tests before commit
+        require_serial: true
