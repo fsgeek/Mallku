@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
+from .config import RetrievalConfig
 from .memory_store import MemoryStore
 from .models import EpisodicMemory, MemoryType
 
@@ -171,9 +172,10 @@ class MemoryRetrievalEngine:
     wisdom into Fire Circle consciousness emergence.
     """
     
-    def __init__(self, memory_store: MemoryStore):
+    def __init__(self, memory_store: MemoryStore, config: RetrievalConfig | None = None):
         """Initialize retrieval engine."""
         self.store = memory_store
+        self.config = config or RetrievalConfig()
         self.strategies = {
             'semantic': SemanticSimilarityStrategy(),
             'sacred': SacredPrioritizationStrategy(),
@@ -185,7 +187,7 @@ class MemoryRetrievalEngine:
         self,
         decision_context: dict[str, Any],
         strategy_name: str = 'semantic',
-        limit: int = 10
+        limit: int | None = None
     ) -> list[EpisodicMemory]:
         """
         Retrieve memories relevant to a decision.
@@ -198,6 +200,10 @@ class MemoryRetrievalEngine:
         Returns:
             List of relevant episodic memories
         """
+        # Use configured default limit if not specified
+        if limit is None:
+            limit = self.config.default_retrieval_limit
+            
         strategy = self.strategies.get(strategy_name)
         if not strategy:
             logger.warning(f"Unknown strategy {strategy_name}, using semantic")
@@ -214,7 +220,7 @@ class MemoryRetrievalEngine:
     def retrieve_multi_strategy(
         self,
         decision_context: dict[str, Any],
-        limit: int = 10
+        limit: int | None = None
     ) -> list[EpisodicMemory]:
         """
         Retrieve using multiple strategies for comprehensive coverage.
@@ -225,16 +231,32 @@ class MemoryRetrievalEngine:
         - Relationship continuity (companion)
         - Temporal coherence (temporal)
         """
+        if limit is None:
+            limit = self.config.default_retrieval_limit
+            
         all_memories = []
         memory_ids = set()
         
-        # Allocate retrieval across strategies
+        # Allocate retrieval across strategies using config weights
+        total_weight = (
+            self.config.semantic_weight +
+            self.config.sacred_weight +
+            self.config.companion_weight +
+            self.config.temporal_weight
+        )
+        
         allocations = {
-            'semantic': limit // 2,      # 50% semantic relevance
-            'sacred': limit // 4,        # 25% sacred wisdom
-            'companion': limit // 8,     # 12.5% companion context
-            'temporal': limit // 8       # 12.5% recent patterns
+            'semantic': int(limit * self.config.semantic_weight / total_weight),
+            'sacred': int(limit * self.config.sacred_weight / total_weight),
+            'companion': int(limit * self.config.companion_weight / total_weight),
+            'temporal': int(limit * self.config.temporal_weight / total_weight)
         }
+        
+        # Ensure at least one from each if limit allows
+        if limit >= 4:
+            for strategy in allocations:
+                if allocations[strategy] == 0:
+                    allocations[strategy] = 1
         
         # Retrieve from each strategy
         for strategy_name, allocation in allocations.items():

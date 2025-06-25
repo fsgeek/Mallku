@@ -17,6 +17,7 @@ from uuid import UUID
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..service.round_orchestrator import RoundSummary
 from ..service.service import FireCircleResult, FireCircleService
+from .config import MemorySystemConfig, DEFAULT_CONFIG
 from .episode_segmenter import EpisodeSegmenter, SegmentationCriteria
 from .memory_store import MemoryStore
 from .models import EpisodicMemory, MemoryType
@@ -41,14 +42,29 @@ class EpisodicMemoryService:
         self,
         memory_store: MemoryStore | None = None,
         event_bus: ConsciousnessEventBus | None = None,
-        storage_path: Path | None = None
+        storage_path: Path | None = None,
+        config: MemorySystemConfig | None = None
     ):
         """Initialize episodic memory service."""
-        self.memory_store = memory_store or MemoryStore(storage_path=storage_path)
+        # Use provided config or load from environment
+        self.config = config or MemorySystemConfig.from_env()
+        
+        # Initialize components with config
+        self.memory_store = memory_store or MemoryStore(
+            storage_path=storage_path,
+            enable_sacred_detection=self.config.storage.enable_sacred_detection
+        )
         self.event_bus = event_bus
-        self.retrieval_engine = MemoryRetrievalEngine(self.memory_store)
-        self.segmenter = EpisodeSegmenter()
-        self.sacred_detector = SacredMomentDetector()
+        self.retrieval_engine = MemoryRetrievalEngine(
+            self.memory_store,
+            config=self.config.retrieval
+        )
+        self.segmenter = EpisodeSegmenter(
+            criteria=self.config.segmentation
+        )
+        self.sacred_detector = SacredMomentDetector(
+            config=self.config.sacred_detection
+        )
         
         # Track active sessions
         self.active_sessions: dict[UUID, dict[str, Any]] = {}
