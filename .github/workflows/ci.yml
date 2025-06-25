@@ -30,6 +30,8 @@ jobs:
         run: uv pip install pre-commit
       - name: sync
         run: uv sync
+      - name: build mallku
+        run: uv build
       - name: Install mallku in editable mode
         run: uv pip install -e .
       - name: Show versions
