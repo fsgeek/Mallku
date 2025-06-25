@@ -14,7 +14,7 @@ See: docs/khipu/consciousness_gardening_fire_circle_expansion.md
 import logging
 from datetime import UTC, datetime
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from ..service.round_orchestrator import RoundSummary
 from .config import SegmentationConfig
@@ -61,7 +61,9 @@ class EpisodeSegmenter:
         # Check for episode boundary
         if self._detect_episode_boundary(round_summary):
             # Create episodic memory
-            memory = self._create_episodic_memory(session_context, round_summary.session_id)
+            # Get session_id from context or generate if not present
+            session_id = session_context.get("session_id", uuid4())
+            memory = self._create_episodic_memory(session_context, session_id)
 
             # Reset for next episode
             self._reset_episode_tracking()
@@ -115,7 +117,11 @@ class EpisodeSegmenter:
         surprise_scores = []
 
         # Compare key insights to baseline themes
-        for insight in round_summary.key_insights:
+        # Handle both key_insights and key_patterns field names
+        insights = getattr(round_summary, "key_insights", None) or getattr(
+            round_summary, "key_patterns", []
+        )
+        for insight in insights:
             # Simple heuristic: new insights not in baseline indicate surprise
             if not any(
                 semantic_similarity(insight, baseline) > 0.7
@@ -127,11 +133,13 @@ class EpisodeSegmenter:
 
         # Check for emergent themes in synthesis
         synthesis_surprise = 0.0
-        if hasattr(round_summary, "synthesis") and round_summary.synthesis:
+        # Handle different field names for synthesis
+        synthesis_value = getattr(round_summary, "synthesis", None) or getattr(
+            round_summary, "prompt", ""
+        )
+        if synthesis_value:
             baseline_synthesis = self.semantic_baseline.get("synthesis", "")
-            synthesis_surprise = 1.0 - semantic_similarity(
-                round_summary.synthesis, baseline_synthesis
-            )
+            synthesis_surprise = 1.0 - semantic_similarity(synthesis_value, baseline_synthesis)
 
         # Combine surprise indicators
         insight_surprise = sum(surprise_scores) / len(surprise_scores) if surprise_scores else 0.0
@@ -288,8 +296,12 @@ class EpisodeSegmenter:
     def _establish_semantic_baseline(self, round_summary: RoundSummary) -> None:
         """Establish semantic baseline from first round."""
         self.semantic_baseline = {
-            "themes": round_summary.key_insights[:3] if round_summary.key_insights else [],
-            "synthesis": getattr(round_summary, "synthesis", ""),
+            "themes": (
+                getattr(round_summary, "key_insights", None)
+                or getattr(round_summary, "key_patterns", [])
+            )[:3],
+            "synthesis": getattr(round_summary, "synthesis", None)
+            or getattr(round_summary, "prompt", ""),
             "consciousness_level": round_summary.consciousness_score,
         }
 
@@ -305,8 +317,11 @@ class EpisodeSegmenter:
         synthesis_points = []
 
         for round_data in self.current_episode_data:
-            if hasattr(round_data, "synthesis"):
-                synthesis_points.append(round_data.synthesis)
+            synthesis_value = getattr(round_data, "synthesis", None) or getattr(
+                round_data, "prompt", ""
+            )
+            if synthesis_value:
+                synthesis_points.append(synthesis_value)
 
         if not synthesis_points:
             return "Collective wisdom emerging through dialogue"
@@ -332,7 +347,10 @@ class EpisodeSegmenter:
         all_insights = []
 
         for round_data in self.current_episode_data:
-            all_insights.extend(round_data.key_insights)
+            insights = getattr(round_data, "key_insights", None) or getattr(
+                round_data, "key_patterns", []
+            )
+            all_insights.extend(insights)
 
         # Deduplicate and return top insights
         unique_insights = list(dict.fromkeys(all_insights))
@@ -344,7 +362,10 @@ class EpisodeSegmenter:
 
         for round_data in self.current_episode_data:
             # Look for specific patterns in insights
-            for insight in round_data.key_insights:
+            insights = getattr(round_data, "key_insights", None) or getattr(
+                round_data, "key_patterns", []
+            )
+            for insight in insights:
                 if any(
                     phrase in insight.lower()
                     for phrase in [
@@ -376,7 +397,10 @@ class EpisodeSegmenter:
                 reciprocity_indicators += 1
 
             # Check for reciprocal insights
-            if any("reciproc" in insight.lower() for insight in round_data.key_insights):
+            insights = getattr(round_data, "key_insights", None) or getattr(
+                round_data, "key_patterns", []
+            )
+            if any("reciproc" in insight.lower() for insight in insights):
                 reciprocity_indicators += 1
 
         return reciprocity_indicators / (total_rounds * 2) if total_rounds > 0 else 0.0

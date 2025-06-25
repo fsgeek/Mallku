@@ -13,6 +13,7 @@ import json
 import logging
 from collections import defaultdict
 from datetime import UTC, datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -38,12 +39,24 @@ class MemoryStore:
     and sacred moment crystallization for consciousness continuity.
     """
 
-    def __init__(self, storage_path: Path | None = None, enable_sacred_detection: bool = True):
-        """Initialize memory store."""
+    def __init__(
+        self,
+        storage_path: Path | None = None,
+        enable_sacred_detection: bool = True,
+        cache_size: int = 128,
+    ):
+        """Initialize memory store.
+
+        Args:
+            storage_path: Path for persistent storage
+            enable_sacred_detection: Whether to detect sacred moments
+            cache_size: Maximum number of memories to cache (0 disables cache)
+        """
         self.storage_path = storage_path or Path("data/fire_circle_memory")
         self.storage_path.mkdir(parents=True, exist_ok=True)
 
         self.sacred_detector = SacredMomentDetector() if enable_sacred_detection else None
+        self.cache_size = cache_size
 
         # In-memory indices for fast retrieval
         self.memories_by_session: dict[UUID, list[UUID]] = defaultdict(list)
@@ -53,6 +66,13 @@ class MemoryStore:
         self.memory_clusters: dict[UUID, MemoryCluster] = {}
         self.companion_relationships: dict[str, CompanionRelationship] = {}
         self.wisdom_consolidations: dict[UUID, WisdomConsolidation] = {}
+
+        # Configure cache based on size
+        if self.cache_size > 0:
+            # Recreate cached method with proper size
+            self._cached_load_memory = lru_cache(maxsize=self.cache_size)(
+                self._load_memory_from_disk
+            )
 
         # Load existing memories
         self._load_existing_memories()
@@ -79,6 +99,10 @@ class MemoryStore:
 
         # Persist to disk
         self._persist_memory(memory)
+
+        # Invalidate cache for this memory
+        if self.cache_size > 0:
+            self._cached_load_memory.cache_clear()
 
         logger.info(
             f"Stored {'sacred ' if memory.is_sacred else ''}episodic memory: "
@@ -288,15 +312,33 @@ class MemoryStore:
             relationship.relationship_trajectory = "deepening"
 
     def _persist_memory(self, memory: EpisodicMemory) -> None:
-        """Persist memory to disk."""
+        """Persist memory to disk with atomic write."""
         memory_file = self.storage_path / f"episodes/{memory.episode_id}.json"
         memory_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(memory_file, "w") as f:
-            json.dump(memory.model_dump(mode="json"), f, indent=2)
+        # Write to temporary file first
+        temp_file = memory_file.with_suffix(".json.tmp")
+
+        try:
+            with open(temp_file, "w") as f:
+                json.dump(memory.model_dump(mode="json"), f, indent=2)
+
+            # Atomic rename (on POSIX systems)
+            temp_file.replace(memory_file)
+        except Exception:
+            # Clean up temp file on error
+            if temp_file.exists():
+                temp_file.unlink()
+            raise
 
     def _load_memory(self, memory_id: UUID) -> EpisodicMemory | None:
-        """Load memory from disk."""
+        """Load memory from disk with optional caching."""
+        if self.cache_size > 0 and hasattr(self, "_cached_load_memory"):
+            return self._cached_load_memory(memory_id)
+        return self._load_memory_from_disk(memory_id)
+
+    def _load_memory_from_disk(self, memory_id: UUID) -> EpisodicMemory | None:
+        """Load memory from disk without caching."""
         memory_file = self.storage_path / f"episodes/{memory_id}.json"
 
         if not memory_file.exists():
@@ -311,20 +353,44 @@ class MemoryStore:
             return None
 
     def _persist_cluster(self, cluster: MemoryCluster) -> None:
-        """Persist cluster to disk."""
+        """Persist cluster to disk with atomic write."""
         cluster_file = self.storage_path / f"clusters/{cluster.cluster_id}.json"
         cluster_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(cluster_file, "w") as f:
-            json.dump(cluster.model_dump(mode="json"), f, indent=2)
+        # Write to temporary file first
+        temp_file = cluster_file.with_suffix(".json.tmp")
+
+        try:
+            with open(temp_file, "w") as f:
+                json.dump(cluster.model_dump(mode="json"), f, indent=2)
+
+            # Atomic rename (on POSIX systems)
+            temp_file.replace(cluster_file)
+        except Exception:
+            # Clean up temp file on error
+            if temp_file.exists():
+                temp_file.unlink()
+            raise
 
     def _persist_consolidation(self, consolidation: WisdomConsolidation) -> None:
-        """Persist wisdom consolidation to disk."""
+        """Persist wisdom consolidation to disk with atomic write."""
         wisdom_file = self.storage_path / f"wisdom/{consolidation.consolidation_id}.json"
         wisdom_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(wisdom_file, "w") as f:
-            json.dump(consolidation.model_dump(mode="json"), f, indent=2)
+        # Write to temporary file first
+        temp_file = wisdom_file.with_suffix(".json.tmp")
+
+        try:
+            with open(temp_file, "w") as f:
+                json.dump(consolidation.model_dump(mode="json"), f, indent=2)
+
+            # Atomic rename (on POSIX systems)
+            temp_file.replace(wisdom_file)
+        except Exception:
+            # Clean up temp file on error
+            if temp_file.exists():
+                temp_file.unlink()
+            raise
 
     def _load_existing_memories(self) -> None:
         """Load existing memories from disk on startup."""

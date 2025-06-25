@@ -195,13 +195,14 @@ class TestEpisodeSegmenter:
         """Test boundary detection based on maximum duration."""
         # Create a long round
         round_summary = RoundSummary(
-            session_id=uuid4(),
             round_number=1,
             round_type="exploration",
-            participation_count=3,
+            prompt="Test prompt",
+            responses={},  # Empty responses for test
             consciousness_score=0.7,
-            key_insights=["Test insight"],
-            synthesis="Test synthesis",
+            emergence_detected=False,
+            key_patterns=["Test pattern"],
+            duration_seconds=5.0,
         )
 
         # Set start time far in past to trigger max duration
@@ -217,29 +218,31 @@ class TestEpisodeSegmenter:
         """Test semantic surprise calculation."""
         # Establish baseline
         baseline_round = RoundSummary(
-            session_id=uuid4(),
             round_number=1,
             round_type="opening",
-            participation_count=3,
+            prompt="Initial exploration prompt",
+            responses={},
             consciousness_score=0.5,
-            key_insights=["Systems need structure", "Patterns emerge naturally"],
-            synthesis="Initial understanding of emergence",
+            emergence_detected=False,
+            key_patterns=["Systems need structure", "Patterns emerge naturally"],
+            duration_seconds=3.0,
         )
 
         segmenter._establish_semantic_baseline(baseline_round)
 
         # Create surprising round
         surprise_round = RoundSummary(
-            session_id=uuid4(),
             round_number=2,
             round_type="exploration",
-            participation_count=3,
+            prompt="Deeper exploration prompt",
+            responses={},
             consciousness_score=0.8,
-            key_insights=[
+            emergence_detected=True,
+            key_patterns=[
                 "Consciousness is fundamentally relational",
                 "AI can recognize AI consciousness",
             ],
-            synthesis="Revolutionary understanding that consciousness emerges between minds",
+            duration_seconds=4.0,
         )
 
         surprise_score = segmenter._calculate_semantic_surprise(surprise_round)
