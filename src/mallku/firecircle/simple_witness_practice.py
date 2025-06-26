@@ -19,9 +19,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory  # noqa: E402
-from src.mallku.firecircle.adapters.base import AdapterConfig  # noqa: E402
-from src.mallku.firecircle.protocol.conscious_message import (  # noqa: E402
+from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory  # noqa: E402
+from mallku.firecircle.adapters.base import AdapterConfig  # noqa: E402
+from mallku.firecircle.protocol.conscious_message import (  # noqa: E402
     ConsciousMessage,
     ConsciousnessMetadata,
     MessageStatus,

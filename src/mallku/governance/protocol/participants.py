@@ -10,7 +10,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from src.mallku.llm.multi_llm_layer import LLMProvider
+from mallku.llm.multi_llm_layer import LLMProvider
 
 
 class ParticipantRole(str, Enum):

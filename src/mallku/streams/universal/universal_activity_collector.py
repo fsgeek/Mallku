@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
-from src.mallku.memory_anchor_client import MemoryAnchorClient
+from mallku.memory_anchor_client import MemoryAnchorClient
 
 
 class WebhookEvent(BaseModel):

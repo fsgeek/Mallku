@@ -3,9 +3,9 @@ Email Activity Provider for Memory-Anchored Search
 Transforms email from isolated messages to episodic memories
 """
 
-from src.mallku.memory_anchor_client import MemoryAnchorClient
-from src.mallku.streams.base import BaseCollector, BaseRecorder
-from src.mallku.streams.reciprocity.scorer import AyniScorer
+from mallku.memory_anchor_client import MemoryAnchorClient
+from mallku.streams.base import BaseCollector, BaseRecorder
+from mallku.streams.reciprocity.scorer import AyniScorer
 
 
 class EmailMemoryCollector(BaseCollector):
