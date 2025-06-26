@@ -43,14 +43,16 @@ class TestConsciousnessGovernanceIntegration:
         """Test reciprocity extraction alert models."""
         # Test that extraction detection models exist and work
         alert = ExtractionAlert(
-            extraction_type=ExtractionType.LABOR,
-            severity=AlertSeverity.MEDIUM,
+            extraction_type=ExtractionType.RESOURCE_HOARDING,
+            severity=AlertSeverity.CONCERN,
             description="Test extraction pattern detected",
-            context={"source": "test"},
+            evidence_summary="Test entity showing resource accumulation patterns",
+            potentially_extractive_entity="test_entity",
+            detection_methodology="test_detection",
         )
 
-        assert alert.extraction_type == ExtractionType.LABOR
-        assert alert.severity == AlertSeverity.MEDIUM
+        assert alert.extraction_type == ExtractionType.RESOURCE_HOARDING
+        assert alert.severity == AlertSeverity.CONCERN
         print("✓ Extraction alert models functional")
 
     @pytest.mark.asyncio
