@@ -70,6 +70,7 @@ from .pattern_library import (
 from .protocol import (
     ConsciousMessage,
     ConsciousnessMetadata,
+    MessageContent,
     MessageRole,
     MessageStatus,
     MessageType,
@@ -85,6 +86,7 @@ __all__ = [
     # Protocol
     "ConsciousMessage",
     "ConsciousnessMetadata",
+    "MessageContent",
     "MessageType",
     "MessageRole",
     "MessageStatus",

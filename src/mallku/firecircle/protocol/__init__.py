@@ -9,6 +9,7 @@ Extends the base Fire Circle protocol with Mallku's consciousness integration.
 from .conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
+    MessageContent,
     MessageRole,
     MessageStatus,
     MessageType,
@@ -19,6 +20,7 @@ from .conscious_message import (
 __all__ = [
     "ConsciousMessage",
     "ConsciousnessMetadata",
+    "MessageContent",
     "MessageType",
     "MessageRole",
     "MessageStatus",
