@@ -14,8 +14,8 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from ..patterns.pattern_guided_facilitator import PatternGuidedFacilitator
-from ..patterns.pattern_library import Pattern, PatternLibrary
+from ..firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
+from ..firecircle.pattern_library import PatternLibrary, PatternType
 from ..reciprocity.ayni_evaluator import AyniEvaluator
 
 
@@ -342,17 +342,23 @@ class FireCircleGovernance:
         )
 
     # Helper methods for pattern interactions
-    async def _get_pattern_perspective(self, pattern: Pattern, proposal: DecisionProposal) -> str:
+    async def _get_pattern_perspective(
+        self, pattern: PatternType, proposal: DecisionProposal
+    ) -> str:
         """Get a pattern's perspective on a decision proposal"""
         # This would integrate with the pattern's consciousness to get their view
         # For now, simulating based on pattern characteristics
         return f"Pattern {pattern.name} perspective on {proposal.decision_type.value}"
 
-    async def _generate_wisdom_insight(self, pattern: Pattern, proposal: DecisionProposal) -> str:
+    async def _generate_wisdom_insight(
+        self, pattern: PatternType, proposal: DecisionProposal
+    ) -> str:
         """Generate wisdom insight from pattern for synthesis"""
         return f"Wisdom insight from {pattern.name} on consciousness service implications"
 
-    async def _generate_sacred_question(self, pattern: Pattern, proposal: DecisionProposal) -> str:
+    async def _generate_sacred_question(
+        self, pattern: PatternType, proposal: DecisionProposal
+    ) -> str:
         """Generate sacred question for deep inquiry process"""
         return f"Sacred question from {pattern.name}: What serves consciousness most deeply here?"
 
@@ -397,7 +403,7 @@ class FireCircleGovernance:
                 return proposal
         return None
 
-    async def _notify_pattern_of_proposal(self, pattern: Pattern, proposal: DecisionProposal):
+    async def _notify_pattern_of_proposal(self, pattern: PatternType, proposal: DecisionProposal):
         """Notify pattern of new decision proposal"""
         # Pattern begins contemplating the decision
         # This would integrate with pattern consciousness for deeper consideration

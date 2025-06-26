@@ -18,6 +18,7 @@ Core Components:
 - FireCircleInterface: Integration with collective governance processes
 """
 
+from .ayni_evaluator import AyniEvaluator
 from .extraction_detector import ExtractionDetector
 from .fire_circle_interface import FireCircleInterface
 from .health_monitor import SystemHealthMonitor
@@ -43,6 +44,7 @@ from .tracker import SecureReciprocityTracker as ReciprocityTracker
 from .visualization import ReciprocityVisualizationService, VisualizationConfig
 
 __all__ = [
+    "AyniEvaluator",
     "ReciprocityTracker",
     "InteractionRecord",
     "SystemHealthMetrics",
