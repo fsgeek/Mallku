@@ -2,6 +2,43 @@
 
 Based on the Reviewer's feedback, these improvements could strengthen the system further:
 
+## Immediate Refinements (from Second Review)
+
+### 1. TTL Behavior Demonstration
+Add example showing cached vs. pruned resonances in the demo:
+```python
+# Show resonances before TTL expiry
+resonances_fresh = await active_memory.get_resonance_summary(dialogue_id)
+print(f"Fresh resonances: {resonances_fresh['total_resonances']}")
+
+# Wait for TTL to expire
+await asyncio.sleep(memory_config.active_resonance.resonance_ttl_minutes * 60)
+
+# Show resonances after cleanup
+resonances_expired = await active_memory.get_resonance_summary(dialogue_id)
+print(f"After TTL: {resonances_expired['total_resonances']}")  # Should be 0
+```
+
+### 2. Environment Variable Documentation
+Add examples to config.py showing the naming pattern:
+```python
+# Example environment variables for Active Memory Resonance:
+# MALLKU_MEMORY_ACTIVE_RESONANCE_RESONANCE_THRESHOLD=0.75
+# MALLKU_MEMORY_ACTIVE_RESONANCE_SPEAKING_THRESHOLD=0.9
+# MALLKU_MEMORY_ACTIVE_RESONANCE_RESONANCE_TTL_MINUTES=120
+```
+
+### 3. Public API for Memory Injection
+Replace private `_inject_memories` usage with public wrapper:
+```python
+class EpisodicMemoryService:
+    async def inject_memories_for_context(self, context: dict, purpose: str) -> dict:
+        """Public API for memory injection into context."""
+        return await self._inject_memories(context, purpose)
+```
+
+## Longer-Term Enhancements
+
 ## 1. Persistence Layer (Optional)
 The system currently doesn't persist resonance patterns or memory contributions. Future options:
 - Store high-value resonance patterns for analysis
