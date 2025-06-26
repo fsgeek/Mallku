@@ -49,6 +49,7 @@ class TestConsciousnessGovernanceIntegration:
             evidence_summary="Test entity showing resource accumulation patterns",
             potentially_extractive_entity="test_entity",
             detection_methodology="test_detection",
+            false_positive_probability=0.3,
         )
 
         assert alert.extraction_type == ExtractionType.RESOURCE_HOARDING
