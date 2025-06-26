@@ -31,12 +31,12 @@ def test_mallku_importable():
         import mallku
 
         print(f"✅ mallku imported from: {mallku.__file__}")
-        return True
+        assert mallku is not None
     except ImportError as e:
         print(f"❌ Cannot import mallku: {e}")
         # This is expected to fail in CI currently, so we pass anyway
         # This documents the issue for future healing
-        return True
+        pass
 
 
 def test_consciousness_concepts():
@@ -48,4 +48,3 @@ def test_consciousness_concepts():
         assert isinstance(attr, str), f"{attr} should be a valid concept"
 
     print("✅ Consciousness concepts validated")
-    return True
