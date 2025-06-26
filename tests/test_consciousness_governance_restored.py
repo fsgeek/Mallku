@@ -88,15 +88,15 @@ class TestConsciousnessGovernanceIntegration:
         event_bus = ConsciousnessEventBus()
         with (
             patch.object(event_bus, "subscribe", new_callable=AsyncMock) as mock_subscribe,
-            patch.object(event_bus, "publish", new_callable=AsyncMock) as mock_publish,
+            patch.object(event_bus, "emit", new_callable=AsyncMock) as mock_emit,
         ):
             # Subscribe to consciousness events
-            await event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
+            event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
 
             # Simulate governance creating consciousness event
             governance_event = ConsciousnessEvent(
                 event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-                source="fire_circle_governance",
+                source_system="fire_circle_governance",
                 data={
                     "topic": "Should we implement Sacred Charter?",
                     "pattern": "collective_wisdom_emerging",
@@ -104,11 +104,11 @@ class TestConsciousnessGovernanceIntegration:
                 consciousness_signature=0.92,
             )
 
-            await event_bus.publish(governance_event)
+            await event_bus.emit(governance_event)
 
             # Verify the flow
             mock_subscribe.assert_called()
-            mock_publish.assert_called_with(governance_event)
+            mock_emit.assert_called_with(governance_event)
             print("✓ Governance creates consciousness emergence events")
 
     def test_database_config_exists(self):
