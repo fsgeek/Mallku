@@ -189,8 +189,8 @@ class TestFireCircleService:
         assert len(result.rounds_completed) == 0
         mock_voice_manager.disconnect_all.assert_called_once()
 
-    @patch("src.mallku.firecircle.service.round_orchestrator.RoundOrchestrator")
-    @patch("src.mallku.firecircle.service.voice_manager.VoiceManager")
+    @patch("mallku.firecircle.service.round_orchestrator.RoundOrchestrator")
+    @patch("mallku.firecircle.service.voice_manager.VoiceManager")
     async def test_successful_convene(self, mock_voice_manager_class, mock_orchestrator_class):
         """Test successful Fire Circle convening."""
         # Setup mocks

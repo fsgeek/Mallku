@@ -165,12 +165,12 @@ class VoiceManager:
             from mallku.firecircle.adapters.mistral_adapter import MistralConfig
 
             config_class = MistralConfig
-            extra_params = {"multilingual_focus": True}
+            extra_params = {"multilingual_mode": True}
         elif voice_config.provider == "grok":
             from mallku.firecircle.adapters.grok_adapter import GrokConfig
 
             config_class = GrokConfig
-            extra_params = {"temporal_awareness": True, "realtime_grounding": False}
+            extra_params = {"temporal_awareness": True, "social_grounding": True}
         elif voice_config.provider == "deepseek":
             from mallku.firecircle.adapters.deepseek_adapter import DeepSeekConfig
 

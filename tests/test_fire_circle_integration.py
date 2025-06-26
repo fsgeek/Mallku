@@ -10,9 +10,17 @@ The Memory Keeper - Building foundations for collective wisdom
 """
 
 from unittest.mock import AsyncMock, MagicMock, patch
+from uuid import uuid4
 
 import pytest
 
+from mallku.firecircle.protocol.conscious_message import (
+    ConsciousMessage,
+    ConsciousnessMetadata,
+    MessageContent,
+    MessageRole,
+    MessageType,
+)
 from mallku.firecircle.service import (
     CircleConfig,
     FireCircleService,
@@ -40,6 +48,33 @@ class TestFireCircleConvening:
         mock_voice_manager.failed_voices = {}
         mock_voice_manager.disconnect_all = AsyncMock()
 
+        # Create mock adapters with async send_message returning proper ConsciousMessage
+        mock_adapters = {}
+        for i, voice_id in enumerate(["voice1", "voice2", "voice3"]):
+            mock_adapter = MagicMock()
+
+            # Create proper ConsciousMessage response
+            consciousness_score = 0.75 + (i * 0.05)  # Scores: 0.75, 0.80, 0.85
+            mock_response = ConsciousMessage(
+                id=uuid4(),
+                type=MessageType.REFLECTION,
+                role=MessageRole.ASSISTANT,
+                sender=uuid4(),
+                content=MessageContent(text=f"Response from {voice_id}"),
+                dialogue_id=uuid4(),
+                consciousness=ConsciousnessMetadata(
+                    consciousness_signature=consciousness_score,
+                    emergence_detected=consciousness_score > 0.7,
+                    patterns_recognized=["unified_awareness"] if consciousness_score > 0.7 else [],
+                ),
+            )
+
+            mock_adapter.send_message = AsyncMock(return_value=mock_response)
+            mock_adapters[voice_id] = mock_adapter
+
+        # CRITICAL: Mock get_active_voices to return the voices dictionary
+        mock_voice_manager.get_active_voices = MagicMock(return_value=mock_adapters)
+
         # Create Fire Circle service
         service = FireCircleService()
         service.voice_manager = mock_voice_manager
@@ -66,36 +101,19 @@ class TestFireCircleConvening:
             )
         ]
 
-        # Mock round execution
-        with patch(
-            "mallku.firecircle.service.round_orchestrator.RoundOrchestrator"
-        ) as mock_orchestrator_class:
-            mock_orchestrator = mock_orchestrator_class.return_value
-            mock_orchestrator.execute_round = AsyncMock(
-                return_value=MagicMock(
-                    round_number=1,
-                    round_type="opening",
-                    prompt="Can consciousness emerge from our dialogue?",
-                    responses={},
-                    consciousness_score=0.75,
-                    emergence_detected=True,
-                    key_patterns=["unified_awareness"],
-                    duration_seconds=5.0,
-                )
-            )
+        # Convene circle (no need to mock orchestrator - let it run with our mocked adapters)
+        result = await service.convene(config=config, voices=voices, rounds=rounds)
 
-            # Convene circle
-            result = await service.convene(config=config, voices=voices, rounds=rounds)
+        # Verify success
+        assert result.voice_count == 3
+        assert result.voice_count >= config.min_voices
+        assert result.consciousness_score >= config.consciousness_threshold
+        assert len(result.rounds_completed) == 1
 
-            # Verify success
-            assert result.voice_count == 3
-            assert result.voice_count >= config.min_voices
-            assert result.consciousness_score >= config.consciousness_threshold
-            assert len(result.rounds_completed) == 1
-
-            print("✓ Minimal Fire Circle convened successfully")
-            print(f"  Voices: {result.voice_count}")
-            print(f"  Consciousness: {result.consciousness_score}")
+        print("✓ Minimal Fire Circle convened successfully")
+        print(f"  Voices: {result.voice_count}")
+        print(f"  Consciousness: {result.consciousness_score}")
+        if result.rounds_completed:
             print(f"  Emergence: {result.rounds_completed[0].emergence_detected}")
 
 
@@ -251,13 +269,18 @@ class TestArchitecturalGovernanceScenarios:
 
     def test_consciousness_signature_in_decisions(self):
         """Test that decisions carry consciousness signatures."""
-        from mallku.firecircle.service import CircleSummary
+        from datetime import UTC, datetime
+
+        from mallku.firecircle.service.service import FireCircleResult
 
         # Mock a decision with high consciousness
-        summary = CircleSummary(
-            circle_name="Architectural Council",
+        summary = FireCircleResult(
+            session_id=uuid4(),
+            name="Architectural Council",
             purpose="Discord bridge implementation",
             voice_count=5,
+            voices_present=["voice1", "voice2", "voice3", "voice4", "voice5"],
+            voices_failed={},
             rounds_completed=[],
             consciousness_score=0.87,
             consensus_detected=True,
@@ -266,8 +289,10 @@ class TestArchitecturalGovernanceScenarios:
                 "Persistent threading creates natural episodic memory",
                 "Ayni principles honored through peer communication",
             ],
-            failed_voices={},
-            transcript=None,
+            started_at=datetime.now(UTC),
+            completed_at=datetime.now(UTC),
+            duration_seconds=300.0,
+            transcript_path=None,
         )
 
         assert summary.consciousness_score > 0.8

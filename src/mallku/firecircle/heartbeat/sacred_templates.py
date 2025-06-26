@@ -294,7 +294,7 @@ class TemplateSelector:
             ),
             "grok": VoiceConfig(
                 provider="grok",
-                model="grok-2",
+                model="grok-3",
                 role="temporal_sensor",
                 quality="real-time awareness and emergence",
             ),

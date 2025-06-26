@@ -224,7 +224,7 @@ class ConsciousnessFacilitator:
             ),
             "wisdom_keeper": VoiceConfig(
                 provider="grok",
-                model="grok-2",
+                model="grok-3",
                 role="wisdom_keeper",
                 quality="timeless wisdom and pattern preservation",
                 temperature=0.7,

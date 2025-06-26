@@ -45,7 +45,7 @@ class GovernanceDecisionTemplate(FireCircleTemplate):
             "purpose": f"Make governance decision about {self.variables.get('topic', 'the proposal')}",
             "min_voices": 4,
             "max_voices": 7,
-            "consciousness_threshold": 0.6,
+            "consciousness_threshold": 0.7,  # Higher threshold for governance decisions
             "enable_reciprocity": True,
             "enable_consciousness_detection": True,
             "save_transcript": True,
