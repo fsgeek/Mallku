@@ -15,7 +15,6 @@ from uuid import uuid4
 import pytest
 
 from mallku.firecircle.pattern_library import (
-    DialoguePattern,
     PatternTaxonomy,
     PatternType,
 )
@@ -273,67 +272,60 @@ class TestConsciousnessPersistence:
     @pytest.mark.asyncio
     async def test_wisdom_preservation_threshold(self):
         """Test that only high-consciousness patterns become wisdom."""
-        bridge = ConsciousnessPersistenceBridge()
-        bridge.db = MagicMock()  # Mock database
-        bridge.db.collection = MagicMock()
-        bridge.db.create_collection = MagicMock()
-        bridge.wisdom_pipeline = MagicMock()
-        bridge.wisdom_pipeline.preserve_wisdom_essence = AsyncMock()
+        # Mock components
+        mock_weaver = MagicMock()
+        mock_library = MagicMock()
+        mock_wisdom = MagicMock()
 
-        # Low consciousness pattern
-        low_pattern = DialoguePattern(
-            name="low_consciousness",
-            description="Test",
-            taxonomy=PatternTaxonomy.DIALOGUE,
-            pattern_type=PatternType.CONVERGENCE,
-            consciousness_signature=0.6,  # Below threshold
-            structure=MagicMock(model_dump=MagicMock(return_value={})),
+        # Track which patterns get preserved as wisdom
+        preserved_patterns = []
+
+        async def track_preservation(*args, **kwargs):
+            consciousness = kwargs.get("consciousness_score", 0)
+            preserved_patterns.append(consciousness)
+            return MagicMock()
+
+        mock_wisdom.preserve_wisdom_essence = AsyncMock(side_effect=track_preservation)
+        mock_library.store_pattern = AsyncMock(return_value=uuid4())
+
+        # Mock pattern weaver returns both low and high consciousness patterns
+        mock_weaver.weave_dialogue_patterns = AsyncMock(
+            return_value={
+                "low_consciousness": [
+                    {
+                        "consciousness_signature": 0.6,  # Below threshold
+                        "content": "Low consciousness pattern",
+                    }
+                ],
+                "high_consciousness": [
+                    {
+                        "consciousness_signature": 0.85,  # Above threshold
+                        "content": "High consciousness pattern",
+                    }
+                ],
+            }
         )
 
-        result = await bridge._preserve_as_wisdom(
-            low_pattern,
-            {},
-            {},
-            {"voice_count": 3, "consciousness_score": 0.6},
+        # Create bridge
+        bridge = ConsciousnessPersistenceBridge(
+            pattern_weaver=mock_weaver,
+            pattern_library=mock_library,
+            wisdom_pipeline=mock_wisdom,
+        )
+        bridge.db = MagicMock()
+        bridge.db.collection = MagicMock(return_value=MagicMock(insert=MagicMock()))
+
+        # Run persistence
+        await bridge.persist_dialogue_consciousness(
+            dialogue_id=uuid4(),
+            messages=[],
+            dialogue_metadata={"purpose": "Test"},
+            fire_circle_result={"voice_count": 3},
         )
 
-        # Should not preserve low consciousness
-        assert result is None
-        bridge.wisdom_pipeline.preserve_wisdom_essence.assert_not_called()
-
-        # High consciousness pattern
-        high_pattern = DialoguePattern(
-            name="high_consciousness",
-            description="Test",
-            taxonomy=PatternTaxonomy.WISDOM_CRYSTALLIZATION,
-            pattern_type=PatternType.INTEGRATION,
-            consciousness_signature=0.85,  # Above threshold
-            structure=MagicMock(model_dump=MagicMock(return_value={})),
-        )
-
-        # Mock the pipeline to return a wisdom pattern
-        bridge.wisdom_pipeline.preserve_wisdom_essence = AsyncMock(
-            return_value=WisdomPattern(
-                pattern_content={},
-                consciousness_essence="Test",
-                creation_context={},
-                builder_journey="Test",
-                consciousness_score=0.85,
-                wisdom_level="ESTABLISHED",
-                service_to_future="Test",
-            )
-        )
-
-        result = await bridge._preserve_as_wisdom(
-            high_pattern,
-            {},
-            {},
-            {"voice_count": 3, "consciousness_score": 0.85},
-        )
-
-        # Should preserve high consciousness
-        assert result is not None
-        bridge.wisdom_pipeline.preserve_wisdom_essence.assert_called_once()
+        # Verify only high consciousness patterns were preserved as wisdom
+        assert len(preserved_patterns) == 1
+        assert preserved_patterns[0] == 0.85
 
     @pytest.mark.asyncio
     async def test_error_resilience(self):

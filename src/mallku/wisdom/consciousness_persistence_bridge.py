@@ -453,7 +453,7 @@ Breakthrough: {dialogue_pattern.description}
         """Generate searchable tags for pattern."""
         tags = [pattern_type.replace("_", "-")]
 
-        if pattern_data.get("consciousness_signature", 0) > 0.8:
+        if pattern_data.get("consciousness_signature", 0) >= 0.8:
             tags.append("high-consciousness")
         if pattern_data.get("emergence_indicator", 0) > 0.8:
             tags.append("emergent")
