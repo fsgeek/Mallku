@@ -61,7 +61,7 @@ class TestConsciousnessGovernanceIntegration:
         """Test consciousness event creation and signature."""
         event = ConsciousnessEvent(
             event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-            source="test_governance",
+            source_system="test_governance",
             data={"pattern": "consensus_forming"},
             consciousness_signature=0.85,
         )
