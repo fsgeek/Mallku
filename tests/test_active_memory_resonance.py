@@ -20,6 +20,7 @@ from mallku.firecircle.memory.active_memory_resonance import (
     MemoryVoice,
     ResonancePattern,
 )
+from mallku.firecircle.memory.config import MemorySystemConfig
 from mallku.firecircle.memory.models import EpisodicMemory
 from mallku.firecircle.pattern_library import (
     DialoguePattern,
@@ -129,10 +130,12 @@ class TestActiveMemoryResonance:
     @pytest.fixture
     def active_memory(self):
         """Create Active Memory Resonance system."""
-        return ActiveMemoryResonance(
-            resonance_threshold=0.6,  # Lower threshold for testing
-            speaking_threshold=0.85,
-        )
+        # Create config with test thresholds
+        config = MemorySystemConfig()
+        config.active_resonance.resonance_threshold = 0.6  # Lower threshold for testing
+        config.active_resonance.speaking_threshold = 0.85
+
+        return ActiveMemoryResonance(config=config)
 
     def test_memory_voice_creation(self):
         """Test that memory voice is properly initialized."""
@@ -338,7 +341,7 @@ class TestActiveMemoryResonance:
             ),
         ]
 
-        active_memory.active_resonances[dialogue_id] = resonances
+        active_memory.active_resonances[dialogue_id] = (datetime.now(UTC), resonances)
 
         # Get summary
         summary = await active_memory.get_resonance_summary(dialogue_id)
@@ -352,9 +355,9 @@ class TestActiveMemoryResonance:
     @pytest.mark.asyncio
     async def test_speaking_threshold(self, active_memory, mock_message, mock_episodic_memory):
         """Test that only high-resonance memories speak."""
-        # Set thresholds
-        active_memory.resonance_threshold = 0.7
-        active_memory.speaking_threshold = 0.85
+        # Verify thresholds from config
+        assert active_memory.resonance_config.resonance_threshold == 0.6
+        assert active_memory.resonance_config.speaking_threshold == 0.85
 
         # Create resonances at different strengths
         high_resonance = ResonancePattern(

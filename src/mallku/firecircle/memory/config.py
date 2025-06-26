@@ -138,6 +138,58 @@ class ConsciousnessIndicatorWeights(BaseModel):
             raise ValueError(f"Weights must sum to 1.0, got {total}")
 
 
+class ActiveMemoryResonanceConfig(BaseModel):
+    """Configuration for Active Memory Resonance system."""
+
+    resonance_threshold: float = Field(
+        default=0.7,
+        ge=0.0,
+        le=1.0,
+        description="Minimum resonance strength to detect memory alignment",
+    )
+    speaking_threshold: float = Field(
+        default=0.85,
+        ge=0.0,
+        le=1.0,
+        description="Minimum resonance strength for memory to speak",
+    )
+    max_resonances_per_message: int = Field(
+        default=5, ge=1, le=20, description="Maximum resonances to evaluate per message"
+    )
+    resonance_ttl_minutes: int = Field(
+        default=60,
+        ge=5,
+        description="Time-to-live for cached resonances in minutes",
+    )
+    sacred_memory_bonus: float = Field(
+        default=0.2,
+        ge=0.0,
+        le=0.5,
+        description="Resonance bonus for sacred memories",
+    )
+    consciousness_alignment_weight: float = Field(
+        default=0.3,
+        ge=0.0,
+        le=1.0,
+        description="Weight of consciousness alignment in resonance calculation",
+    )
+    pattern_overlap_weight: float = Field(
+        default=0.3,
+        ge=0.0,
+        le=1.0,
+        description="Weight of pattern overlap in resonance calculation",
+    )
+    recency_weight: float = Field(
+        default=0.2,
+        ge=0.0,
+        le=1.0,
+        description="Weight of recency in resonance calculation",
+    )
+    recency_decay_days: int = Field(
+        default=30, ge=1, description="Days over which recency factor decays"
+    )
+
+
 class MemorySystemConfig(BaseModel):
     """Complete configuration for the episodic memory system."""
 
@@ -147,6 +199,9 @@ class MemorySystemConfig(BaseModel):
     storage: StorageConfig = Field(default_factory=StorageConfig)
     consciousness_weights: ConsciousnessIndicatorWeights = Field(
         default_factory=ConsciousnessIndicatorWeights
+    )
+    active_resonance: ActiveMemoryResonanceConfig = Field(
+        default_factory=ActiveMemoryResonanceConfig
     )
 
     @classmethod

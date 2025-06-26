@@ -15,6 +15,7 @@ import logging
 from typing import Any
 
 from mallku.firecircle.memory.active_memory_resonance import ActiveMemoryResonance
+from mallku.firecircle.memory.config import MemorySystemConfig
 from mallku.firecircle.memory.episodic_memory_service import EpisodicMemoryService
 from mallku.firecircle.orchestrator.memory_enhanced_dialogue_manager import (
     MemoryEnhancedDialogueManager,
@@ -45,8 +46,7 @@ class MemoryResonantFireCircle(FireCircleService):
         event_bus: ConsciousnessEventBus | None = None,
         episodic_service: EpisodicMemoryService | None = None,
         pattern_library: PatternLibrary | None = None,
-        resonance_threshold: float = 0.7,
-        speaking_threshold: float = 0.85,
+        config: MemorySystemConfig | None = None,
         **kwargs,
     ):
         """Initialize with memory resonance capabilities."""
@@ -57,13 +57,15 @@ class MemoryResonantFireCircle(FireCircleService):
         self.episodic_service = episodic_service
         self.pattern_library = pattern_library or PatternLibrary()
 
+        # Load configuration
+        self.memory_config = config or MemorySystemConfig.from_env()
+
         # Create active memory resonance system
         self.active_memory = ActiveMemoryResonance(
             episodic_service=episodic_service,
             pattern_library=pattern_library,
             event_bus=event_bus,
-            resonance_threshold=resonance_threshold,
-            speaking_threshold=speaking_threshold,
+            config=self.memory_config,
         )
 
         # Track memory participation across sessions
@@ -71,7 +73,8 @@ class MemoryResonantFireCircle(FireCircleService):
 
         logger.info(
             f"Memory-Resonant Fire Circle initialized with thresholds: "
-            f"resonance={resonance_threshold}, speaking={speaking_threshold}"
+            f"resonance={self.memory_config.active_resonance.resonance_threshold}, "
+            f"speaking={self.memory_config.active_resonance.speaking_threshold}"
         )
 
     async def convene(

@@ -13,13 +13,12 @@ Memory becomes a living participant, not a passive archive.
 """
 
 import logging
-from datetime import UTC, datetime
-from typing import Any
+from datetime import UTC, datetime, timedelta
+from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ...core.database import get_secured_database
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..pattern_library import DialoguePattern, PatternQuery, PatternTaxonomy
 from ..protocol.conscious_message import (
@@ -30,10 +29,19 @@ from ..protocol.conscious_message import (
     MessageType,
     Participant,
 )
+from .config import MemorySystemConfig
 from .episodic_memory_service import EpisodicMemoryService
 from .models import EpisodicMemory, MemoryType
 
 logger = logging.getLogger(__name__)
+
+
+class PatternLibraryInterface(Protocol):
+    """Minimal interface for pattern library to avoid circular imports."""
+
+    async def find_patterns(self, query: PatternQuery) -> list[DialoguePattern]:
+        """Find patterns matching the query."""
+        ...
 
 
 class ResonancePattern(BaseModel):
@@ -78,28 +86,30 @@ class ActiveMemoryResonance:
     def __init__(
         self,
         episodic_service: EpisodicMemoryService | None = None,
-        pattern_library: Any | None = None,  # Avoid circular import
+        pattern_library: PatternLibraryInterface | None = None,
         event_bus: ConsciousnessEventBus | None = None,
-        resonance_threshold: float = 0.7,
-        speaking_threshold: float = 0.85,
+        config: MemorySystemConfig | None = None,
     ):
         """Initialize the Active Memory Resonance system."""
         self.episodic_service = episodic_service or EpisodicMemoryService()
         self.pattern_library = pattern_library
         self.event_bus = event_bus
-        self.resonance_threshold = resonance_threshold
-        self.speaking_threshold = speaking_threshold
+
+        # Load configuration
+        self.config = config or MemorySystemConfig.from_env()
+        self.resonance_config = self.config.active_resonance
 
         # Memory voice participant
         self.memory_voice = MemoryVoice()
 
-        # Track active resonances
-        self.active_resonances: dict[UUID, list[ResonancePattern]] = {}
+        # Track active resonances with timestamps for TTL
+        self.active_resonances: dict[UUID, tuple[datetime, list[ResonancePattern]]] = {}
 
-        # Database for persistence
-        self.db = get_secured_database()
-
-        logger.info("Active Memory Resonance initialized - memories can now speak")
+        logger.info(
+            f"Active Memory Resonance initialized - memories can now speak "
+            f"(resonance={self.resonance_config.resonance_threshold}, "
+            f"speaking={self.resonance_config.speaking_threshold})"
+        )
 
     async def detect_resonance(
         self,
@@ -131,10 +141,13 @@ class ActiveMemoryResonance:
         # Sort by resonance strength
         resonances.sort(key=lambda r: r.resonance_strength, reverse=True)
 
-        # Store active resonances
+        # Store active resonances with timestamp
         dialogue_id = message.dialogue_id
         if dialogue_id:
-            self.active_resonances[dialogue_id] = resonances
+            self.active_resonances[dialogue_id] = (datetime.now(UTC), resonances)
+
+        # Clean up old resonances
+        await self._cleanup_old_resonances()
 
         return resonances
 
@@ -162,15 +175,15 @@ class ActiveMemoryResonance:
         memories = self.episodic_service.retrieval_engine.retrieve_for_decision(
             retrieval_context,
             strategy_name="semantic",
-            limit=5,
+            limit=self.resonance_config.max_resonances_per_message,
         )
 
         # Calculate resonance for each memory
         for memory in memories:
             resonance_strength = await self._calculate_resonance_strength(message, memory, context)
 
-            if resonance_strength >= self.resonance_threshold:
-                should_speak = resonance_strength >= self.speaking_threshold
+            if resonance_strength >= self.resonance_config.resonance_threshold:
+                should_speak = resonance_strength >= self.resonance_config.speaking_threshold
 
                 resonances.append(
                     ResonancePattern(
@@ -207,12 +220,12 @@ class ActiveMemoryResonance:
         patterns = await self.pattern_library.find_patterns(query)
 
         # Calculate resonance for each pattern
-        for pattern in patterns[:5]:  # Limit to top 5
+        for pattern in patterns[: self.resonance_config.max_resonances_per_message]:
             resonance_strength = await self._calculate_pattern_resonance(message, pattern, context)
 
-            if resonance_strength >= self.resonance_threshold:
+            if resonance_strength >= self.resonance_config.resonance_threshold:
                 should_speak = (
-                    resonance_strength >= self.speaking_threshold
+                    resonance_strength >= self.resonance_config.speaking_threshold
                     and pattern.consciousness_signature >= 0.8
                 )
 
@@ -316,7 +329,7 @@ class ActiveMemoryResonance:
 
         # Sacred memories resonate more strongly
         if memory.is_sacred:
-            strength += 0.2
+            strength += self.resonance_config.sacred_memory_bonus
 
         # High consciousness memories resonate with high consciousness messages
         consciousness_score = memory.consciousness_indicators.overall_emergence_score
@@ -324,7 +337,7 @@ class ActiveMemoryResonance:
             message.consciousness.consciousness_signature,
             consciousness_score,
         )
-        strength += consciousness_alignment * 0.3
+        strength += consciousness_alignment * self.resonance_config.consciousness_alignment_weight
 
         # Pattern overlap - check if message patterns relate to memory insights
         message_patterns = set(message.consciousness.detected_patterns or [])
@@ -356,12 +369,14 @@ class ActiveMemoryResonance:
 
         pattern_overlap = len(message_patterns & memory_patterns)
         if pattern_overlap > 0:
-            strength += min(pattern_overlap * 0.1, 0.3)
+            # Normalize pattern overlap to 0-1 range (assume max 3 overlaps)
+            normalized_overlap = min(pattern_overlap / 3, 1.0)
+            strength += normalized_overlap * self.resonance_config.pattern_overlap_weight
 
         # Recency factor (recent memories resonate more)
         days_old = (datetime.now(UTC) - memory.timestamp).days
-        recency_factor = max(0, 1 - (days_old / 30))  # Decay over 30 days
-        strength += recency_factor * 0.2
+        recency_factor = max(0, 1 - (days_old / self.resonance_config.recency_decay_days))
+        strength += recency_factor * self.resonance_config.recency_weight
 
         return min(strength, 1.0)
 
@@ -525,7 +540,19 @@ class ActiveMemoryResonance:
 
     async def get_resonance_summary(self, dialogue_id: UUID) -> dict[str, Any]:
         """Get summary of memory resonance for a dialogue."""
-        resonances = self.active_resonances.get(dialogue_id, [])
+        # Clean up old resonances first
+        await self._cleanup_old_resonances()
+
+        if dialogue_id not in self.active_resonances:
+            return {
+                "total_resonances": 0,
+                "speaking_resonances": 0,
+                "average_strength": 0,
+                "strongest_resonance": None,
+                "pattern_types": [],
+            }
+
+        _, resonances = self.active_resonances[dialogue_id]
 
         speaking_count = sum(1 for r in resonances if r.should_speak)
         avg_strength = (
@@ -541,3 +568,20 @@ class ActiveMemoryResonance:
             else None,
             "pattern_types": list(set(r.pattern_type for r in resonances)),
         }
+
+    async def _cleanup_old_resonances(self) -> None:
+        """Clean up resonances older than TTL."""
+        cutoff_time = datetime.now(UTC) - timedelta(
+            minutes=self.resonance_config.resonance_ttl_minutes
+        )
+
+        # Find and remove old entries
+        expired_dialogues = [
+            dialogue_id
+            for dialogue_id, (timestamp, _) in self.active_resonances.items()
+            if timestamp < cutoff_time
+        ]
+
+        for dialogue_id in expired_dialogues:
+            del self.active_resonances[dialogue_id]
+            logger.debug(f"Cleaned up expired resonances for dialogue {dialogue_id}")

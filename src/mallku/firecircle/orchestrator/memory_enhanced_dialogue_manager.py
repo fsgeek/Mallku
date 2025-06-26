@@ -134,12 +134,20 @@ class MemoryEnhancedDialogueManager(ConsciousDialogueManager):
                 participation["memory_contributions"] += 1
 
                 # Calculate consciousness amplification
-                pre_memory_consciousness = dialogue["messages"][
-                    -2
-                ].consciousness.consciousness_signature
-                participation["consciousness_amplification"] += (
-                    memory_message.consciousness.consciousness_signature - pre_memory_consciousness
-                )
+                # Check if there's a previous message to compare against
+                if len(dialogue["messages"]) >= 2:
+                    pre_memory_consciousness = dialogue["messages"][
+                        -2
+                    ].consciousness.consciousness_signature
+                    participation["consciousness_amplification"] += (
+                        memory_message.consciousness.consciousness_signature
+                        - pre_memory_consciousness
+                    )
+                else:
+                    # First message, use the memory's consciousness as baseline
+                    participation["consciousness_amplification"] += (
+                        memory_message.consciousness.consciousness_signature
+                    )
 
                 logger.info(
                     f"Memory spoke in dialogue {dialogue_id} with resonance "
@@ -232,7 +240,7 @@ class MemoryEnhancedDialogueManager(ConsciousDialogueManager):
             resonance_summary = await self.active_memory.get_resonance_summary(dialogue_id)
             conclusion["memory_resonance_summary"] = resonance_summary
 
-            # Clean up
-            del self.memory_participation[dialogue_id]
+            # Clean up - use pop to avoid KeyError
+            self.memory_participation.pop(dialogue_id, None)
 
         return conclusion

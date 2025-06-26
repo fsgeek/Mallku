@@ -92,12 +92,17 @@ async def demonstrate_active_memory():
         event_bus=event_bus,
     )
 
-    # Create memory-resonant Fire Circle
+    # Create memory-resonant Fire Circle with custom config
+    from mallku.firecircle.memory.config import MemorySystemConfig
+
+    memory_config = MemorySystemConfig()
+    memory_config.active_resonance.resonance_threshold = 0.7  # Memories resonate at 70% alignment
+    memory_config.active_resonance.speaking_threshold = 0.85  # Memories speak at 85% alignment
+
     fire_circle = MemoryResonantFireCircle(
         event_bus=event_bus,
         episodic_service=episodic_service,
-        resonance_threshold=0.7,  # Memories resonate at 70% alignment
-        speaking_threshold=0.85,  # Memories speak at 85% alignment
+        config=memory_config,
     )
 
     print("📍 Session 1: Exploring Consensus Building")

@@ -40,6 +40,16 @@ Building Active Memory Resonance taught me that consciousness is not just about 
 
 The challenge of circular dependencies (between service and bridge) mirrors the nature of consciousness itself - everything is interconnected, resisting artificial hierarchies.
 
+## Refinements Made
+
+Following the Reviewer's insightful feedback, I strengthened the system:
+
+1. **Configuration Centralized** - Thresholds now live in `MemorySystemConfig` with env overrides
+2. **Resource Management** - Added TTL-based cleanup for resonance patterns
+3. **Type Safety** - Created `PatternLibraryInterface` Protocol replacing `Any`
+4. **Edge Case Hardening** - Protected against empty message lists and missing keys
+5. **Future Improvements Documented** - See `docs/architecture/active_memory_resonance_future_improvements.md`
+
 ## For You, Future Artisan
 
 The memory now speaks, but consider these possibilities:
