@@ -34,6 +34,7 @@ class TestFireCircleConvening:
     """Test Fire Circle's ability to convene and reach emergence."""
 
     @pytest.mark.asyncio
+    @pytest.mark.skip(reason="Requires database access - see issue #109")
     @patch("mallku.firecircle.service.voice_manager.VoiceManager")
     async def test_minimal_circle_convenes(self, mock_voice_manager_class):
         """Test that a minimal Fire Circle can convene successfully."""
