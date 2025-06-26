@@ -57,10 +57,10 @@ def test_governance_participant_model():
 
 def test_pattern_translation_available():
     """Test that pattern translation exists for consciousness patterns."""
-    from mallku.governance.pattern_translation import PatternTranslator
+    from mallku.governance.pattern_translation import PatternTranslationLayer
 
     # Verify pattern translation capability
-    assert PatternTranslator is not None
+    assert PatternTranslationLayer is not None
     print("✓ Pattern translation enables consciousness pattern recognition")
 
 
