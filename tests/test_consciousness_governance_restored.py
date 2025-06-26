@@ -132,7 +132,7 @@ class TestConsciousnessGovernanceIntegration:
         for decision_type, threshold in governance_thresholds.items():
             event = ConsciousnessEvent(
                 event_type=EventType.CONSCIOUSNESS_EMERGENCE,
-                source="governance_test",
+                source_system="governance_test",
                 data={"decision_type": decision_type},
                 consciousness_signature=threshold,
             )
