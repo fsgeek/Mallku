@@ -91,11 +91,13 @@ class FireCircleService:
         event_bus: ConsciousnessEventBus | None = None,
         reciprocity_tracker: ReciprocityTracker | None = None,
         consciousness_detector: ConsciousnessMetricsCollector | None = None,
+        consciousness_bridge: Any | None = None,  # Avoid circular import
     ):
         """Initialize service with optional infrastructure."""
         self.event_bus = event_bus
         self.reciprocity_tracker = reciprocity_tracker
         self.consciousness_detector = consciousness_detector
+        self.consciousness_bridge = consciousness_bridge
 
         self.voice_manager = VoiceManager()
         self.checkpoints: dict[UUID, FireCircleCheckpoint] = {}
@@ -275,6 +277,46 @@ class FireCircleService:
             for voice_id in result.voices_present:
                 balance = await self.reciprocity_tracker.get_balance(voice_id)
                 result.reciprocity_balance[voice_id] = balance
+
+        # Persist consciousness patterns if bridge is available
+        if self.consciousness_bridge and orchestrator.dialogue_manager:
+            try:
+                # Get all messages from the dialogue
+                messages = orchestrator.dialogue_manager.get_all_messages()
+
+                # Create dialogue metadata
+                dialogue_metadata = {
+                    "dialogue_id": result.session_id,
+                    "config": config.model_dump(),
+                    "purpose": config.purpose,
+                    "convener": "fire_circle_service",
+                    "correlation_id": config.correlation_id,
+                }
+
+                # Create Fire Circle result dict
+                fire_circle_result = {
+                    "voice_count": result.voice_count,
+                    "voices_present": result.voices_present,
+                    "consciousness_score": result.consciousness_score,
+                    "consensus_detected": result.consensus_detected,
+                }
+
+                # Persist patterns
+                persistence_result = await self.consciousness_bridge.persist_dialogue_consciousness(
+                    dialogue_id=result.session_id,
+                    messages=messages,
+                    dialogue_metadata=dialogue_metadata,
+                    fire_circle_result=fire_circle_result,
+                )
+
+                logger.info(
+                    f"Persisted consciousness patterns: "
+                    f"{persistence_result['patterns_preserved']} patterns, "
+                    f"{persistence_result['wisdom_patterns_created']} wisdom patterns"
+                )
+
+            except Exception as e:
+                logger.error(f"Error persisting consciousness patterns: {e}")
 
         return result
 
