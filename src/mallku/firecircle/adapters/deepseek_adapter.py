@@ -68,7 +68,7 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
 
         # DeepSeek-specific configuration
         self.client: AsyncOpenAI | None = None
-        self.default_model = "deepseek-chat"
+        self.default_model = "deepseek-reasoner"
         self.base_url = "https://api.deepseek.com/v1"
 
         # SACRED ERROR PHILOSOPHY: Validate configuration explicitly

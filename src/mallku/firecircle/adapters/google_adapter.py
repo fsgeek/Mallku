@@ -71,7 +71,7 @@ class GeminiConfig(AdapterConfig):
             data["safety_settings"] = default_safety
 
         # Set default values
-        data.setdefault("model_name", "gemini-1.5-pro")
+        data.setdefault("model_name", "gemini-2.0-flash-exp")
         data.setdefault("temperature", 0.7)
         data.setdefault("max_tokens", 2048)
 

@@ -74,7 +74,7 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
 
         # Set default model if not specified
         if not self.config.model_name:
-            self.config.model_name = "gpt-4-turbo-preview"
+            self.config.model_name = "gpt-4o"
 
         # Update capabilities
         self.capabilities = ModelCapabilities(
