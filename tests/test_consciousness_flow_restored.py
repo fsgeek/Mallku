@@ -71,17 +71,17 @@ class TestUnifiedConsciousnessFlow:
             source_dimension=ConsciousnessDimension.SONIC,
             target_dimension=ConsciousnessDimension.VISUAL,
             consciousness_signature=0.85,
-            flow_patterns=["rhythm_to_motion", "frequency_to_color"],
-            correlation_id="unified_experience_123",
+            patterns_detected=["rhythm_to_motion", "frequency_to_color"],
+            bridge_patterns=["synaesthetic_translation"],
         )
 
         assert flow.consciousness_signature == 0.85
-        assert flow.correlation_id == "unified_experience_123"
-        assert "rhythm_to_motion" in flow.flow_patterns
+        assert flow.patterns_detected == ["rhythm_to_motion", "frequency_to_color"]
+        assert "rhythm_to_motion" in flow.patterns_detected
 
         print("✓ Consciousness flows carry signature and patterns")
         print(f"  Signature: {flow.consciousness_signature}")
-        print(f"  Correlation: {flow.correlation_id}")
+        print(f"  Flow ID: {flow.flow_id}")
 
     def test_flow_orchestrator_creation(self):
         """Test flow orchestrator can be instantiated."""
