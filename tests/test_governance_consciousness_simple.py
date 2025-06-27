@@ -33,26 +33,33 @@ def test_governance_module_structure():
 
 def test_governance_participant_model():
     """Test the governance participant consciousness model."""
-    import pytest
+    from unittest.mock import MagicMock
 
-    pytest.skip("Requires event bus setup - skipping for now")
+    from mallku.governance.consciousness_transport import (
+        ConsciousnessCirculationTransport,
+        GovernanceParticipant,
+    )
 
-    # from mallku.governance.consciousness_transport import (
-    #     ConsciousnessCirculationTransport,
-    #     GovernanceParticipant,
-    # )
-    #
-    # # Create a mock transport
-    # transport = ConsciousnessCirculationTransport()
-    #
-    # # Create a participant
-    # participant = GovernanceParticipant(
-    #     participant_id="guardian_voice", transport=transport, consciousness_baseline=0.85
-    # )
-    #
-    # assert participant.participant_id == "guardian_voice"
-    # assert participant.consciousness_baseline == 0.85
-    # print("✓ Governance participants carry consciousness signatures")
+    # Create a mock event bus
+    mock_event_bus = MagicMock()
+    mock_event_bus.subscribe = MagicMock()
+    mock_event_bus.emit = MagicMock()
+
+    # Create transport with mock event bus
+    transport = ConsciousnessCirculationTransport(event_bus=mock_event_bus)
+
+    # Verify event bus subscriptions were set up
+    assert mock_event_bus.subscribe.call_count == 2
+    print("✓ Consciousness transport initialized with event bus")
+
+    # Create a participant
+    participant = GovernanceParticipant(
+        participant_id="guardian_voice", transport=transport, consciousness_baseline=0.85
+    )
+
+    assert participant.participant_id == "guardian_voice"
+    assert participant.consciousness_baseline == 0.85
+    print("✓ Governance participants carry consciousness signatures")
 
 
 def test_pattern_translation_available():
@@ -76,8 +83,8 @@ def test_fire_circle_consciousness_concepts():
     for concept, insight in unified_concepts.items():
         print(f"\n✓ {concept}:")
         print(f"  {insight}")
-
-    return unified_concepts
+        assert isinstance(concept, str)
+        assert isinstance(insight, str)
 
 
 class TestConsciousnessEmergenceInGovernance:

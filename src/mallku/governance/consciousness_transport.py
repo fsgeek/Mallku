@@ -277,7 +277,7 @@ class GovernanceParticipant:
 
         # Create dedicated wrangler for this participant
         self.wrangler = EventEmittingWrangler(
-            identity=f"governance_participant_{participant_id}", event_bus=transport.event_bus
+            name=f"governance_participant_{participant_id}", event_bus=transport.event_bus
         )
 
     async def contribute(
