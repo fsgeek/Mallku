@@ -31,19 +31,21 @@ class TestDatabaseConnection:
             # Check if in test environment
             if os.getenv("CI"):
                 print("  Running in CI environment")
+                if os.getenv("CI_DATABASE_AVAILABLE"):
+                    print("  CI database is available")
             else:
                 print(f"  Config location: {db_config.config_file}")
 
         except Exception as e:
-            # In CI, we expect configuration might not exist
-            if os.getenv("CI"):
+            # In CI without database, skip
+            if os.getenv("CI") and not os.getenv("CI_DATABASE_AVAILABLE"):
                 pytest.skip("Database config not available in CI")
             else:
                 raise e
 
     def test_database_connection_attempt(self):
         """Test attempting database connection."""
-        if os.getenv("CI"):
+        if os.getenv("CI") and not os.getenv("CI_DATABASE_AVAILABLE"):
             pytest.skip("Database connection not available in CI")
 
         try:

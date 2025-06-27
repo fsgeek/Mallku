@@ -68,16 +68,30 @@ class MallkuDBConfig:
     def _create_default_config(self) -> None:
         """Create default configuration for test database."""
         self.config = configparser.ConfigParser()
-        self.config["database"] = {
-            "host": "localhost",
-            "port": "8529",
-            "database": "Mallku",
-            "user_name": "mallku_user",
-            "user_password": "test_password",
-            "admin_user": "root",
-            "admin_passwd": "test_admin",
-            "ssl": "false",
-        }
+
+        # Use CI environment variables if available
+        if os.getenv("CI_DATABASE_AVAILABLE"):
+            self.config["database"] = {
+                "host": os.getenv("ARANGODB_HOST", "localhost"),
+                "port": os.getenv("ARANGODB_PORT", "8529"),
+                "database": os.getenv("ARANGODB_DATABASE", "test_mallku"),
+                "user_name": "",  # No auth in CI
+                "user_password": "",  # No auth in CI
+                "admin_user": "",  # No auth in CI
+                "admin_passwd": "",  # No auth in CI
+                "ssl": "false",
+            }
+        else:
+            self.config["database"] = {
+                "host": "localhost",
+                "port": "8529",
+                "database": "Mallku",
+                "user_name": "mallku_user",
+                "user_password": "test_password",
+                "admin_user": "root",
+                "admin_passwd": "test_admin",
+                "ssl": "false",
+            }
 
         # Save the default config
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
@@ -138,12 +152,33 @@ class MallkuDBConfig:
             username = db_config["user_name"]
             password = db_config["user_password"]
 
-            self._database = self.client.db(
-                database_name, username=username, password=password, verify=True
-            )
+            # Handle no-auth case for CI
+            if os.getenv("ARANGODB_NO_AUTH") and not username:
+                self._database = self.client.db(database_name, verify=True)
+            else:
+                self._database = self.client.db(
+                    database_name, username=username, password=password, verify=True
+                )
 
             # Test the connection
-            self._database.properties()
+            try:
+                self._database.properties()
+            except Exception as db_error:
+                # In CI, database might not exist yet - create it
+                if os.getenv("CI_DATABASE_AVAILABLE"):
+                    logging.info(f"Database {database_name} not found, creating it...")
+                    try:
+                        sys_db = self.client.db("_system", verify=True)
+                        if not sys_db.has_database(database_name):
+                            sys_db.create_database(database_name)
+                        # Reconnect to the new database
+                        self._database = self.client.db(database_name, verify=True)
+                        self._database.properties()
+                    except Exception as create_error:
+                        logging.error(f"Failed to create database: {create_error}")
+                        raise db_error
+                else:
+                    raise db_error
 
             logging.info(f"Connected to database {database_name}")
             return True
