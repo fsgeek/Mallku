@@ -50,10 +50,6 @@ jobs:
         ports:
           - 8529:8529
         options: >-
-          --health-cmd "curl -f http://localhost:8529/_api/version || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
           --memory=512m
           --cpus=1
 
@@ -67,6 +63,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Wait for ArangoDB
+        run: |
+          echo "Waiting for ArangoDB to be ready..."
+          for i in {1..30}; do
+            if curl -f http://localhost:8529/_api/version 2>/dev/null; then
+              echo "ArangoDB is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          curl http://localhost:8529/_api/version || exit 1
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
