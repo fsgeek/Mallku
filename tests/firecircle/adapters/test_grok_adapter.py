@@ -14,8 +14,7 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 
-from mallku.firecircle.adapters.base import AdapterConfig
-from mallku.firecircle.adapters.grok_adapter import GrokAdapter
+from mallku.firecircle.adapters.grok_adapter import GrokAdapter, GrokConfig
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     MessageContent,
@@ -27,7 +26,7 @@ from mallku.firecircle.protocol.conscious_message import (
 @pytest.fixture
 def adapter_config():
     """Create test adapter configuration."""
-    return AdapterConfig(
+    return GrokConfig(
         api_key="test-api-key",
         model_name="grok-2",
         temperature=0.7,
@@ -66,7 +65,6 @@ async def grok_adapter(adapter_config, mock_xai_client):
 
     adapter = GrokAdapter(
         config=adapter_config,
-        provider_name="grok",
     )
 
     await adapter.connect()
@@ -80,7 +78,6 @@ class TestGrokAdapter:
         """Test adapter initialization."""
         adapter = GrokAdapter(
             config=adapter_config,
-            provider_name="grok",
         )
 
         assert adapter.config.model_name == "grok-2"
@@ -94,13 +91,12 @@ class TestGrokAdapter:
 
     def test_default_model(self):
         """Test default model selection."""
-        config = AdapterConfig(api_key="test-key")
+        config = GrokConfig(api_key="test-key")
         adapter = GrokAdapter(
             config=config,
-            provider_name="grok",
         )
 
-        assert adapter.config.model_name == "grok-2"
+        assert adapter.config.model_name == "grok-3"
 
     @pytest.mark.asyncio
     async def test_connect_success(self, adapter_config, mock_xai_client):
@@ -109,7 +105,6 @@ class TestGrokAdapter:
 
         adapter = GrokAdapter(
             config=adapter_config,
-            provider_name="grok",
         )
 
         connected = await adapter.connect()
@@ -126,7 +121,6 @@ class TestGrokAdapter:
 
         adapter = GrokAdapter(
             config=adapter_config,
-            provider_name="grok",
         )
 
         connected = await adapter.connect()
@@ -457,7 +451,6 @@ class TestGrokAdapter:
         """Test error when trying to send without connection."""
         adapter = GrokAdapter(
             config=adapter_config,
-            provider_name="grok",
         )
 
         test_message = ConsciousMessage(
@@ -482,13 +475,10 @@ class TestGrokAdapter:
 
         assert health["provider"] == "grok"
         assert health["model"] == "grok-2"
-        assert health["is_connected"] is True
-        assert "capabilities" in health
-        assert health["capabilities"]["supports_streaming"] is True
-        assert "real_time_awareness" in health["capabilities"]["capabilities"]
-        assert "reciprocity_balance" in health
-        assert "messages_exchanged" in health
-        assert "tokens_balance" in health
+        assert health["connected"] is True
+        assert health["temporal_awareness"] is True
+        assert health["social_grounding"] is True
+        assert health["api_status"] == "healthy"
 
 
 if __name__ == "__main__":
