@@ -70,7 +70,7 @@ class MallkuDBConfig:
         self.config = configparser.ConfigParser()
 
         # Use CI environment variables if available
-        if os.getenv("CI_DATABASE_AVAILABLE"):
+        if os.getenv("CI_DATABASE_AVAILABLE") == "1":
             self.config["database"] = {
                 "host": os.getenv("ARANGODB_HOST", "localhost"),
                 "port": os.getenv("ARANGODB_PORT", "8529"),
@@ -165,7 +165,13 @@ class MallkuDBConfig:
                 self._database.properties()
             except Exception as db_error:
                 # In CI, database might not exist yet - create it
-                if os.getenv("CI_DATABASE_AVAILABLE"):
+                # Only handle specific database not found errors
+                error_msg = str(db_error).lower()
+                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
+                    "database not found" in error_msg
+                    or "database '_system' not found" in error_msg
+                    or "404" in error_msg
+                ):
                     logging.info(f"Database {database_name} not found, creating it...")
                     try:
                         sys_db = self.client.db("_system", verify=True)
@@ -178,6 +184,7 @@ class MallkuDBConfig:
                         logging.error(f"Failed to create database: {create_error}")
                         raise db_error
                 else:
+                    # Not a database-not-found error, propagate it
                     raise db_error
 
             logging.info(f"Connected to database {database_name}")
