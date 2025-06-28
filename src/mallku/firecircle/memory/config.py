@@ -138,6 +138,72 @@ class ConsciousnessIndicatorWeights(BaseModel):
             raise ValueError(f"Weights must sum to 1.0, got {total}")
 
 
+class ConsciousnessSegmentationConfig(BaseModel):
+    """Configuration for enhanced consciousness episode segmentation."""
+
+    # Phase transition thresholds
+    semantic_surprise_for_pause: float = Field(
+        default=0.7, ge=0.0, le=1.0, description="Semantic surprise threshold for Inhalation→Pause"
+    )
+    convergence_for_exhalation: float = Field(
+        default=0.6, ge=0.0, le=1.0, description="Convergence threshold for Pause→Exhalation"
+    )
+    pattern_density_for_exhalation: float = Field(
+        default=0.5, ge=0.0, le=1.0, description="Pattern density threshold for Pause→Exhalation"
+    )
+    emergence_for_rest: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Consciousness emergence for Exhalation→Rest"
+    )
+    stability_for_rest: float = Field(
+        default=0.7, ge=0.0, le=1.0, description="Stability threshold for Exhalation→Rest"
+    )
+    new_questions_for_inhalation: float = Field(
+        default=0.5, ge=0.0, le=1.0, description="New questions threshold for Rest→Inhalation"
+    )
+
+    # Sacred pattern thresholds
+    sacred_score_for_boundary: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Sacred score threshold for boundary detection"
+    )
+    governance_consciousness_sacred: float = Field(
+        default=0.85, ge=0.0, le=1.0, description="Governance consciousness for sacred detection"
+    )
+    sacred_pattern_weight_filter: float = Field(
+        default=1.5, ge=0.0, le=3.0, description="Minimum aggregate weight for sacred boundary"
+    )
+
+    # Phase completion thresholds
+    phase_completion_threshold: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Phase completion score for natural boundary"
+    )
+
+    # Question resolution thresholds
+    question_resolution_consciousness: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Consciousness score for question resolution"
+    )
+    question_resolution_max_new: int = Field(
+        default=2, ge=0, description="Maximum new questions for resolution boundary"
+    )
+
+    # Emotional resonance
+    emotional_coherence_threshold: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Emotional coherence for resonance tracking"
+    )
+
+    # Transformation seeds
+    transformation_seed_normalization: int = Field(
+        default=3, ge=1, description="Number of seeds to normalize transformation potential"
+    )
+
+    # Rhythm detection windows
+    previous_rounds_for_phase: int = Field(
+        default=3, ge=1, description="Number of previous rounds to consider for phase detection"
+    )
+    pattern_normalization_count: int = Field(
+        default=5, ge=1, description="Expected patterns for density normalization"
+    )
+
+
 class ActiveMemoryResonanceConfig(BaseModel):
     """Configuration for Active Memory Resonance system."""
 
@@ -194,6 +260,9 @@ class MemorySystemConfig(BaseModel):
     """Complete configuration for the episodic memory system."""
 
     segmentation: SegmentationConfig = Field(default_factory=SegmentationConfig)
+    consciousness_segmentation: ConsciousnessSegmentationConfig = Field(
+        default_factory=ConsciousnessSegmentationConfig
+    )
     sacred_detection: SacredDetectionConfig = Field(default_factory=SacredDetectionConfig)
     retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)

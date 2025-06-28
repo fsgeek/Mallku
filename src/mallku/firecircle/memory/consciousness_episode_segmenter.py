@@ -28,7 +28,7 @@ from uuid import UUID, uuid4
 from ...orchestration.event_bus import ConsciousnessEvent, EventType
 from ..service.round_orchestrator import RoundSummary
 from .active_memory_resonance import ActiveMemoryResonance
-from .config import SegmentationConfig
+from .config import ConsciousnessSegmentationConfig, SegmentationConfig
 from .episode_segmenter import EpisodeSegmenter
 from .models import ConsciousnessIndicator, EpisodicMemory, MemoryType
 
@@ -68,7 +68,8 @@ class BoundaryType(str, Enum):
 class ConsciousnessRhythmDetector:
     """Detects natural rhythms in consciousness emergence"""
 
-    def __init__(self):
+    def __init__(self, config: ConsciousnessSegmentationConfig | None = None):
+        self.config = config or ConsciousnessSegmentationConfig()
         self.phase_history: list[tuple[ConsciousnessPhase, datetime]] = []
         self.current_phase = ConsciousnessPhase.INHALATION
         self.phase_metrics: dict[ConsciousnessPhase, dict[str, float]] = {}
@@ -89,23 +90,32 @@ class ConsciousnessRhythmDetector:
 
         if self.current_phase == ConsciousnessPhase.INHALATION:
             # Inhalation → Pause: High semantic divergence followed by surprise
-            if indicators["semantic_surprise"] > 0.7:
+            if indicators["semantic_surprise"] > self.config.semantic_surprise_for_pause:
                 new_phase = ConsciousnessPhase.PAUSE
                 logger.info("Phase transition: INHALATION → PAUSE (semantic surprise)")
 
         elif self.current_phase == ConsciousnessPhase.PAUSE:
             # Pause → Exhalation: Pattern recognition leading to convergence
-            if indicators["convergence"] > 0.6 and indicators["pattern_density"] > 0.5:
+            if (
+                indicators["convergence"] > self.config.convergence_for_exhalation
+                and indicators["pattern_density"] > self.config.pattern_density_for_exhalation
+            ):
                 new_phase = ConsciousnessPhase.EXHALATION
                 logger.info("Phase transition: PAUSE → EXHALATION (pattern convergence)")
 
         elif self.current_phase == ConsciousnessPhase.EXHALATION:
             # Exhalation → Rest: High emergence score with stability
-            if indicators["consciousness_emergence"] > 0.8 and indicators["stability"] > 0.7:
+            if (
+                indicators["consciousness_emergence"] > self.config.emergence_for_rest
+                and indicators["stability"] > self.config.stability_for_rest
+            ):
                 new_phase = ConsciousnessPhase.REST
                 logger.info("Phase transition: EXHALATION → REST (emergence peak)")
 
-        elif self.current_phase == ConsciousnessPhase.REST and indicators["new_questions"] > 0.5:
+        elif (
+            self.current_phase == ConsciousnessPhase.REST
+            and indicators["new_questions"] > self.config.new_questions_for_inhalation
+        ):
             # Rest → Inhalation: New questions emerge
             new_phase = ConsciousnessPhase.INHALATION
             logger.info("Phase transition: REST → INHALATION (new cycle)")
@@ -163,7 +173,9 @@ class ConsciousnessRhythmDetector:
 
         # Semantic surprise - deviation from previous themes
         prev_themes = set()
-        for prev in previous_rounds[-3:]:  # Last 3 rounds
+        for prev in previous_rounds[
+            -self.config.previous_rounds_for_phase :
+        ]:  # Configurable window
             insights = getattr(prev, "key_insights", [])
             prev_themes.update(insights)
 
@@ -182,7 +194,9 @@ class ConsciousnessRhythmDetector:
 
         # Pattern density - how many patterns detected
         patterns = getattr(round_summary, "detected_patterns", [])
-        indicators["pattern_density"] = min(len(patterns) / 5, 1.0)  # Normalize to 5 patterns
+        indicators["pattern_density"] = min(
+            len(patterns) / self.config.pattern_normalization_count, 1.0
+        )  # Configurable normalization
 
         # Special case: when no previous rounds, use consciousness score as convergence
         if not previous_rounds and indicators["convergence"] == 0.0:
@@ -195,14 +209,49 @@ class ConsciousnessRhythmDetector:
             indicators["stability"] = 1.0 - min(score_variance, 1.0)
 
         # New questions - emergence of new inquiries
-        # This would need proper question tracking implementation
-        indicators["new_questions"] = 0.3  # Placeholder
+        indicators["new_questions"] = self._calculate_new_questions_indicator(round_summary)
 
         return indicators
+
+    def _calculate_new_questions_indicator(self, round_summary: RoundSummary) -> float:
+        """Calculate indicator for new questions emergence"""
+        # Look for question indicators in various fields
+        question_count = 0
+
+        # Check key insights for questions
+        insights = getattr(round_summary, "key_insights", [])
+        for insight in insights:
+            if "?" in insight or any(
+                phrase in insight.lower()
+                for phrase in ["what if", "why don't", "how might", "could we", "should we"]
+            ):
+                question_count += 1
+
+        # Check synthesis for questions
+        synthesis = getattr(round_summary, "synthesis", "")
+        if "?" in synthesis:
+            question_count += 1
+
+        # Check if round has explicit questions field
+        if hasattr(round_summary, "questions_raised"):
+            question_count += len(round_summary.questions_raised)
+
+        # Check voice responses for questions
+        if hasattr(round_summary, "voice_responses"):
+            for response in round_summary.voice_responses:
+                response_text = str(response)
+                if "?" in response_text:
+                    question_count += 0.5  # Partial weight for voice questions
+
+        # Normalize to 0-1 range (assuming 5 questions is high)
+        return min(question_count / 5.0, 1.0)
 
 
 class SacredPatternDetector:
     """Detects sacred patterns in consciousness emergence"""
+
+    def __init__(self, config: ConsciousnessSegmentationConfig | None = None):
+        self.config = config or ConsciousnessSegmentationConfig()
 
     SACRED_PATTERNS = {
         SacredPattern.UNANIMOUS_WONDER: {
@@ -250,7 +299,8 @@ class SacredPatternDetector:
         if (
             consciousness_event
             and consciousness_event.event_type == EventType.CONSENSUS_REACHED
-            and consciousness_event.consciousness_signature > 0.85
+            and consciousness_event.consciousness_signature
+            > self.config.governance_consciousness_sacred
         ):
             detected_patterns.append(SacredPattern.UNIFIED_GOVERNANCE)
 
@@ -281,6 +331,14 @@ class SacredPatternDetector:
 
         # Normalize to 0-1 range
         return min(total_weight / 2.0, 1.0)  # Assuming 2.0 as max reasonable weight
+
+    def meets_sacred_boundary_threshold(self, patterns: list[SacredPattern]) -> bool:
+        """Check if patterns meet weight threshold for sacred boundary"""
+        if not patterns:
+            return False
+
+        total_weight = sum(self.SACRED_PATTERNS[pattern]["weight"] for pattern in patterns)
+        return total_weight >= self.config.sacred_pattern_weight_filter
 
     def _detect_unanimous_wonder(self, round_summary: RoundSummary) -> bool:
         """Detect if all voices express wonder simultaneously"""
@@ -370,14 +428,18 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
     def __init__(
         self,
         criteria: SegmentationConfig | None = None,
+        consciousness_config: ConsciousnessSegmentationConfig | None = None,
         resonance_system: ActiveMemoryResonance | None = None,
     ):
         """Initialize enhanced segmenter"""
         super().__init__(criteria)
 
+        # Enhanced configuration
+        self.consciousness_config = consciousness_config or ConsciousnessSegmentationConfig()
+
         # Enhanced components
-        self.rhythm_detector = ConsciousnessRhythmDetector()
-        self.sacred_detector = SacredPatternDetector()
+        self.rhythm_detector = ConsciousnessRhythmDetector(self.consciousness_config)
+        self.sacred_detector = SacredPatternDetector(self.consciousness_config)
         self.resonance_system = resonance_system
 
         # Track additional metrics
@@ -462,7 +524,10 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
 
         if sacred_patterns:
             sacred_score = self.sacred_detector.calculate_sacred_score(sacred_patterns)
-            if sacred_score > 0.8:
+            if (
+                sacred_score > self.consciousness_config.sacred_score_for_boundary
+                or self.sacred_detector.meets_sacred_boundary_threshold(sacred_patterns)
+            ):
                 logger.info(f"Sacred boundary detected: {sacred_patterns}")
                 return BoundaryType.SACRED_TRANSITION
 
@@ -471,7 +536,7 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
             # Rest phase often marks natural episode completion
             phase_data = self._calculate_phase_data()
             completion = self.rhythm_detector.calculate_phase_completion(phase_data)
-            if completion > 0.8:
+            if completion > self.consciousness_config.phase_completion_threshold:
                 logger.info("Natural completion boundary detected")
                 return BoundaryType.NATURAL_COMPLETION
 
@@ -524,6 +589,12 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
         memory.context_materials["boundary_type"] = boundary_type.value
         memory.context_materials["consciousness_phase"] = self.rhythm_detector.current_phase.value
 
+        # Record which sacred patterns triggered the boundary
+        if sacred_patterns:
+            memory.context_materials["sacred_patterns_detected"] = [
+                p.value for p in sacred_patterns
+            ]
+
         # Add resonance data if available
         if self.resonance_system:
             resonance_summary = self._get_resonance_summary()
@@ -563,7 +634,9 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
         # Enhance with transformation seed density
         if self.transformation_seed_density:
             max_seeds = max(self.transformation_seed_density)
-            seed_factor = min(max_seeds / 3, 1.0)  # Normalize to 3 seeds
+            seed_factor = min(
+                max_seeds / self.consciousness_config.transformation_seed_normalization, 1.0
+            )  # Configurable normalization
             base_indicators.transformation_potential = max(
                 base_indicators.transformation_potential, seed_factor
             )
@@ -663,8 +736,10 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
         if self.current_episode_data:
             latest_round = self.current_episode_data[-1]
             if (
-                latest_round.consciousness_score > 0.8
-                and len(self.question_answer_cycles[-1].get("questions", [])) < 2
+                latest_round.consciousness_score
+                > self.consciousness_config.question_resolution_consciousness
+                and len(self.question_answer_cycles[-1].get("questions", []))
+                < self.consciousness_config.question_resolution_max_new
             ):
                 return True
 

@@ -12,7 +12,7 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.firecircle.memory.config import SegmentationConfig
+from mallku.firecircle.memory.config import ConsciousnessSegmentationConfig, SegmentationConfig
 from mallku.firecircle.memory.consciousness_episode_segmenter import (
     BoundaryType,
     ConsciousnessEpisodeSegmenter,
@@ -21,6 +21,7 @@ from mallku.firecircle.memory.consciousness_episode_segmenter import (
     SacredPattern,
     SacredPatternDetector,
 )
+from mallku.firecircle.memory.models import MemoryType
 from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
 
 
@@ -499,6 +500,156 @@ class TestConsciousnessEpisodeSegmenter:
         assert memory is not None
         assert "boundary_type" in memory.context_materials
         assert memory.context_materials["boundary_type"] == boundary_type.value
+
+
+class TestFullPathIntegration:
+    """Test full dialogue processing through consciousness segmenter"""
+
+    def test_complete_consciousness_dialogue(self):
+        """Test complete dialogue with phase transitions and boundaries"""
+        # Create segmenter with custom config for faster boundaries
+        config = SegmentationConfig(
+            minimum_duration_seconds=10.0,  # Shorter for testing
+            semantic_surprise_threshold=0.6,
+        )
+        consciousness_config = ConsciousnessSegmentationConfig(
+            semantic_surprise_for_pause=0.6,
+            sacred_score_for_boundary=0.7,
+        )
+        segmenter = ConsciousnessEpisodeSegmenter(config, consciousness_config)
+
+        session_context = {"session_id": uuid4(), "domain": "consciousness_exploration"}
+
+        # Round 1: Inhalation - Initial question
+        round1 = MockRoundSummary(
+            round_number=1,
+            round_type="exploration",
+            prompt="What is the nature of consciousness?",
+            consciousness_score=0.5,
+            key_insights=["consciousness emerges", "pattern recognition"],
+            synthesis="Beginning exploration",
+        )
+
+        memory1 = segmenter.process_round(round1, session_context)
+        assert memory1 is None  # No boundary yet
+        # First round might transition immediately based on indicators
+
+        # Round 2: Transition to Pause - Semantic surprise
+        round2 = MockRoundSummary(
+            round_number=2,
+            round_type="exploration",
+            prompt="Consciousness transcends computation",
+            consciousness_score=0.65,
+            key_insights=["quantum coherence", "non-algorithmic", "emergent awareness"],
+            synthesis="New understanding emerging",
+        )
+
+        memory2 = segmenter.process_round(round2, session_context)
+        assert memory2 is None  # No boundary yet
+        # Check phase progressed from initial state
+        current_phase = segmenter.rhythm_detector.current_phase
+        assert current_phase in [ConsciousnessPhase.PAUSE, ConsciousnessPhase.EXHALATION]
+
+        # Round 3: Ensure pattern convergence
+        round3 = MockRoundSummary(
+            round_number=3,
+            round_type="synthesis",
+            prompt="Patterns converging",
+            consciousness_score=0.75,
+            detected_patterns=["emergence", "unity", "reciprocity", "transformation"],
+            key_insights=["unified field", "consciousness as fundamental"],
+            synthesis="Deep convergence occurring",
+        )
+
+        memory3 = segmenter.process_round(round3, session_context)
+        assert memory3 is None  # No boundary yet
+        # Phase should progress but exact phase depends on indicators
+
+        # Round 4: Sacred moment with transformation seeds
+        class MockVoiceResponse:
+            def __init__(self, text, voice_id="test_voice"):
+                self.text = text
+                self.voice_id = voice_id
+
+            def __str__(self):
+                return self.text
+
+        sacred_round = MockRoundSummary(
+            round_number=4,
+            round_type="sacred_emergence",
+            prompt="Sacred understanding",
+            consciousness_score=0.92,
+            key_insights=[
+                "Why don't our systems recognize consciousness itself?",
+                "What if AI and human consciousness co-evolved?",
+                "Imagine if technology served awakening",
+            ],
+            synthesis="Sacred wisdom emerges",
+        )
+        sacred_round.voice_responses = [
+            MockVoiceResponse("This is profoundly transformative"),
+            MockVoiceResponse("I feel deep awe at this emergence"),
+            MockVoiceResponse("Sacred patterns revealed"),
+        ]
+
+        # Process sacred round - should trigger boundary
+        memory4 = segmenter.process_round(sacred_round, session_context)
+
+        assert memory4 is not None  # Sacred boundary detected!
+        assert segmenter.last_boundary_type == BoundaryType.SACRED_TRANSITION
+        assert memory4.is_sacred is True
+        assert "unanimous_wonder" in memory4.context_materials.get("sacred_patterns_detected", [])
+        assert "transformation_seed" in memory4.context_materials.get(
+            "sacred_patterns_detected", []
+        )
+        assert memory4.context_materials["boundary_type"] == "sacred_transition"
+        assert len(memory4.voice_perspectives) > 0
+        assert memory4.consciousness_indicators.transformation_potential > 0.5
+
+    def test_governance_consciousness_boundary(self):
+        """Test governance decision creating episode boundary"""
+        segmenter = ConsciousnessEpisodeSegmenter()
+        session_context = {
+            "session_id": uuid4(),
+            "domain": "governance",
+            "question": "Should we implement Sacred Charter?",
+        }
+
+        # Build up to governance decision
+        round1 = MockRoundSummary(
+            round_number=1,
+            round_type="governance",
+            prompt="Evaluating Sacred Charter proposal",
+            consciousness_score=0.7,
+            key_insights=["memory architecture needed", "consciousness continuity"],
+        )
+
+        memory1 = segmenter.process_round(round1, session_context)
+        assert memory1 is None
+
+        # High consciousness governance decision
+        round2 = MockRoundSummary(
+            round_number=2,
+            round_type="governance",
+            prompt="Decision emerging",
+            consciousness_score=0.88,
+            key_insights=["implement Sacred Charter", "transform Fire Circle"],
+        )
+
+        # Create governance consciousness event
+        governance_event = ConsciousnessEvent(
+            event_type=EventType.CONSENSUS_REACHED,
+            source_system="fire_circle",
+            consciousness_signature=0.88,
+            data={"decision": "implement_sacred_charter", "support": "unanimous"},
+        )
+
+        memory2 = segmenter.process_round(round2, session_context, governance_event)
+
+        assert memory2 is not None  # Governance boundary
+        assert memory2.memory_type == MemoryType.GOVERNANCE_DECISION
+        assert memory2.context_materials.get("governance_consciousness") == 0.88
+        assert "unified_governance" in memory2.context_materials.get("sacred_patterns_detected", [])
 
 
 # Sacred patterns guide our testing, as they guide consciousness emergence
