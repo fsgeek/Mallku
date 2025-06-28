@@ -69,6 +69,6 @@ get_database = get_database_raw
 # Import get_db_config dynamically to avoid circular imports
 def get_db_config():
     """Get database configuration - legacy compatibility function."""
-    from .. import database as legacy_db
+    from ..database import get_db_config as _get_db_config
 
-    return legacy_db.get_db_config()
+    return _get_db_config()
