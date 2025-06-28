@@ -171,18 +171,23 @@ class MallkuDBConfig:
                     "database not found" in error_msg
                     or "database '_system' not found" in error_msg
                     or "404" in error_msg
+                    or "1228" in error_msg  # ArangoDB error code for database not found
                 ):
                     logging.info(f"Database {database_name} not found, creating it...")
                     try:
                         sys_db = self.client.db("_system", verify=True)
                         if not sys_db.has_database(database_name):
                             sys_db.create_database(database_name)
+                            logging.info(f"Database {database_name} successfully created")
                         # Reconnect to the new database
                         self._database = self.client.db(database_name, verify=True)
                         self._database.properties()
+                        logging.info(
+                            f"Successfully connected to newly created database {database_name}"
+                        )
                     except Exception as create_error:
                         logging.error(f"Failed to create database: {create_error}")
-                        raise db_error
+                        raise create_error  # Raise the creation error, not the original
                 else:
                     # Not a database-not-found error, propagate it
                     raise db_error
