@@ -272,11 +272,13 @@ class EpisodeSegmenter:
                     voice_data[voice_id] = {
                         "insights": [],
                         "questions": [],
-                        "tone": response.get("tone", "neutral"),
+                        "tone": getattr(
+                            response, "tone", getattr(response, "emotional_tone", "neutral")
+                        ),
                     }
 
-                voice_data[voice_id]["insights"].extend(response.get("insights", []))
-                voice_data[voice_id]["questions"].extend(response.get("questions", []))
+                voice_data[voice_id]["insights"].extend(getattr(response, "insights", []))
+                voice_data[voice_id]["questions"].extend(getattr(response, "questions", []))
 
         # Convert to perspectives
         perspectives = []
