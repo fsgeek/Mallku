@@ -153,12 +153,36 @@ class MallkuDBConfig:
             password = db_config["user_password"]
 
             # Handle no-auth case for CI
-            if os.getenv("ARANGODB_NO_AUTH") and not username:
-                self._database = self.client.db(database_name, verify=True)
-            else:
-                self._database = self.client.db(
-                    database_name, username=username, password=password, verify=True
-                )
+            try:
+                if os.getenv("ARANGODB_NO_AUTH") and not username:
+                    self._database = self.client.db(database_name, verify=True)
+                else:
+                    self._database = self.client.db(
+                        database_name, username=username, password=password, verify=True
+                    )
+            except Exception as conn_error:
+                # In CI, database might not exist yet - create it
+                error_msg = str(conn_error).lower()
+                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
+                    "database not found" in error_msg
+                    or "1228" in error_msg  # ArangoDB error code for database not found
+                ):
+                    logging.info(
+                        f"Database {database_name} not found during connection, creating it..."
+                    )
+                    sys_db = self.client.db("_system", verify=True)
+                    if not sys_db.has_database(database_name):
+                        sys_db.create_database(database_name)
+                        logging.info(f"Database {database_name} successfully created")
+                    # Try connecting again
+                    if os.getenv("ARANGODB_NO_AUTH") and not username:
+                        self._database = self.client.db(database_name, verify=True)
+                    else:
+                        self._database = self.client.db(
+                            database_name, username=username, password=password, verify=True
+                        )
+                else:
+                    raise
 
             # Test the connection
             try:
