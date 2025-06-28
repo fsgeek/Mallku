@@ -69,6 +69,21 @@ get_database = get_database_raw
 # Import get_db_config dynamically to avoid circular imports
 def get_db_config():
     """Get database configuration - legacy compatibility function."""
-    from ..database import get_db_config as _get_db_config
+    # Import the module using absolute path to avoid confusion
+    import os
 
-    return _get_db_config()
+    # Get the path to the database.py file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    database_module_path = os.path.join(parent_dir, "database.py")
+
+    # Import the module directly
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("_database_module", database_module_path)
+    if spec and spec.loader:
+        _database_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_database_module)
+        return _database_module.get_db_config()
+    else:
+        raise ImportError("Could not load database.py module")
