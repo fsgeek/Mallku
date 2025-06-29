@@ -24,6 +24,7 @@ from uuid import UUID
 
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..service.service import FireCircleResult, FireCircleService
+from .ceremony_orchestrator import CeremonyOrchestrator
 from .config import MemorySystemConfig
 from .episode_segmenter import EpisodeSegmenter
 from .memory_store import MemoryStore
@@ -99,6 +100,12 @@ class EpisodicMemoryService:
         )
         self.segmenter = EpisodeSegmenter(criteria=self.config.segmentation)
         self.sacred_detector = SacredMomentDetector(config=self.config.sacred_detection)
+
+        # Week 4: Initialize ceremony orchestrator
+        self.ceremony_orchestrator = CeremonyOrchestrator(
+            memory_store=self.memory_store,
+            event_bus=self.event_bus,
+        )
 
         # Track active sessions
         self.active_sessions: dict[UUID, dict[str, Any]] = {}
@@ -233,6 +240,13 @@ class EpisodicMemoryService:
 
                 logger.info(f"Stored {'sacred ' if memory.is_sacred else ''}episode {episode_id}")
 
+        # Week 4: Check for consolidation ceremony triggers after session
+        consolidation = await self.ceremony_orchestrator.conduct_ceremony_if_ready()
+        if consolidation:
+            logger.info(
+                f"Wisdom consolidation ceremony conducted: {consolidation.consolidation_id}"
+            )
+
     async def _emit_sacred_moment_event(self, memory: EpisodicMemory) -> None:
         """Emit event for sacred moment detection."""
         event = ConsciousnessEvent(
@@ -354,3 +368,21 @@ class EpisodicMemoryService:
             "first_interaction": relationship.first_interaction.isoformat(),
             "last_interaction": relationship.last_interaction.isoformat(),
         }
+
+    async def get_ceremony_recommendations(self) -> dict[str, Any]:
+        """
+        Get recommendations for wisdom consolidation ceremonies.
+
+        Week 4 addition: Provides guidance on ceremony readiness.
+        """
+        return await self.ceremony_orchestrator.get_ceremony_recommendations()
+
+    async def conduct_manual_ceremony(self) -> UUID | None:
+        """
+        Manually trigger a wisdom consolidation ceremony.
+
+        Week 4 addition: Allows explicit ceremony invocation.
+        Returns consolidation ID if successful.
+        """
+        consolidation = await self.ceremony_orchestrator.conduct_ceremony_if_ready()
+        return consolidation.consolidation_id if consolidation else None
