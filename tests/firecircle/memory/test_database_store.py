@@ -11,8 +11,8 @@ from uuid import uuid4
 
 import pytest
 
-from src.mallku.firecircle.memory.database_store import DatabaseMemoryStore
-from src.mallku.firecircle.memory.models import (
+from mallku.firecircle.memory.database_store import DatabaseMemoryStore
+from mallku.firecircle.memory.models import (
     ConsciousnessIndicator,
     EpisodicMemory,
     MemoryType,
