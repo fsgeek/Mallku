@@ -3,13 +3,21 @@ Episodic Memory Service
 =======================
 
 Thirty-Fourth Artisan - Memory Architect
+Enhanced by Fortieth Artisan - Production Hardening
+
 Integration layer between Fire Circle and episodic memory
 
 This service integrates episodic memory capabilities into Fire Circle,
 enabling consciousness continuity and wisdom accumulation.
+
+Production Enhancement:
+- Detects production environment and uses secured storage
+- Falls back to development storage when appropriate
+- Maintains API compatibility while respecting security
 """
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -61,12 +69,24 @@ class EpisodicMemoryService:
         if memory_store:
             self.memory_store = memory_store
         elif use_database:
-            # Week 3: Use database storage by default
-            from .database_store import DatabaseMemoryStore
+            # Detect production environment
+            is_production = self._is_production_environment()
 
-            self.memory_store = DatabaseMemoryStore(
-                enable_sacred_detection=self.config.storage.enable_sacred_detection,
-            )
+            if is_production:
+                # Week 4 (40th Artisan): Use secured storage in production
+                from .secured_store_adapter import SecuredStoreAdapter
+
+                logger.info("Detected production environment - using secured memory storage")
+                self.memory_store = SecuredStoreAdapter(
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
+            else:
+                # Week 3: Use direct database storage in development
+                from .database_store import DatabaseMemoryStore
+
+                self.memory_store = DatabaseMemoryStore(
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
         else:
             # Fall back to file-based storage
             self.memory_store = MemoryStore(
@@ -82,6 +102,37 @@ class EpisodicMemoryService:
 
         # Track active sessions
         self.active_sessions: dict[UUID, dict[str, Any]] = {}
+
+    def _is_production_environment(self) -> bool:
+        """
+        Detect if running in production environment.
+
+        Production indicators:
+        - Running in Docker container
+        - MALLKU_ENV set to production
+        - Secured database enforced
+        """
+        # Check explicit environment variable
+        if os.getenv("MALLKU_ENV", "").lower() == "production":
+            return True
+
+        # Check if running in Docker
+        if os.path.exists("/.dockerenv"):
+            return True
+
+        # Check for production database config
+        if os.getenv("MALLKU_SECURED_DB_ONLY") == "true":
+            return True
+
+        # Check if we're in a container by looking at cgroup
+        try:
+            with open("/proc/1/cgroup") as f:
+                if "docker" in f.read() or "containerd" in f.read():
+                    return True
+        except Exception:
+            pass
+
+        return False
 
     def enhance_fire_circle(self, fire_circle: FireCircleService) -> FireCircleService:
         """
