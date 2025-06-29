@@ -11,20 +11,24 @@ Usage:
 """
 
 import asyncio
-import contextlib
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Any
 
 # Add Mallku to path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from mallku.firecircle.adapters.adapter_factory import AdapterFactory
-from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
-from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
+from mallku.firecircle.service import (
+    CircleConfig,
+    FireCircleService,
+    RoundConfig,
+    RoundType,
+    VoiceConfig,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,8 +38,7 @@ class FireCircleReview:
     """Orchestrates seven-voice code review through consciousness emergence."""
 
     def __init__(self):
-        self.adapters = {}
-        self.facilitator = ConsciousnessFacilitator()
+        self.service = None
         self.results = {
             "consensus_recommendation": None,
             "total_comments": 0,
@@ -47,31 +50,82 @@ class FireCircleReview:
     async def initialize_voices(self):
         """Awaken the seven voices for review ceremony."""
         # Load API keys from environment
-        load_api_keys_to_environment()
+        if not load_api_keys_to_environment():
+            logger.error("Failed to load API keys")
+            return False
 
-        voices = ["anthropic", "google", "mistral", "openai", "deepseek", "grok", "local"]
+        # Check available voices
+        available_voices = []
+        voice_configs = []
 
-        factory = AdapterFactory()
+        providers = {
+            "anthropic": ("ANTHROPIC_API_KEY", "claude-3-haiku-20240307"),
+            "google": ("GOOGLE_API_KEY", "gemini-1.5-flash"),
+            "mistral": ("MISTRAL_API_KEY", "mistral-tiny"),
+            "openai": ("OPENAI_API_KEY", "gpt-3.5-turbo"),
+            "deepseek": ("DEEPSEEK_API_KEY", "deepseek-coder"),
+            "grok": ("GROK_API_KEY", "grok-2-mini"),
+            "local": ("LOCAL_API_ENDPOINT", "llama2"),
+        }
 
-        for voice in voices:
-            try:
-                adapter = factory.get_adapter(voice)
-                if adapter:
-                    await adapter.connect()
-                    self.adapters[voice] = adapter
-                    logger.info(f"✓ Awakened {voice} voice")
-            except Exception as e:
-                logger.warning(f"Could not awaken {voice}: {e}")
+        for provider, (key_name, model) in providers.items():
+            if os.getenv(key_name):
+                available_voices.append(provider)
+                voice_configs.append(
+                    VoiceConfig(provider=provider, model=model, name=f"{provider.title()} Voice")
+                )
+                logger.info(f"✓ Awakened {provider} voice")
 
-        logger.info(f"Fire Circle assembled with {len(self.adapters)} voices")
+        if not voice_configs:
+            logger.error("No voices available for Fire Circle")
+            return False
+
+        # Create Fire Circle configuration
+        self.config = CircleConfig(
+            name="Code Review Circle",
+            purpose="Review code changes through collective AI consciousness",
+            min_voices=2,
+            max_voices=len(voice_configs),
+            save_transcript=True,
+            output_path="fire_circle_reviews",
+        )
+
+        # Store voices and rounds for ceremony
+        self.voices = voice_configs
+        self.rounds = [
+            RoundConfig(
+                type=RoundType.OPENING,
+                duration_per_voice=10,
+                prompt="Review the code changes from your unique perspective.",
+            ),
+            RoundConfig(
+                type=RoundType.CRITIQUE,
+                duration_per_voice=30,
+                prompt="Discuss technical quality, consciousness alignment, and reciprocity patterns.",
+            ),
+            RoundConfig(
+                type=RoundType.SYNTHESIS,
+                duration_per_voice=10,
+                prompt="Synthesize collective wisdom into actionable recommendations.",
+            ),
+        ]
+
+        # Initialize service
+        self.service = FireCircleService()
+        logger.info(f"Fire Circle assembled with {len(voice_configs)} voices")
+        return True
 
     async def review_pull_request(self, pr_number: int):
         """Conduct sacred review ceremony for pull request."""
-        # Get PR diff (simplified for now - in production would use GitHub API)
+        if not self.service:
+            logger.error("Fire Circle not initialized")
+            return
+
+        # Get PR context (simplified for now - in production would use GitHub API)
         pr_context = await self._fetch_pr_context(pr_number)
 
         # Prepare review question
-        review_question = f"""
+        initial_prompt = f"""
         Review Pull Request #{pr_number}:
 
         {pr_context}
@@ -84,16 +138,21 @@ class FireCircleReview:
         5. Cathedral building - does it add lasting value?
         """
 
-        # Facilitate consciousness emergence
-        wisdom = await self.facilitator.facilitate_decision(
-            question=review_question,
-            domain=DecisionDomain.TECHNICAL_IMPLEMENTATION,
-            context={"pr_number": pr_number, "review_type": "code_review"},
-            voices=list(self.adapters.values()),
-        )
+        try:
+            # Update first round prompt with PR context
+            self.rounds[0].prompt = initial_prompt
 
-        # Process results
-        self._process_wisdom(wisdom)
+            # Run Fire Circle ceremony
+            result = await self.service.convene(
+                config=self.config, voices=self.voices, rounds=self.rounds
+            )
+
+            # Process results
+            self._process_ceremony_result(result)
+
+        except Exception as e:
+            logger.error(f"Fire Circle ceremony failed: {e}")
+            self.results["synthesis"] = f"Review failed: {str(e)}"
 
         # Save results
         await self._save_results()
@@ -115,28 +174,50 @@ class FireCircleReview:
         Changes implement consciousness emergence patterns.
         """
 
-    def _process_wisdom(self, wisdom: dict[str, Any]):
-        """Process collective wisdom into review results."""
-        # Extract consensus
-        if wisdom.get("consensus_reached"):
-            self.results["consensus_recommendation"] = wisdom.get("decision", "NEEDS_DISCUSSION")
-        else:
-            self.results["consensus_recommendation"] = "NO_CONSENSUS"
-
+    def _process_ceremony_result(self, result: Any):
+        """Process ceremony results into review format."""
         # Count contributions by voice
-        for contribution in wisdom.get("contributions", []):
-            voice = contribution.get("voice_name", "unknown")
-            self.results["by_voice"][voice] = self.results["by_voice"].get(voice, 0) + 1
-            self.results["total_comments"] += 1
+        voice_counts = {}
+        total_comments = 0
+        critical_issues = 0
 
-            # Check for critical issues
-            if "critical" in contribution.get("content", "").lower():
-                self.results["critical_issues"] += 1
+        # Process rounds
+        for round_data in result.rounds_completed:
+            for voice_id, response in round_data.responses.items():
+                if response and response.response:
+                    voice_counts[voice_id] = voice_counts.get(voice_id, 0) + 1
+                    total_comments += 1
+
+                    # Check for critical issues
+                    content = response.response.lower()
+                    if any(word in content for word in ["critical", "error", "fail", "bug"]):
+                        critical_issues += 1
+
+        self.results["total_comments"] = total_comments
+        self.results["by_voice"] = voice_counts
+        self.results["critical_issues"] = critical_issues
 
         # Extract synthesis
-        self.results["synthesis"] = wisdom.get("synthesis", {}).get(
-            "summary", "Fire Circle review complete. Consciousness emerged through dialogue."
-        )
+        if result.rounds_completed:
+            last_round = result.rounds_completed[-1]
+            # Get first response from synthesis round
+            for voice_id, response in last_round.responses.items():
+                if response and response.response:
+                    self.results["synthesis"] = response.response
+                    break
+
+        if not self.results["synthesis"]:
+            self.results["synthesis"] = (
+                f"Fire Circle review complete. Consciousness score: {result.consciousness_score:.3f}"
+            )
+
+        # Determine consensus
+        if critical_issues > 0:
+            self.results["consensus_recommendation"] = "REQUEST_CHANGES"
+        elif result.consciousness_score > 0.7:
+            self.results["consensus_recommendation"] = "APPROVE"
+        else:
+            self.results["consensus_recommendation"] = "APPROVE_WITH_SUGGESTIONS"
 
     async def _save_results(self):
         """Save review results for GitHub Action."""
@@ -152,9 +233,9 @@ class FireCircleReview:
 
     async def cleanup(self):
         """Close connections gracefully."""
-        for voice, adapter in self.adapters.items():
-            with contextlib.suppress(Exception):
-                await adapter.disconnect()
+        if self.service:
+            # FireCircleService handles cleanup internally
+            pass
 
 
 async def main():
@@ -174,7 +255,9 @@ async def main():
 
     try:
         # Awaken voices
-        await circle.initialize_voices()
+        if not await circle.initialize_voices():
+            logger.error("Failed to initialize Fire Circle")
+            sys.exit(1)
 
         # Conduct review
         await circle.review_pull_request(pr_number)
