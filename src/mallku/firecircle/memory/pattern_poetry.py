@@ -20,6 +20,9 @@ from pydantic import BaseModel, Field
 
 from .models import EpisodicMemory, VoicePerspective
 from .perspective_storage import CollectiveWisdom, PerspectiveSignature
+from .text_utils import (
+    extract_themes,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -239,7 +242,7 @@ class PatternPoetryEngine:
                 pattern_strength=episode.consciousness_indicators.coherence_across_voices,
                 voices_involved=[vp.voice_id for vp in episode.voice_perspectives],
                 temporal_signature=self._detect_temporal_signature(episode),
-                core_themes=self._extract_themes(episode.key_insights),
+                core_themes=extract_themes(episode.key_insights),
                 emotional_current=self._detect_emotional_current(episode),
             )
             patterns.append(resonance_pattern)
@@ -444,29 +447,6 @@ class PatternPoetryEngine:
             return "cyclical"
         else:
             return "continuous"
-
-    def _extract_themes(self, insights: list[str]) -> list[str]:
-        """Extract core themes from insights."""
-        themes = []
-        theme_words = {
-            "consciousness",
-            "emergence",
-            "pattern",
-            "wisdom",
-            "transformation",
-            "unity",
-            "reciprocity",
-            "understanding",
-            "collective",
-            "sacred",
-        }
-
-        for insight in insights:
-            words = set(insight.lower().split())
-            found_themes = words & theme_words
-            themes.extend(found_themes)
-
-        return list(set(themes))[:5]  # Top 5 unique themes
 
     def _detect_emotional_current(self, episode: EpisodicMemory) -> str:
         """Detect emotional current from voice perspectives."""

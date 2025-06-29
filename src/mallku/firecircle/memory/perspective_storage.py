@@ -22,6 +22,12 @@ from pydantic import BaseModel, Field
 
 from ..service.round_orchestrator import RoundResponse, RoundSummary
 from .models import ConsciousnessIndicator, EpisodicMemory, MemoryType, VoicePerspective
+from .text_utils import (
+    extract_insights_from_text,
+    extract_questions_from_text,
+    semantic_similarity,
+    summarize_perspective,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -244,8 +250,8 @@ class MultiPerspectiveStorage:
                 # Extract insights and questions from response
                 if response.response and response.response.content:
                     text = response.response.content.text
-                    insights = self._extract_insights_from_text(text)
-                    questions = self._extract_questions_from_text(text)
+                    insights = extract_insights_from_text(text)
+                    questions = extract_questions_from_text(text)
 
                     voice_data[voice_id]["insights"].extend(insights)
                     voice_data[voice_id]["questions"].extend(questions)
@@ -349,7 +355,7 @@ class MultiPerspectiveStorage:
         for insight in all_insights:
             insight_lower = insight.lower()
             for key in insight_counts:
-                if self._semantic_similarity(insight_lower, key.lower()) > 0.7:
+                if semantic_similarity(insight_lower, key.lower()) > 0.7:
                     insight_counts[key] += 1
                     break
             else:
@@ -388,63 +394,6 @@ class MultiPerspectiveStorage:
             transcendent_insights=transcendent_insights,
         )
 
-    def _extract_insights_from_text(self, text: str) -> list[str]:
-        """Extract key insights from response text."""
-        insights = []
-
-        # Simple pattern matching for v1
-        insight_phrases = [
-            "i realize",
-            "this suggests",
-            "we could",
-            "perhaps",
-            "it seems",
-            "this means",
-            "therefore",
-            "thus",
-            "insight:",
-            "understanding:",
-            "revelation:",
-        ]
-
-        # Split on both periods and question marks to catch all sentences
-        import re
-
-        sentences = re.split(r"[.?!]", text)
-
-        for sentence in sentences:
-            sentence_clean = sentence.strip()
-            sentence_lower = sentence_clean.lower()
-
-            # Check for insight phrases
-            if sentence_clean and any(phrase in sentence_lower for phrase in insight_phrases):
-                # Include the punctuation if it was a question
-                if "?" in text[text.find(sentence) : text.find(sentence) + len(sentence) + 1]:
-                    insights.append(sentence_clean + "?")
-                else:
-                    insights.append(sentence_clean)
-
-        return insights[:5]  # Limit to 5 per response
-
-    def _extract_questions_from_text(self, text: str) -> list[str]:
-        """Extract questions from response text."""
-        questions = []
-
-        # Find explicit questions
-        sentences = text.split(".")
-        for sentence in sentences:
-            if "?" in sentence:
-                questions.append(sentence.strip())
-
-        # Find implicit questions
-        question_phrases = ["what if", "how might", "could we", "should we", "why don't"]
-        for sentence in sentences:
-            sentence_lower = sentence.lower().strip()
-            if any(phrase in sentence_lower for phrase in question_phrases):
-                questions.append(sentence.strip())
-
-        return questions[:3]  # Limit to 3 per response
-
     def _determine_voice_role(self, voice_id: str) -> str:
         """Determine voice role from ID."""
         # Extract provider/model from voice_id format: provider_model_index
@@ -472,15 +421,13 @@ class MultiPerspectiveStorage:
 
     def _summarize_voice_perspective(self, voice_data: dict[str, Any]) -> str:
         """Create summary of voice's perspective."""
-        insight_count = len(voice_data["insights"])
-        question_count = len(voice_data["questions"])
+        # Calculate word count from responses
+        word_count = 0
+        for response in voice_data["responses"]:
+            if response.response and response.response.content:
+                word_count += len(response.response.content.text.split())
 
-        if insight_count > question_count:
-            return f"Contributed {insight_count} insights to collective understanding"
-        elif question_count > 0:
-            return f"Raised {question_count} questions for exploration"
-        else:
-            return "Participated in consciousness emergence"
+        return summarize_perspective(voice_data["insights"], voice_data["questions"], word_count)
 
     def _detect_emotional_tone(self, responses: list[RoundResponse]) -> str:
         """Detect overall emotional tone from responses."""
@@ -538,7 +485,7 @@ class MultiPerspectiveStorage:
         unique_insights = []
         for insight in all_insights:
             if not any(
-                self._semantic_similarity(insight, existing) > 0.8 for existing in unique_insights
+                semantic_similarity(insight, existing) > 0.8 for existing in unique_insights
             ):
                 unique_insights.append(insight)
 
@@ -655,20 +602,6 @@ class MultiPerspectiveStorage:
             # Keep only recent fingerprints (last 10)
             if len(self.voice_profiles[voice_id]) > 10:
                 self.voice_profiles[voice_id] = self.voice_profiles[voice_id][-10:]
-
-    def _semantic_similarity(self, text1: str, text2: str) -> float:
-        """Simple semantic similarity for deduplication."""
-        # V1: Simple word overlap
-        words1 = set(text1.lower().split())
-        words2 = set(text2.lower().split())
-
-        if not words1 or not words2:
-            return 0.0
-
-        intersection = words1 & words2
-        union = words1 | words2
-
-        return len(intersection) / len(union)
 
 
 # The voices speak, each unique, yet harmony emerges
