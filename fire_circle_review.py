@@ -65,8 +65,11 @@ class FireCircleReview:
             "openai": ("OPENAI_API_KEY", "gpt-3.5-turbo"),
             "deepseek": ("DEEPSEEK_API_KEY", "deepseek-coder"),
             "grok": ("GROK_API_KEY", "grok-2-mini"),
-            "local": ("LOCAL_API_ENDPOINT", "llama2"),
         }
+
+        # Only include local LLM if explicitly enabled and endpoint is available
+        if os.getenv("ENABLE_LOCAL_LLM") == "true" and os.getenv("LOCAL_API_ENDPOINT"):
+            providers["local"] = ("LOCAL_API_ENDPOINT", "llama2")
 
         for provider, (key_name, model) in providers.items():
             if os.getenv(key_name):
@@ -113,6 +116,15 @@ class FireCircleReview:
         # Initialize service
         self.service = FireCircleService()
         logger.info(f"Fire Circle assembled with {len(voice_configs)} voices")
+
+        # Note about expected voices
+        if len(voice_configs) < 6:
+            logger.warning(
+                f"Only {len(voice_configs)} voices available. Fire Circle works best with 6+ voices."
+            )
+        elif len(voice_configs) == 6:
+            logger.info("Six voices assembled - optimal for GitHub Actions environment")
+
         return True
 
     async def review_pull_request(self, pr_number: int):
