@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload review artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: fire-circle-review-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           path: |
