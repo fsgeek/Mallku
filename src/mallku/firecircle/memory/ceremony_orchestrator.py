@@ -25,6 +25,7 @@ from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus
 from .consolidation_ceremony import ConsolidationCriteria, WisdomConsolidationCeremony
 from .memory_store import MemoryStore
 from .models import EpisodicMemory, WisdomConsolidation
+from .text_utils import extract_keywords
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +169,7 @@ class CeremonyOrchestrator:
 
         for episode_id in self.memory_store.sacred_memories:
             episode = self.memory_store._load_memory(episode_id)
-            if episode and not hasattr(episode, "_consolidated"):
+            if episode and episode.consolidated_into is None:
                 unconsolidated.append(episode)
 
         return unconsolidated
@@ -194,8 +195,10 @@ class CeremonyOrchestrator:
         for episode_id in episode_ids:
             episode = self.memory_store._load_memory(episode_id)
             if episode:
-                # Add consolidation marker (in real implementation, would persist)
-                episode._consolidated = consolidation_id
+                # Use proper model fields for consolidation tracking
+                episode.consolidated_into = consolidation_id
+                episode.consolidated_at = datetime.now(UTC)
+                # TODO: In production, persist the updated episode to database
 
     def _record_ceremony(
         self, consolidation: WisdomConsolidation, episodes: list[EpisodicMemory]
@@ -309,11 +312,3 @@ class CeremonyOrchestrator:
                 logger.info(f"Post-session ceremony conducted: {consolidation.consolidation_id}")
 
         episodic_service._process_session_rounds = enhanced_process
-
-
-# Import helper for backwards compatibility
-def extract_keywords(text: str) -> set[str]:
-    """Extract keywords from text."""
-    from .text_utils import extract_keywords as _extract_keywords
-
-    return _extract_keywords(text)

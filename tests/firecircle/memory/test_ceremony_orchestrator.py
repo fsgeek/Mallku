@@ -85,7 +85,8 @@ class TestCeremonyOrchestrator:
             sacred_reason="High consciousness emergence",
         )
         # Mark as not consolidated
-        memory._consolidated = None
+        memory.consolidated_into = None
+        memory.consolidated_at = None
         return memory
 
     @pytest.mark.asyncio
@@ -96,7 +97,8 @@ class TestCeremonyOrchestrator:
 
         # Add a sacred memory
         orchestrator.memory_store.sacred_memories = [uuid4()]
-        orchestrator.memory_store._load_memory.return_value = MagicMock(_consolidated=None)
+        mock_memory = MagicMock(consolidated_into=None)
+        orchestrator.memory_store._load_memory.return_value = mock_memory
 
         triggered = await orchestrator.check_ceremony_triggers()
         assert triggered  # Should trigger due to time
@@ -238,20 +240,22 @@ class TestCeremonyOrchestrator:
 
         # Verify memories were loaded and marked
         assert orchestrator.memory_store._load_memory.call_count == 2
-        assert hasattr(sacred_memory, "_consolidated")
+        assert sacred_memory.consolidated_into == consolidation_id
+        assert sacred_memory.consolidated_at is not None
 
     @pytest.mark.asyncio
     async def test_integration_with_episodic_service(self, orchestrator):
         """Test integration with episodic memory service."""
         # Create mock episodic service
         episodic_service = MagicMock()
-        episodic_service._process_session_rounds = AsyncMock()
+        original_process_session_rounds = AsyncMock()
+        episodic_service._process_session_rounds = original_process_session_rounds
 
         await orchestrator.integrate_with_episodic_service(episodic_service)
 
         # Verify integration
         assert orchestrator.episodic_service == episodic_service
-        assert episodic_service._process_session_rounds != episodic_service._process_session_rounds
+        assert episodic_service._process_session_rounds != original_process_session_rounds
 
     def test_ceremony_schedule_initialization(self):
         """Test ceremony schedule configuration."""
