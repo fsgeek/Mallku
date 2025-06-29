@@ -43,16 +43,36 @@ class EpisodicMemoryService:
         event_bus: ConsciousnessEventBus | None = None,
         storage_path: Path | None = None,
         config: MemorySystemConfig | None = None,
+        use_database: bool = True,  # Week 3: Default to database storage
     ):
-        """Initialize episodic memory service."""
+        """Initialize episodic memory service.
+
+        Args:
+            memory_store: Optional pre-configured memory store
+            event_bus: Optional consciousness event bus
+            storage_path: Path for file-based storage (if not using database)
+            config: Memory system configuration
+            use_database: Whether to use database storage (default True)
+        """
         # Use provided config or load from environment
         self.config = config or MemorySystemConfig.from_env()
 
         # Initialize components with config
-        self.memory_store = memory_store or MemoryStore(
-            storage_path=storage_path,
-            enable_sacred_detection=self.config.storage.enable_sacred_detection,
-        )
+        if memory_store:
+            self.memory_store = memory_store
+        elif use_database:
+            # Week 3: Use database storage by default
+            from .database_store import DatabaseMemoryStore
+
+            self.memory_store = DatabaseMemoryStore(
+                enable_sacred_detection=self.config.storage.enable_sacred_detection,
+            )
+        else:
+            # Fall back to file-based storage
+            self.memory_store = MemoryStore(
+                storage_path=storage_path,
+                enable_sacred_detection=self.config.storage.enable_sacred_detection,
+            )
         self.event_bus = event_bus
         self.retrieval_engine = MemoryRetrievalEngine(
             self.memory_store, config=self.config.retrieval

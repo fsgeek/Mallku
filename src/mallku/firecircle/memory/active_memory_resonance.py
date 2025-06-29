@@ -89,9 +89,10 @@ class ActiveMemoryResonance:
         pattern_library: PatternLibraryInterface | None = None,
         event_bus: ConsciousnessEventBus | None = None,
         config: MemorySystemConfig | None = None,
+        use_database: bool = True,  # Week 3: Default to database storage
     ):
         """Initialize the Active Memory Resonance system."""
-        self.episodic_service = episodic_service or EpisodicMemoryService()
+        self.episodic_service = episodic_service or EpisodicMemoryService(use_database=use_database)
         self.pattern_library = pattern_library
         self.event_bus = event_bus
 

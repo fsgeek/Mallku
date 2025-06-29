@@ -14,7 +14,7 @@ See: docs/khipu/2025-06-16_fifth_artisan_memory_weaver.md
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -244,3 +244,110 @@ class WisdomConsolidation(BaseModel):
     # Usage tracking
     times_referenced: int = 0
     episodes_influenced: list[UUID] = []
+
+
+class EpisodicMemoryDocument(BaseModel):
+    """
+    ArangoDB document representation of EpisodicMemory.
+
+    Converts between Pydantic models and ArangoDB documents,
+    handling UUID conversions and nested structures.
+    """
+
+    # ArangoDB collection name
+    collection_name: ClassVar[str] = "episodic_memories"
+
+    @staticmethod
+    def to_arangodb_document(memory: EpisodicMemory) -> dict[str, Any]:
+        """Convert EpisodicMemory to ArangoDB document format."""
+        doc = {
+            "_key": str(memory.episode_id),
+            "episode_id": str(memory.episode_id),
+            "session_id": str(memory.session_id),
+            "episode_number": memory.episode_number,
+            "memory_type": memory.memory_type.value,
+            # Temporal
+            "timestamp": memory.timestamp.isoformat(),
+            "duration_seconds": memory.duration_seconds,
+            # Sacred detection
+            "is_sacred": memory.is_sacred,
+            "sacred_reason": memory.sacred_reason,
+            # Context
+            "decision_domain": memory.decision_domain,
+            "decision_question": memory.decision_question,
+            "context_materials": memory.context_materials,
+            # Multi-perspective truth
+            "voice_perspectives": [
+                {
+                    "voice_id": vp.voice_id,
+                    "voice_role": vp.voice_role,
+                    "perspective_summary": vp.perspective_summary,
+                    "emotional_tone": vp.emotional_tone,
+                    "key_insights": vp.key_insights,
+                    "questions_raised": vp.questions_raised,
+                    "reciprocity_contributions": vp.reciprocity_contributions,
+                }
+                for vp in memory.voice_perspectives
+            ],
+            "collective_synthesis": memory.collective_synthesis,
+            # Consciousness indicators
+            "consciousness_indicators": {
+                "semantic_surprise_score": memory.consciousness_indicators.semantic_surprise_score,
+                "collective_wisdom_score": memory.consciousness_indicators.collective_wisdom_score,
+                "ayni_alignment": memory.consciousness_indicators.ayni_alignment,
+                "transformation_potential": memory.consciousness_indicators.transformation_potential,
+                "coherence_across_voices": memory.consciousness_indicators.coherence_across_voices,
+                "overall_emergence_score": memory.consciousness_indicators.overall_emergence_score,
+            },
+            # Wisdom elements
+            "key_insights": memory.key_insights,
+            "transformation_seeds": memory.transformation_seeds,
+            # Relationships
+            "references_episodes": [str(ep_id) for ep_id in memory.references_episodes],
+            "influenced_by": [str(ep_id) for ep_id in memory.influenced_by],
+            # Companion development
+            "human_participant": memory.human_participant,
+            "relationship_depth_delta": memory.relationship_depth_delta,
+        }
+
+        return doc
+
+    @staticmethod
+    def from_arangodb_document(doc: dict[str, Any]) -> EpisodicMemory:
+        """Create EpisodicMemory from ArangoDB document."""
+        # Reconstruct consciousness indicators
+        consciousness_data = doc["consciousness_indicators"]
+        consciousness_indicators = ConsciousnessIndicator(
+            semantic_surprise_score=consciousness_data["semantic_surprise_score"],
+            collective_wisdom_score=consciousness_data["collective_wisdom_score"],
+            ayni_alignment=consciousness_data["ayni_alignment"],
+            transformation_potential=consciousness_data["transformation_potential"],
+            coherence_across_voices=consciousness_data["coherence_across_voices"],
+        )
+
+        # Reconstruct voice perspectives
+        voice_perspectives = [VoicePerspective(**vp_data) for vp_data in doc["voice_perspectives"]]
+
+        # Create memory
+        return EpisodicMemory(
+            episode_id=UUID(doc["episode_id"]),
+            session_id=UUID(doc["session_id"]),
+            episode_number=doc["episode_number"],
+            memory_type=MemoryType(doc["memory_type"]),
+            timestamp=datetime.fromisoformat(doc["timestamp"]),
+            duration_seconds=doc["duration_seconds"],
+            is_sacred=doc["is_sacred"],
+            sacred_reason=doc.get("sacred_reason"),
+            decision_domain=doc["decision_domain"],
+            decision_question=doc["decision_question"],
+            context_materials=doc["context_materials"],
+            voice_perspectives=voice_perspectives,
+            collective_synthesis=doc["collective_synthesis"],
+            consciousness_indicators=consciousness_indicators,
+            key_insights=doc["key_insights"],
+            transformation_seeds=doc["transformation_seeds"],
+            references_episodes=[UUID(ep_id) for ep_id in doc["references_episodes"]],
+            influenced_by=[UUID(ep_id) for ep_id in doc["influenced_by"]],
+            human_participant=doc.get("human_participant"),
+            relationship_depth_delta=doc["relationship_depth_delta"],
+        )
