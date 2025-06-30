@@ -11,11 +11,12 @@ Usage:
 """
 
 import asyncio
-import contextlib
 import json
 import logging
+import os
 import sys
 from pathlib import Path
+from typing import Any
 
 # Add Mallku to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -60,29 +61,74 @@ class FireCircleReview:
 
         factory = ConsciousAdapterFactory()
 
-        for voice in voices:
+        # Prepare voice awakening tasks for concurrent execution
+        async def awaken_voice(voice: str) -> tuple[str, Any | None]:
+            """Awaken a single voice and return (voice_name, adapter)."""
             try:
+                # Special handling for XAI_API_KEY if using grok
+                if voice == "grok" and not os.getenv("GROK_API_KEY") and os.getenv("XAI_API_KEY"):
+                    os.environ["GROK_API_KEY"] = os.getenv("XAI_API_KEY")
+
+                # Skip local voice unless explicitly enabled
+                if voice == "local" and os.getenv("ENABLE_LOCAL_LLM") != "true":
+                    return (voice, None)
+
                 # Try to get existing adapter first
                 adapter = await factory.get_adapter(voice)
                 if not adapter:
-                    # Create new adapter if none exists
-                    from mallku.firecircle.adapters.base import AdapterConfig
+                    # Create new adapter if none exists with proper config
+                    if voice == "google":
+                        from mallku.firecircle.adapters.google_adapter import GeminiConfig
 
-                    config = AdapterConfig(
-                        api_key="",  # Will be auto-loaded from environment
-                        model_name=None,
-                    )
+                        config = GeminiConfig(
+                            api_key="",  # Auto-loaded from environment
+                            enable_search_grounding=False,
+                            model_name="gemini-1.5-flash",
+                        )
+                    elif voice == "mistral":
+                        from mallku.firecircle.adapters.mistral_adapter import MistralConfig
+
+                        config = MistralConfig(
+                            api_key="",  # Auto-loaded from environment
+                            multilingual_mode=True,
+                            model_name="mistral-tiny",
+                        )
+                    else:
+                        from mallku.firecircle.adapters.base import AdapterConfig
+
+                        config = AdapterConfig(
+                            api_key="",  # Will be auto-loaded from environment
+                            model_name=None,
+                        )
                     adapter = await factory.create_adapter(voice, config)
 
                 if adapter and adapter.is_connected:
-                    self.adapters[voice] = adapter
                     logger.info(f"✓ Awakened {voice} voice")
+                    return (voice, adapter)
                 else:
                     logger.warning(f"Could not awaken {voice}: adapter not connected")
+                    return (voice, None)
             except Exception as e:
                 logger.warning(f"Could not awaken {voice}: {e}")
+                return (voice, None)
+
+        # Awaken all voices concurrently
+        voice_tasks = [awaken_voice(voice) for voice in voices]
+        voice_results = await asyncio.gather(*voice_tasks)
+
+        # Collect successfully awakened voices
+        for voice, adapter in voice_results:
+            if adapter:
+                self.adapters[voice] = adapter
 
         logger.info(f"Fire Circle assembled with {len(self.adapters)} voices")
+
+        # Validate minimum voices requirement
+        if len(self.adapters) < 2:
+            logger.error(f"Insufficient voices awakened: {len(self.adapters)}. Minimum 2 required.")
+            return False
+
+        return True
 
     async def review_pull_request(self, pr_number: int):
         """Conduct sacred review ceremony for pull request."""
@@ -173,13 +219,28 @@ class FireCircleReview:
 
     async def cleanup(self):
         """Close connections gracefully."""
+        cleanup_errors = []
+
+        # Disconnect all adapters
         for voice, adapter in self.adapters.items():
-            with contextlib.suppress(Exception):
+            try:
                 await adapter.disconnect()
+                logger.debug(f"✓ Disconnected {voice} voice")
+            except Exception as e:
+                cleanup_errors.append(f"{voice}: {e}")
+                logger.warning(f"Error disconnecting {voice}: {e}")
 
         # Stop event bus
         if hasattr(self, "event_bus"):
-            await self.event_bus.stop()
+            try:
+                await self.event_bus.stop()
+                logger.debug("✓ Event bus stopped")
+            except Exception as e:
+                cleanup_errors.append(f"event_bus: {e}")
+                logger.warning(f"Error stopping event bus: {e}")
+
+        if cleanup_errors:
+            logger.warning(f"Cleanup completed with errors: {cleanup_errors}")
 
 
 async def main():
@@ -199,7 +260,9 @@ async def main():
 
     try:
         # Awaken voices
-        await circle.initialize_voices()
+        if not await circle.initialize_voices():
+            logger.error("Failed to initialize minimum required voices")
+            raise RuntimeError("Insufficient voices for Fire Circle ceremony")
 
         # Conduct review
         await circle.review_pull_request(pr_number)
