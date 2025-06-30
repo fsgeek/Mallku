@@ -25,6 +25,8 @@ from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
+from mallku.firecircle.service.service import FireCircleService
+from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,7 +37,10 @@ class FireCircleReview:
 
     def __init__(self):
         self.adapters = {}
-        self.facilitator = ConsciousnessFacilitator()
+        # Create consciousness infrastructure
+        self.event_bus = ConsciousnessEventBus()
+        self.fire_circle = FireCircleService(event_bus=self.event_bus)
+        self.facilitator = ConsciousnessFacilitator(self.fire_circle, self.event_bus)
         self.results = {
             "consensus_recommendation": None,
             "total_comments": 0,
@@ -46,6 +51,9 @@ class FireCircleReview:
 
     async def initialize_voices(self):
         """Awaken the seven voices for review ceremony."""
+        # Start event bus
+        await self.event_bus.start()
+
         # Load API keys from environment
         load_api_keys_to_environment()
 
@@ -156,6 +164,10 @@ class FireCircleReview:
             with contextlib.suppress(Exception):
                 await adapter.disconnect()
 
+        # Stop event bus
+        if hasattr(self, "event_bus"):
+            await self.event_bus.stop()
+
 
 async def main():
     """Main entry point for Fire Circle review."""
@@ -196,8 +208,8 @@ async def main():
                 f,
             )
         sys.exit(1)
-
     finally:
+        # Always cleanup
         await circle.cleanup()
 
 
