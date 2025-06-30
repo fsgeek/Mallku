@@ -24,8 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Disable database for Fire Circle Review
-      MALLKU_NO_DATABASE: "true"
-      CI_DATABASE_AVAILABLE: "0"
+      MALLKU_SKIP_DATABASE: "true"
 
     steps:
       - name: Checkout code
