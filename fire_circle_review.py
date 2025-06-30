@@ -64,7 +64,7 @@ class FireCircleReview:
             "mistral": ("MISTRAL_API_KEY", "mistral-tiny"),
             "openai": ("OPENAI_API_KEY", "gpt-3.5-turbo"),
             "deepseek": ("DEEPSEEK_API_KEY", "deepseek-coder"),
-            "grok": ("GROK_API_KEY", "grok-2-mini"),
+            "grok": ("GROK_API_KEY", "grok-2-mini"),  # Also checks XAI_API_KEY below
         }
 
         # Only include local LLM if explicitly enabled and endpoint is available
@@ -72,7 +72,18 @@ class FireCircleReview:
             providers["local"] = ("LOCAL_API_ENDPOINT", "llama2")
 
         for provider, (key_name, model) in providers.items():
-            if os.getenv(key_name):
+            # Special handling for Grok - check both GROK_API_KEY and XAI_API_KEY
+            if provider == "grok":
+                api_key = os.getenv(key_name) or os.getenv("XAI_API_KEY")
+                if api_key:
+                    available_voices.append(provider)
+                    voice_configs.append(
+                        VoiceConfig(
+                            provider=provider, model=model, name=f"{provider.title()} Voice"
+                        )
+                    )
+                    logger.info(f"✓ Awakened {provider} voice")
+            elif os.getenv(key_name):
                 available_voices.append(provider)
                 voice_configs.append(
                     VoiceConfig(provider=provider, model=model, name=f"{provider.title()} Voice")
