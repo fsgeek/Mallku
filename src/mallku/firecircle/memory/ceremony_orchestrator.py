@@ -117,6 +117,16 @@ class CeremonyOrchestrator:
 
         Returns the consolidation if ceremony was conducted, None otherwise.
         """
+        # Check if we're running without database
+        import os
+
+        if os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true":
+            logger.warning(
+                "Wisdom consolidation ceremonies unavailable without database persistence. "
+                "Sacred moments are recognized but cannot be woven into lasting wisdom."
+            )
+            return None
+
         if not await self.check_ceremony_triggers():
             return None
 

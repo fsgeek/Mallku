@@ -202,13 +202,20 @@ class PatternLibrary:
 
     def __init__(self):
         """Initialize pattern library with secured database"""
-        self.db = get_secured_database()
+        import os
+
+        self._skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
         self.collection_name = "dialogue_patterns"
         self._pattern_cache: dict[UUID, DialoguePattern] = {}
         self._taxonomy_index: dict[PatternTaxonomy, set[UUID]] = defaultdict(set)
         self._lineage_graph: dict[UUID, set[UUID]] = defaultdict(set)
 
-        logger.info("Pattern Library initialized")
+        if not self._skip_database:
+            self.db = get_secured_database()
+            logger.info("Pattern Library initialized with database")
+        else:
+            self.db = None
+            logger.info("Pattern Library initialized without database (MALLKU_SKIP_DATABASE=true)")
 
     async def store_pattern(self, pattern: DialoguePattern) -> UUID:
         """
@@ -228,11 +235,11 @@ class PatternLibrary:
         for parent_id in pattern.parent_patterns:
             self._lineage_graph[parent_id].add(pattern.pattern_id)
 
-        # Store in database
-        pattern_dict = pattern.model_dump()
-        pattern_dict["_key"] = str(pattern.pattern_id)
-
-        await self.db.upsert_document(self.collection_name, pattern_dict, key_field="_key")
+        # Store in database if available
+        if self.db:
+            pattern_dict = pattern.model_dump()
+            pattern_dict["_key"] = str(pattern.pattern_id)
+            await self.db.upsert_document(self.collection_name, pattern_dict, key_field="_key")
 
         logger.info(f"Stored pattern: {pattern.name} ({pattern.pattern_id})")
         return pattern.pattern_id
@@ -251,12 +258,13 @@ class PatternLibrary:
         if pattern_id in self._pattern_cache:
             return self._pattern_cache[pattern_id]
 
-        # Load from database
-        doc = await self.db.get_document(self.collection_name, str(pattern_id))
-        if doc:
-            pattern = DialoguePattern(**doc)
-            self._pattern_cache[pattern_id] = pattern
-            return pattern
+        # Load from database if available
+        if self.db:
+            doc = await self.db.get_document(self.collection_name, str(pattern_id))
+            if doc:
+                pattern = DialoguePattern(**doc)
+                self._pattern_cache[pattern_id] = pattern
+                return pattern
 
         return None
 
@@ -270,6 +278,21 @@ class PatternLibrary:
         Returns:
             List of matching patterns
         """
+        # If database is skipped, return from cache
+        if not self.db:
+            patterns = list(self._pattern_cache.values())
+            # Apply basic filters
+            if query.taxonomy:
+                patterns = [p for p in patterns if p.taxonomy == query.taxonomy]
+            if query.pattern_type:
+                patterns = [p for p in patterns if p.pattern_type == query.pattern_type]
+            if query.lifecycle_stage:
+                patterns = [p for p in patterns if p.lifecycle_stage == query.lifecycle_stage]
+            if query.min_fitness is not None:
+                patterns = [p for p in patterns if p.fitness_score >= query.min_fitness]
+            # Sort and limit
+            patterns.sort(key=lambda p: (p.fitness_score, p.observation_count), reverse=True)
+            return patterns[: query.limit]
         # Build AQL query
         filters = []
         binds = {}

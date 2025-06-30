@@ -85,27 +85,32 @@ class SecuredDatabaseInterface:
     - Collection policies enforce data integrity
     """
 
-    def __init__(self, database: "StandardDatabase"):
+    def __init__(self, database: "StandardDatabase | None"):
         """Initialize with database connection and security enforcement."""
         self._database = database
         self._security_registry = SecurityRegistry()
         self._collection_policies: dict[str, CollectionSecurityPolicy] = {}
         self._initialized = False
+        self._skip_database = database is None
 
         # Track operations for auditing
         self._operation_count = 0
         self._security_violations = []
+
+        if self._skip_database:
+            logger.info("SecuredDatabaseInterface initialized without database (mock mode)")
 
     async def initialize(self) -> None:
         """Initialize the secured interface and load security policies."""
         if self._initialized:
             return
 
-        # Load security registry from database if it exists
-        await self._load_security_registry()
+        if not self._skip_database:
+            # Load security registry from database if it exists
+            await self._load_security_registry()
 
-        # Register default collection policies
-        await self._register_default_policies()
+            # Register default collection policies
+            await self._register_default_policies()
 
         self._initialized = True
         logger.info("Secured database interface initialized")
@@ -128,6 +133,10 @@ class SecuredDatabaseInterface:
         # Register the policy
         self.register_collection_policy(policy)
 
+        if self._skip_database:
+            logger.debug(f"Skipping collection creation for {collection_name} (database disabled)")
+            return None
+
         # Create collection with schema validation
         if not self._database.has_collection(collection_name):
             collection = self._database.create_collection(
@@ -147,6 +156,10 @@ class SecuredDatabaseInterface:
         This ensures all operations on the collection go through security checks.
         """
         self._ensure_initialized()
+
+        if self._skip_database:
+            logger.debug(f"Skipping collection retrieval for {collection_name} (database disabled)")
+            return None
 
         if collection_name not in self._collection_policies:
             raise SecurityViolationError(
@@ -209,6 +222,20 @@ class SecuredDatabaseInterface:
             else [],
         }
 
+    def collections(self) -> list[str]:
+        """Get list of collection names."""
+        if self._skip_database:
+            return []
+        return [col.name for col in self._database.collections()] if self._database else []
+
+    def create_collection(self, name: str) -> None:
+        """Create a collection (legacy compatibility)."""
+        if self._skip_database:
+            logger.debug(f"Skipping collection creation for {name} (database disabled)")
+            return
+        if self._database:
+            self._database.create_collection(name)
+
     def _ensure_initialized(self) -> None:
         """Ensure the interface is initialized before operations."""
         if not self._initialized:
@@ -216,6 +243,10 @@ class SecuredDatabaseInterface:
 
     async def _load_security_registry(self) -> None:
         """Load security registry from database if it exists."""
+        if self._skip_database:
+            logger.info("Skip loading security registry (database disabled)")
+            return
+
         if self._database.has_collection("security_registry_data"):
             query = """
             FOR doc IN security_registry_data

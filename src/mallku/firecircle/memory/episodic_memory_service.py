@@ -66,10 +66,13 @@ class EpisodicMemoryService:
         # Use provided config or load from environment
         self.config = config or MemorySystemConfig.from_env()
 
+        # Check if database should be skipped entirely
+        skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
+
         # Initialize components with config
         if memory_store:
             self.memory_store = memory_store
-        elif use_database:
+        elif use_database and not skip_database:
             # Detect production environment
             is_production = self._is_production_environment()
 
@@ -89,11 +92,23 @@ class EpisodicMemoryService:
                     enable_sacred_detection=self.config.storage.enable_sacred_detection,
                 )
         else:
-            # Fall back to file-based storage
-            self.memory_store = MemoryStore(
-                storage_path=storage_path,
-                enable_sacred_detection=self.config.storage.enable_sacred_detection,
-            )
+            # Fall back to file-based or in-memory storage
+            if skip_database:
+                # Use mock store when database is explicitly skipped
+                from .mock_memory_store import MockMemoryStore
+
+                logger.info(
+                    "Database skipped (MALLKU_SKIP_DATABASE=true) - using mock memory storage"
+                )
+                self.memory_store = MockMemoryStore(
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
+            else:
+                # Use file-based storage as fallback
+                self.memory_store = MemoryStore(
+                    storage_path=storage_path,
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
         self.event_bus = event_bus
         self.retrieval_engine = MemoryRetrievalEngine(
             self.memory_store, config=self.config.retrieval

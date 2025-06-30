@@ -39,12 +39,20 @@ class ConsciousMemoryStore:
         collection_name: str = "fire_circle_dialogues",
     ):
         """Initialize with Mallku's memory infrastructure."""
-        self.memory_service = memory_service or MemoryAnchorService()
-        self.collection_name = collection_name
-        self.db = get_secured_database()
+        import os
 
-        # Ensure collection exists
-        self._ensure_collection()
+        self.collection_name = collection_name
+        self.db = None
+        self._skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
+
+        if not self._skip_database:
+            self.memory_service = memory_service or MemoryAnchorService()
+            self.db = get_secured_database()
+            # Ensure collection exists
+            self._ensure_collection()
+        else:
+            self.memory_service = None
+            logger.info("ConsciousMemoryStore: Database skipped (MALLKU_SKIP_DATABASE=true)")
 
     def _ensure_collection(self) -> None:
         """Ensure Fire Circle collection exists in secured database."""
@@ -73,6 +81,10 @@ class ConsciousMemoryStore:
         Returns:
             Success status
         """
+        if self._skip_database:
+            logger.debug(f"Skipping dialogue storage for {dialogue_id} (database disabled)")
+            return True
+
         try:
             # Create dialogue anchor
             dialogue_anchor = MemoryAnchor(
