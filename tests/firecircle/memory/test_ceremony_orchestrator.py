@@ -12,18 +12,18 @@ from uuid import uuid4
 
 import pytest
 
-from src.mallku.firecircle.memory.ceremony_orchestrator import (
+from mallku.firecircle.memory.ceremony_orchestrator import (
     CeremonyOrchestrator,
     CeremonySchedule,
 )
-from src.mallku.firecircle.memory.memory_store import MemoryStore
-from src.mallku.firecircle.memory.models import (
+from mallku.firecircle.memory.memory_store import MemoryStore
+from mallku.firecircle.memory.models import (
     ConsciousnessIndicator,
     EpisodicMemory,
     MemoryType,
     WisdomConsolidation,
 )
-from src.mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 
 class TestCeremonyOrchestrator:

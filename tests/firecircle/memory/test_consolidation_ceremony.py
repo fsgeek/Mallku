@@ -11,11 +11,11 @@ from uuid import uuid4
 
 import pytest
 
-from src.mallku.firecircle.memory.consolidation_ceremony import (
+from mallku.firecircle.memory.consolidation_ceremony import (
     ConsolidationCriteria,
     WisdomConsolidationCeremony,
 )
-from src.mallku.firecircle.memory.models import (
+from mallku.firecircle.memory.models import (
     ConsciousnessIndicator,
     EpisodicMemory,
     MemoryType,
