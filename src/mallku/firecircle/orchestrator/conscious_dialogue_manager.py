@@ -121,8 +121,15 @@ class ConsciousDialogueManager:
         self.active_dialogues: dict[UUID, dict[str, Any]] = {}
         self.participant_states: dict[UUID, dict[UUID, ParticipantState]] = {}
 
-        # Get secured database
-        self.db = get_secured_database()
+        # Get secured database if not skipped
+        import os
+
+        self._skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
+        if not self._skip_database:
+            self.db = get_secured_database()
+        else:
+            self.db = None
+            logger.info("ConsciousDialogueManager: Database skipped (MALLKU_SKIP_DATABASE=true)")
 
         # Initialize consciousness-guided speaker selector
         self.consciousness_speaker_selector = ConsciousnessGuidedSpeakerSelector(event_bus)
