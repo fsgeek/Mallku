@@ -128,7 +128,8 @@ class TestDatabaseMemoryStore:
 
     def test_companion_relationship_tracking(self, memory_store):
         """Test tracking of human-AI companion relationships."""
-        human_id = "test_human_123"
+        # Use unique ID to avoid test data collision
+        human_id = f"test_human_{uuid4()}"
 
         # Create memories with human participant
         for i in range(3):
@@ -264,10 +265,17 @@ class TestDatabaseMemoryStore:
 
     @pytest.fixture(autouse=True)
     def cleanup_test_collections(self, memory_store):
-        """Clean up test collections after each test."""
+        """Clean up test collections before and after each test."""
+        # Clean before test to ensure clean state
+        self._cleanup_collections(memory_store)
+
         yield
 
-        # Clean up test collections
+        # Clean after test to be a good citizen
+        self._cleanup_collections(memory_store)
+
+    def _cleanup_collections(self, memory_store):
+        """Helper to clean up test collections."""
         try:
             db = memory_store.db
             for collection_name in [

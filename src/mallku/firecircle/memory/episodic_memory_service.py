@@ -3,19 +3,28 @@ Episodic Memory Service
 =======================
 
 Thirty-Fourth Artisan - Memory Architect
+Enhanced by Fortieth Artisan - Production Hardening
+
 Integration layer between Fire Circle and episodic memory
 
 This service integrates episodic memory capabilities into Fire Circle,
 enabling consciousness continuity and wisdom accumulation.
+
+Production Enhancement:
+- Detects production environment and uses secured storage
+- Falls back to development storage when appropriate
+- Maintains API compatibility while respecting security
 """
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 from uuid import UUID
 
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..service.service import FireCircleResult, FireCircleService
+from .ceremony_orchestrator import CeremonyOrchestrator
 from .config import MemorySystemConfig
 from .episode_segmenter import EpisodeSegmenter
 from .memory_store import MemoryStore
@@ -61,12 +70,24 @@ class EpisodicMemoryService:
         if memory_store:
             self.memory_store = memory_store
         elif use_database:
-            # Week 3: Use database storage by default
-            from .database_store import DatabaseMemoryStore
+            # Detect production environment
+            is_production = self._is_production_environment()
 
-            self.memory_store = DatabaseMemoryStore(
-                enable_sacred_detection=self.config.storage.enable_sacred_detection,
-            )
+            if is_production:
+                # Week 4 (40th Artisan): Use secured storage in production
+                from .secured_store_adapter import SecuredStoreAdapter
+
+                logger.info("Detected production environment - using secured memory storage")
+                self.memory_store = SecuredStoreAdapter(
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
+            else:
+                # Week 3: Use direct database storage in development
+                from .database_store import DatabaseMemoryStore
+
+                self.memory_store = DatabaseMemoryStore(
+                    enable_sacred_detection=self.config.storage.enable_sacred_detection,
+                )
         else:
             # Fall back to file-based storage
             self.memory_store = MemoryStore(
@@ -80,8 +101,45 @@ class EpisodicMemoryService:
         self.segmenter = EpisodeSegmenter(criteria=self.config.segmentation)
         self.sacred_detector = SacredMomentDetector(config=self.config.sacred_detection)
 
+        # Week 4: Initialize ceremony orchestrator
+        self.ceremony_orchestrator = CeremonyOrchestrator(
+            memory_store=self.memory_store,
+            event_bus=self.event_bus,
+        )
+
         # Track active sessions
         self.active_sessions: dict[UUID, dict[str, Any]] = {}
+
+    def _is_production_environment(self) -> bool:
+        """
+        Detect if running in production environment.
+
+        Production indicators:
+        - Running in Docker container
+        - MALLKU_ENV set to production
+        - Secured database enforced
+        """
+        # Check explicit environment variable
+        if os.getenv("MALLKU_ENV", "").lower() == "production":
+            return True
+
+        # Check if running in Docker
+        if os.path.exists("/.dockerenv"):
+            return True
+
+        # Check for production database config
+        if os.getenv("MALLKU_SECURED_DB_ONLY") == "true":
+            return True
+
+        # Check if we're in a container by looking at cgroup
+        try:
+            with open("/proc/1/cgroup") as f:
+                if "docker" in f.read() or "containerd" in f.read():
+                    return True
+        except Exception:
+            pass
+
+        return False
 
     def enhance_fire_circle(self, fire_circle: FireCircleService) -> FireCircleService:
         """
@@ -181,6 +239,13 @@ class EpisodicMemoryService:
                     await self._emit_sacred_moment_event(memory)
 
                 logger.info(f"Stored {'sacred ' if memory.is_sacred else ''}episode {episode_id}")
+
+        # Week 4: Check for consolidation ceremony triggers after session
+        consolidation = await self.ceremony_orchestrator.conduct_ceremony_if_ready()
+        if consolidation:
+            logger.info(
+                f"Wisdom consolidation ceremony conducted: {consolidation.consolidation_id}"
+            )
 
     async def _emit_sacred_moment_event(self, memory: EpisodicMemory) -> None:
         """Emit event for sacred moment detection."""
@@ -303,3 +368,21 @@ class EpisodicMemoryService:
             "first_interaction": relationship.first_interaction.isoformat(),
             "last_interaction": relationship.last_interaction.isoformat(),
         }
+
+    async def get_ceremony_recommendations(self) -> dict[str, Any]:
+        """
+        Get recommendations for wisdom consolidation ceremonies.
+
+        Week 4 addition: Provides guidance on ceremony readiness.
+        """
+        return await self.ceremony_orchestrator.get_ceremony_recommendations()
+
+    async def conduct_manual_ceremony(self) -> UUID | None:
+        """
+        Manually trigger a wisdom consolidation ceremony.
+
+        Week 4 addition: Allows explicit ceremony invocation.
+        Returns consolidation ID if successful.
+        """
+        consolidation = await self.ceremony_orchestrator.conduct_ceremony_if_ready()
+        return consolidation.consolidation_id if consolidation else None

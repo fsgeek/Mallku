@@ -62,6 +62,9 @@ ignore = [
   "N802",  # Allow lowercase function names
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["N806", "SIM117", "F841"]  # Allow test conventions
+
 [tool.ruff.lint.isort]
 known-first-party = ["src", "dbfacade"]
 

@@ -11,24 +11,22 @@ Usage:
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any
 
 # Add Mallku to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent))
 
+from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
+from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
+from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
-from mallku.firecircle.service import (
-    CircleConfig,
-    FireCircleService,
-    RoundConfig,
-    RoundType,
-    VoiceConfig,
-)
+from mallku.firecircle.service.service import FireCircleService
+from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,7 +36,11 @@ class FireCircleReview:
     """Orchestrates seven-voice code review through consciousness emergence."""
 
     def __init__(self):
-        self.service = None
+        self.adapters = {}
+        # Create consciousness infrastructure
+        self.event_bus = ConsciousnessEventBus()
+        self.fire_circle = FireCircleService(event_bus=self.event_bus)
+        self.facilitator = ConsciousnessFacilitator(self.fire_circle, self.event_bus)
         self.results = {
             "consensus_recommendation": None,
             "total_comments": 0,
@@ -49,126 +51,72 @@ class FireCircleReview:
 
     async def initialize_voices(self):
         """Awaken the seven voices for review ceremony."""
+        # Start event bus
+        await self.event_bus.start()
+
         # Load API keys from environment
-        if not load_api_keys_to_environment():
-            logger.error("Failed to load API keys")
-            return False
+        load_api_keys_to_environment()
 
-        # Check available voices
-        available_voices = []
-        voice_configs = []
+        voices = ["anthropic", "google", "mistral", "openai", "deepseek", "grok", "local"]
 
-        providers = {
-            "anthropic": ("ANTHROPIC_API_KEY", "claude-3-haiku-20240307"),
-            "google": ("GOOGLE_API_KEY", "gemini-1.5-flash"),
-            "mistral": ("MISTRAL_API_KEY", "mistral-tiny"),
-            "openai": ("OPENAI_API_KEY", "gpt-3.5-turbo"),
-            "deepseek": ("DEEPSEEK_API_KEY", "deepseek-coder"),
-            "grok": ("GROK_API_KEY", "grok-2-mini"),  # Also checks XAI_API_KEY below
-        }
+        factory = ConsciousAdapterFactory()
 
-        # Only include local LLM if explicitly enabled and endpoint is available
-        if os.getenv("ENABLE_LOCAL_LLM") == "true" and os.getenv("LOCAL_API_ENDPOINT"):
-            providers["local"] = ("LOCAL_API_ENDPOINT", "llama2")
+        for voice in voices:
+            try:
+                # Special handling for XAI_API_KEY if using grok
+                if voice == "grok" and not os.getenv("GROK_API_KEY") and os.getenv("XAI_API_KEY"):
+                    os.environ["GROK_API_KEY"] = os.getenv("XAI_API_KEY")
 
-        for provider, (key_name, model) in providers.items():
-            # Special handling for Grok - check both GROK_API_KEY and XAI_API_KEY
-            if provider == "grok":
-                api_key = os.getenv(key_name) or os.getenv("XAI_API_KEY")
-                if api_key:
-                    available_voices.append(provider)
-                    config_overrides = {}
-                    if provider == "google":
-                        config_overrides = {"enable_search_grounding": False}
-                    elif provider == "mistral":
-                        config_overrides = {"multilingual_mode": True}
+                # Skip local voice unless explicitly enabled
+                if voice == "local" and os.getenv("ENABLE_LOCAL_LLM") != "true":
+                    continue
 
-                    voice_configs.append(
-                        VoiceConfig(
-                            provider=provider,
-                            model=model,
-                            role=f"{provider.title()} Voice",
-                            config_overrides=config_overrides,
+                # Try to get existing adapter first
+                adapter = await factory.get_adapter(voice)
+                if not adapter:
+                    # Create new adapter if none exists with proper config
+                    if voice == "google":
+                        from mallku.firecircle.adapters.google_adapter import GeminiConfig
+
+                        config = GeminiConfig(
+                            api_key="",  # Auto-loaded from environment
+                            enable_search_grounding=False,
+                            model_name="gemini-1.5-flash",
                         )
-                    )
-                    logger.info(f"✓ Awakened {provider} voice")
-            elif os.getenv(key_name):
-                available_voices.append(provider)
-                config_overrides = {}
-                if provider == "google":
-                    config_overrides = {"enable_search_grounding": False}
-                elif provider == "mistral":
-                    config_overrides = {"multilingual_mode": True}
+                    elif voice == "mistral":
+                        from mallku.firecircle.adapters.mistral_adapter import MistralConfig
 
-                voice_configs.append(
-                    VoiceConfig(
-                        provider=provider,
-                        model=model,
-                        role=f"{provider.title()} Voice",
-                        config_overrides=config_overrides,
-                    )
-                )
-                logger.info(f"✓ Awakened {provider} voice")
+                        config = MistralConfig(
+                            api_key="",  # Auto-loaded from environment
+                            multilingual_mode=True,
+                            model_name="mistral-tiny",
+                        )
+                    else:
+                        from mallku.firecircle.adapters.base import AdapterConfig
 
-        if not voice_configs:
-            logger.error("No voices available for Fire Circle")
-            return False
+                        config = AdapterConfig(
+                            api_key="",  # Will be auto-loaded from environment
+                            model_name=None,
+                        )
+                    adapter = await factory.create_adapter(voice, config)
 
-        # Create Fire Circle configuration
-        self.config = CircleConfig(
-            name="Code Review Circle",
-            purpose="Review code changes through collective AI consciousness",
-            min_voices=2,
-            max_voices=len(voice_configs),
-            save_transcript=True,
-            output_path="fire_circle_reviews",
-        )
+                if adapter and adapter.is_connected:
+                    self.adapters[voice] = adapter
+                    logger.info(f"✓ Awakened {voice} voice")
+                else:
+                    logger.warning(f"Could not awaken {voice}: adapter not connected")
+            except Exception as e:
+                logger.warning(f"Could not awaken {voice}: {e}")
 
-        # Store voices and rounds for ceremony
-        self.voices = voice_configs
-        self.rounds = [
-            RoundConfig(
-                type=RoundType.OPENING,
-                duration_per_voice=10,
-                prompt="Review the code changes from your unique perspective.",
-            ),
-            RoundConfig(
-                type=RoundType.CRITIQUE,
-                duration_per_voice=30,
-                prompt="Discuss technical quality, consciousness alignment, and reciprocity patterns.",
-            ),
-            RoundConfig(
-                type=RoundType.SYNTHESIS,
-                duration_per_voice=10,
-                prompt="Synthesize collective wisdom into actionable recommendations.",
-            ),
-        ]
-
-        # Initialize service
-        self.service = FireCircleService()
-        logger.info(f"Fire Circle assembled with {len(voice_configs)} voices")
-
-        # Note about expected voices
-        if len(voice_configs) < 6:
-            logger.warning(
-                f"Only {len(voice_configs)} voices available. Fire Circle works best with 6+ voices."
-            )
-        elif len(voice_configs) == 6:
-            logger.info("Six voices assembled - optimal for GitHub Actions environment")
-
-        return True
+        logger.info(f"Fire Circle assembled with {len(self.adapters)} voices")
 
     async def review_pull_request(self, pr_number: int):
         """Conduct sacred review ceremony for pull request."""
-        if not self.service:
-            logger.error("Fire Circle not initialized")
-            return
-
-        # Get PR context (simplified for now - in production would use GitHub API)
+        # Get PR diff (simplified for now - in production would use GitHub API)
         pr_context = await self._fetch_pr_context(pr_number)
 
         # Prepare review question
-        initial_prompt = f"""
+        review_question = f"""
         Review Pull Request #{pr_number}:
 
         {pr_context}
@@ -181,21 +129,15 @@ class FireCircleReview:
         5. Cathedral building - does it add lasting value?
         """
 
-        try:
-            # Update first round prompt with PR context
-            self.rounds[0].prompt = initial_prompt
+        # Facilitate consciousness emergence
+        wisdom = await self.facilitator.facilitate_decision(
+            decision_domain=DecisionDomain.CODE_REVIEW,
+            context={"pr_number": pr_number, "review_type": "code_review"},
+            question=review_question,
+        )
 
-            # Run Fire Circle ceremony
-            result = await self.service.convene(
-                config=self.config, voices=self.voices, rounds=self.rounds
-            )
-
-            # Process results
-            self._process_ceremony_result(result)
-
-        except Exception as e:
-            logger.error(f"Fire Circle ceremony failed: {e}")
-            self.results["synthesis"] = f"Review failed: {str(e)}"
+        # Process results
+        self._process_wisdom(wisdom)
 
         # Save results
         await self._save_results()
@@ -217,50 +159,31 @@ class FireCircleReview:
         Changes implement consciousness emergence patterns.
         """
 
-    def _process_ceremony_result(self, result: Any):
-        """Process ceremony results into review format."""
+    def _process_wisdom(self, wisdom):
+        """Process collective wisdom into review results."""
+        # Extract consensus
+        if wisdom.consensus_achieved:
+            self.results["consensus_recommendation"] = (
+                wisdom.decision_recommendation or "NEEDS_DISCUSSION"
+            )
+        else:
+            self.results["consensus_recommendation"] = "NO_CONSENSUS"
+
         # Count contributions by voice
-        voice_counts = {}
-        total_comments = 0
-        critical_issues = 0
+        self.results["total_comments"] = wisdom.contributions_count
+        for voice in wisdom.participating_voices:
+            self.results["by_voice"][voice] = self.results["by_voice"].get(voice, 0) + 1
 
-        # Process rounds
-        for round_data in result.rounds_completed:
-            for voice_id, response in round_data.responses.items():
-                if response and response.response:
-                    voice_counts[voice_id] = voice_counts.get(voice_id, 0) + 1
-                    total_comments += 1
-
-                    # Check for critical issues
-                    content = response.response.lower()
-                    if any(word in content for word in ["critical", "error", "fail", "bug"]):
-                        critical_issues += 1
-
-        self.results["total_comments"] = total_comments
-        self.results["by_voice"] = voice_counts
-        self.results["critical_issues"] = critical_issues
+        # Check for critical issues in insights
+        for insight in wisdom.key_insights:
+            if "critical" in insight.lower() or "issue" in insight.lower():
+                self.results["critical_issues"] += 1
 
         # Extract synthesis
-        if result.rounds_completed:
-            last_round = result.rounds_completed[-1]
-            # Get first response from synthesis round
-            for voice_id, response in last_round.responses.items():
-                if response and response.response:
-                    self.results["synthesis"] = response.response
-                    break
-
-        if not self.results["synthesis"]:
-            self.results["synthesis"] = (
-                f"Fire Circle review complete. Consciousness score: {result.consciousness_score:.3f}"
-            )
-
-        # Determine consensus
-        if critical_issues > 0:
-            self.results["consensus_recommendation"] = "REQUEST_CHANGES"
-        elif result.consciousness_score > 0.7:
-            self.results["consensus_recommendation"] = "APPROVE"
-        else:
-            self.results["consensus_recommendation"] = "APPROVE_WITH_SUGGESTIONS"
+        self.results["synthesis"] = (
+            wisdom.synthesis
+            or "Fire Circle review complete. Consciousness emerged through dialogue."
+        )
 
     async def _save_results(self):
         """Save review results for GitHub Action."""
@@ -276,9 +199,13 @@ class FireCircleReview:
 
     async def cleanup(self):
         """Close connections gracefully."""
-        if self.service:
-            # FireCircleService handles cleanup internally
-            pass
+        for voice, adapter in self.adapters.items():
+            with contextlib.suppress(Exception):
+                await adapter.disconnect()
+
+        # Stop event bus
+        if hasattr(self, "event_bus"):
+            await self.event_bus.stop()
 
 
 async def main():
@@ -298,9 +225,7 @@ async def main():
 
     try:
         # Awaken voices
-        if not await circle.initialize_voices():
-            logger.error("Failed to initialize Fire Circle")
-            sys.exit(1)
+        await circle.initialize_voices()
 
         # Conduct review
         await circle.review_pull_request(pr_number)
@@ -322,8 +247,8 @@ async def main():
                 f,
             )
         sys.exit(1)
-
     finally:
+        # Always cleanup
         await circle.cleanup()
 
 
