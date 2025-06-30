@@ -36,11 +36,12 @@ The Fire Circle requires API keys for each AI voice to participate in code revie
 - **Model used**: deepseek-coder
 - **Purpose**: Deep code understanding
 
-### 6. GROK_API_KEY
+### 6. GROK_API_KEY or XAI_API_KEY
 - **Provider**: X.AI (Grok)
 - **Obtain from**: https://x.ai/api
 - **Model used**: grok-2-mini
 - **Purpose**: Real-time awareness and temporal consciousness
+- **Note**: Can use either GROK_API_KEY or XAI_API_KEY as the secret name
 
 ## Configuration Steps
 

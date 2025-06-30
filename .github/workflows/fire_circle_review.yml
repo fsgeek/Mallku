@@ -17,6 +17,10 @@ jobs:
   distributed-review:
     name: Fire Circle Distributed Review
     runs-on: ubuntu-latest
+    env:
+      # Disable database for Fire Circle Review
+      MALLKU_NO_DATABASE: "true"
+      CI_DATABASE_AVAILABLE: "0"
 
     steps:
       - name: Checkout code

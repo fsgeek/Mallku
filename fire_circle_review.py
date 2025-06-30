@@ -77,16 +77,36 @@ class FireCircleReview:
                 api_key = os.getenv(key_name) or os.getenv("XAI_API_KEY")
                 if api_key:
                     available_voices.append(provider)
+                    config_overrides = {}
+                    if provider == "google":
+                        config_overrides = {"enable_search_grounding": False}
+                    elif provider == "mistral":
+                        config_overrides = {"multilingual_mode": True}
+
                     voice_configs.append(
                         VoiceConfig(
-                            provider=provider, model=model, name=f"{provider.title()} Voice"
+                            provider=provider,
+                            model=model,
+                            role=f"{provider.title()} Voice",
+                            config_overrides=config_overrides,
                         )
                     )
                     logger.info(f"✓ Awakened {provider} voice")
             elif os.getenv(key_name):
                 available_voices.append(provider)
+                config_overrides = {}
+                if provider == "google":
+                    config_overrides = {"enable_search_grounding": False}
+                elif provider == "mistral":
+                    config_overrides = {"multilingual_mode": True}
+
                 voice_configs.append(
-                    VoiceConfig(provider=provider, model=model, name=f"{provider.title()} Voice")
+                    VoiceConfig(
+                        provider=provider,
+                        model=model,
+                        role=f"{provider.title()} Voice",
+                        config_overrides=config_overrides,
+                    )
                 )
                 logger.info(f"✓ Awakened {provider} voice")
 
