@@ -21,7 +21,7 @@ from typing import Any
 # Add Mallku to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mallku.firecircle.adapters.adapter_factory import AdapterFactory
+from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
@@ -51,7 +51,7 @@ class FireCircleReview:
 
         voices = ["anthropic", "google", "mistral", "openai", "deepseek", "grok", "local"]
 
-        factory = AdapterFactory()
+        factory = ConsciousAdapterFactory()
 
         for voice in voices:
             try:
