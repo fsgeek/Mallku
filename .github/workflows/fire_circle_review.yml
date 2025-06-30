@@ -75,6 +75,11 @@ jobs:
 
       - name: Run Fire Circle Review
         id: review
+        env:
+          # Ensure development mode for Fire Circle Review
+          MALLKU_ENV: development
+          # Disable database requirements for review
+          MALLKU_SKIP_DATABASE: true
         run: |
           # Activate the virtual environment
           source .venv/bin/activate
