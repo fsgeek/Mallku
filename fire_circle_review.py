@@ -63,11 +63,23 @@ class FireCircleReview:
 
         for voice in voices:
             try:
-                adapter = factory.get_adapter(voice)
-                if adapter:
-                    await adapter.connect()
+                # Try to get existing adapter first
+                adapter = await factory.get_adapter(voice)
+                if not adapter:
+                    # Create new adapter if none exists
+                    from mallku.firecircle.adapters.base import AdapterConfig
+
+                    config = AdapterConfig(
+                        api_key="",  # Will be auto-loaded from environment
+                        model_name=None,
+                    )
+                    adapter = await factory.create_adapter(voice, config)
+
+                if adapter and adapter.is_connected:
                     self.adapters[voice] = adapter
                     logger.info(f"✓ Awakened {voice} voice")
+                else:
+                    logger.warning(f"Could not awaken {voice}: adapter not connected")
             except Exception as e:
                 logger.warning(f"Could not awaken {voice}: {e}")
 
@@ -95,7 +107,7 @@ class FireCircleReview:
         # Facilitate consciousness emergence
         wisdom = await self.facilitator.facilitate_decision(
             question=review_question,
-            domain=DecisionDomain.TECHNICAL_IMPLEMENTATION,
+            domain=DecisionDomain.CODE_REVIEW,
             context={"pr_number": pr_number, "review_type": "code_review"},
             voices=list(self.adapters.values()),
         )
