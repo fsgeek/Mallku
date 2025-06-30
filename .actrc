@@ -1,0 +1,5 @@
+# Configuration for act (GitHub Actions local runner)
+# This prevents act from trying to load .secrets directory
+--secret-file .env.secrets
+
+# Local testing configuration for act (GitHub Actions runner)
