@@ -13,6 +13,11 @@ on:
         required: true
         type: number
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   distributed-review:
     name: Fire Circle Distributed Review
@@ -38,7 +43,7 @@ jobs:
           uv python install 3.12
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/uv
@@ -163,5 +168,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
-              reviewers: ['steward'] // Add appropriate reviewers
+              reviewers: [context.repo.owner] // Request review from repository owner
             });
