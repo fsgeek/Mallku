@@ -11,8 +11,11 @@ Usage:
     python fire_circle_review_ci.py <PR_NUMBER>
 """
 
+import asyncio
 import logging
 import os
+import sys
+from pathlib import Path
 
 # Set CI-specific environment before any imports
 os.environ["MALLKU_SKIP_DATABASE"] = "true"
@@ -28,16 +31,37 @@ print("For development, use: python fire_circle_review.py")
 print("=" * 60)
 print()
 
-# Now import and run the regular fire circle review
-from fire_circle_review import main  # noqa: E402
+# Add Mallku to path
+sys.path.insert(0, str(Path(__file__).parent))
 
-if __name__ == "__main__":
-    import asyncio
+# Import after setting environment variables
+from mallku.firecircle.runner import run_fire_circle_review  # noqa: E402
 
-    # Log that we're in CI mode
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+async def main():
+    """CI-specific entry point for Fire Circle review."""
+    if len(sys.argv) < 2:
+        print("Usage: python fire_circle_review_ci.py <PR_NUMBER>")
+        sys.exit(1)
+
+    try:
+        pr_number = int(sys.argv[1])
+    except ValueError:
+        print("PR_NUMBER must be an integer")
+        sys.exit(1)
+
     logger.info("Fire Circle Review running in CI/CD mode - no persistence")
 
-    # Run the main function
+    try:
+        # Run the shared implementation
+        await run_fire_circle_review(pr_number)
+    except Exception as e:
+        logger.error(f"Review failed: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
     asyncio.run(main())

@@ -22,9 +22,9 @@ async def test_minimal():
     # Test 1: Import
     print("\n1️⃣ Testing imports...")
     try:
-        from fire_circle_review import FireCircleReview
+        from mallku.firecircle.runner import FireCircleReviewRunner
 
-        print("✅ Fire Circle Review imported successfully")
+        print("✅ Fire Circle Review Runner imported successfully")
     except ImportError as e:
         print(f"❌ Import failed: {e}")
         return
@@ -32,8 +32,8 @@ async def test_minimal():
     # Test 2: Initialization
     print("\n2️⃣ Testing initialization...")
     try:
-        circle = FireCircleReview()
-        print("✅ FireCircleReview instance created")
+        circle = FireCircleReviewRunner()
+        print("✅ FireCircleReviewRunner instance created")
         print(f"   - Event bus: {'✓' if hasattr(circle, 'event_bus') else '✗'}")
         print(f"   - Fire Circle: {'✓' if hasattr(circle, 'fire_circle') else '✗'}")
         print(f"   - Facilitator: {'✓' if hasattr(circle, 'facilitator') else '✗'}")

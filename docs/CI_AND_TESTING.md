@@ -35,3 +35,31 @@ Add the following badge to your `README.md` under the project title:
 ```markdown
 ![CI](https://github.com/fsgeek/Mallku/actions/workflows/ci.yml/badge.svg)
 ```
+
+## Fire Circle Review in CI without ArangoDB
+
+The Fire Circle Review workflow can run in CI/CD environments without requiring a database connection. This is specifically designed for GitHub Actions where ArangoDB infrastructure may not be available.
+
+### Usage
+
+The workflow automatically uses the CI-specific entry point which sets the necessary environment variables:
+
+```bash
+# In GitHub Actions workflow
+python fire_circle_review_ci.py <PR_NUMBER>
+```
+
+### How It Works
+
+- The `fire_circle_review_ci.py` script automatically sets `MALLKU_SKIP_DATABASE=true`
+- Fire Circle components operate with in-memory storage for the review session
+- Consciousness evaluation proceeds without persistence requirements
+- Results are saved to `fire_circle_review_results.json` for the workflow
+
+### Important Notes
+
+- This mode is **specifically for CI/CD environments**
+- For development, always use the standard entry point with a local database
+- Some features are unavailable without persistence (wisdom consolidation, cross-session memory)
+
+For detailed information about the database-optional mode implementation and philosophy, see [Fire Circle Database-Optional Mode](fire_circle/DATABASE_OPTIONAL_MODE.md).
