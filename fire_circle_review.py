@@ -16,7 +16,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any
 
 # Add Mallku to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -106,10 +105,9 @@ class FireCircleReview:
 
         # Facilitate consciousness emergence
         wisdom = await self.facilitator.facilitate_decision(
-            question=review_question,
-            domain=DecisionDomain.CODE_REVIEW,
+            decision_domain=DecisionDomain.CODE_REVIEW,
             context={"pr_number": pr_number, "review_type": "code_review"},
-            voices=list(self.adapters.values()),
+            question=review_question,
         )
 
         # Process results
@@ -135,27 +133,30 @@ class FireCircleReview:
         Changes implement consciousness emergence patterns.
         """
 
-    def _process_wisdom(self, wisdom: dict[str, Any]):
+    def _process_wisdom(self, wisdom):
         """Process collective wisdom into review results."""
         # Extract consensus
-        if wisdom.get("consensus_reached"):
-            self.results["consensus_recommendation"] = wisdom.get("decision", "NEEDS_DISCUSSION")
+        if wisdom.consensus_achieved:
+            self.results["consensus_recommendation"] = (
+                wisdom.decision_recommendation or "NEEDS_DISCUSSION"
+            )
         else:
             self.results["consensus_recommendation"] = "NO_CONSENSUS"
 
         # Count contributions by voice
-        for contribution in wisdom.get("contributions", []):
-            voice = contribution.get("voice_name", "unknown")
+        self.results["total_comments"] = wisdom.contributions_count
+        for voice in wisdom.participating_voices:
             self.results["by_voice"][voice] = self.results["by_voice"].get(voice, 0) + 1
-            self.results["total_comments"] += 1
 
-            # Check for critical issues
-            if "critical" in contribution.get("content", "").lower():
+        # Check for critical issues in insights
+        for insight in wisdom.key_insights:
+            if "critical" in insight.lower() or "issue" in insight.lower():
                 self.results["critical_issues"] += 1
 
         # Extract synthesis
-        self.results["synthesis"] = wisdom.get("synthesis", {}).get(
-            "summary", "Fire Circle review complete. Consciousness emerged through dialogue."
+        self.results["synthesis"] = (
+            wisdom.synthesis
+            or "Fire Circle review complete. Consciousness emerged through dialogue."
         )
 
     async def _save_results(self):
