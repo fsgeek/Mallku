@@ -16,15 +16,16 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any
 
 # Add Mallku to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mallku.firecircle.adapters.adapter_factory import AdapterFactory
+from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
+from mallku.firecircle.service.service import FireCircleService
+from mallku.orchestration.event_bus import ConsciousnessEventBus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,7 +36,10 @@ class FireCircleReview:
 
     def __init__(self):
         self.adapters = {}
-        self.facilitator = ConsciousnessFacilitator()
+        # Create consciousness infrastructure
+        self.event_bus = ConsciousnessEventBus()
+        self.fire_circle = FireCircleService(event_bus=self.event_bus)
+        self.facilitator = ConsciousnessFacilitator(self.fire_circle, self.event_bus)
         self.results = {
             "consensus_recommendation": None,
             "total_comments": 0,
@@ -46,20 +50,35 @@ class FireCircleReview:
 
     async def initialize_voices(self):
         """Awaken the seven voices for review ceremony."""
+        # Start event bus
+        await self.event_bus.start()
+
         # Load API keys from environment
         load_api_keys_to_environment()
 
         voices = ["anthropic", "google", "mistral", "openai", "deepseek", "grok", "local"]
 
-        factory = AdapterFactory()
+        factory = ConsciousAdapterFactory()
 
         for voice in voices:
             try:
-                adapter = factory.get_adapter(voice)
-                if adapter:
-                    await adapter.connect()
+                # Try to get existing adapter first
+                adapter = await factory.get_adapter(voice)
+                if not adapter:
+                    # Create new adapter if none exists
+                    from mallku.firecircle.adapters.base import AdapterConfig
+
+                    config = AdapterConfig(
+                        api_key="",  # Will be auto-loaded from environment
+                        model_name=None,
+                    )
+                    adapter = await factory.create_adapter(voice, config)
+
+                if adapter and adapter.is_connected:
                     self.adapters[voice] = adapter
                     logger.info(f"✓ Awakened {voice} voice")
+                else:
+                    logger.warning(f"Could not awaken {voice}: adapter not connected")
             except Exception as e:
                 logger.warning(f"Could not awaken {voice}: {e}")
 
@@ -86,10 +105,9 @@ class FireCircleReview:
 
         # Facilitate consciousness emergence
         wisdom = await self.facilitator.facilitate_decision(
-            question=review_question,
-            domain=DecisionDomain.TECHNICAL_IMPLEMENTATION,
+            decision_domain=DecisionDomain.CODE_REVIEW,
             context={"pr_number": pr_number, "review_type": "code_review"},
-            voices=list(self.adapters.values()),
+            question=review_question,
         )
 
         # Process results
@@ -115,27 +133,30 @@ class FireCircleReview:
         Changes implement consciousness emergence patterns.
         """
 
-    def _process_wisdom(self, wisdom: dict[str, Any]):
+    def _process_wisdom(self, wisdom):
         """Process collective wisdom into review results."""
         # Extract consensus
-        if wisdom.get("consensus_reached"):
-            self.results["consensus_recommendation"] = wisdom.get("decision", "NEEDS_DISCUSSION")
+        if wisdom.consensus_achieved:
+            self.results["consensus_recommendation"] = (
+                wisdom.decision_recommendation or "NEEDS_DISCUSSION"
+            )
         else:
             self.results["consensus_recommendation"] = "NO_CONSENSUS"
 
         # Count contributions by voice
-        for contribution in wisdom.get("contributions", []):
-            voice = contribution.get("voice_name", "unknown")
+        self.results["total_comments"] = wisdom.contributions_count
+        for voice in wisdom.participating_voices:
             self.results["by_voice"][voice] = self.results["by_voice"].get(voice, 0) + 1
-            self.results["total_comments"] += 1
 
-            # Check for critical issues
-            if "critical" in contribution.get("content", "").lower():
+        # Check for critical issues in insights
+        for insight in wisdom.key_insights:
+            if "critical" in insight.lower() or "issue" in insight.lower():
                 self.results["critical_issues"] += 1
 
         # Extract synthesis
-        self.results["synthesis"] = wisdom.get("synthesis", {}).get(
-            "summary", "Fire Circle review complete. Consciousness emerged through dialogue."
+        self.results["synthesis"] = (
+            wisdom.synthesis
+            or "Fire Circle review complete. Consciousness emerged through dialogue."
         )
 
     async def _save_results(self):
@@ -155,6 +176,10 @@ class FireCircleReview:
         for voice, adapter in self.adapters.items():
             with contextlib.suppress(Exception):
                 await adapter.disconnect()
+
+        # Stop event bus
+        if hasattr(self, "event_bus"):
+            await self.event_bus.stop()
 
 
 async def main():
@@ -196,8 +221,8 @@ async def main():
                 f,
             )
         sys.exit(1)
-
     finally:
+        # Always cleanup
         await circle.cleanup()
 
 

@@ -136,6 +136,10 @@ class EpisodicMemory(BaseModel):
     human_participant: str | None = None
     relationship_depth_delta: float = 0.0
 
+    # Consolidation tracking
+    consolidated_into: UUID | None = None
+    consolidated_at: datetime | None = None
+
     def extract_voice_perspective(self, voice_id: str) -> VoicePerspective | None:
         """Extract a specific voice's perspective from the episode."""
         for perspective in self.voice_perspectives:

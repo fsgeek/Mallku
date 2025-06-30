@@ -24,21 +24,31 @@ jobs:
         with:
           fetch-depth: 0  # Full history for proper diff analysis
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Set up Python with uv
+        run: |
+          uv python install 3.12
 
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: |
+            ~/.cache/uv
+            ~/.cache/pip
+          key: deps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          echo "=== Running uv sync ==="
+          uv sync
+          echo -e "\n=== Installing mallku in editable mode ==="
+          uv pip install -e .
+          echo -e "\n=== After install, checking mallku ==="
+          uv pip list | grep -i mallku || echo "mallku not in pip list after install"
 
       - name: Load API keys from secrets
         run: |
@@ -50,11 +60,34 @@ jobs:
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
           echo "GROK_API_KEY=${{ secrets.GROK_API_KEY }}" >> $GITHUB_ENV
 
+          # Create .secrets directory and API keys file for the script
+          mkdir -p .secrets
+          cat > .secrets/api_keys.json << EOF
+          {
+            "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+            "ANTHROPIC_API_KEY": "${{ secrets.ANTHROPIC_API_KEY }}",
+            "DEEPSEEK_API_KEY": "${{ secrets.DEEPSEEK_API_KEY }}",
+            "MISTRAL_API_KEY": "${{ secrets.MISTRAL_API_KEY }}",
+            "GOOGLE_API_KEY": "${{ secrets.GOOGLE_API_KEY }}",
+            "GROK_API_KEY": "${{ secrets.GROK_API_KEY }}"
+          }
+          EOF
+
       - name: Run Fire Circle Review
         id: review
         run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+
+          # Verify we're in the right environment
+          echo "=== Environment check ==="
+          which python
+          python --version
+          echo -e "\n=== Checking mallku installation ==="
+          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
+
           PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          echo "🔥 Initiating Fire Circle Review for PR #$PR_NUMBER"
+          echo -e "\n🔥 Initiating Fire Circle Review for PR #$PR_NUMBER"
           python fire_circle_review.py review $PR_NUMBER
 
       - name: Post review summary
