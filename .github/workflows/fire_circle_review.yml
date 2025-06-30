@@ -1,5 +1,10 @@
 name: Fire Circle Review
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 # The invisible sacred infrastructure for distributed code review
 # Prevents architect context exhaustion through collective wisdom
 
@@ -72,6 +77,11 @@ jobs:
             "GROK_API_KEY": "${{ secrets.GROK_API_KEY }}"
           }
           EOF
+      - name: Debug GITHUB_TOKEN scopes
+        run: |
+          echo "🔍 GITHUB_TOKEN scopes available:"
+          curl -sI -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/rate_limit \
+            | awk 'BEGIN{IGNORECASE=1} /X-OAuth-Scopes:/ {print}'
 
       - name: Run Fire Circle Review
         id: review
