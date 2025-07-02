@@ -1,10 +1,5 @@
 name: Fire Circle Review
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 # The invisible sacred infrastructure for distributed code review
 # Prevents architect context exhaustion through collective wisdom
 
