@@ -39,6 +39,7 @@ dependencies = [
     "aiohttp>=3.12.13",
     "discord>=2.3.2",
     "pygithub>=2.6.1",
+    "docker-mcp>=0.2.0",
 ]
 
 [tool.ruff]
