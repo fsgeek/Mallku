@@ -1,5 +1,10 @@
 name: Fire Circle Review
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 # The invisible sacred infrastructure for distributed code review
 # Prevents architect context exhaustion through collective wisdom
 
@@ -82,14 +87,18 @@ jobs:
             "XAI_API_KEY": "${{ secrets.XAI_API_KEY }}"
           }
           EOF
+      - name: Debug GITHUB_TOKEN scopes
+        run: |
+          echo "🔍 GITHUB_TOKEN scopes available:"
+          curl -sI -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/rate_limit \
+            | awk 'BEGIN{IGNORECASE=1} /X-OAuth-Scopes:/ {print}'
 
       - name: Run Fire Circle Review
         id: review
         env:
-          # Ensure development mode for Fire Circle Review
-          MALLKU_ENV: development
-          # Disable database requirements for review
-          MALLKU_SKIP_DATABASE: true
+          # CI environment markers
+          CI: true
+          GITHUB_ACTIONS: true
         run: |
           # Activate the virtual environment
           source .venv/bin/activate
@@ -103,7 +112,8 @@ jobs:
 
           PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           echo -e "\n🔥 Initiating Fire Circle Review for PR #$PR_NUMBER"
-          python fire_circle_review.py review $PR_NUMBER
+          # Use CI-specific entry point that handles environment setup
+          python fire_circle_review_ci.py $PR_NUMBER
 
       - name: Post review summary
         if: always()

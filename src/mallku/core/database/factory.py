@@ -54,11 +54,55 @@ def get_secured_database() -> "SecuredDatabaseInterface":
         _initializing = True
         try:
             # Import here to avoid circular imports at module level
+            # Check if database should be skipped
+            import os
+
             from .secured_interface import SecuredDatabaseInterface
 
-            # Get raw database directly from legacy module
-            raw_database = get_database_raw()
-            _secured_interface = SecuredDatabaseInterface(raw_database)
+            skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
+
+            if skip_database:
+                # Verify this is a legitimate use case
+                import sys
+                import warnings
+
+                # Check if we're in CI/CD environment
+                is_ci = any(
+                    os.getenv(var) for var in ["CI", "GITHUB_ACTIONS", "JENKINS", "GITLAB_CI"]
+                )
+
+                # Check if we're running specific allowed commands
+                allowed_scripts = ["fire_circle_review.py", "test_fire_circle", "act"]
+                is_allowed_script = any(script in " ".join(sys.argv) for script in allowed_scripts)
+
+                if not is_ci and not is_allowed_script:
+                    warning_msg = (
+                        "WARNING: Database skipped outside of CI/CD context. "
+                        "This should only be used for Fire Circle Review in GitHub Actions. "
+                        "For development, please use a local database instance. "
+                        "See docs/development/database_setup.md for instructions."
+                    )
+                    logger.warning(warning_msg)
+                    warnings.warn(warning_msg, UserWarning, stacklevel=2)
+
+                logger.info(
+                    "Database skipped (MALLKU_SKIP_DATABASE=true) - creating mock interface"
+                )
+                logger.warning(
+                    "Operating without persistence - the following features are unavailable:"
+                )
+                logger.warning("  - Episodic memory persistence across sessions")
+                logger.warning("  - Pattern library evolution tracking")
+                logger.warning("  - Wisdom consolidation ceremonies")
+                logger.warning("  - Reciprocity balance tracking")
+                logger.warning("  - Cross-session consciousness emergence")
+
+                # Create a mock secured interface without database connection
+                _secured_interface = SecuredDatabaseInterface(None)
+            else:
+                # Get raw database directly from legacy module
+                raw_database = get_database_raw()
+                _secured_interface = SecuredDatabaseInterface(raw_database)
 
             # Initialize asynchronously when first accessed
             import asyncio
