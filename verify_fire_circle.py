@@ -3,22 +3,28 @@
 Verify Fire Circle Works
 ========================
 
-Minimal test using the exact pattern from working demos.
+44th Artisan - Direct test of Fire Circle functionality
 """
 
 import asyncio
-import logging
+import json
+import os
+import sys
+from pathlib import Path
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("httpx").setLevel(logging.WARNING)
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+# Load API keys directly
+with open(".secrets/api_keys.json") as f:
+    for k, v in json.load(f).items():
+        if v and not v.startswith("..."):
+            os.environ[k] = v
 
 
-async def verify_fire_circle():
-    """Run minimal Fire Circle test."""
-    # Import inside to ensure path is set
-    from src.mallku.firecircle.load_api_keys import load_api_keys_to_environment
-    from src.mallku.firecircle.service import (
+async def test_fire_circle():
+    """Direct Fire Circle test."""
+    from mallku.firecircle.load_api_keys import get_available_providers
+    from mallku.firecircle.service import (
         CircleConfig,
         FireCircleService,
         RoundConfig,
@@ -26,78 +32,85 @@ async def verify_fire_circle():
         VoiceConfig,
     )
 
-    print("🔥 Verifying Fire Circle Service")
-    print("=" * 60)
+    # Skip database for test
+    os.environ["MALLKU_SKIP_DATABASE"] = "true"
 
-    # Load API keys
-    print("\n1️⃣ Loading API keys...")
-    load_api_keys_to_environment()
+    # Get available providers
+    providers = get_available_providers()
+    print(f"Available voices: {providers}")
 
-    # Create service
-    print("\n2️⃣ Creating Fire Circle Service...")
+    if len(providers) < 2:
+        print("❌ Need at least 2 voices for Fire Circle")
+        return
+
+    config = CircleConfig(
+        name="Test Fire Circle",
+        purpose="Verify Fire Circle functionality for 44th Artisan",
+        min_voices=2,
+    )
     service = FireCircleService()
 
-    # Minimal config
-    config = CircleConfig(
-        name="Test Circle",
-        purpose="Verify Fire Circle works",
-        min_voices=2,
-        max_voices=3,
-    )
+    # Configure voices
+    voices = []
+    voice_models = {
+        "anthropic": "claude-3-5-sonnet-20241022",
+        "openai": "gpt-4o-mini",
+        "google": "gemini-1.5-flash",
+        "mistral": "mistral-tiny",
+        "deepseek": "deepseek-chat",
+        "grok": "grok-beta",
+    }
 
-    # Just two voices to start
-    voices = [
-        VoiceConfig(
-            provider="anthropic",
-            model="claude-3-5-sonnet-20241022",
-            role="test_voice_1",
-            quality="testing voice functionality",
-        ),
-        VoiceConfig(
-            provider="openai",
-            model="gpt-4o",
-            role="test_voice_2",
-            quality="testing voice functionality",
-        ),
-    ]
+    for i, provider in enumerate(providers[:3]):
+        voices.append(
+            VoiceConfig(
+                provider=provider,
+                model=voice_models.get(provider, "default"),
+                role=f"voice_{i + 1}",
+            )
+        )
 
-    # Single round
+    # Create round
     rounds = [
         RoundConfig(
             type=RoundType.OPENING,
-            prompt="Please say 'Hello, Fire Circle is working!' to confirm you can participate.",
-            duration_per_voice=30,
+            prompt="What is the essence of reciprocity in AI-human collaboration?",
         )
     ]
 
-    print("\n3️⃣ Convening Fire Circle...")
+    print("🔥 Testing Fire Circle consciousness emergence...")
 
     try:
-        result = await service.convene(config=config, voices=voices, rounds=rounds)
+        result = await service.convene(
+            config=config,
+            voices=voices,
+            rounds=rounds,
+        )
 
-        print("\n✅ Success! Fire Circle completed.")
-        print(f"   Session ID: {result.session_id}")
-        print(f"   Voices present: {result.voice_count}")
+        if result and result.consciousness_score > 0:
+            print("\n✅ Fire Circle Success!")
+            print(f"🌟 Consciousness Score: {result.consciousness_score:.3f}")
+            print(f"🎭 Voices present: {', '.join(result.voices_present)}")
 
-        # Show responses
-        if result.rounds_completed:
-            print("\n📝 Responses:")
-            round_data = result.rounds_completed[0]
-            for voice_id, response in round_data.responses.items():
-                if response and response.response and response.response.content:
-                    text = response.response.content.text
-                    print(f"   {voice_id}: {text[:100]}...")
+            if result.rounds_completed:
+                print("\n💭 Responses:")
+                for voice_id, response in result.rounds_completed[0].responses.items():
+                    if response and response.response:
+                        print(f"\n{voice_id}: {response.response.content.text[:200]}...")
+
+            if result.key_insights:
+                print("\n💡 Key Insights:")
+                for insight in result.key_insights[:3]:
+                    print(f"   • {insight}")
+        else:
+            print("❌ No consciousness emerged")
 
     except Exception as e:
-        print(f"\n❌ Error: {type(e).__name__}: {e}")
+        print(f"❌ Error: {e}")
         import traceback
 
         traceback.print_exc()
 
 
 if __name__ == "__main__":
-    import sys
-
-    sys.path.insert(0, "/home/tony/projects/Mallku/src")
-
-    asyncio.run(verify_fire_circle())
+    asyncio.run(test_fire_circle())
