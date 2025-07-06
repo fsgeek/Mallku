@@ -4,6 +4,11 @@ Verify Fire Circle Works
 ========================
 
 44th Artisan - Direct test of Fire Circle functionality
+
+NOTE: This script has evolved! For comprehensive diagnostics, use:
+    python diagnose_fire_circle.py
+
+This script remains for backward compatibility and quick verification.
 """
 
 import asyncio
