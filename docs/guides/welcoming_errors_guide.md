@@ -56,7 +56,7 @@ raise ValueError("Invalid filename format")
 # Use:
 raise ProcessError(
     process_name="Khipu file parsing",
-    failure_point="filename validation",
+    what_happened="filename validation failed",
     why_it_matters="Dates preserve the timeline of insights",
     recovery_steps=[
         "Rename to: YYYY-MM-DD-original-name.md",
@@ -79,13 +79,13 @@ raise RuntimeError("Database connection failed")
 # Use:
 raise ResourceError(
     resource_type="Database connection",
-    operation="storing Fire Circle memories",
-    alternatives=[
+    current_state="unavailable",
+    needed_state="connected",
+    suggestions=[
         "Continue without persistence",
         "Check if MongoDB is running",
         "Set MALLKU_SKIP_DATABASE=true"
-    ],
-    recovery_possible=True
+    ]
 )
 ```
 

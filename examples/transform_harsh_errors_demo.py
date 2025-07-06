@@ -22,6 +22,7 @@ from mallku.firecircle.errors import (
     ProcessError,
     ResourceError,
     ConfigurationError,
+    WelcomingError,
     WelcomingErrorContext,
 )
 
@@ -66,7 +67,7 @@ def main():
         'ValueError: Invalid filename format, expected YYYY-MM-DD-..: emergence_patterns',
         ProcessError(
             process_name="Khipu file parsing",
-            failure_point="filename validation",
+            what_happened="filename validation failed",
             why_it_matters="Khipu filenames encode the date for chronological ordering",
             recovery_steps=[
                 "Rename the file to include date: YYYY-MM-DD-original-name.md",
@@ -83,14 +84,14 @@ def main():
         'RuntimeError: Failed to connect to database: Connection refused',
         ResourceError(
             resource_type="Database connection",
-            operation="storing Fire Circle memories",
-            alternatives=[
+            current_state="unavailable",
+            needed_state="connected",
+            suggestions=[
                 "Continue without persistence (memories won't be saved)",
                 "Check if MongoDB is running: sudo systemctl status mongod",
                 "Start MongoDB: sudo systemctl start mongod",
                 "Or set MALLKU_SKIP_DATABASE=true to proceed without storage"
-            ],
-            recovery_possible=True
+            ]
         )
     )
     
@@ -100,7 +101,7 @@ def main():
         "ContractViolationError: Contract violations: missing required field 'schema', insufficient examples",
         ProcessError(
             process_name="Prompt validation",
-            failure_point="contract compliance check",
+            what_happened="contract compliance check failed",
             why_it_matters="Contracts ensure LLM responses meet quality standards",
             recovery_steps=[
                 "Add 'schema' field to your prompt context",
@@ -143,9 +144,9 @@ def main():
         with WelcomingErrorContext("configuration", "Settings Loader"):
             # Simulate a harsh error
             raise ValueError("Invalid setting: temperature must be between 0 and 1")
-    except ProcessError as e:
+    except WelcomingError as e:
         print(f"\n{e}")
-        print("\n✅ Notice how ValueError became a welcoming ProcessError!")
+        print("\n✅ Notice how ValueError became a welcoming error!")
     
     # Design patterns
     print("\n\n" + "=" * 60)
