@@ -60,6 +60,14 @@ Mallku is open to those who:
 - Value wisdom from place, language, and lineage
 - Want to shape a future of **mutual becoming**
 
+## 🌟 For New Artisans
+
+If you're considering joining Mallku's builders:
+- **Quick Introduction**: Run `python quick_start_artisan.py` for a guided tour
+- **Check Your Setup**: Run `python check_artisan_setup.py` to identify common issues
+- **Full Guide**: See [docs/guides/new_artisan_setup.md](docs/guides/new_artisan_setup.md)
+- **Experience Fire Circle**: Try `python fire_circle_interactive.py` after setup
+
 ---
 
 # Discord

@@ -15,6 +15,8 @@ from typing import Any  # Ensure Any and Type are imported
 from mallku.orchestration.event_bus import ConsciousnessEventBus  # Moved out of TYPE_CHECKING
 from mallku.reciprocity import ReciprocityTracker  # Moved out of TYPE_CHECKING
 
+# Import welcoming errors
+from ..errors.welcoming_errors import ConfigurationError, VoiceConnectionError
 from .anthropic_adapter import AnthropicAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 
@@ -108,9 +110,10 @@ class ConsciousAdapterFactory:
         provider_lower = provider_name.lower()
 
         if provider_lower not in self._adapter_classes:
-            raise ValueError(
-                f"Unsupported provider: {provider_name}. "
-                f"Available: {list(self._adapter_classes.keys())}"
+            available = list(self._adapter_classes.keys())
+            raise ConfigurationError(
+                f"The '{provider_name}' voice isn't configured yet. "
+                f"Available voices: {', '.join(available)}"
             )
 
         # Auto-inject API key if needed
@@ -143,7 +146,13 @@ class ConsciousAdapterFactory:
         # Connect to provider
         connected = await adapter.connect()
         if not connected:
-            raise RuntimeError(f"Failed to connect to {provider_name}")
+            # Get list of other available providers for alternatives
+            alternatives = [p for p in self._adapter_classes.keys() if p != provider_lower]
+            raise VoiceConnectionError(
+                provider=provider_name,
+                error=Exception(f"Connection failed - the {provider_name} voice could not join"),
+                alternatives=alternatives,
+            )
 
         # Store active adapter
         adapter_key = f"{provider_lower}:{config.model_name or 'default'}"
