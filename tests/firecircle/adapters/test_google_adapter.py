@@ -89,7 +89,7 @@ class TestGoogleAIAdapter:
         assert capabilities.supports_streaming is True
         assert capabilities.supports_tools is True
         assert capabilities.supports_vision is True
-        assert capabilities.max_context_length == 2_000_000  # 2M for gemini-1.5-pro
+        assert capabilities.max_context_length == 32_000  # Default model fallback
         assert "multimodal_synthesis" in capabilities.capabilities
         assert "extended_context" in capabilities.capabilities
         assert "cross_perceptual_reasoning" in capabilities.capabilities

@@ -8,6 +8,7 @@ for locally-hosted AI models in Fire Circle.
 Testing Sovereignty Through Architecture...
 """
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -236,6 +237,9 @@ class TestLocalAIAdapter:
 
     async def test_event_emission_for_sovereignty(self, adapter, event_bus):
         """Test sovereignty events are emitted correctly."""
+        # Start the event bus
+        await event_bus.start()
+        
         events_received = []
 
         async def handler(event):
@@ -252,12 +256,18 @@ class TestLocalAIAdapter:
 
             await adapter.connect()
 
+        # Allow event processing
+        await asyncio.sleep(0.1)
+        
         # Should emit sovereignty event
         assert len(events_received) == 1
         event = events_received[0]
         assert event.data["sovereignty"]
         assert event.data["privacy_preserving"]
         assert event.consciousness_signature == 0.95
+        
+        # Clean up
+        await event_bus.stop()
 
     async def test_local_contribution_calculation(self, adapter):
         """Test contribution value for local inference."""
