@@ -65,8 +65,14 @@ Create `.secrets/api_keys.json`:
 
 Test that Fire Circle can hear the voices:
 ```bash
+# Quick verification
 python verify_fire_circle.py
+
+# Or for comprehensive diagnostics (recommended)
+python diagnose_fire_circle.py --detailed
 ```
+
+The diagnostic tool provides deep health insights including latency, quirks, and readiness.
 
 If this succeeds, you'll see something like:
 ```
