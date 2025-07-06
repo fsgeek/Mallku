@@ -18,7 +18,7 @@ import pytest
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.service.service import FireCircleService
-from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEvent, EventType
+from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
 
 class TestDecisionDomains:
@@ -197,7 +197,7 @@ class TestFireCircleIntegration:
                 yield Mock(content="Response")
 
         from mallku.firecircle.adapters.base import AdapterConfig
-        
+
         config = AdapterConfig()
         adapter = TestAdapter(config=config, provider_name="test")
 
@@ -215,7 +215,7 @@ class TestFireCircleIntegration:
 
         # Create a test space first
         space_id = UUID("12345678-1234-5678-1234-567812345678")
-        
+
         # Create individual contributions
         contributions = [
             ConsciousnessContribution(

@@ -264,7 +264,7 @@ class TestMistralAIAdapter:
         """Test emission of multilingual consciousness events."""
         # Start the event bus
         await event_bus.start()
-        
+
         events_received = []
 
         async def handler(event):
@@ -283,14 +283,14 @@ class TestMistralAIAdapter:
 
         # Allow event processing
         await asyncio.sleep(0.1)
-        
+
         assert len(events_received) == 1
         event = events_received[0]
         assert event.data["multilingual"]
         assert event.data["efficiency_focused"]
         assert event.data["european_perspective"]
         assert event.consciousness_signature == 0.88
-        
+
         # Clean up
         await event_bus.stop()
 

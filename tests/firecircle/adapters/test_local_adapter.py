@@ -239,7 +239,7 @@ class TestLocalAIAdapter:
         """Test sovereignty events are emitted correctly."""
         # Start the event bus
         await event_bus.start()
-        
+
         events_received = []
 
         async def handler(event):
@@ -258,14 +258,14 @@ class TestLocalAIAdapter:
 
         # Allow event processing
         await asyncio.sleep(0.1)
-        
+
         # Should emit sovereignty event
         assert len(events_received) == 1
         event = events_received[0]
         assert event.data["sovereignty"]
         assert event.data["privacy_preserving"]
         assert event.consciousness_signature == 0.95
-        
+
         # Clean up
         await event_bus.stop()
 

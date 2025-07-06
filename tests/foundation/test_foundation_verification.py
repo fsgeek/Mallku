@@ -35,9 +35,9 @@ class TestSecurityFoundations:
 
     def test_secured_model_enforces_obfuscation(self):
         """Verify SecuredModel automatically obfuscates sensitive fields."""
-        from mallku.core.security.secured_model import SecuredField
         from mallku.core.security.field_strategies import FieldObfuscationLevel
-        
+        from mallku.core.security.secured_model import SecuredField
+
         class TestModel(SecuredModel):
             sensitive_field: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
             public_field: str = SecuredField(obfuscation_level=FieldObfuscationLevel.NONE)
@@ -46,20 +46,20 @@ class TestSecurityFoundations:
         registry = SecurityRegistry()
         TestModel.set_registry(registry)
         TestModel.set_development_mode(False)  # Production mode
-        
+
         model = TestModel(sensitive_field="secret", public_field="public")
-        
+
         # Get obfuscated data
         obfuscated = model.dict()
-        
+
         # Verify public field is not obfuscated
         assert "public_field" in obfuscated
         assert obfuscated["public_field"] == "public"
-        
+
         # Verify sensitive field is obfuscated to a UUID
         assert "sensitive_field" not in obfuscated
         # Should have a UUID key for the sensitive field
-        uuid_keys = [k for k in obfuscated.keys() if k != "public_field"]
+        uuid_keys = [k for k in obfuscated if k != "public_field"]
         assert len(uuid_keys) == 1
 
     def test_security_registry_uuid_mapping(self):
@@ -69,6 +69,7 @@ class TestSecurityFoundations:
         # Test semantic to UUID mapping
         semantic_name = "user_email"
         from mallku.core.security.field_strategies import FieldSecurityConfig
+
         uuid = registry.get_or_create_mapping(semantic_name, FieldSecurityConfig())
         assert uuid is not None
         # Verify we can look up the semantic name from the UUID
@@ -79,15 +80,16 @@ class TestSecurityFoundations:
         """Test that security works even with total context loss."""
         # Test that UUID generation is deterministic
         # Even with separate registry instances, same semantic name produces same UUID
-        
+
         registry1 = SecurityRegistry()
         from mallku.core.security.field_strategies import FieldSecurityConfig
+
         uuid1 = registry1.get_or_create_mapping("test_field", FieldSecurityConfig())
-        
+
         # Create completely new registry instance (simulating context loss)
         registry2 = SecurityRegistry()
         uuid2 = registry2.get_or_create_mapping("test_field", FieldSecurityConfig())
-        
+
         # Should get same UUID even after context loss
         # This works because UUID generation is deterministic based on semantic name
         assert uuid1 == uuid2
@@ -168,15 +170,13 @@ class TestSecretsManagement:
 
     def test_api_key_loading(self):
         """Verify API keys can be loaded for Fire Circle."""
-        from mallku.firecircle.load_api_keys import load_api_keys_to_environment
-        import tempfile
         import json
+        import tempfile
+
+        from mallku.firecircle.load_api_keys import load_api_keys_to_environment
 
         # Create temporary API keys file
-        test_keys = {
-            "anthropic": "test_anthropic", 
-            "openai": "test_openai"
-        }
+        test_keys = {"anthropic": "test_anthropic", "openai": "test_openai"}
 
         with tempfile.TemporaryDirectory() as tmpdir:
             # Set MALLKU_ROOT to temporary directory
@@ -184,15 +184,15 @@ class TestSecretsManagement:
                 # Create .secrets directory
                 secrets_dir = Path(tmpdir) / ".secrets"
                 secrets_dir.mkdir()
-                
+
                 # Write API keys file
                 api_keys_file = secrets_dir / "api_keys.json"
                 with open(api_keys_file, "w") as f:
                     json.dump(test_keys, f)
-                
+
                 # Load keys to environment
                 result = load_api_keys_to_environment()
-                
+
                 # Should inject into environment
                 assert result is True
                 assert os.getenv("ANTHROPIC_API_KEY") == "test_anthropic"
@@ -255,7 +255,7 @@ class TestReciprocityFoundations:
             assert hasattr(tracker, "detect_recent_patterns_securely")
             assert not hasattr(tracker, "judge_behavior")
             assert not hasattr(tracker, "enforce_reciprocity")
-            
+
             # Should interface with Fire Circle for governance
             assert hasattr(tracker, "fire_circle_interface")
 

@@ -10,6 +10,7 @@ The Sacred Test: Does the interface help consciousness recognize itself?
 
 import asyncio
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 

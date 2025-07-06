@@ -38,8 +38,8 @@ class TestArchitecturalSecurity:
 
     def test_uuid_obfuscation_automatic(self):
         """Verify UUID obfuscation happens automatically."""
-        from mallku.core.security.secured_model import SecuredField
         from mallku.core.security.field_strategies import FieldObfuscationLevel
+        from mallku.core.security.secured_model import SecuredField
 
         class UserModel(SecuredModel):
             email: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
@@ -49,19 +49,19 @@ class TestArchitecturalSecurity:
         registry = SecurityRegistry()
         UserModel.set_registry(registry)
         UserModel.set_development_mode(False)  # Production mode
-        
+
         # Create instance
         user = UserModel(email="test@example.com", public_name="Test User")
 
         # Get obfuscated version
         serialized = user.dict()
-        
+
         # Email should be obfuscated to UUID
         assert "email" not in serialized
-        # Public name should remain visible  
+        # Public name should remain visible
         assert serialized["public_name"] == "Test User"
         # Should have a UUID key for email
-        uuid_keys = [k for k in serialized.keys() if k != "public_name"]
+        uuid_keys = [k for k in serialized if k != "public_name"]
         assert len(uuid_keys) == 1
         assert len(uuid_keys[0]) == 36  # UUID length
 
@@ -69,7 +69,7 @@ class TestArchitecturalSecurity:
         """Verify security registry generates deterministic UUIDs."""
         registry1 = SecurityRegistry()
         registry2 = SecurityRegistry()
-        
+
         from mallku.core.security.field_strategies import FieldSecurityConfig
 
         # Different instances should generate same UUIDs for same field names
@@ -77,20 +77,18 @@ class TestArchitecturalSecurity:
         uuid1 = registry1.get_or_create_mapping("test_field", FieldSecurityConfig())
         uuid2 = registry2.get_or_create_mapping("test_field", FieldSecurityConfig())
         assert uuid1 == uuid2
-        
+
         # Should be able to resolve back
         assert registry1.get_semantic_name(uuid1) == "test_field"
         assert registry2.get_semantic_name(uuid2) == "test_field"
 
     def test_temporal_offset_prevents_correlation(self):
         """Verify temporal offsets prevent timing correlation attacks."""
-        from mallku.core.security.field_strategies import FieldSecurityConfig, FieldIndexStrategy
-        
+        from mallku.core.security.field_strategies import FieldIndexStrategy, FieldSecurityConfig
+
         # Create a field security config with temporal offset
-        config = FieldSecurityConfig(
-            index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET
-        )
-        
+        config = FieldSecurityConfig(index_strategy=FieldIndexStrategy.TEMPORAL_OFFSET)
+
         # Verify temporal offset is a valid strategy
         assert config.index_strategy == FieldIndexStrategy.TEMPORAL_OFFSET
         assert hasattr(FieldIndexStrategy, "TEMPORAL_OFFSET")
@@ -158,17 +156,17 @@ class TestAmnesiaSecurity:
     def test_security_without_registry(self):
         """Test security works even if registry is lost."""
         # Security should work through deterministic UUID generation
-        
+
         # Create two separate registries
         registry1 = SecurityRegistry()
         registry2 = SecurityRegistry()
-        
+
         from mallku.core.security.field_strategies import FieldSecurityConfig
-        
+
         # Even without shared state, same field names produce same UUIDs
         uuid1 = registry1.get_or_create_mapping("user_id", FieldSecurityConfig())
         uuid2 = registry2.get_or_create_mapping("user_id", FieldSecurityConfig())
-        
+
         assert uuid1 == uuid2  # Deterministic generation ensures consistency
 
     def test_obfuscation_without_config(self):
@@ -203,23 +201,20 @@ class TestReciprocitySecurity:
         # This test would verify that reciprocity models use SecuredModel
         # Currently SecuredReciprocityEvent doesn't exist yet
         # The principle is that all models should inherit from SecuredModel
-        
-        from mallku.core.security.secured_model import SecuredModel, SecuredField
+
         from mallku.core.security.field_strategies import FieldObfuscationLevel
-        
+        from mallku.core.security.secured_model import SecuredField, SecuredModel
+
         # Example of how reciprocity models should be structured
         class ReciprocityEvent(SecuredModel):
             giver_id: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
             receiver_id: str = SecuredField(obfuscation_level=FieldObfuscationLevel.UUID_ONLY)
             action_type: str = SecuredField(obfuscation_level=FieldObfuscationLevel.NONE)
             value: float = SecuredField(obfuscation_level=FieldObfuscationLevel.NONE)
-        
+
         # Verify the model can be created
         event = ReciprocityEvent(
-            giver_id="user123", 
-            receiver_id="user456", 
-            action_type="contribution", 
-            value=10.0
+            giver_id="user123", receiver_id="user456", action_type="contribution", value=10.0
         )
         assert event.giver_id == "user123"  # Internal representation unchanged
 
