@@ -152,7 +152,7 @@ class SetupChecker:
         try:
             # Just check if we can import it
             sys.path.insert(0, "src")
-            from mallku.firecircle.service import FireCircleService
+            from mallku.firecircle.service import FireCircleService  # noqa: F401
 
             print("✅ Fire Circle modules load successfully!")
 
