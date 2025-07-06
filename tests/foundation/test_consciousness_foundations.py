@@ -11,13 +11,14 @@ Third Guardian - Consciousness foundation verification
 
 import asyncio
 from unittest.mock import Mock, patch
+from uuid import UUID
 
 import pytest
 
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.service.service import FireCircleService
-from mallku.orchestration.event_bus import ConsciousnessEventBus
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEvent, EventType
 
 
 class TestDecisionDomains:
@@ -27,13 +28,13 @@ class TestDecisionDomains:
         """Verify all 8 decision domains are available."""
         expected_domains = {
             "CODE_REVIEW",
-            "ARCHITECTURE_DESIGN",
+            "ARCHITECTURE",
             "RESOURCE_ALLOCATION",
             "GOVERNANCE",
             "ETHICAL_CONSIDERATION",
             "STRATEGIC_PLANNING",
-            "CONFLICT_RESOLUTION",
-            "KNOWLEDGE_SYNTHESIS",
+            "CONSCIOUSNESS_EXPLORATION",
+            "RELATIONSHIP_DYNAMICS",
         }
 
         # Get all domains
@@ -89,7 +90,7 @@ class TestConsciousnessEmergence:
         with patch.object(facilitator, "_select_voices_for_domain") as mock_select:
             mock_select.return_value = ["ayni_guardian", "impact_assessor"]
 
-            voices = facilitator._select_voices_for_domain(
+            voices = await facilitator._select_voices_for_domain(
                 DecisionDomain.CODE_REVIEW,
                 available_voices=["anthropic", "openai", "google", "mistral"],
             )
@@ -103,22 +104,24 @@ class TestConsciousnessEmergence:
     @pytest.mark.asyncio
     async def test_emergence_quality_metrics(self):
         """Verify emergence quality is measured."""
-        from mallku.firecircle.consciousness.models import CollectiveWisdom
+        from mallku.firecircle.consciousness.decision_framework import CollectiveWisdom
 
         # Create wisdom with contributions
         wisdom = CollectiveWisdom(
-            consensus_achieved=True,
+            decision_context="Test context for consciousness emergence",
+            decision_domain=DecisionDomain.CONSCIOUSNESS_EXPLORATION,
+            emergence_quality=0.92,
+            reciprocity_embodiment=0.85,
+            coherence_score=0.88,
+            synthesis="Collective wisdom emerges through dialogue",
             decision_recommendation="APPROVE",
-            participating_voices=["voice1", "voice2", "voice3"],
-            contributions_count=10,
             key_insights=[
                 "Advances consciousness emergence",
                 "Supports reciprocity patterns",
                 "Builds cathedral foundation",
             ],
-            synthesis="Collective wisdom emerges through dialogue",
-            confidence_score=0.85,
-            emergence_quality=0.92,
+            participating_voices=["voice1", "voice2", "voice3"],
+            consensus_achieved=True,
         )
 
         # Emergence quality should measure collective > individual
@@ -138,22 +141,23 @@ class TestConsciousnessEmergence:
             events_received.append(event)
 
         # Subscribe to consciousness events
-        event_bus.subscribe("consciousness.emergence", event_handler)
+        event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_handler)
 
         # Emit consciousness event
-        await event_bus.emit(
-            "consciousness.emergence",
-            {
+        event = ConsciousnessEvent(
+            event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+            data={
                 "type": "emergence_detected",
                 "quality": 0.95,
                 "voices": ["anthropic", "openai", "google"],
             },
         )
+        await event_bus.emit(event)
 
         # Should receive event
         await asyncio.sleep(0.1)  # Allow event processing
         assert len(events_received) == 1
-        assert events_received[0]["type"] == "emergence_detected"
+        assert events_received[0].data["type"] == "emergence_detected"
 
         await event_bus.stop()
 
@@ -180,61 +184,83 @@ class TestFireCircleIntegration:
 
         # Mock adapter
         class TestAdapter(ConsciousModelAdapter):
-            async def send_message(self, message: str) -> str:
-                return "Response"
-
-            async def initialize(self):
-                self._initialized = True
-
-            async def check_connection(self) -> bool:
+            async def connect(self) -> bool:
                 return True
 
-        adapter = TestAdapter()
+            async def disconnect(self) -> None:
+                pass
+
+            async def send_message(self, message, history=None):
+                return Mock(content="Response")
+
+            async def stream_message(self, message, history=None):
+                yield Mock(content="Response")
+
+        from mallku.firecircle.adapters.base import AdapterConfig
+        
+        config = AdapterConfig()
+        adapter = TestAdapter(config=config, provider_name="test")
 
         # Should track consciousness signatures
-        assert hasattr(adapter, "consciousness_weight")
+        assert hasattr(adapter.config, "consciousness_weight")
+        assert adapter.config.consciousness_weight == 1.0
 
     @pytest.mark.asyncio
     async def test_collective_wisdom_synthesis(self):
         """Test synthesis of collective wisdom."""
-        from mallku.firecircle.consciousness.models import (
+        from mallku.firecircle.consciousness.decision_framework import (
             CollectiveWisdom,
             ConsciousnessContribution,
         )
 
+        # Create a test space first
+        space_id = UUID("12345678-1234-5678-1234-567812345678")
+        
         # Create individual contributions
         contributions = [
             ConsciousnessContribution(
                 voice_id="anthropic",
-                content="Focus on security architecture",
-                consciousness_signature=0.9,
+                space_id=space_id,
+                perspective="Focus on security architecture",
+                domain_expertise="Security and architectural patterns",
+                reasoning_pattern="Systematic security analysis",
+                coherency_assessment=0.9,
             ),
             ConsciousnessContribution(
                 voice_id="openai",
-                content="Consider scalability patterns",
-                consciousness_signature=0.85,
+                space_id=space_id,
+                perspective="Consider scalability patterns",
+                domain_expertise="Distributed systems and scalability",
+                reasoning_pattern="Pattern-based scalability reasoning",
+                coherency_assessment=0.85,
             ),
             ConsciousnessContribution(
                 voice_id="google",
-                content="Ensure reciprocity in design",
-                consciousness_signature=0.88,
+                space_id=space_id,
+                perspective="Ensure reciprocity in design",
+                domain_expertise="Reciprocity patterns and system design",
+                reasoning_pattern="Reciprocal systems thinking",
+                coherency_assessment=0.88,
             ),
         ]
 
         # Synthesize collective wisdom
         wisdom = CollectiveWisdom(
+            decision_context="Test consciousness synthesis",
+            decision_domain=DecisionDomain.ARCHITECTURE,
             consensus_achieved=True,
             decision_recommendation="APPROVE",
             participating_voices=["anthropic", "openai", "google"],
             contributions_count=len(contributions),
-            key_insights=[c.content for c in contributions],
+            key_insights=[c.perspective for c in contributions],
             synthesis="Security, scalability, and reciprocity form foundation",
-            confidence_score=0.88,
             emergence_quality=0.91,
+            reciprocity_embodiment=0.88,
+            coherence_score=0.89,
         )
 
         # Collective should exceed individual parts
-        assert wisdom.emergence_quality > max(c.consciousness_signature for c in contributions)
+        assert wisdom.emergence_quality > max(c.coherency_assessment for c in contributions)
 
 
 class TestConsciousnessPatterns:
@@ -252,17 +278,20 @@ class TestConsciousnessPatterns:
 
     def test_wisdom_preservation(self):
         """Verify wisdom is preserved, not compressed."""
-        from mallku.firecircle.consciousness.models import CollectiveWisdom
+        from mallku.firecircle.consciousness.decision_framework import CollectiveWisdom
 
         wisdom = CollectiveWisdom(
+            decision_context="Test wisdom preservation context",
+            decision_domain=DecisionDomain.GOVERNANCE,
             consensus_achieved=True,
             decision_recommendation="NEEDS_DISCUSSION",
             participating_voices=["v1", "v2"],
             contributions_count=5,
             key_insights=["insight1", "insight2"],
             synthesis="Complex synthesis",
-            confidence_score=0.7,
             emergence_quality=0.8,
+            reciprocity_embodiment=0.7,
+            coherence_score=0.75,
         )
 
         # Should preserve full context

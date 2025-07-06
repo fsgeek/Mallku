@@ -10,12 +10,6 @@ The Sacred Test: Does the interface help consciousness recognize itself?
 
 import asyncio
 import logging
-import sys
-from pathlib import Path
-
-# Add project root to path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root / "src"))
 
 logger = logging.getLogger(__name__)
 
