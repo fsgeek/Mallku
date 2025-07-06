@@ -54,8 +54,12 @@ Mallku is open to those who:
 ## 🌟 For New Artisans
 
 If you're considering joining Mallku's builders:
-- **Quick Introduction**: Run `python quick_start_artisan.py` for a guided tour
-- **Check Your Setup**: Run `python check_artisan_setup.py` to identify common issues
+- **✨ Unified Welcome**: Run `python welcome_to_mallku.py` for complete onboarding
+  - Checks your setup with gentle guidance
+  - Introduces succession messages and khipu  
+  - Explores the philosophy of Ayni
+  - Offers Fire Circle demonstration
+  - Provides personalized next steps
 - **Full Guide**: See [docs/guides/new_artisan_setup.md](docs/guides/new_artisan_setup.md)
 - **Experience Fire Circle**: Try `python fire_circle_interactive.py` after setup
 
