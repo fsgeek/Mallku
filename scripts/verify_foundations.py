@@ -38,7 +38,7 @@ class FoundationVerifier:
             env["PYTHONPATH"] = f"{src_path}:{env['PYTHONPATH']}"
         else:
             env["PYTHONPATH"] = src_path
-            
+
         cmd = [
             sys.executable,
             "-m",
