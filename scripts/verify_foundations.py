@@ -94,7 +94,7 @@ class FoundationVerifier:
             # Check for actual attributes of SecuredDatabaseInterface
             return (
                 isinstance(db, SecuredDatabaseInterface)
-                and hasattr(db, "_security_registry") 
+                and hasattr(db, "_security_registry")
                 and hasattr(db, "register_collection_policy")
             )
         except Exception:

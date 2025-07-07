@@ -30,16 +30,15 @@ class TestSecurityFoundations:
         """Ensure get_secured_database() is the ONLY authorized database access."""
         # This test verifies the secured database interface exists
         # In CI, we mock the connection to avoid auth issues
-        import os
         from unittest.mock import Mock, patch
-        
+
         # Mock the database to avoid connection issues
         mock_db = Mock()
         mock_db.enforce_security = Mock()
         mock_db._security_registry = Mock()
         mock_db.is_secured = Mock(return_value=True)
-        
-        with patch('mallku.core.database.factory.get_database_raw', return_value=mock_db):
+
+        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
             db = get_secured_database()
             assert db is not None
             # SecuredDatabaseInterface has _security_registry instead of enforce_security

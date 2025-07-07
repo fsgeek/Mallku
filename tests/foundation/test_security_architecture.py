@@ -34,18 +34,19 @@ class TestArchitecturalSecurity:
 
         # Mock database to avoid connection issues in CI
         from unittest.mock import Mock, patch
-        
+
         mock_db = Mock()
         mock_db._security_registry = Mock()
         mock_db.register_collection_policy = Mock()
-        
-        with patch('mallku.core.database.factory.get_database_raw', return_value=mock_db):
+
+        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
             # Only secured access should be available
             db = get_secured_database()
             assert hasattr(db, "_security_registry")
             assert hasattr(db, "register_collection_policy")
             # Verify it's a SecuredDatabaseInterface
             from mallku.core.database.secured_interface import SecuredDatabaseInterface
+
             assert isinstance(db, SecuredDatabaseInterface)
 
     def test_uuid_obfuscation_automatic(self):
@@ -108,7 +109,11 @@ class TestArchitecturalSecurity:
     @pytest.mark.asyncio
     async def test_event_bus_security(self):
         """Verify event bus doesn't leak sensitive data."""
-        from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType, ConsciousnessEvent
+        from mallku.orchestration.event_bus import (
+            ConsciousnessEvent,
+            ConsciousnessEventBus,
+            EventType,
+        )
 
         bus = ConsciousnessEventBus()
         await bus.start()
@@ -126,7 +131,7 @@ class TestArchitecturalSecurity:
         event = ConsciousnessEvent(event_type=EventType.MEMORY_ANCHOR_CREATED)
 
         await bus.emit(event)
-        
+
         # Give event time to process
         await asyncio.sleep(0.1)
 
@@ -162,9 +167,9 @@ class TestContainerizationSecurity:
         # Note: In production, this would check actual network configuration
         # For now, we verify the secured database interface exists
         from unittest.mock import Mock
-        
+
         mock_db = Mock()
-        with patch('mallku.core.database.factory.get_database_raw', return_value=mock_db):
+        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
             db = get_secured_database()
             assert db is not None
 
@@ -208,14 +213,14 @@ class TestAmnesiaSecurity:
         """Verify database is secure by default, not by configuration."""
         # Mock database to avoid connection issues
         from unittest.mock import Mock
-        
+
         mock_db = Mock()
         mock_db._security_registry = Mock()
         mock_db.register_collection_policy = Mock()
-        
+
         # Remove all configuration
         with patch.dict(os.environ, {}, clear=True):
-            with patch('mallku.core.database.factory.get_database_raw', return_value=mock_db):
+            with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
                 db = get_secured_database()
 
                 # Should still be secured
@@ -223,6 +228,7 @@ class TestAmnesiaSecurity:
                 assert hasattr(db, "register_collection_policy")
                 # Verify it's the secured interface
                 from mallku.core.database.secured_interface import SecuredDatabaseInterface
+
                 assert isinstance(db, SecuredDatabaseInterface)
 
 
