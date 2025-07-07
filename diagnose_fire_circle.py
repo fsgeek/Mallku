@@ -23,7 +23,7 @@ import os
 import sys
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -119,7 +119,7 @@ class FireCircleDiagnostics:
             test_prompt = "Respond with just 'Present' to confirm connection."
 
             # Time the response
-            response = await adapter.generate(test_prompt)
+            await adapter.generate(test_prompt)
 
             latency_ms = (time.time() - start_time) * 1000
 
@@ -150,7 +150,7 @@ class FireCircleDiagnostics:
             model=model,
             available=False,
             quirks=self.known_quirks.get(provider, []),
-            last_checked=datetime.now(),
+            last_checked=datetime.now(timezone.utc),
         )
 
         # Check if API key exists
@@ -312,6 +312,9 @@ class FireCircleDiagnostics:
 
         # Recommendations
         print("\n💡 Recommendations:")
+
+        unavailable = [v for v in self.voices_health.values() if not v.available]
+        network_health = self.calculate_network_health()
 
         if len(unavailable) > 0:
             print(f"   • Configure {len(unavailable)} unavailable voices for better diversity")

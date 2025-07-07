@@ -58,7 +58,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
         # Verify policy properties
         assert policy.collection_name == "memory_anchors"
-        assert policy.requires_security == False  # Legacy compatibility
+        assert not policy.requires_security  # Legacy compatibility
         assert policy.allowed_model_types == []  # Empty for legacy compatibility
 
         # The policy should have basic schema validation
@@ -103,7 +103,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
             # The collection wrapper should exist and have the right policy
             assert collection._policy.collection_name == "memory_anchors"
-            assert collection._policy.requires_security == False
+            assert not collection._policy.requires_security
 
     @pytest.mark.asyncio
     async def test_memory_anchor_creation_through_secured_path(

@@ -129,7 +129,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
         # Verify policy properties
         assert policy.collection_name == "memory_anchors"
-        assert policy.requires_security == False  # Legacy compatibility
+        assert not policy.requires_security  # Legacy compatibility
         assert policy.allowed_model_types == []  # Empty for legacy compatibility
 
         # The policy should have basic schema validation

@@ -51,14 +51,14 @@ class TestArchitecturalBoundaries:
 
         # Verify policy properties match architectural design
         assert memory_anchor_policy.collection_name == "memory_anchors"
-        assert memory_anchor_policy.requires_security == False
+        assert not memory_anchor_policy.requires_security
         assert memory_anchor_policy.allowed_model_types == []
 
         # This is intentional - memory_anchors doesn't require SecuredModel
         # because it was designed before the security layer was added
 
         # Document the implication
-        assert memory_anchor_policy.requires_security == False, (
+        assert not memory_anchor_policy.requires_security, (
             "memory_anchors collection bypasses SecuredModel requirement "
             "for backward compatibility with existing MemoryAnchor class"
         )
@@ -289,17 +289,17 @@ class TestSecurityPolicyEnforcement:
         )
 
         # Key differences
-        assert memory_policy.requires_security == False
-        assert reciprocity_policy.requires_security == True
+        assert not memory_policy.requires_security
+        assert reciprocity_policy.requires_security
 
         assert len(memory_policy.allowed_model_types) == 0
         assert len(reciprocity_policy.allowed_model_types) > 0
 
         # Document the architectural decision
-        assert memory_policy.requires_security == False, (
+        assert not memory_policy.requires_security, (
             "memory_anchors uses legacy MemoryAnchor class, not SecuredModel"
         )
-        assert reciprocity_policy.requires_security == True, (
+        assert reciprocity_policy.requires_security, (
             "New collections require SecuredModel for data protection"
         )
 
