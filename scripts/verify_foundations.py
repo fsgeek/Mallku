@@ -36,10 +36,12 @@ class FoundationVerifier:
             "pytest",
             str(self.test_dir),
             "-v" if self.verbose else "-q",
-            "-k",
-            component if component else "",
             "--tb=short",
         ]
+        
+        # Add component filter only if specified
+        if component:
+            cmd.extend(["-k", component])
 
         print("\n🔍 Running foundation verification tests...")
         if component:
@@ -49,6 +51,15 @@ class FoundationVerifier:
 
         # Parse results
         self._parse_results(result)
+        
+        # If failed and verbose, show output
+        if result.returncode != 0 and self.verbose:
+            print("\n--- Test Output ---")
+            if result.stdout:
+                print(result.stdout)
+            if result.stderr:
+                print("\n--- Error Output ---")
+                print(result.stderr)
 
         return result.returncode == 0
 
