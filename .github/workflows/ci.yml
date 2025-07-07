@@ -187,6 +187,8 @@ jobs:
         run: |
           source .venv/bin/activate
           echo "=== Running Foundation Verification ==="
+          # Set PYTHONPATH to ensure mallku can be imported
+          export PYTHONPATH=/home/runner/work/Mallku/Mallku/src:$PYTHONPATH
           python scripts/verify_foundations.py --verbose
           if [ $? -ne 0 ]; then
             echo "❌ Foundation verification failed!"
