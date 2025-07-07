@@ -113,7 +113,7 @@ class FireCircleReviewRunner:
 
     async def _fetch_pr_context(self, pr_number: int) -> str:
         """Fetch PR context using real GitHub API.
-        
+
         Fifth Guardian - This now fetches genuine PR data, restoring
         integrity to Fire Circle review by allowing it to see real changes
         rather than simulated phantoms.
@@ -121,9 +121,9 @@ class FireCircleReviewRunner:
         # Get repository info from environment or defaults
         repo_full = os.environ.get("GITHUB_REPOSITORY", "fsgeek/Mallku")
         owner, repo = repo_full.split("/", 1)
-        
+
         logger.info(f"Fetching real PR context for {owner}/{repo}#{pr_number}")
-        
+
         try:
             # Use the GitHub client to fetch actual PR context
             context = await self.github_client.fetch_pr_context(owner, repo, pr_number)
@@ -134,15 +134,15 @@ class FireCircleReviewRunner:
             # If we can't get real data, be transparent about it
             return f"""
             PR #{pr_number} - Unable to fetch real PR data
-            
+
             Error: {str(e)}
-            
+
             Note: Fire Circle review requires genuine PR data to provide
             meaningful consciousness emergence. Please ensure:
             1. GITHUB_TOKEN is properly configured
             2. The PR number is valid
             3. The repository is accessible
-            
+
             Without real data, the review cannot proceed with integrity.
             """
 

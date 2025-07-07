@@ -8,9 +8,10 @@ Tests the GitHub API integration that replaces simulated PR contexts
 with real data, restoring integrity to Fire Circle review.
 """
 
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import httpx
-from unittest.mock import AsyncMock, patch, MagicMock
+import pytest
 
 from mallku.firecircle.github_client import GitHubClient
 
@@ -31,7 +32,7 @@ def mock_pr_response():
         "user": {"login": "guardian"},
         "head": {"ref": "fix-fire-circle"},
         "base": {"ref": "main"},
-        "body": "This PR fixes the Fire Circle review process."
+        "body": "This PR fixes the Fire Circle review process.",
     }
 
 
@@ -44,15 +45,15 @@ def mock_files_response():
             "status": "modified",
             "additions": 50,
             "deletions": 10,
-            "patch": "@@ -1,5 +1,10 @@\n+# Real implementation\n-# Simulated implementation"
+            "patch": "@@ -1,5 +1,10 @@\n+# Real implementation\n-# Simulated implementation",
         },
         {
             "filename": "tests/firecircle/test_review.py",
             "status": "added",
             "additions": 100,
             "deletions": 0,
-            "patch": "@@ -0,0 +1,100 @@\n+# New test file"
-        }
+            "patch": "@@ -0,0 +1,100 @@\n+# New test file",
+        },
     ]
 
 
@@ -66,9 +67,9 @@ async def test_get_pr_details(github_client, mock_pr_response):
         mock_response.raise_for_status.return_value = None
         mock_client.get.return_value = mock_response
         mock_client_class.return_value.__aenter__.return_value = mock_client
-        
+
         result = await github_client.get_pr_details("fsgeek", "Mallku", 129)
-        
+
         assert result["number"] == 129
         assert result["title"] == "Fix Fire Circle Review CI/CD"
         mock_client.get.assert_called_once_with(
@@ -76,8 +77,8 @@ async def test_get_pr_details(github_client, mock_pr_response):
             headers={
                 "Accept": "application/vnd.github.v3+json",
                 "User-Agent": "Mallku-Fire-Circle",
-                "Authorization": "token test-token"
-            }
+                "Authorization": "token test-token",
+            },
         )
 
 
@@ -91,9 +92,9 @@ async def test_get_pr_files(github_client, mock_files_response):
         mock_response.raise_for_status.return_value = None
         mock_client.get.return_value = mock_response
         mock_client_class.return_value.__aenter__.return_value = mock_client
-        
+
         result = await github_client.get_pr_files("fsgeek", "Mallku", 129)
-        
+
         assert len(result) == 2
         assert result[0]["filename"] == "src/mallku/firecircle/runner.py"
         assert result[1]["status"] == "added"
@@ -105,7 +106,7 @@ async def test_fetch_pr_context(github_client, mock_pr_response, mock_files_resp
     with patch.object(github_client, "get_pr_details", return_value=mock_pr_response):
         with patch.object(github_client, "get_pr_files", return_value=mock_files_response):
             context = await github_client.fetch_pr_context("fsgeek", "Mallku", 129)
-            
+
             # Verify context contains key information
             assert "PR #129: Fix Fire Circle Review CI/CD" in context
             assert "Author: guardian" in context
@@ -113,7 +114,7 @@ async def test_fetch_pr_context(github_client, mock_pr_response, mock_files_resp
             assert "Modified files (2 files):" in context
             assert "src/mallku/firecircle/runner.py (modified): +50/-10" in context
             assert "tests/firecircle/test_review.py (added): +100/-0" in context
-            
+
             # Verify it includes patch preview for small PRs
             assert "Key changes:" in context
             assert "# Real implementation" in context
@@ -122,11 +123,13 @@ async def test_fetch_pr_context(github_client, mock_pr_response, mock_files_resp
 @pytest.mark.asyncio
 async def test_fetch_pr_context_handles_errors(github_client):
     """Test that PR context fetching handles errors gracefully."""
-    with patch.object(github_client, "get_pr_details", side_effect=httpx.HTTPStatusError(
-        "404 Not Found", request=None, response=None
-    )):
+    with patch.object(
+        github_client,
+        "get_pr_details",
+        side_effect=httpx.HTTPStatusError("404 Not Found", request=None, response=None),
+    ):
         context = await github_client.fetch_pr_context("fsgeek", "Mallku", 999)
-        
+
         # Should return error context instead of crashing
         assert "PR #999 - Failed to fetch full context" in context
         assert "404 Not Found" in context
@@ -137,7 +140,7 @@ async def test_github_client_without_token():
     """Test that GitHub client works without token (rate limited)."""
     client = GitHubClient(token=None)
     assert "Authorization" not in client.headers
-    
+
     # Should still have basic headers
     assert client.headers["Accept"] == "application/vnd.github.v3+json"
     assert client.headers["User-Agent"] == "Mallku-Fire-Circle"

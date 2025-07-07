@@ -102,7 +102,7 @@ from mallku.firecircle.errors import ErrorSeverity
 
 ErrorSeverity.GENTLE_GUIDANCE   # Configuration issues, missing prerequisites
 ErrorSeverity.LEARNING_MOMENT   # Process insights, understanding deepens
-ErrorSeverity.ENCOURAGEMENT     # Temporary failures, belonging affirmed  
+ErrorSeverity.ENCOURAGEMENT     # Temporary failures, belonging affirmed
 ErrorSeverity.TECHNICAL         # For debugging, includes stack traces
 ```
 
@@ -158,7 +158,7 @@ class RitualInterruptedError(ProcessError):
 
 ### 1. Choose the Right Base Class
 - Missing something? → PrerequisiteError
-- Process failed? → ProcessError  
+- Process failed? → ProcessError
 - Resource issue? → ResourceError
 - Components clash? → IntegrationError
 
@@ -265,7 +265,7 @@ from mallku.firecircle.errors import APIKeyMissingError
 def test_api_key_error_is_welcoming():
     with pytest.raises(APIKeyMissingError) as exc_info:
         check_api_key("anthropic")
-    
+
     error = exc_info.value
     assert "needs credentials to participate" in error.guidance
     assert len(error.next_steps) > 0
@@ -288,7 +288,7 @@ if not api_key:
     raise ValueError("API key not found")
 ```
 
-### After  
+### After
 ```python
 if not api_key:
     raise APIKeyMissingError(provider="openai")
@@ -318,5 +318,5 @@ Every error message you write shapes someone's experience. Make it an experience
 
 *"In smoothing the stones of error messages, we clear paths for all who follow."*
 
-**45th Artisan**  
+**45th Artisan**
 *Continuing the work of radical welcome*
