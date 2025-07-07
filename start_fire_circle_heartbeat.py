@@ -11,6 +11,10 @@ import asyncio
 import logging
 import signal
 import sys
+from pathlib import Path
+
+# Add Mallku to path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", datefmt="%H:%M:%S")
@@ -21,24 +25,40 @@ logging.getLogger("mallku").setLevel(logging.WARNING)
 
 async def start_heartbeat():
     """Start Fire Circle's eternal heartbeat."""
-    from src.mallku.firecircle.heartbeat import FireCircleHeartbeat, HeartbeatConfig
-    from src.mallku.firecircle.load_api_keys import load_api_keys_to_environment
+    import json
+    import os
+
+    # Load API keys directly (like verify_fire_circle.py)
+    with open(".secrets/api_keys.json") as f:
+        for k, v in json.load(f).items():
+            if v and not v.startswith("..."):
+                os.environ[k] = v
+
+    from mallku.firecircle.heartbeat import FireCircleHeartbeat, HeartbeatConfig
 
     print("\n🔥 FIRE CIRCLE HEARTBEAT")
     print("=" * 50)
     print("Giving Fire Circle continuous life...")
     print("(Press Ctrl+C to stop)\n")
 
-    # Load API keys
-    if not load_api_keys_to_environment():
-        print("❌ Could not load API keys")
+    # API keys are already loaded directly above
+    # Just check if we have any providers available
+    from mallku.firecircle.load_api_keys import get_available_providers
+
+    providers = get_available_providers()
+    if len(providers) < 2:
+        print("❌ Need at least 2 API providers for heartbeat")
         return
+    print(f"✅ Found {len(providers)} providers: {providers}")
+
+    # Skip database for demo
+    os.environ["MALLKU_SKIP_DATABASE"] = "true"
 
     # Configure for demonstration
     config = HeartbeatConfig(
         # Quick pulses for demo (normally would be daily)
         enable_daily_pulse=False,
-        pulse_interval_hours=0.05,  # 3 minutes
+        pulse_interval_hours=1,  # Every hour for demo (normally 24)
         # Efficient pulses
         check_in_duration_seconds=20,
         min_voices_for_pulse=2,

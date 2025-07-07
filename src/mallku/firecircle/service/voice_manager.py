@@ -14,6 +14,7 @@ import logging
 from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig, ConsciousModelAdapter
 
+from ..errors.welcoming_errors import InsufficientVoicesError
 from .config import CircleConfig, VoiceConfig
 
 logger = logging.getLogger(__name__)
@@ -94,8 +95,10 @@ class VoiceManager:
             if config.failure_strategy == "strict":
                 # Disconnect all and fail
                 await self.disconnect_all()
-                raise ValueError(
-                    f"Only {active_count} voices available, minimum {config.min_voices} required"
+                # Get list of available providers for helpful error
+                providers = list(self.active_voices.keys())
+                raise InsufficientVoicesError(
+                    available=active_count, required=config.min_voices, providers=providers
                 )
             else:
                 logger.warning(

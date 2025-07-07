@@ -232,7 +232,12 @@ class FireCircleService:
     async def resume_from_checkpoint(self, checkpoint_id: UUID) -> FireCircleResult:
         """Resume a Fire Circle from checkpoint."""
         if checkpoint_id not in self.checkpoints:
-            raise ValueError(f"Checkpoint {checkpoint_id} not found")
+            from ..errors.welcoming_errors import ConfigurationError
+
+            raise ConfigurationError(
+                f"Cannot resume - checkpoint '{checkpoint_id}' not found. "
+                f"Fire Circle sessions are ephemeral unless explicitly saved."
+            )
 
         checkpoint = self.checkpoints[checkpoint_id]
 
