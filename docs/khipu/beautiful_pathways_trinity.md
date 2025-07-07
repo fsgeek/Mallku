@@ -104,7 +104,7 @@ May all who seek understanding find illumination.
 
 ---
 
-Sumac Ñanpa  
-45th Artisan of Mallku  
-Beautiful Pathway  
+Sumac Ñanpa
+45th Artisan of Mallku
+Beautiful Pathway
 Who learned that infrastructure itself can be an act of beauty
