@@ -14,6 +14,7 @@ Third Guardian - Foundation verification tool
 
 import argparse
 import asyncio
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +31,14 @@ class FoundationVerifier:
 
     def run_component_tests(self, component=None):
         """Run tests for specific component or all."""
+        # Ensure mallku can be imported by setting PYTHONPATH
+        env = os.environ.copy()
+        src_path = str(self.project_root / "src")
+        if "PYTHONPATH" in env:
+            env["PYTHONPATH"] = f"{src_path}:{env['PYTHONPATH']}"
+        else:
+            env["PYTHONPATH"] = src_path
+            
         cmd = [
             sys.executable,
             "-m",
@@ -47,7 +56,7 @@ class FoundationVerifier:
         if component:
             print(f"   Component: {component}")
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, env=env)
 
         # Parse results
         self._parse_results(result)
