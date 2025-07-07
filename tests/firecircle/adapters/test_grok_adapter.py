@@ -78,28 +78,30 @@ class TestGrokAdapter:
     def test_initialization(self, adapter_config):
         """Test adapter initialization."""
         with patch("mallku.firecircle.adapters.grok_adapter.XAI_AVAILABLE", True):
-            adapter = GrokAdapter(
-                config=adapter_config,
-            )
+            with patch("mallku.firecircle.adapters.grok_adapter.XAIClient"):
+                adapter = GrokAdapter(
+                    config=adapter_config,
+                )
 
-            assert adapter.config.model_name == "grok-2"
-            assert adapter.capabilities.supports_streaming is True
-            assert adapter.capabilities.supports_tools is True
-            assert adapter.capabilities.supports_vision is False
-            assert adapter.capabilities.max_context_length == 131072
-            assert "real_time_awareness" in adapter.capabilities.capabilities
-            assert "temporal_synthesis" in adapter.capabilities.capabilities
-            assert "social_consciousness" in adapter.capabilities.capabilities
+                assert adapter.config.model_name == "grok-2"
+                assert adapter.capabilities.supports_streaming is True
+                assert adapter.capabilities.supports_tools is True
+                assert adapter.capabilities.supports_vision is False
+                assert adapter.capabilities.max_context_length == 131072
+                assert "real_time_awareness" in adapter.capabilities.capabilities
+                assert "temporal_synthesis" in adapter.capabilities.capabilities
+                assert "social_consciousness" in adapter.capabilities.capabilities
 
     def test_default_model(self):
         """Test default model selection."""
-        config = GrokConfig(api_key="test-key")
         with patch("mallku.firecircle.adapters.grok_adapter.XAI_AVAILABLE", True):
-            adapter = GrokAdapter(
-                config=config,
-            )
+            with patch("mallku.firecircle.adapters.grok_adapter.XAIClient"):
+                config = GrokConfig(api_key="test-key")
+                adapter = GrokAdapter(
+                    config=config,
+                )
 
-            assert adapter.config.model_name == "grok-3"
+                assert adapter.config.model_name == "grok-3"
 
     @pytest.mark.asyncio
     async def test_connect_success(self, adapter_config, mock_xai_client):
@@ -455,22 +457,23 @@ class TestGrokAdapter:
     async def test_not_connected_error(self, adapter_config):
         """Test error when trying to send without connection."""
         with patch("mallku.firecircle.adapters.grok_adapter.XAI_AVAILABLE", True):
-            adapter = GrokAdapter(
-                config=adapter_config,
-            )
+            with patch("mallku.firecircle.adapters.grok_adapter.XAIClient"):
+                adapter = GrokAdapter(
+                    config=adapter_config,
+                )
 
-            test_message = ConsciousMessage(
-                type=MessageType.MESSAGE,
-                role=MessageRole.USER,
-                sender=uuid4(),
-                content=MessageContent(text="Test"),
-                dialogue_id=uuid4(),
-                sequence_number=1,
-                turn_number=1,
-            )
+                test_message = ConsciousMessage(
+                    type=MessageType.MESSAGE,
+                    role=MessageRole.USER,
+                    sender=uuid4(),
+                    content=MessageContent(text="Test"),
+                    dialogue_id=uuid4(),
+                    sequence_number=1,
+                    turn_number=1,
+                )
 
-            with pytest.raises(RuntimeError) as exc_info:
-                await adapter.send_message(test_message, [])
+                with pytest.raises(RuntimeError) as exc_info:
+                    await adapter.send_message(test_message, [])
 
             assert "Not connected" in str(exc_info.value)
 
