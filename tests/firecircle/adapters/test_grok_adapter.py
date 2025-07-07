@@ -475,7 +475,7 @@ class TestGrokAdapter:
                 with pytest.raises(RuntimeError) as exc_info:
                     await adapter.send_message(test_message, [])
 
-        assert "Not connected" in str(exc_info.value)
+            assert "Not connected" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_check_health(self, grok_adapter):

@@ -315,7 +315,6 @@ class FireCircleDiagnostics:
 
         unavailable = [v for v in self.voices_health.values() if not v.available]
         network_health = self.calculate_network_health()
-
         if len(unavailable) > 0:
             print(f"   • Configure {len(unavailable)} unavailable voices for better diversity")
 
