@@ -38,7 +38,7 @@ class FoundationVerifier:
             "-v" if self.verbose else "-q",
             "--tb=short",
         ]
-        
+
         # Add component filter only if specified
         if component:
             cmd.extend(["-k", component])
@@ -51,7 +51,7 @@ class FoundationVerifier:
 
         # Parse results
         self._parse_results(result)
-        
+
         # If failed and verbose, show output
         if result.returncode != 0 and self.verbose:
             print("\n--- Test Output ---")
