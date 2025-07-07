@@ -314,6 +314,7 @@ class FireCircleDiagnostics:
         print("\n💡 Recommendations:")
 
         unavailable = [v for v in self.voices_health.values() if not v.available]
+        network_health = self.calculate_network_health()
         if len(unavailable) > 0:
             print(f"   • Configure {len(unavailable)} unavailable voices for better diversity")
 
@@ -323,7 +324,6 @@ class FireCircleDiagnostics:
                 f"   • Investigate high latency for: {', '.join(v.provider for v in slow_voices)}"
             )
 
-        network_health = self.calculate_network_health()
         if network_health < 0.7:
             print("   • Address health issues before important ceremonies")
 
