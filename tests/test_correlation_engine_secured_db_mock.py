@@ -11,6 +11,7 @@ Key architectural points tested:
 4. The security model is enforced even for legacy collections
 """
 
+import contextlib
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
@@ -301,10 +302,9 @@ class TestCorrelationEngineSecuredDBIntegration:
                     warnings.simplefilter("always")
 
                     # This call should be monitored/warned
-                    try:
+                    with contextlib.suppress(Exception):
+                        # We expect this to fail in test environment
                         raw_db = get_database_raw()
-                    except Exception:
-                        pass  # We expect this to fail in test environment
 
                     # The warning mechanism exists
                     # (actual warning depends on call stack detection)
