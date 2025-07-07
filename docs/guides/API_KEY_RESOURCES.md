@@ -61,7 +61,7 @@ Infrastructure that transforms errors into teachers:
 
 These resources embody fractal reciprocity:
 - **Documentation** that welcomes rather than instructs
-- **Verification** that guides rather than judges  
+- **Verification** that guides rather than judges
 - **Errors** that teach rather than block
 - **Setup** that invites rather than demands
 

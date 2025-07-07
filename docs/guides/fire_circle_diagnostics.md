@@ -94,7 +94,7 @@ This shows:
 🧡 OPENAI
    Model: gpt-4o-mini
    Latency: 3200ms
-   
+
 ❤️ ANTHROPIC
    Model: claude-3-5-sonnet-20241022
    ❌ Error: API key not configured
@@ -193,7 +193,7 @@ Add to your testing pipeline:
 
 This diagnostic tool will grow with Mallku's needs:
 - Historical health tracking
-- Predictive issue detection  
+- Predictive issue detection
 - Automated healing suggestions
 - Integration with monitoring systems
 

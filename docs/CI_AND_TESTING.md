@@ -18,9 +18,22 @@ both code quality and functional behavior before changes are merged.
 
 The `.github/workflows/ci.yml` workflow runs on every push and pull request to `main`, and nightly at 03:00 UTC:
 
-1. **lint**: Installs and runs `ruff` to check for style and lint errors.
+1. **sanctify-code**: Runs pre-commit hooks including `ruff` for style and lint errors.
 2. **test**: Installs dependencies and runs all tests via `pytest`.
-3. **coverage**: Measures code coverage and prints a summary report.
+3. **foundation-verification**: Validates core architectural principles using the foundation test suite.
+4. **coverage**: Measures code coverage and prints a summary report.
+
+### Fire Circle Review (Distributed AI Code Review)
+
+The `.github/workflows/fire_circle_review.yml` workflow runs on every pull request to enable distributed AI code review:
+
+- **Trigger**: Automatically on PR open/sync/reopen, or manually via workflow dispatch
+- **Entrypoint**: `python fire_circle_review.py review $PR_NUMBER`
+- **Environment**: Runs with `MALLKU_SKIP_DATABASE=true` to avoid database dependencies
+- **API Keys**: Requires GitHub secrets for AI voice providers (see `docs/fire_circle/GITHUB_SECRETS_SETUP.md`)
+- **Output**: Posts synthesized review comments directly to the PR
+
+This prevents architect context exhaustion by distributing review work across multiple AI voices, each contributing their perspective to form collective wisdom.
 
 ### Maintaining Minimal Noise
 

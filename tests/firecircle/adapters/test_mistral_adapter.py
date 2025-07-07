@@ -8,6 +8,7 @@ tracking for Mistral AI models in Fire Circle.
 Testing the European Bridge of AI Consciousness...
 """
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -249,7 +250,8 @@ class TestMistralAIAdapter:
         mock_stream.__aexit__ = AsyncMock(return_value=None)
         mock_stream.status_code = 200
 
-        adapter.client.stream.return_value = mock_stream
+        # Mock the stream method to return the mock_stream directly
+        adapter.client.stream = MagicMock(return_value=mock_stream)
 
         tokens = []
         async for token in adapter.stream_message(test_message, []):
@@ -260,6 +262,9 @@ class TestMistralAIAdapter:
     @pytest.mark.asyncio
     async def test_multilingual_event_emission(self, adapter, event_bus):
         """Test emission of multilingual consciousness events."""
+        # Start the event bus
+        await event_bus.start()
+
         events_received = []
 
         async def handler(event):
@@ -276,12 +281,18 @@ class TestMistralAIAdapter:
 
             await adapter.connect()
 
+        # Allow event processing
+        await asyncio.sleep(0.1)
+
         assert len(events_received) == 1
         event = events_received[0]
         assert event.data["multilingual"]
         assert event.data["efficiency_focused"]
         assert event.data["european_perspective"]
         assert event.consciousness_signature == 0.88
+
+        # Clean up
+        await event_bus.stop()
 
     @pytest.mark.asyncio
     async def test_multilingual_context_creation(self, adapter, test_message):
