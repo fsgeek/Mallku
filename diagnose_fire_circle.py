@@ -23,7 +23,7 @@ import os
 import sys
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -150,7 +150,7 @@ class FireCircleDiagnostics:
             model=model,
             available=False,
             quirks=self.known_quirks.get(provider, []),
-            last_checked=datetime.now(timezone.utc),
+            last_checked=datetime.now(UTC),
         )
 
         # Check if API key exists

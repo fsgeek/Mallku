@@ -303,7 +303,7 @@ class TestCorrelationEngineSecuredDBIntegration:
                     # This call should be monitored/warned
                     try:
                         raw_db = get_database_raw()
-                    except:
+                    except Exception:
                         pass  # We expect this to fail in test environment
 
                     # The warning mechanism exists
