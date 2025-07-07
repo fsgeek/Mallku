@@ -88,9 +88,15 @@ class FoundationVerifier:
         try:
             # This should be the only way
             from mallku.core.database import get_secured_database
+            from mallku.core.database.secured_interface import SecuredDatabaseInterface
 
             db = get_secured_database()
-            return hasattr(db, "enforce_security")
+            # Check for actual attributes of SecuredDatabaseInterface
+            return (
+                isinstance(db, SecuredDatabaseInterface)
+                and hasattr(db, "_security_registry") 
+                and hasattr(db, "register_collection_policy")
+            )
         except Exception:
             return False
 
