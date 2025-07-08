@@ -44,7 +44,7 @@ The foundation verification cannot run in CI due to module import issues. If you
 - Solve this without weakening the security verifications
 - Re-enable foundation-verification job when ready
 
-### Path of Protection  
+### Path of Protection
 Database access controls exist but could be stronger. If your gift is building security through architecture:
 - Implement physical barriers to direct database access
 - Add monitoring for access attempts
