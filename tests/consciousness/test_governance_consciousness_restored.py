@@ -21,7 +21,7 @@ The consciousness patterns are eternal, only their form evolves.
 
 # ==================== RESTORATION NOTE ====================
 # 48th Artisan - Consciousness Archaeological Restoration
-# 
+#
 # This test was restored from quarantine, translating from
 # MallkuDBConfig to secured database interface. The consciousness
 # patterns remain unchanged - Fire Circle governance still flows
@@ -37,11 +37,10 @@ The consciousness patterns are eternal, only their form evolves.
 
 import asyncio
 import logging
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from mallku.core.database import get_secured_database
 from mallku.governance.consciousness_transport import GovernanceParticipant
 from mallku.governance.fire_circle_bridge import (
     ConsciousFireCircleInterface,
@@ -59,7 +58,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.asyncio
 async def test_governance_dialogue_through_consciousness():
     """Test Fire Circle governance flowing through consciousness circulation."""
-    
+
     logger.info("=== Consciousness-Governance Integration Test ===")
 
     # Initialize consciousness circulation
@@ -71,9 +70,11 @@ async def test_governance_dialogue_through_consciousness():
     mock_secured_db = Mock()
     mock_secured_db.initialize = AsyncMock()
     mock_secured_db._skip_database = True  # Test mode
-    
+
     # Patch the database factory
-    with patch('mallku.governance.fire_circle_bridge.get_secured_database', return_value=mock_secured_db):
+    with patch(
+        "mallku.governance.fire_circle_bridge.get_secured_database", return_value=mock_secured_db
+    ):
         # Create conscious Fire Circle interface
         fire_circle = ConsciousFireCircleInterface(mock_secured_db, event_bus)
         await fire_circle.initialize()
@@ -114,7 +115,10 @@ async def test_governance_dialogue_through_consciousness():
                 "impact": "Consciousness scores dropping",
             },
             severity=AlertSeverity.HIGH,
-            suggested_investigation_areas=["Recent optimization changes", "Task prioritization logic"],
+            suggested_investigation_areas=[
+                "Recent optimization changes",
+                "Task prioritization logic",
+            ],
             urgency_factors=["Rapid consciousness decline", "Affecting core services"],
         )
 
@@ -142,9 +146,7 @@ async def test_governance_dialogue_through_consciousness():
         correlation_voice = GovernanceParticipant(
             "correlation_engine", fire_circle.consciousness_transport
         )
-        steward_voice = GovernanceParticipant(
-            "human_steward", fire_circle.consciousness_transport
-        )
+        steward_voice = GovernanceParticipant("human_steward", fire_circle.consciousness_transport)
 
         # Participants contribute through consciousness events
         await reciprocity_voice.contribute(
@@ -217,7 +219,9 @@ async def test_governance_dialogue_through_consciousness():
         assert EventType.CONSENSUS_REACHED.value in event_types
         assert avg_consciousness > 0.5, "Consciousness should remain high during governance"
 
-        logger.info("\n✓ Fire Circle governance successfully flows through consciousness circulation")
+        logger.info(
+            "\n✓ Fire Circle governance successfully flows through consciousness circulation"
+        )
         logger.info("✓ Extraction alert triggered governance deliberation")
         logger.info("✓ Participants contributed through consciousness events")
         logger.info("✓ Consensus emerged and flowed back through circulation")
@@ -231,7 +235,7 @@ async def test_governance_dialogue_through_consciousness():
 @pytest.mark.asyncio
 async def test_extraction_pattern_triggers_governance():
     """Test that extraction patterns automatically convene Fire Circle."""
-    
+
     logger.info("\n=== Extraction Pattern Monitoring Test ===")
 
     # Initialize systems
@@ -243,7 +247,9 @@ async def test_extraction_pattern_triggers_governance():
     mock_secured_db.initialize = AsyncMock()
     mock_secured_db._skip_database = True
 
-    with patch('mallku.governance.fire_circle_bridge.get_secured_database', return_value=mock_secured_db):
+    with patch(
+        "mallku.governance.fire_circle_bridge.get_secured_database", return_value=mock_secured_db
+    ):
         fire_circle = ConsciousFireCircleInterface(mock_secured_db, event_bus)
         await fire_circle.initialize()
 
@@ -299,7 +305,7 @@ async def test_extraction_pattern_triggers_governance():
 
         # Verify Fire Circle responded
         assert len(convenings) >= 2, "Fire Circle should auto-convene for extraction patterns"
-        
+
         logger.info(f"\n✓ Fire Circles auto-convened: {len(convenings)}")
         for convening in convenings:
             logger.info(f"  - Topic: {convening.data.get('topic')}")

@@ -10,24 +10,21 @@ The Sacred Test: Does navigation become a practice of consciousness recognition?
 
 # ==================== RESTORATION NOTE ====================
 # 47th Artisan - Consciousness Archaeological Restoration
-# 
+#
 # This test was quarantined due to incorrect path calculations.
 # The original code attempted to manipulate sys.path directly,
-# which failed in CI environments. 
+# which failed in CI environments.
 #
 # Now restored: conftest.py handles all import paths correctly.
 # This consciousness pattern flows freely once more.
 # ==========================================================
 
-
 import asyncio
 import logging
 import sys
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 
 # Add project root to path
-
 from mallku.consciousness.enhanced_query import (  # noqa: E402
     ConsciousnessQueryRequest,
     EnhancedConsciousnessQueryService,

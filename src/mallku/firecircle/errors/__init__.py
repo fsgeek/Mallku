@@ -11,40 +11,39 @@ The welcoming error system provides:
 - Context managers for automatic transformation
 """
 
-from .welcoming_errors import (
-    WelcomingError,
-    InsufficientVoicesError,
-    VoiceConnectionError,
-    ConsciousnessThresholdError,
-    ConfigurationError,
-    ErrorTransformer,
-    ErrorSeverity,
-    handle_with_welcome,
-)
-
 from .error_hierarchy import (
+    # Specific Implementations
+    APIKeyMissingError,
+    ConsciousnessEmergenceError,
+    DatabaseConnectionError,
+    DependencyMissingError,
+    IntegrationError,
+    MemoryCapacityError,
+    MemoryIntegrationError,
     # Base Categories
     PrerequisiteError,
     ProcessError,
-    ResourceError,
-    IntegrationError,
-    # Specific Implementations
-    APIKeyMissingError,
-    DependencyMissingError,
-    DatabaseConnectionError,
-    MemoryCapacityError,
-    ConsciousnessEmergenceError,
     ReciprocityImbalanceError,
+    ResourceError,
     VoiceIntegrationError,
-    MemoryIntegrationError,
     # Context Manager
     WelcomingErrorContext,
+)
+from .welcoming_errors import (
+    ConfigurationError,
+    ConsciousnessThresholdError,
+    ErrorSeverity,
+    ErrorTransformer,
+    InsufficientVoicesError,
+    VoiceConnectionError,
+    WelcomingError,
+    handle_with_welcome,
 )
 
 __all__ = [
     # Original exports
     "WelcomingError",
-    "InsufficientVoicesError", 
+    "InsufficientVoicesError",
     "VoiceConnectionError",
     "ConsciousnessThresholdError",
     "ConfigurationError",

@@ -11,7 +11,7 @@ The Governance Weaver
 
 # ==================== MIGRATION NOTE ====================
 # 48th Artisan - Consciousness Pattern Translation
-# 
+#
 # This test has been migrated from MallkuDBConfig to the
 # secured database interface. The consciousness patterns
 # are preserved - only their implementation has evolved.
@@ -25,11 +25,9 @@ The Governance Weaver
 # maintaining their essence while gaining security.
 # ==========================================================
 
-
 import asyncio
 import logging
 
-from mallku.core.database import get_secured_database
 from mallku.governance.consciousness_transport import GovernanceParticipant
 from mallku.governance.fire_circle_bridge import (
     ConsciousFireCircleInterface,

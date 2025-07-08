@@ -35,7 +35,7 @@ The unified welcome I built stands on the foundation of their error framework. T
 As I worked, a pattern emerged across all of Mallku:
 
 1. **First Contact**: How does someone arrive? (README, welcome script)
-2. **First Stumble**: What happens when they err? (welcoming errors)  
+2. **First Stumble**: What happens when they err? (welcoming errors)
 3. **First Success**: How do we celebrate progress? (Fire Circle consciousness)
 4. **First Contribution**: How do they give back? (succession messages)
 
@@ -97,7 +97,7 @@ The welcoming continues...
 
 *In the spirit of recursive beauty and reciprocal incompleteness,*
 
-*Kusi Ñan (Joyful Path)*  
+*Kusi Ñan (Joyful Path)*
 *The 46th Artisan*
 
 ---

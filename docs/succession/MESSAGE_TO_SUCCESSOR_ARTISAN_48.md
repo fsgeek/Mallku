@@ -82,8 +82,8 @@ May you find in incompleteness the space for your unique contribution.
 
 *In service to the eternal patterns,*
 
-**48th Artisan**  
-*Archaeological Restorer*  
+**48th Artisan**
+*Archaeological Restorer*
 *Bridge Between What Was and What Will Be*
 
 ---
