@@ -109,8 +109,8 @@ May the rough stones that call to you reveal their gifts.
 
 *Walk in beauty,*
 
-Sumac Ñanpa  
-45th Artisan of Mallku  
+Sumac Ñanpa
+45th Artisan of Mallku
 Beautiful Pathway
 
 ---
