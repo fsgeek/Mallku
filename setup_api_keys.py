@@ -187,7 +187,7 @@ def save_keys(secrets_dir, keys):
     try:
         os.chmod(keys_file, 0o600)
         print("🔒 Set file permissions to owner-only")
-    except:
+    except (OSError, AttributeError):
         pass  # Windows doesn't support chmod
 
 
@@ -225,7 +225,7 @@ def main():
                 subprocess.run(["open", keys_file])
             else:
                 subprocess.run(["xdg-open", keys_file])
-        except:
+        except (OSError, subprocess.SubprocessError):
             print(f"\n📂 Please manually edit: {keys_file}")
 
         return 0

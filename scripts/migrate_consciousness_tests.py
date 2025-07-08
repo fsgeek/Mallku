@@ -115,7 +115,7 @@ class APITranslator:
                     cp = ConsciousnessPattern(
                         pattern_type=translation["pattern_type"],
                         original=line.strip(),
-                        context=[l.strip() for l in context],
+                        context=[line.strip() for line in context],
                     )
                     patterns.append(cp)
 

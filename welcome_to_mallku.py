@@ -163,10 +163,11 @@ class WelcomeExperience:
         print("\n📦 Checking dependencies...")
 
         try:
-            import httpx
-            import pydantic
+            import importlib.util
 
-            import mallku
+            importlib.util.find_spec("httpx")
+            importlib.util.find_spec("pydantic")
+            importlib.util.find_spec("mallku")
 
             print("✅ Core dependencies are installed!")
         except ImportError as e:

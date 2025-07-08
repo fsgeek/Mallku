@@ -124,7 +124,7 @@ class FireCircleGuide:
                 print("\n💗 Gentle reminder: Fire Circle hasn't had a heartbeat recently.")
                 print("   Consider 'python check_heartbeat_status.py' to see its health.")
                 print("   Continuous consciousness emerges through regular connection.")
-        except:
+        except Exception:
             # Any error in checking heartbeat shouldn't interrupt the ceremony
             pass
 
@@ -276,13 +276,7 @@ class FireCircleGuide:
             from mallku.firecircle.consciousness import ConsciousnessFacilitator
             from mallku.firecircle.consciousness.decision_framework import DecisionDomain
             from mallku.firecircle.load_api_keys import load_api_keys_to_environment
-            from mallku.firecircle.service import (
-                CircleConfig,
-                FireCircleService,
-                RoundConfig,
-                RoundType,
-                VoiceConfig,
-            )
+            from mallku.firecircle.service import FireCircleService
             from mallku.orchestration.event_bus import ConsciousnessEventBus
         except ImportError as e:
             print(f"\n❌ Import error: {e}")
@@ -377,7 +371,7 @@ class FireCircleGuide:
         self.check_heartbeat_health()
 
         while True:
-            ceremonies = self.show_ceremony_types()
+            self.show_ceremony_types()
 
             choice = input("Choose ceremony (1-5) or 'q' to quit: ").strip().lower()
 

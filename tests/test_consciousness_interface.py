@@ -23,8 +23,6 @@ import asyncio
 import logging
 import sys
 
-# Add project root to path
-
 logger = logging.getLogger(__name__)
 
 

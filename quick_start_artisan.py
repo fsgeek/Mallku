@@ -165,7 +165,7 @@ def main():
     try:
         show_welcome()
         explore_succession()
-        has_voices = check_voices()
+        check_voices()
         explore_philosophy()
         suggest_next_steps()
 

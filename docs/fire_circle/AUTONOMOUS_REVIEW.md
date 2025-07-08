@@ -42,7 +42,16 @@ The workflow requires API keys for each voice, configured as GitHub secrets:
 - `GOOGLE_API_KEY` - Gemini models
 - `GROK_API_KEY` - Grok models
 
-The local voice operates without an API key when available.
+### Local LLM Support
+The local voice (7th voice) is optional and disabled by default because:
+- Requires significant hardware resources (GPU/high memory)
+- Not available in GitHub Actions environment
+- Not suitable for typical development laptops
+
+To enable local LLM support:
+1. Set environment variable: `ENABLE_LOCAL_LLM=true`
+2. Provide local endpoint: `LOCAL_API_ENDPOINT=http://localhost:8080`
+3. Ensure local LLM server is running with sufficient resources
 
 ### Current Limitations
 The current implementation uses simplified PR context fetching. Future enhancements should:

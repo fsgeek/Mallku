@@ -110,7 +110,7 @@ jobs:
           python --version
           echo -e "\n=== Checking mallku installation ==="
           pip list | grep -i mallku || echo "mallku not in pip list"
-          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
+          python -c "import mallku; print(f'\u2713 mallku imported from: {mallku.__file__}')" || echo "\u2717 Failed to import mallku"
 
           # First run minimal tests to verify pytest works
           echo -e "\n=== Running minimal CI tests ==="
@@ -128,7 +128,7 @@ jobs:
                    tests/test_governance_consciousness_simple.py tests/test_consciousness_governance_restored.py \
                    tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                    tests/test_fire_circle_integration.py tests/test_database_integration.py \
-                   tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py -v
+                   tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py -v \
                    tests/firecircle/memory/test_consciousness_episode_segmenter.py \
                    tests/firecircle/memory/test_perspective_storage.py \
                    tests/firecircle/memory/test_pattern_poetry.py \
@@ -138,6 +138,72 @@ jobs:
             # Try running all tests to see progress
             pytest tests -v --maxfail=5 || true
           fi
+
+  # foundation-verification:
+  #   # TEMPORARY: Disabled due to module import issues in CI
+  #   # The foundation tests work locally but fail in CI with "ModuleNotFoundError: No module named 'mallku'"
+  #   # despite PYTHONPATH being set. This needs investigation.
+  #   # See: https://github.com/fsgeek/Mallku/pull/129
+  #   runs-on: ubuntu-latest
+  #   needs: test
+
+  #   services:
+  #     arangodb:
+  #       image: arangodb:3.12
+  #       env:
+  #         ARANGO_NO_AUTH: 1  # For testing only - no auth required
+  #       ports:
+  #         - 8529:8529
+  #       options: >-
+  #         --memory=512m
+  #         --cpus=1
+
+  #   env:
+  #     # Database configuration for tests
+  #     ARANGODB_HOST: localhost
+  #     ARANGODB_PORT: 8529
+  #     ARANGODB_DATABASE: test_mallku
+  #     ARANGODB_NO_AUTH: 1
+  #     CI_DATABASE_AVAILABLE: 1
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Wait for ArangoDB
+  #       run: |
+  #         echo "Waiting for ArangoDB to be ready..."
+  #         for i in {1..30}; do
+  #           if curl -f http://localhost:8529/_api/version 2>/dev/null; then
+  #             echo "ArangoDB is ready!"
+  #             break
+  #           fi
+  #           echo "Waiting... ($i/30)"
+  #           sleep 2
+  #         done
+  #         curl http://localhost:8529/_api/version || exit 1
+  #     - name: Install uv
+  #       run: |
+  #         curl -LsSf https://astral.sh/uv/install.sh | sh
+  #         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+  #     - name: Set up Python with uv
+  #       run: |
+  #         uv python install 3.12
+  #     - name: Install dependencies
+  #       run: |
+  #         uv sync
+  #         uv pip install -e .
+  #         uv pip install pytest pytest-asyncio pytest-mock
+  #     - name: Verify Foundations
+  #       run: |
+  #         source .venv/bin/activate
+  #         echo "=== Running Foundation Verification ==="
+  #         # Set PYTHONPATH to ensure mallku can be imported
+  #         export PYTHONPATH=/home/runner/work/Mallku/Mallku/src:$PYTHONPATH
+  #         python scripts/verify_foundations.py --verbose
+  #         if [ $? -ne 0 ]; then
+  #           echo "❌ Foundation verification failed!"
+  #           exit 1
+  #         fi
+  #         echo "✅ Foundation verification passed!"
 
   coverage:
     runs-on: ubuntu-latest

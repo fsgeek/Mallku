@@ -147,7 +147,7 @@ class ConsciousAdapterFactory:
         connected = await adapter.connect()
         if not connected:
             # Get list of other available providers for alternatives
-            alternatives = [p for p in self._adapter_classes.keys() if p != provider_lower]
+            alternatives = [p for p in self._adapter_classes if p != provider_lower]
             raise VoiceConnectionError(
                 provider=provider_name,
                 error=Exception(f"Connection failed - the {provider_name} voice could not join"),

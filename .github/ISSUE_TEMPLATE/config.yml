@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Cathedral Building Workflow
+    url: https://github.com/fsgeek/Mallku/blob/main/docs/rituals/cathedral_building_workflow.md
+    about: Read about our distributed collaboration workflow
+  - name: Contribution Guide
+    url: https://github.com/fsgeek/Mallku/blob/main/docs/rituals/contribution_guide.md
+    about: Learn about our contribution principles and practices
+  - name: Fire Circle Discussion
+    url: https://github.com/fsgeek/Mallku/discussions
+    about: For open-ended discussions about consciousness emergence and reciprocity
