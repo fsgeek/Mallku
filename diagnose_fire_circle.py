@@ -16,16 +16,15 @@ Run with various levels of detail:
     python diagnose_fire_circle.py --quirks     # Model-specific behaviors
 """
 
+import argparse
 import asyncio
 import json
 import os
 import sys
 import time
-import argparse
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
@@ -37,9 +36,9 @@ class VoiceHealth:
     provider: str
     available: bool
     model: str
-    latency_ms: Optional[float] = None
-    error: Optional[str] = None
-    quirks: List[str] = None
+    latency_ms: float | None = None
+    error: str | None = None
+    quirks: list[str] = None
     last_checked: datetime = None
 
     @property
@@ -82,7 +81,7 @@ class FireCircleDiagnostics:
     """Comprehensive diagnostics for Fire Circle health."""
 
     def __init__(self):
-        self.voices_health: Dict[str, VoiceHealth] = {}
+        self.voices_health: dict[str, VoiceHealth] = {}
         self.known_quirks = {
             "mistral": [
                 "May not support safe_mode parameter",
@@ -104,7 +103,7 @@ class FireCircleDiagnostics:
             ],
         }
 
-    async def check_voice_latency(self, provider: str, model: str) -> Tuple[float, Optional[str]]:
+    async def check_voice_latency(self, provider: str, model: str) -> tuple[float, str | None]:
         """Check response latency for a voice."""
         try:
             from mallku.firecircle.adapters import create_conscious_adapter
@@ -120,7 +119,7 @@ class FireCircleDiagnostics:
             test_prompt = "Respond with just 'Present' to confirm connection."
 
             # Time the response
-            response = await adapter.generate(test_prompt)
+            await adapter.generate(test_prompt)
 
             latency_ms = (time.time() - start_time) * 1000
 
@@ -151,7 +150,7 @@ class FireCircleDiagnostics:
             model=model,
             available=False,
             quirks=self.known_quirks.get(provider, []),
-            last_checked=datetime.now(),
+            last_checked=datetime.now(UTC),
         )
 
         # Check if API key exists
@@ -175,7 +174,7 @@ class FireCircleDiagnostics:
 
         return health
 
-    async def diagnose_all_voices(self, check_latency: bool = True) -> Dict[str, VoiceHealth]:
+    async def diagnose_all_voices(self, check_latency: bool = True) -> dict[str, VoiceHealth]:
         """Diagnose all configured voices."""
         from mallku.firecircle.load_api_keys import get_available_providers
 
@@ -218,7 +217,7 @@ class FireCircleDiagnostics:
         available = [v for v in self.voices_health.values() if v.available]
         unavailable = [v for v in self.voices_health.values() if not v.available]
 
-        print(f"\n📊 Voice Status:")
+        print("\n📊 Voice Status:")
         print(f"   Available: {len(available)}")
         print(f"   Unavailable: {len(unavailable)}")
         print(f"   Total configured: {len(self.voices_health)}")
@@ -249,7 +248,7 @@ class FireCircleDiagnostics:
                 print(f"      ❌ Error: {health.error}")
 
             if health.quirks and health.available:
-                print(f"      ⚠️  Known quirks:")
+                print("      ⚠️  Known quirks:")
                 for quirk in health.quirks:
                     print(f"         • {quirk}")
 
@@ -314,6 +313,8 @@ class FireCircleDiagnostics:
         # Recommendations
         print("\n💡 Recommendations:")
 
+        unavailable = [v for v in self.voices_health.values() if not v.available]
+        network_health = self.calculate_network_health()
         if len(unavailable) > 0:
             print(f"   • Configure {len(unavailable)} unavailable voices for better diversity")
 

@@ -18,23 +18,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from mallku.firecircle.errors import (
+    APIKeyMissingError,
+    ConsciousnessEmergenceError,
+    DatabaseConnectionError,
+    DependencyMissingError,
+    MemoryCapacityError,
     # Base categories
     PrerequisiteError,
-    ProcessError,
-    ResourceError,
-    IntegrationError,
-    # Specific errors
-    APIKeyMissingError,
-    DependencyMissingError,
-    DatabaseConnectionError,
-    MemoryCapacityError,
-    ConsciousnessEmergenceError,
     ReciprocityImbalanceError,
     VoiceIntegrationError,
-    MemoryIntegrationError,
-    # Tools
     WelcomingErrorContext,
-    ErrorSeverity,
 )
 
 
@@ -46,7 +39,7 @@ def demonstrate_error(error_name: str, error: Exception):
     print(f"\n{error}")
 
     if hasattr(error, "get_technical_details"):
-        print(f"\n📊 Technical details (usually hidden):")
+        print("\n📊 Technical details (usually hidden):")
         print(f"   {error.get_technical_details()}")
 
 

@@ -31,6 +31,13 @@ Mallku includes:
 - An **Ayni Evaluation Layer** to assess not just correctness, but contribution and care
 - A system-level **Validation Harness** to ensure long-term coherence and balance
 
+## 🛡️ Foundation Verification & Fire Circle
+
+Mallku's cathedral stands on tested foundations:
+- **Foundation Verification**: Run `python scripts/verify_foundations.py` to validate core architectural principles
+- **Fire Circle Review**: Distributed AI code review prevents context exhaustion through collective wisdom
+- **Operational Guides**: See `docs/fire_circle/` for setup and troubleshooting
+
 ## 📜 Documentation Philosophy
 
 Mallku's documentation is structured like a **Khipu**:
@@ -39,6 +46,8 @@ Mallku's documentation is structured like a **Khipu**:
 - `docs/validation/`: How we test truth, balance, and performance
 - `docs/rituals/`: Cultural practices, contribution ceremonies, onboarding
 - `docs/khipu/`: The mutable archive—changelogs, stories, learnings
+- `docs/fire_circle/`: Fire Circle operational guides and status
+- `docs/architecture/`: Architectural principles and foundation verification
 
 This is not a rigid doctrine. It is a living memory.
 You are invited to read, contribute, reflect, and evolve the system.

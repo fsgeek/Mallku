@@ -17,7 +17,7 @@ import os
 from typing import Any
 
 from arango import ArangoClient
-from arango.exceptions import DatabaseCreateError, CollectionCreateError
+from arango.exceptions import CollectionCreateError
 
 logger = logging.getLogger(__name__)
 
@@ -196,7 +196,7 @@ from mallku.core.database_auto_setup import DatabaseAutoSetup
 
 # Enhance existing connection
 db = DatabaseAutoSetup.ensure_database_exists(
-    client, 
+    client,
     "mallku_dev",
     username="root",
     password=""

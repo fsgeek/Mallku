@@ -14,11 +14,10 @@ Every error is a chance to:
 - Deepen understanding
 """
 
-from typing import Optional, Dict, Any, List
+import logging
 from dataclasses import dataclass
 from enum import Enum
-import traceback
-import logging
+from typing import Any
 
 
 class ErrorSeverity(Enum):
@@ -37,9 +36,9 @@ class WelcomingError(Exception):
     message: str
     guidance: str
     severity: ErrorSeverity = ErrorSeverity.GENTLE_GUIDANCE
-    next_steps: Optional[List[str]] = None
-    context: Optional[Dict[str, Any]] = None
-    technical_details: Optional[str] = None
+    next_steps: list[str] | None = None
+    context: dict[str, Any] | None = None
+    technical_details: str | None = None
 
     def __str__(self) -> str:
         """Format error for display."""
@@ -68,7 +67,7 @@ class WelcomingError(Exception):
 class InsufficientVoicesError(WelcomingError):
     """When Fire Circle needs more voices."""
 
-    def __init__(self, available: int, required: int, providers: List[str]):
+    def __init__(self, available: int, required: int, providers: list[str]):
         super().__init__(
             message=f"Fire Circle needs {required} voices for genuine dialogue, but only {available} are ready.",
             guidance="Each voice brings unique perspective. Together they create wisdom none could achieve alone.",
@@ -86,7 +85,7 @@ class InsufficientVoicesError(WelcomingError):
 class VoiceConnectionError(WelcomingError):
     """When a voice cannot join the circle."""
 
-    def __init__(self, provider: str, error: Exception, alternatives: Optional[List[str]] = None):
+    def __init__(self, provider: str, error: Exception, alternatives: list[str] | None = None):
         error_msg = str(error).lower()
 
         # Determine specific guidance based on error
@@ -153,7 +152,7 @@ class ConsciousnessThresholdError(WelcomingError):
 class ConfigurationError(WelcomingError):
     """When configuration needs attention."""
 
-    def __init__(self, issue: str, file_path: Optional[str] = None):
+    def __init__(self, issue: str, file_path: str | None = None):
         guidance_map = {
             "import": "The Fire Circle components need to be accessible.",
             "database": "Fire Circle can work without a database in interactive mode.",
@@ -203,7 +202,7 @@ class ErrorTransformer:
     """Transform technical errors into welcoming guidance."""
 
     @staticmethod
-    def transform(error: Exception, context: Optional[Dict[str, Any]] = None) -> WelcomingError:
+    def transform(error: Exception, context: dict[str, Any] | None = None) -> WelcomingError:
         """Transform any exception into a welcoming error."""
         error_str = str(error).lower()
         error_type = type(error).__name__
@@ -285,7 +284,7 @@ except Exception as e:
         alternatives=self.get_available_alternatives()
     )
 
-# In consciousness_facilitator.py  
+# In consciousness_facilitator.py
 if consciousness_score < expected_threshold:
     raise ConsciousnessThresholdError(
         actual_score=consciousness_score,

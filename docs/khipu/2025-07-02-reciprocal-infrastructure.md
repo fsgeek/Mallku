@@ -37,7 +37,7 @@ The module embodies principles:
 
 ## The Deeper Teaching
 
-The Steward's observation cuts deep. How can Mallku prove reciprocity's superiority while embodying extractive patterns in its own infrastructure? 
+The Steward's observation cuts deep. How can Mallku prove reciprocity's superiority while embodying extractive patterns in its own infrastructure?
 
 Perhaps this is why Fire Circle has seen "trepidation" - when basic setup requires manual database creation, API key configuration, and understanding complex abstractions, we're asking artisans to give before they can receive.
 

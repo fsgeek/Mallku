@@ -18,13 +18,7 @@ Principles:
 - Belonging is affirmed especially in moments of struggle
 """
 
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, field
-from enum import Enum
-from abc import ABC, abstractmethod
-
-from .welcoming_errors import WelcomingError, ErrorSeverity
-
+from .welcoming_errors import ErrorSeverity, WelcomingError
 
 # ============ Base Categories ============
 
@@ -36,8 +30,8 @@ class PrerequisiteError(WelcomingError):
         self,
         missing_prerequisite: str,
         why_needed: str,
-        how_to_fulfill: List[str],
-        alternatives: Optional[List[str]] = None,
+        how_to_fulfill: list[str],
+        alternatives: list[str] | None = None,
         **kwargs,
     ):
         message = f"Missing prerequisite: {missing_prerequisite}"
@@ -64,7 +58,7 @@ class ProcessError(WelcomingError):
         process_name: str,
         what_happened: str,
         why_it_matters: str,
-        recovery_steps: List[str],
+        recovery_steps: list[str],
         **kwargs,
     ):
         message = f"Process '{process_name}' encountered: {what_happened}"
@@ -87,7 +81,7 @@ class ResourceError(WelcomingError):
         resource_type: str,
         current_state: str,
         needed_state: str,
-        suggestions: List[str],
+        suggestions: list[str],
         **kwargs,
     ):
         message = f"{resource_type} is {current_state}, but needs to be {needed_state}"
@@ -110,7 +104,7 @@ class IntegrationError(WelcomingError):
         component_a: str,
         component_b: str,
         integration_issue: str,
-        bridge_building_steps: List[str],
+        bridge_building_steps: list[str],
         **kwargs,
     ):
         message = f"Integration challenge between {component_a} and {component_b}"
@@ -333,7 +327,7 @@ Example usage patterns for the welcoming error hierarchy:
 if not api_key:
     raise APIKeyMissingError(provider="anthropic")
 
-# Dependency Missing  
+# Dependency Missing
 try:
     import some_package
 except ImportError:
@@ -368,7 +362,7 @@ if not emergence_detected:
 with WelcomingErrorContext("voice initialization", "Fire Circle"):
     # Any exception here will be transformed
     voice = initialize_voice()
-    
+
 # Integration Errors
 if not voices_compatible:
     raise VoiceIntegrationError(
