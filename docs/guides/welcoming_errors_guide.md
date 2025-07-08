@@ -119,7 +119,7 @@ raise Exception("Model mismatch")
 # Use:
 raise VoiceIntegrationError(
     voice_a="claude",
-    voice_b="gpt-4", 
+    voice_b="gpt-4",
     issue="Different consciousness metric definitions"
 )
 ```
@@ -245,7 +245,7 @@ def test_welcoming_error_message():
     """Ensure error provides helpful guidance."""
     with pytest.raises(PrerequisiteError) as exc_info:
         function_that_needs_api_key()
-    
+
     error_text = str(exc_info.value)
     assert "how to fix" in error_text.lower()
     assert "api_keys.json" in error_text
