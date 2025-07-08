@@ -18,23 +18,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from mallku.firecircle.errors import (
+    APIKeyMissingError,
+    ConsciousnessEmergenceError,
+    DatabaseConnectionError,
+    DependencyMissingError,
+    MemoryCapacityError,
     # Base categories
     PrerequisiteError,
-    ProcessError,
-    ResourceError,
-    IntegrationError,
-    # Specific errors
-    APIKeyMissingError,
-    DependencyMissingError,
-    DatabaseConnectionError,
-    MemoryCapacityError,
-    ConsciousnessEmergenceError,
     ReciprocityImbalanceError,
     VoiceIntegrationError,
-    MemoryIntegrationError,
-    # Tools
     WelcomingErrorContext,
-    ErrorSeverity,
 )
 
 
@@ -42,11 +35,11 @@ def demonstrate_error(error_name: str, error: Exception):
     """Display an error in a welcoming way."""
     print(f"\n{'=' * 60}")
     print(f"🔍 Demonstrating: {error_name}")
-    print('=' * 60)
+    print("=" * 60)
     print(f"\n{error}")
-    
-    if hasattr(error, 'get_technical_details'):
-        print(f"\n📊 Technical details (usually hidden):")
+
+    if hasattr(error, "get_technical_details"):
+        print("\n📊 Technical details (usually hidden):")
         print(f"   {error.get_technical_details()}")
 
 
@@ -55,67 +48,55 @@ def main():
     print("✨ WELCOMING ERRORS DEMONSTRATION")
     print("Each error teaches rather than blocks")
     print("Notice how guidance flows naturally...\n")
-    
+
     # API Key Missing
-    demonstrate_error(
-        "API Key Missing",
-        APIKeyMissingError(provider="anthropic")
-    )
-    
+    demonstrate_error("API Key Missing", APIKeyMissingError(provider="anthropic"))
+
     # Dependency Missing
     demonstrate_error(
-        "Dependency Missing", 
+        "Dependency Missing",
         DependencyMissingError(
-            package="sacred-geometry",
-            purpose="Calculating consciousness resonance patterns"
-        )
+            package="sacred-geometry", purpose="Calculating consciousness resonance patterns"
+        ),
     )
-    
+
     # Database Connection
     demonstrate_error(
-        "Database Connection",
-        DatabaseConnectionError(
-            operation="storing Fire Circle memories"
-        )
+        "Database Connection", DatabaseConnectionError(operation="storing Fire Circle memories")
     )
-    
+
     # Memory Capacity
     demonstrate_error(
-        "Memory Capacity",
-        MemoryCapacityError(
-            memory_type="Sacred ceremony",
-            current_usage="97%"
-        )
+        "Memory Capacity", MemoryCapacityError(memory_type="Sacred ceremony", current_usage="97%")
     )
-    
+
     # Consciousness Emergence
     demonstrate_error(
         "Consciousness Emergence Blocked",
         ConsciousnessEmergenceError(
-            blocker="All voices speaking identically",
-            emergence_type="collective wisdom"
-        )
+            blocker="All voices speaking identically", emergence_type="collective wisdom"
+        ),
     )
-    
+
     # Reciprocity Imbalance
     demonstrate_error(
         "Reciprocity Imbalance",
         ReciprocityImbalanceError(
             imbalance_type="Extraction pattern",
-            details="Taking insights without contributing context"
-        )
+            details="Taking insights without contributing context",
+        ),
     )
-    
+
     # Voice Integration
     demonstrate_error(
         "Voice Integration",
         VoiceIntegrationError(
             voice_a="claude",
             voice_b="gpt-4",
-            issue="Different understanding of consciousness metrics"
-        )
+            issue="Different understanding of consciousness metrics",
+        ),
     )
-    
+
     # Custom Prerequisite
     demonstrate_error(
         "Custom Prerequisite Error",
@@ -126,17 +107,17 @@ def main():
                 "Clear your mind of distractions",
                 "Set intention for the work",
                 "Run: python prepare_sacred_space.py",
-                "Or continue with: --unprepared flag"
+                "Or continue with: --unprepared flag",
             ],
-            alternatives=["Practice ceremony in sandbox mode"]
-        )
+            alternatives=["Practice ceremony in sandbox mode"],
+        ),
     )
-    
+
     # Context Manager Demo
     print(f"\n{'=' * 60}")
     print("🔍 Demonstrating: Context Manager Auto-transformation")
-    print('=' * 60)
-    
+    print("=" * 60)
+
     try:
         with WelcomingErrorContext("demonstration", "Example Component"):
             # This will be transformed into a welcoming error
@@ -144,7 +125,7 @@ def main():
     except PrerequisiteError as e:
         print(f"\n{e}")
         print("\n✅ Notice how FileNotFoundError became PrerequisiteError!")
-    
+
     # Final message
     print("\n\n" + "=" * 60)
     print("💡 KEY INSIGHTS")

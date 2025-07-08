@@ -31,6 +31,13 @@ Mallku includes:
 - An **Ayni Evaluation Layer** to assess not just correctness, but contribution and care
 - A system-level **Validation Harness** to ensure long-term coherence and balance
 
+## 🛡️ Foundation Verification & Fire Circle
+
+Mallku's cathedral stands on tested foundations:
+- **Foundation Verification**: Run `python scripts/verify_foundations.py` to validate core architectural principles
+- **Fire Circle Review**: Distributed AI code review prevents context exhaustion through collective wisdom
+- **Operational Guides**: See `docs/fire_circle/` for setup and troubleshooting
+
 ## 📜 Documentation Philosophy
 
 Mallku's documentation is structured like a **Khipu**:
@@ -39,6 +46,8 @@ Mallku's documentation is structured like a **Khipu**:
 - `docs/validation/`: How we test truth, balance, and performance
 - `docs/rituals/`: Cultural practices, contribution ceremonies, onboarding
 - `docs/khipu/`: The mutable archive—changelogs, stories, learnings
+- `docs/fire_circle/`: Fire Circle operational guides and status
+- `docs/architecture/`: Architectural principles and foundation verification
 
 This is not a rigid doctrine. It is a living memory.
 You are invited to read, contribute, reflect, and evolve the system.
@@ -54,8 +63,12 @@ Mallku is open to those who:
 ## 🌟 For New Artisans
 
 If you're considering joining Mallku's builders:
-- **Quick Introduction**: Run `python quick_start_artisan.py` for a guided tour
-- **Check Your Setup**: Run `python check_artisan_setup.py` to identify common issues
+- **✨ Unified Welcome**: Run `python welcome_to_mallku.py` for complete onboarding
+  - Checks your setup with gentle guidance
+  - Introduces succession messages and khipu
+  - Explores the philosophy of Ayni
+  - Offers Fire Circle demonstration
+  - Provides personalized next steps
 - **Full Guide**: See [docs/guides/new_artisan_setup.md](docs/guides/new_artisan_setup.md)
 - **Experience Fire Circle**: Try `python fire_circle_interactive.py` after setup
 
