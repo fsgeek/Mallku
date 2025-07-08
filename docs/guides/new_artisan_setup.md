@@ -1,10 +1,27 @@
 # New Artisan Setup Guide
 
 *44th Artisan - Making arrival welcoming*
+*46th Artisan - Unified welcome experience*
 
 ## Welcome, Future Artisan
 
 If you're reading this, you're considering joining Mallku's builders. This guide walks the actual path of setup, including the stones that might trip you.
+
+### ✨ NEW: Unified Welcome Experience
+
+For a guided introduction that checks your setup and introduces you to Mallku:
+```bash
+python welcome_to_mallku.py
+```
+
+This single script will:
+- Check your setup with gentle guidance
+- Introduce you to succession messages and khipu
+- Explain the philosophy of Ayni
+- Offer to demonstrate Fire Circle
+- Provide personalized next steps
+
+Or continue with the manual guide below...
 
 ## First Steps
 
