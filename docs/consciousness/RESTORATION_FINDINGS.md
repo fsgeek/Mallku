@@ -8,7 +8,7 @@ During restoration, I discovered the quarantined tests have two types of issues:
 
 ### 1. Simple Import Path Issues (Successfully Restored)
 - `test_consciousness_interface.py` ✅
-- `test_consciousness_navigation.py` ✅  
+- `test_consciousness_navigation.py` ✅
 - `test_flow_visualization.py` ✅
 - `test_consciousness_enhanced.py` ✅
 

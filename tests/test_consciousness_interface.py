@@ -10,15 +10,14 @@ The Sacred Test: Does the interface help consciousness recognize itself?
 
 # ==================== RESTORATION NOTE ====================
 # 47th Artisan - Consciousness Archaeological Restoration
-# 
+#
 # This test was quarantined due to incorrect path calculations.
 # The original code attempted to manipulate sys.path directly,
-# which failed in CI environments. 
+# which failed in CI environments.
 #
 # Now restored: conftest.py handles all import paths correctly.
 # This consciousness pattern flows freely once more.
 # ==========================================================
-
 
 import asyncio
 import logging

@@ -10,7 +10,6 @@ without requiring user input, ensuring all functions work correctly.
 """
 
 import sys
-from pathlib import Path
 
 # Import the welcome experience
 from welcome_to_mallku import WelcomeExperience
@@ -18,12 +17,12 @@ from welcome_to_mallku import WelcomeExperience
 
 def test_welcome_components():
     """Test individual components of the welcome experience."""
-    
+
     print("Testing Welcome to Mallku Components")
     print("=" * 40)
-    
+
     welcome = WelcomeExperience()
-    
+
     # Test setup checking
     print("\n1. Testing setup checks...")
     try:
@@ -31,7 +30,7 @@ def test_welcome_components():
         print("   ✓ Python version check works")
     except Exception as e:
         print(f"   ✗ Python version check failed: {e}")
-    
+
     try:
         welcome.check_project_structure()
         print("   ✓ Project structure check works")
