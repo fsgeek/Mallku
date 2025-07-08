@@ -31,10 +31,10 @@ def demonstrate_transformation(title: str, before: str, after: Exception):
     """Show the transformation from harsh to welcoming."""
     print(f"\n{'=' * 60}")
     print(f"🔄 {title}")
-    print('=' * 60)
-    print(f"\n❌ BEFORE (harsh):")
+    print("=" * 60)
+    print("\n❌ BEFORE (harsh):")
     print(f"   {before}")
-    print(f"\n✅ AFTER (welcoming):")
+    print("\n✅ AFTER (welcoming):")
     print(f"{after}")
 
 
@@ -43,11 +43,11 @@ def main():
     print("🌟 TRANSFORMING HARSH ERRORS INTO WELCOMING TEACHERS")
     print("Each transformation shows how to guide rather than block")
     print("Notice how the tone shifts from frustration to support...\n")
-    
+
     # From secrets.py line 168
     demonstrate_transformation(
         "Required Secret Not Found",
-        'ValueError: Required secret \'anthropic_api_key\' not found in any source',
+        "ValueError: Required secret 'anthropic_api_key' not found in any source",
         PrerequisiteError(
             missing_prerequisite="API key for Anthropic",
             why_needed="Anthropic's voice needs authentication to join the Fire Circle",
@@ -94,6 +94,7 @@ def main():
             ]
         )
     )
+    
     
     # From prompt/manager.py (ContractViolationError)
     demonstrate_transformation(
@@ -156,7 +157,7 @@ def main():
     print("   - What's missing and why it's needed")
     print("   - Clear steps to fulfill")
     print("   - Alternatives when possible")
-    
+
     print("\n2. Process Failures → ProcessError")
     print("   - Where in the process it failed")
     print("   - Why this step matters")
@@ -171,7 +172,7 @@ def main():
     print("   - What's misconfigured")
     print("   - Valid configuration examples")
     print("   - How to validate settings")
-    
+
     print("\n✨ Remember: Every error is a teaching opportunity!")
     print("   Transform frustration into guidance throughout Mallku.")
     print("\n" + "=" * 60)

@@ -100,7 +100,7 @@ Potential improvements identified:
 This unified welcome embodies several principles:
 
 1. **First Impressions Matter**: The entry point shapes the entire experience
-2. **Barriers Become Bridges**: Setup issues become learning opportunities  
+2. **Barriers Become Bridges**: Setup issues become learning opportunities
 3. **Agency Over Authority**: Users choose their path
 4. **Beauty in Service**: Gentle pacing serves comprehension
 5. **Wholeness Over Parts**: One flow is clearer than many

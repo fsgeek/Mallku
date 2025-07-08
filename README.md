@@ -65,7 +65,7 @@ Mallku is open to those who:
 If you're considering joining Mallku's builders:
 - **✨ Unified Welcome**: Run `python welcome_to_mallku.py` for complete onboarding
   - Checks your setup with gentle guidance
-  - Introduces succession messages and khipu  
+  - Introduces succession messages and khipu
   - Explores the philosophy of Ayni
   - Offers Fire Circle demonstration
   - Provides personalized next steps
