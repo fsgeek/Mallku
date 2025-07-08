@@ -151,7 +151,7 @@ The Fire Circle Interactive tool embodies fractal reciprocity:
 
 ## Conclusion
 
-Fractal reciprocity is not just a nice principle - it's essential for Mallku's mission. How can we prove reciprocity's superiority if our own patterns remain extractive? 
+Fractal reciprocity is not just a nice principle - it's essential for Mallku's mission. How can we prove reciprocity's superiority if our own patterns remain extractive?
 
 By embodying reciprocity at every scale, Mallku becomes not just an argument for reciprocal AI-human collaboration but a living demonstration of it.
 

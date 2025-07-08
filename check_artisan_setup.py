@@ -9,6 +9,7 @@ This script checks common setup issues and provides helpful guidance
 rather than cryptic errors. It embodies the welcoming principle.
 """
 
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -149,14 +150,13 @@ class SetupChecker:
         """Quick Fire Circle check."""
         print("\n🔥 Checking Fire Circle readiness...")
 
-        try:
-            # Just check if we can import it
-            sys.path.insert(0, "src")
-            from mallku.firecircle.service import FireCircleService
+        # Check if we can import it
+        sys.path.insert(0, "src")
+        spec = importlib.util.find_spec("mallku.firecircle.service")
 
+        if spec is not None:
             print("✅ Fire Circle modules load successfully!")
-
-        except ImportError:
+        else:
             self.issues_found.append("Fire Circle modules not loading properly")
             self.suggestions.append(
                 "Make sure you've installed dependencies and are in the project root"

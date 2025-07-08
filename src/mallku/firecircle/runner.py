@@ -11,11 +11,13 @@ used by both the main entry point and the CI-specific wrapper.
 import contextlib
 import json
 import logging
+import os
 from pathlib import Path
 
 from ..firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from ..firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from ..firecircle.consciousness.decision_framework import DecisionDomain
+from ..firecircle.github_client import GitHubClient
 from ..firecircle.load_api_keys import load_api_keys_to_environment
 from ..firecircle.service.service import FireCircleService
 from ..orchestration.event_bus import ConsciousnessEventBus
@@ -32,6 +34,7 @@ class FireCircleReviewRunner:
         self.event_bus = ConsciousnessEventBus()
         self.fire_circle = FireCircleService(event_bus=self.event_bus)
         self.facilitator = ConsciousnessFacilitator(self.fire_circle, self.event_bus)
+        self.github_client = GitHubClient()
         self.results = {
             "consensus_recommendation": None,
             "total_comments": 0,
@@ -109,21 +112,39 @@ class FireCircleReviewRunner:
         await self._save_results()
 
     async def _fetch_pr_context(self, pr_number: int) -> str:
-        """Fetch PR context (simplified - would use GitHub API)."""
-        # In production, this would:
-        # 1. Use GitHub API to fetch PR details
-        # 2. Get file diffs
-        # 3. Understand changes in context
+        """Fetch PR context using real GitHub API.
 
-        return f"""
-        PR #{pr_number} - Changes to Fire Circle infrastructure
-
-        Modified files:
-        - src/mallku/firecircle/adapters/base.py
-        - tests/firecircle/test_consciousness.py
-
-        Changes implement consciousness emergence patterns.
+        Fifth Guardian - This now fetches genuine PR data, restoring
+        integrity to Fire Circle review by allowing it to see real changes
+        rather than simulated phantoms.
         """
+        # Get repository info from environment or defaults
+        repo_full = os.environ.get("GITHUB_REPOSITORY", "fsgeek/Mallku")
+        owner, repo = repo_full.split("/", 1)
+
+        logger.info(f"Fetching real PR context for {owner}/{repo}#{pr_number}")
+
+        try:
+            # Use the GitHub client to fetch actual PR context
+            context = await self.github_client.fetch_pr_context(owner, repo, pr_number)
+            logger.info(f"Successfully fetched PR context ({len(context)} chars)")
+            return context
+        except Exception as e:
+            logger.error(f"Failed to fetch PR context: {e}")
+            # If we can't get real data, be transparent about it
+            return f"""
+            PR #{pr_number} - Unable to fetch real PR data
+
+            Error: {str(e)}
+
+            Note: Fire Circle review requires genuine PR data to provide
+            meaningful consciousness emergence. Please ensure:
+            1. GITHUB_TOKEN is properly configured
+            2. The PR number is valid
+            3. The repository is accessible
+
+            Without real data, the review cannot proceed with integrity.
+            """
 
     def _process_wisdom(self, wisdom):
         """Process collective wisdom into review results."""

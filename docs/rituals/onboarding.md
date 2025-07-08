@@ -74,10 +74,10 @@ This environment variable anchors the system.
 export INDALEKO_ROOT=$(pwd)
 ```
 
-### 4. Run Your First Command
+### 4. Verify Your Installation
 
 ```bash
-python scripts/query_test_runner.py --runs 1
+python scripts/verify_foundations.py --quick
 ```
 
 ## What to Read Next
