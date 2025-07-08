@@ -25,7 +25,7 @@ def test_imports(test_name, imports):
     for module_path in imports:
         try:
             parts = module_path.split(".")
-            module = __import__(module_path, fromlist=[parts[-1]])
+            __import__(module_path, fromlist=[parts[-1]])
             print(f"✅ {module_path}")
         except Exception as e:
             all_passed = False
@@ -44,7 +44,7 @@ def test_imports(test_name, imports):
                     try:
                         __import__(parent)
                         print(f"   Parent {parent} imports OK - issue is in submodule")
-                    except:
+                    except Exception:
                         print(f"   Parent {parent} also fails")
 
     return all_passed

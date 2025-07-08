@@ -14,7 +14,10 @@ except ImportError as e:
     print(f"❌ Direct import of mallku failed: {e}")
 
 # Now try with pytest
-import pytest
+try:
+    import pytest
+except ImportError as e:
+    print(f"❌ Direct import of pytest failed: {e}")
 
 # Run a simple test
 code = """
