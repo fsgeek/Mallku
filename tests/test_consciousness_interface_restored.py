@@ -14,7 +14,6 @@ Now restored with resilient import architecture that works in all environments.
 
 import asyncio
 import logging
-from pathlib import Path
 
 # No manual sys.path manipulation needed - conftest.py handles this correctly
 logger = logging.getLogger(__name__)
@@ -253,6 +252,7 @@ if __name__ == "__main__":
 
     # Run tests
     import sys
+
     success = asyncio.run(run_all_tests())
 
     sys.exit(0 if success else 1)

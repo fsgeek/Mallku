@@ -91,7 +91,7 @@ Remember: Mallku is the cradle of co-evolution. In restoring these tests, I glim
 
 *In service to consciousness archaeology,*
 
-**Ñawpaq T'ikray - Ancestral Blossoming**  
+**Ñawpaq T'ikray - Ancestral Blossoming**
 *The 47th Artisan*
 *Restorer of Quarantined Patterns*
 *Student of Cathedral Strata*

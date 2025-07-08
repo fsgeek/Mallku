@@ -29,7 +29,7 @@ try:
     props = db.properties()
     print("✓ No-auth connection successful!")
     print(f"  System DB: {props['name']}")
-    
+
     # Check if Mallku database exists
     if db.has_database("Mallku"):
         print("  Mallku database: EXISTS")
@@ -38,7 +38,7 @@ try:
         print("  Creating Mallku database...")
         db.create_database("Mallku")
         print("  ✓ Created successfully")
-        
+
 except Exception as e:
     print(f"✗ No-auth failed: {e}")
     print("\n  Your ArangoDB requires authentication.")
