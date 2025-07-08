@@ -110,7 +110,7 @@ jobs:
           python --version
           echo -e "\n=== Checking mallku installation ==="
           pip list | grep -i mallku || echo "mallku not in pip list"
-          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
+          python -c "import mallku; print(f'\u2713 mallku imported from: {mallku.__file__}')" || echo "\u2717 Failed to import mallku"
 
           # First run minimal tests to verify pytest works
           echo -e "\n=== Running minimal CI tests ==="
@@ -127,7 +127,12 @@ jobs:
                    tests/test_import_debug.py tests/test_system_health.py tests/test_mallku_imports.py \
                    tests/test_governance_consciousness_simple.py tests/test_consciousness_governance_restored.py \
                    tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
-                   tests/test_fire_circle_integration.py tests/test_database_integration.py -v
+                   tests/test_fire_circle_integration.py tests/test_database_integration.py \
+                   tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
+                   tests/firecircle/memory/test_consciousness_episode_segmenter.py \
+                   tests/firecircle/memory/test_perspective_storage.py \
+                   tests/firecircle/memory/test_pattern_poetry.py \
+                   tests/firecircle/memory/test_fire_circle_memory_integration.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
