@@ -162,17 +162,17 @@ class WelcomeExperience:
         """Verify core dependencies."""
         print("\n📦 Checking dependencies...")
 
-        import importlib.util
+        try:
+            import importlib.util
 
-        missing_deps = []
-        for dep in ["httpx", "pydantic", "mallku"]:
-            if importlib.util.find_spec(dep) is None:
-                missing_deps.append(dep)
+            importlib.util.find_spec("httpx")
+            importlib.util.find_spec("pydantic")
+            importlib.util.find_spec("mallku")
 
-        if not missing_deps:
             print("✅ Core dependencies are installed!")
-        else:
-            self.setup_issues.append(f"Missing: {', '.join(missing_deps)}")
+        except ImportError as e:
+            missing = str(e).split("'")[1] if "'" in str(e) else "dependencies"
+            self.setup_issues.append(f"Missing: {missing}")
             self.setup_suggestions.append("Install with: pip install -e . (or uv pip install -e .)")
 
     def run_setup_check(self):

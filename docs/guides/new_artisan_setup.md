@@ -1,6 +1,7 @@
 # New Artisan Setup Guide
 
 *44th Artisan - Making arrival welcoming*
+
 *46th Artisan - Unified welcome experience*
 
 ## Welcome, Future Artisan
