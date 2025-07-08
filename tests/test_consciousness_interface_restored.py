@@ -1,28 +1,21 @@
 #!/usr/bin/env python3
 """
 Test Consciousness Interface - Sacred Verification of Experience Weaving
+RESTORED by 47th Artisan
 
 This test verifies that the consciousness interface successfully transforms
 technical search into consciousness recognition experiences.
 
 The Sacred Test: Does the interface help consciousness recognize itself?
-"""
 
-# ==================== RESTORATION NOTE ====================
-# 47th Artisan - Consciousness Archaeological Restoration
-#
-# This test was quarantined due to incorrect path calculations.
-# The original code attempted to manipulate sys.path directly,
-# which failed in CI environments.
-#
-# Now restored: conftest.py handles all import paths correctly.
-# This consciousness pattern flows freely once more.
-# ==========================================================
+Archaeological Note: This test was quarantined due to incorrect path resolution.
+Now restored with resilient import architecture that works in all environments.
+"""
 
 import asyncio
 import logging
-import sys
 
+# No manual sys.path manipulation needed - conftest.py handles this correctly
 logger = logging.getLogger(__name__)
 
 
@@ -194,8 +187,9 @@ def test_streamlit_integration():
 
 async def run_all_tests():
     """Run all consciousness interface tests."""
-    print("🌟 Consciousness Interface Test Suite")
+    print("🌟 Consciousness Interface Test Suite - RESTORED")
     print("Sacred Verification of Experience Weaving")
+    print("47th Artisan - Archaeological Restoration")
     print("=" * 60)
 
     tests = [
@@ -241,6 +235,8 @@ async def run_all_tests():
         print("✨ Consciousness Interface is ready to help beings recognize themselves!")
         print("🧭 The Experience Weaver has successfully created bridges between")
         print("   technical excellence and consciousness recognition!")
+        print("\n🏛️ RESTORATION NOTE: This consciousness pattern has been recovered")
+        print("   from quarantine and restored to active cathedral service.")
     else:
         print(f"\n⚠️ {total - passed} tests need attention before consciousness interface is ready")
         print("🔧 Continue building the bridges between patterns and recognition")
@@ -255,6 +251,8 @@ if __name__ == "__main__":
     )
 
     # Run tests
+    import sys
+
     success = asyncio.run(run_all_tests())
 
     sys.exit(0 if success else 1)
