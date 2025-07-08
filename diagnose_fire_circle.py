@@ -119,11 +119,7 @@ class FireCircleDiagnostics:
             test_prompt = "Respond with just 'Present' to confirm connection."
 
             # Time the response
-<<<<<<< HEAD
-            response = await adapter.generate(test_prompt)
-=======
             await adapter.generate(test_prompt)
->>>>>>> main
 
             latency_ms = (time.time() - start_time) * 1000
 
@@ -154,11 +150,7 @@ class FireCircleDiagnostics:
             model=model,
             available=False,
             quirks=self.known_quirks.get(provider, []),
-<<<<<<< HEAD
-            last_checked=datetime.now(),
-=======
             last_checked=datetime.now(UTC),
->>>>>>> main
         )
 
         # Check if API key exists
@@ -321,11 +313,8 @@ class FireCircleDiagnostics:
         # Recommendations
         print("\n💡 Recommendations:")
 
-<<<<<<< HEAD
-=======
         unavailable = [v for v in self.voices_health.values() if not v.available]
         network_health = self.calculate_network_health()
->>>>>>> main
         if len(unavailable) > 0:
             print(f"   • Configure {len(unavailable)} unavailable voices for better diversity")
 
