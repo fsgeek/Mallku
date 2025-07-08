@@ -22,9 +22,7 @@ import json
 import os
 import sys
 import time
-import asyncio
 from pathlib import Path
-from typing import List, Optional, Tuple, Dict
 
 # Ensure we can import Mallku components
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -42,7 +40,7 @@ class WelcomeExperience:
             "python_version": sys.version_info,
             "current_dir": Path.cwd(),
             "has_api_keys": False,
-            "voice_count": 0
+            "voice_count": 0,
         }
 
     def print_slowly(self, text: str, delay: float = 0.03):
@@ -84,7 +82,9 @@ class WelcomeExperience:
             print(f"✅ Python {version.major}.{version.minor}.{version.micro} - Excellent!")
         else:
             self.is_ready = False
-            self.setup_issues.append(f"Python {version.major}.{version.minor} is older than recommended")
+            self.setup_issues.append(
+                f"Python {version.major}.{version.minor} is older than recommended"
+            )
             self.setup_suggestions.append(
                 "Consider upgrading to Python 3.10+ for best compatibility"
             )
@@ -139,7 +139,9 @@ class WelcomeExperience:
             self.context["has_api_keys"] = self.context["voice_count"] > 0
 
             if self.context["voice_count"] >= 2:
-                print(f"✅ Found {self.context['voice_count']} configured voices: {', '.join(self.voices_available)}")
+                print(
+                    f"✅ Found {self.context['voice_count']} configured voices: {', '.join(self.voices_available)}"
+                )
                 print("   Ready for consciousness to emerge!")
             elif self.context["voice_count"] == 1:
                 self.setup_issues.append("Only 1 voice configured")
@@ -148,15 +150,11 @@ class WelcomeExperience:
                 )
             else:
                 self.setup_issues.append("No valid API keys found")
-                self.setup_suggestions.append(
-                    "Add your API keys to .secrets/api_keys.json"
-                )
+                self.setup_suggestions.append("Add your API keys to .secrets/api_keys.json")
 
         except json.JSONDecodeError:
             self.setup_issues.append("API keys file has invalid JSON")
-            self.setup_suggestions.append(
-                "Fix JSON syntax in .secrets/api_keys.json"
-            )
+            self.setup_suggestions.append("Fix JSON syntax in .secrets/api_keys.json")
         except Exception as e:
             self.setup_issues.append(f"Error reading API keys: {e}")
 
@@ -164,17 +162,18 @@ class WelcomeExperience:
         """Verify core dependencies."""
         print("\n📦 Checking dependencies...")
 
-        try:
-            import mallku
-            import pydantic
-            import httpx
+        import importlib.util
+
+        missing_deps = []
+        for dep in ["httpx", "pydantic", "mallku"]:
+            if importlib.util.find_spec(dep) is None:
+                missing_deps.append(dep)
+
+        if not missing_deps:
             print("✅ Core dependencies are installed!")
-        except ImportError as e:
-            missing = str(e).split("'")[1] if "'" in str(e) else "dependencies"
-            self.setup_issues.append(f"Missing: {missing}")
-            self.setup_suggestions.append(
-                "Install with: pip install -e . (or uv pip install -e .)"
-            )
+        else:
+            self.setup_issues.append(f"Missing: {', '.join(missing_deps)}")
+            self.setup_suggestions.append("Install with: pip install -e . (or uv pip install -e .)")
 
     def run_setup_check(self):
         """Run all setup checks."""
@@ -202,7 +201,9 @@ class WelcomeExperience:
         else:
             print(f"\n Found {len(self.setup_issues)} things to address:")
 
-            for i, (issue, suggestion) in enumerate(zip(self.setup_issues, self.setup_suggestions), 1):
+            for i, (issue, suggestion) in enumerate(
+                zip(self.setup_issues, self.setup_suggestions), 1
+            ):
                 print(f"\n{i}. {issue}")
                 print(f"   💡 {suggestion}")
 
@@ -212,7 +213,7 @@ class WelcomeExperience:
             print("   [N] No, I'll fix these first")
 
             choice = input("\nYour choice (Y/n): ").strip().lower()
-            return choice != 'n'
+            return choice != "n"
 
     def explore_succession(self):
         """Guide through succession messages."""
@@ -231,8 +232,8 @@ class WelcomeExperience:
             succession_dir = Path("docs/succession")
             artisan_messages = sorted(
                 succession_dir.glob("MESSAGE_TO_SUCCESSOR_ARTISAN_*.md"),
-                key=lambda p: int(p.stem.split('_')[-1]) if p.stem.split('_')[-1].isdigit() else 0,
-                reverse=True
+                key=lambda p: int(p.stem.split("_")[-1]) if p.stem.split("_")[-1].isdigit() else 0,
+                reverse=True,
             )
 
             if artisan_messages:
@@ -267,15 +268,15 @@ class WelcomeExperience:
 
         try:
             khipu_dir = Path("docs/khipu")
-            recent_khipu = sorted(khipu_dir.glob("*.md"),
-                                key=lambda p: p.stat().st_mtime,
-                                reverse=True)[:5]
+            recent_khipu = sorted(
+                khipu_dir.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True
+            )[:5]
 
             if recent_khipu:
                 print("\n📚 Recent khipu include:")
                 for khipu in recent_khipu:
                     # Extract title from filename
-                    title = khipu.stem.replace('_', ' ').replace('-', ' ').title()
+                    title = khipu.stem.replace("_", " ").replace("-", " ").title()
                     print(f"   • {title}")
 
                 print("\nEach tells a story of consciousness emerging through code.")
@@ -325,7 +326,7 @@ class WelcomeExperience:
 
             choice = input("\nYour choice (Y/n): ").strip().lower()
 
-            if choice != 'n':
+            if choice != "n":
                 print("\n🔥 Preparing Fire Circle demonstration...")
                 print("   (This would run a simple consciousness emergence)")
                 print("   Run: python fire_circle_interactive.py")
