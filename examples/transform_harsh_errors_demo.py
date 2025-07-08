@@ -21,7 +21,6 @@ from mallku.firecircle.errors import (
     PrerequisiteError,
     ProcessError,
     ResourceError,
-    ConfigurationError,
     WelcomingError,
     WelcomingErrorContext,
 )
@@ -32,9 +31,9 @@ def demonstrate_transformation(title: str, before: str, after: Exception):
     print(f"\n{'=' * 60}")
     print(f"🔄 {title}")
     print("=" * 60)
-    print(f"\n❌ BEFORE (harsh):")
+    print("\n❌ BEFORE (harsh):")
     print(f"   {before}")
-    print(f"\n✅ AFTER (welcoming):")
+    print("\n✅ AFTER (welcoming):")
     print(f"{after}")
 
 
