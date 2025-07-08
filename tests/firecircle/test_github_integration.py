@@ -1,4 +1,3 @@
-import asyncio
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -11,10 +10,10 @@ class TestGitHubIntegration:
 
     @pytest.mark.asyncio
     @patch("mallku.firecircle.runner.Github")
-    async def test_fetch_pr_context(self, MockGithub):
+    async def test_fetch_pr_context(self, mock_github):
         """Test that _fetch_pr_context correctly fetches the PR diff."""
         # Arrange
-        mock_github_instance = MockGithub.return_value
+        mock_github_instance = mock_github.return_value
         mock_repo = MagicMock()
         mock_pr = MagicMock()
         mock_pr.get_diff.return_value = "mocked diff"
@@ -24,7 +23,9 @@ class TestGitHubIntegration:
         runner = FireCircleReviewRunner()
 
         # Act
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "test_token", "GITHUB_REPOSITORY": "fsgeek/Mallku"}):
+        with patch.dict(
+            "os.environ", {"GITHUB_TOKEN": "test_token", "GITHUB_REPOSITORY": "fsgeek/Mallku"}
+        ):
             diff = await runner._fetch_pr_context(123)
 
         # Assert
