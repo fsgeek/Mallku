@@ -110,7 +110,7 @@ jobs:
           python --version
           echo -e "\n=== Checking mallku installation ==="
           pip list | grep -i mallku || echo "mallku not in pip list"
-          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
+          python -c "import mallku; print(f'\u2713 mallku imported from: {mallku.__file__}')" || echo "\u2717 Failed to import mallku"
 
           # First run minimal tests to verify pytest works
           echo -e "\n=== Running minimal CI tests ==="
