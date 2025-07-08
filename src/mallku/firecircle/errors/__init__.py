@@ -44,7 +44,7 @@ from .error_hierarchy import (
 __all__ = [
     # Original exports
     "WelcomingError",
-    "InsufficientVoicesError", 
+    "InsufficientVoicesError",
     "VoiceConnectionError",
     "ConsciousnessThresholdError",
     "ConfigurationError",

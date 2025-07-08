@@ -28,7 +28,7 @@ class DatabaseAutoSetup:
     # Required collections for Mallku
     REQUIRED_COLLECTIONS = [
         "memory_anchors",
-        "reciprocity_activities", 
+        "reciprocity_activities",
         "temporal_links",
         "consciousness_events",
         "fire_circle_sessions",
@@ -47,7 +47,7 @@ class DatabaseAutoSetup:
     ) -> Any:
         """
         Ensure a database exists, creating it if necessary.
-        
+
         This embodies reciprocal infrastructure - instead of failing when
         a database doesn't exist, we create the conditions for success.
         """
@@ -60,27 +60,27 @@ class DatabaseAutoSetup:
             return db
         except Exception as e:
             error_msg = str(e).lower()
-            
+
             # Check if it's because database doesn't exist
             if "database not found" in error_msg or "1228" in error_msg:
                 logger.info(f"Database {database_name} not found, creating it...")
-                
+
                 try:
                     # Connect to system database to create new database
                     sys_db = client.db("_system", username=username, password=password)
-                    
+
                     if not sys_db.has_database(database_name):
                         sys_db.create_database(database_name)
                         logger.info(f"✓ Created database: {database_name}")
-                    
+
                     # Now connect to the newly created database
                     db = client.db(database_name, username=username, password=password)
-                    
+
                     # Create required collections
                     cls._ensure_collections_exist(db)
-                    
+
                     return db
-                    
+
                 except Exception as create_error:
                     logger.error(f"Failed to create database: {create_error}")
                     raise
@@ -107,27 +107,27 @@ class DatabaseAutoSetup:
     def should_auto_setup(cls) -> bool:
         """
         Determine if automatic setup should be enabled.
-        
+
         Following Indaleko philosophy, we default to "yes" but respect
         explicit opt-out for production safety.
         """
         # Explicit opt-out
         if os.getenv("MALLKU_NO_AUTO_SETUP", "").lower() == "true":
             return False
-        
+
         # Explicit opt-in (legacy CI flag)
         if os.getenv("CI_DATABASE_AVAILABLE") == "1":
             return True
-        
+
         # Development environment indicators
         if os.getenv("MALLKU_ENV", "").lower() in ["development", "dev", "test"]:
             return True
-        
+
         # Check if we're in a known development setup
         if os.path.exists(".git") and not os.path.exists("/.dockerenv"):
             # Local development (has .git, not in Docker)
             return True
-        
+
         # Default to reciprocal behavior - make things work
         return True
 
@@ -135,18 +135,21 @@ class DatabaseAutoSetup:
     def enhance_connection(cls, original_connect_func):
         """
         Decorator to enhance database connection with auto-setup.
-        
+
         This wraps existing connection functions to add reciprocal
         infrastructure creation.
         """
+
         def enhanced_connect(*args, **kwargs):
             if cls.should_auto_setup():
                 # Extract connection parameters
                 if args:
-                    database_name = args[0] if isinstance(args[0], str) else kwargs.get("database", "mallku")
+                    database_name = (
+                        args[0] if isinstance(args[0], str) else kwargs.get("database", "mallku")
+                    )
                 else:
                     database_name = kwargs.get("database", "mallku")
-                
+
                 # Try auto-setup first
                 try:
                     client = ArangoClient(hosts=kwargs.get("hosts", "http://localhost:8529"))
@@ -158,30 +161,30 @@ class DatabaseAutoSetup:
                     )
                 except Exception as e:
                     logger.debug(f"Auto-setup failed, falling back to original: {e}")
-            
+
             # Fall back to original behavior
             return original_connect_func(*args, **kwargs)
-        
+
         return enhanced_connect
 
 
 def make_database_reciprocal():
     """
     Transform Mallku's database layer to be reciprocal.
-    
+
     After calling this, database connections will automatically create
     databases and collections as needed, embodying the principle that
     infrastructure should support intention, not block it.
     """
     logger.info("Enabling reciprocal database infrastructure...")
-    
+
     # This would patch the existing database connection functions
     # to use auto-setup. Implementation depends on how Mallku's
     # database layer is structured.
-    
+
     # For now, we provide the building blocks that can be integrated
     # into the existing codebase.
-    
+
     logger.info("✓ Database layer ready for reciprocal operation")
 
 
