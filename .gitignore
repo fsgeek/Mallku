@@ -195,3 +195,6 @@ fire_circle_reviews/
 # Fire Circle session outputs
 fire_circle_heartbeats/
 fire_circle_transcripts/
+
+# gemini config
+.gemini/
