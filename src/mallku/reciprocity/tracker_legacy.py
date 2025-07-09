@@ -23,7 +23,7 @@ from .models import (
     ReciprocityPattern,
     SystemHealthMetrics,
 )
-from .secure_tracker import SecureReciprocityTracker
+from .tracker import SecureReciprocityTracker
 
 logger = logging.getLogger(__name__)
 

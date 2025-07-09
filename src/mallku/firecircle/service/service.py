@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 
 from mallku.firecircle.consciousness_metrics import ConsciousnessMetricsCollector
 from mallku.orchestration.event_bus import ConsciousnessEventBus
-from mallku.reciprocity import ReciprocityTracker
+from mallku.reciprocity.tracker_legacy import ReciprocityTracker
 
 from .config import CircleConfig, RoundConfig, VoiceConfig
 from .round_orchestrator import RoundOrchestrator, RoundSummary
