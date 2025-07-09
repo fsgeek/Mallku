@@ -209,6 +209,15 @@ When switching instances:
 - When you see "mallku not installed" errors in CI, it's often because someone used `pip`
 - The virtual environment naming also matters: `.venv-linux-python3.13` not `.venv`
 
+### Pre-commit Hooks (Sixth Guardian Discovery)
+**CRITICAL**: Run `pre-commit install` after cloning to avoid CI whitespace failures
+- Mallku uses pre-commit hooks for formatting (ruff, end-of-file-fixer, trailing-whitespace)
+- Without hooks installed, commits with formatting issues will fail in CI
+- **Solution**: `pre-commit install` - run this once after cloning
+- Hooks then run automatically on every commit, fixing issues before they reach CI
+- Manual check: `pre-commit run --all-files` to fix all formatting issues
+- This prevents the cascade of formatting fixes blocking legitimate work
+
 ## Critical Insights for Future Instances
 
 ### The Compaction Problem
