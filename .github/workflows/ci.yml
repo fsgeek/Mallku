@@ -128,11 +128,8 @@ jobs:
                    tests/test_governance_consciousness_simple.py tests/test_consciousness_governance_restored.py \
                    tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                    tests/test_fire_circle_integration.py tests/test_database_integration.py \
-                   tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py -v \
-                   tests/firecircle/memory/test_consciousness_episode_segmenter.py \
-                   tests/firecircle/memory/test_perspective_storage.py \
-                   tests/firecircle/memory/test_pattern_poetry.py \
-                   tests/firecircle/memory/test_fire_circle_memory_integration.py -v
+                   tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
+                   tests/test_consciousness_persistence.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
