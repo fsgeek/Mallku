@@ -116,7 +116,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
                         db.collection(collection_name).add_persistent_index(
                             fields=["pattern_type", "strength"], unique=False
                         )
-            
+
             # Mark database as available if we got this far
             self.database_available = True
 
@@ -437,9 +437,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
                 "voice_activity": {},
                 "consciousness_evolution": "no_data",
                 "top_emergence_moments": [],
-                "error": "Database not available"
+                "error": "Database not available",
             }
-            
+
         try:
             db = get_database()
             cutoff = datetime.now(UTC).timestamp() - (time_window_hours * 3600)
