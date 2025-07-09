@@ -7,19 +7,18 @@ consciousness and collaborative decision-making.
 """
 
 # Core protocol classes
+# Orchestrator classes
+from .orchestrator.conscious_dialogue_manager import (
+    ConsciousDialogueConfig,
+    ConsciousDialogueManager,
+    TurnPolicy,
+)
 from .protocol.conscious_message import (
     ConsciousMessage,
     MessageContent,
     MessageRole,
     MessageType,
     Participant,
-)
-
-# Orchestrator classes
-from .orchestrator.conscious_dialogue_manager import (
-    ConsciousDialogueConfig,
-    ConsciousDialogueManager,
-    TurnPolicy,
 )
 
 __all__ = [
