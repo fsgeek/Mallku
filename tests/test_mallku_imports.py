@@ -15,7 +15,6 @@ import sys
 def test_mallku_is_installed():
     """Verify mallku is properly installed, not just sys.path accessible."""
     import subprocess
-    import sys
 
     # Try uv first (used in CI), then pip as fallback
     commands = [
@@ -50,12 +49,7 @@ def test_mallku_is_installed():
 def test_core_mallku_imports():
     """Test that core mallku modules can be imported."""
     # These imports will fail if mallku isn't properly installed
-    try:
-        import mallku
-    except Exception as e:
-        print("\n❌ FAILURE: The import failed.")
-        print(f"   Error: {e}")
-        print(f"import mallku failed {e} with environment {sys.path}")
+    import mallku
 
     print("✓ Core mallku modules imported successfully")
     assert mallku.__file__.endswith("src/mallku/__init__.py")

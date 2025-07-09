@@ -18,6 +18,8 @@ import importlib
 import sys
 from pathlib import Path
 
+import pytest
+
 # Resolve the repository root (two levels up from this file)
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
@@ -28,6 +30,18 @@ SRC_DIR = ROOT_DIR / "src"
 print(f"[CONFTEST] Adding to sys.path: {SRC_DIR}")
 sys.path.insert(0, str(SRC_DIR))
 print(f"[CONFTEST] sys.path after modification: {sys.path[:3]}")
+
+# CRITICAL: Force pytest to preserve our sys.path modification
+
+
+@pytest.fixture(scope="session", autouse=True)
+def preserve_sys_path():
+    """Ensure src directory stays in sys.path throughout the test session."""
+    if str(SRC_DIR) not in sys.path:
+        sys.path.insert(0, str(SRC_DIR))
+    yield
+    # Don't remove it after tests
+
 
 # Remove *other* Mallku copies that might be earlier on the import path
 # Remove *other* Mallku copies (both root and src) that might shadow the
