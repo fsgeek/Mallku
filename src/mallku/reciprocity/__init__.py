@@ -1,3 +1,5 @@
-from .tracker_legacy import ReciprocityTracker as ReciprocityTracker
+from .tracker_legacy import ReciprocityTracker
 
-__all__ = ["ReciprocityTracker"]
+__all__ = [
+    "ReciprocityTracker",
+]
