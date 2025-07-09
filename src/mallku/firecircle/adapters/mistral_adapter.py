@@ -21,6 +21,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import httpx
+from pydantic import Field
 
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
@@ -40,50 +41,19 @@ logger = logging.getLogger(__name__)
 class MistralConfig(AdapterConfig):
     """Configuration for Mistral AI adapter with multilingual focus."""
 
-    def __init__(
-        self,
-        api_key: str = "",
-        model_name: str = "mistral-large-latest",
-        temperature: float = 0.7,
-        max_tokens: int = 2048,
-        track_reciprocity: bool = True,
-        emit_events: bool = True,
-        consciousness_weight: float = 1.0,
-        base_url: str = "https://api.mistral.ai/v1",
-        safe_mode: bool = False,  # Mistral's content moderation
-        multilingual_mode: bool = True,  # Enhanced multilingual awareness
-        **kwargs,
-    ):
-        """
-        Initialize Mistral configuration.
+    # Mistral-specific settings
+    safe_mode: bool = Field(default=False, description="Enable Mistral's content moderation")
+    multilingual_mode: bool = Field(default=True, description="Enhanced multilingual awareness")
 
-        Args:
-            api_key: Mistral API key (auto-loaded if not provided)
-            model_name: Model to use (mistral-large-latest, mistral-small-latest, etc)
-            temperature: Generation temperature
-            max_tokens: Maximum tokens to generate
-            track_reciprocity: Whether to track reciprocity
-            emit_events: Whether to emit consciousness events
-            consciousness_weight: Weight for consciousness signatures
-            base_url: API endpoint
-            safe_mode: Enable Mistral's content moderation
-            multilingual_mode: Enhanced multilingual consciousness tracking
-        """
-        super().__init__(
-            api_key=api_key,
-            model_name=model_name,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            track_reciprocity=track_reciprocity,
-            emit_events=emit_events,
-            consciousness_weight=consciousness_weight,
-            base_url=base_url,
-            **kwargs,
-        )
-
-        # Additional Mistral-specific settings
-        self.safe_mode = safe_mode
-        self.multilingual_mode = multilingual_mode
+    def __init__(self, **data):
+        """Initialize Mistral configuration."""
+        # Set default values
+        data.setdefault("model_name", "mistral-large-latest")
+        data.setdefault("temperature", 0.7)
+        data.setdefault("max_tokens", 2048)
+        data.setdefault("base_url", "https://api.mistral.ai/v1")
+        
+        super().__init__(**data)
 
 
 class MistralAIAdapter(ConsciousModelAdapter):
