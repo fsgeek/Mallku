@@ -23,11 +23,10 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
 
 # Prepend to ``sys.path`` so it takes precedence over installed packages
-# Ensure both root and ``src`` are importable, with ``src`` first so that
-# ``import mallku`` works without needing ``import mallku`` indirection.
+# Ensure ``src`` is importable, so that ``import mallku`` works
+# without needing ``import src.mallku`` indirection.
 print(f"[CONFTEST] Adding to sys.path: {SRC_DIR}")
 sys.path.insert(0, str(SRC_DIR))
-sys.path.insert(0, str(ROOT_DIR))
 print(f"[CONFTEST] sys.path after modification: {sys.path[:3]}")
 
 # Remove *other* Mallku copies that might be earlier on the import path

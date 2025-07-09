@@ -11,7 +11,7 @@ Showing how consciousness emergence guides collective wisdom
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 # Configure logging
 logging.basicConfig(
@@ -43,7 +43,7 @@ async def prioritize_critical_issues():
     print("\n" + "=" * 80)
     print("🔥 FIRE CIRCLE GOVERNANCE: Issue Prioritization")
     print("=" * 80)
-    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print(f"Date: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M')}")
     print("\nConvening Fire Circle to prioritize critical Mallku issues...")
 
     wisdom = await facilitate_mallku_decision(
