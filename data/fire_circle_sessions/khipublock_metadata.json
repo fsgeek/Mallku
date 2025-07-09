@@ -1,0 +1,11 @@
+{
+  "type": "fire_circle_khipublock_proposal",
+  "timestamp": "2025-07-09T20:05:52.363311+00:00",
+  "session_id": "3ad66679-bee4-4562-9c19-264a831197f2",
+  "voice_count": 3,
+  "rounds_completed": 4,
+  "proposal": "KhipuBlock symbolic memory architecture",
+  "issue": "#156",
+  "transcript": "fire_circle_transcripts/khipublock_memory_architecture_proposal_3ad66679.json",
+  "sacred_moment": true
+}
