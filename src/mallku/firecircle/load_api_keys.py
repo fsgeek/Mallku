@@ -74,10 +74,23 @@ def load_api_keys_to_environment():
         }
 
         loaded_count = 0
+        
+        # Check both lowercase and uppercase keys
         for json_key, env_var in key_mapping.items():
+            # Try lowercase first
             if json_key in api_keys:
                 os.environ[env_var] = api_keys[json_key]
                 logger.info(f"Loaded {json_key} API key into {env_var}")
+                loaded_count += 1
+            # Try uppercase
+            elif env_var in api_keys:
+                os.environ[env_var] = api_keys[env_var]
+                logger.info(f"Loaded {env_var} into environment")
+                loaded_count += 1
+            # Try XAI_API_KEY for Grok
+            elif json_key == "grok" and "XAI_API_KEY" in api_keys:
+                os.environ[env_var] = api_keys["XAI_API_KEY"]
+                logger.info(f"Loaded XAI_API_KEY as {env_var}")
                 loaded_count += 1
 
         logger.info(f"Loaded {loaded_count} API keys from .secrets/api_keys.json")
