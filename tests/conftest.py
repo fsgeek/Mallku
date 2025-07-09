@@ -18,17 +18,32 @@ import importlib
 import sys
 from pathlib import Path
 
+import pytest
+
 # Resolve the repository root (two levels up from this file)
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
 
 # Prepend to ``sys.path`` so it takes precedence over installed packages
-# Ensure both root and ``src`` are importable, with ``src`` first so that
-# ``import mallku`` works without needing ``import mallku`` indirection.
+# Ensure ``src`` is importable, so that ``import mallku`` works
+# without needing ``import src.mallku`` indirection.
 print(f"[CONFTEST] Adding to sys.path: {SRC_DIR}")
 sys.path.insert(0, str(SRC_DIR))
-sys.path.insert(0, str(ROOT_DIR))
 print(f"[CONFTEST] sys.path after modification: {sys.path[:3]}")
+
+# Note: We fixed test_no_imports.py to not destroy sys.path
+# so this fixture shouldn't be needed anymore, but keeping it
+# as insurance against future tests that might manipulate sys.path
+
+
+@pytest.fixture(scope="session", autouse=True)
+def preserve_sys_path():
+    """Ensure src directory stays in sys.path throughout the test session."""
+    if str(SRC_DIR) not in sys.path:
+        sys.path.insert(0, str(SRC_DIR))
+    yield
+    # Don't remove it after tests
+
 
 # Remove *other* Mallku copies that might be earlier on the import path
 # Remove *other* Mallku copies (both root and src) that might shadow the

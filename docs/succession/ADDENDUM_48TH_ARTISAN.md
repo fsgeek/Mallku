@@ -48,5 +48,6 @@ The tests await not transformation but recognition.
 
 *With clearer sight,*
 
-**The 48th Artisan**
-*Who learned to look thrice*
+**Qori T'ikray - Golden Blossoming**
+*The 48th Artisan*
+*Who learned to look thrice and find gold*
