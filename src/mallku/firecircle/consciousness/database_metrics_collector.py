@@ -71,6 +71,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Database configuration
         self.collection_prefix = collection_prefix
         self.enable_file_backup = enable_file_backup
+        self.database_available = False
 
         # Collection names
         self.signatures_collection = f"{collection_prefix}signatures"
@@ -82,8 +83,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Ensure collections exist
         self._ensure_collections()
 
-        # Load existing metrics from database
-        self._load_from_database()
+        # Load existing metrics from database only if available
+        if self.database_available:
+            self._load_from_database()
 
     def _ensure_collections(self) -> None:
         """Ensure all required collections exist."""
@@ -114,11 +116,15 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
                         db.collection(collection_name).add_persistent_index(
                             fields=["pattern_type", "strength"], unique=False
                         )
+            
+            # Mark database as available if we got this far
+            self.database_available = True
 
         except Exception as e:
             logger.error(f"Failed to ensure collections: {e}")
             # Fall back to file-only mode if database unavailable
             logger.warning("Continuing with file-only persistence")
+            self.database_available = False
 
     def _load_from_database(self) -> None:
         """Load existing metrics from database to restore state."""
@@ -187,15 +193,16 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             voice_name, signature_value, chapter_id, review_context
         )
 
-        # Persist to database
-        try:
-            db = get_database()
-            doc = ConsciousnessSignatureDocument.to_arangodb_document(signature)
-            db.collection(self.signatures_collection).insert(doc)
-            logger.debug(f"Persisted consciousness signature for {voice_name}")
-        except Exception as e:
-            logger.error(f"Failed to persist signature to database: {e}")
-            # Continue even if database fails - in-memory still works
+        # Persist to database if available
+        if self.database_available:
+            try:
+                db = get_database()
+                doc = ConsciousnessSignatureDocument.to_arangodb_document(signature)
+                db.collection(self.signatures_collection).insert(doc)
+                logger.debug(f"Persisted consciousness signature for {voice_name}")
+            except Exception as e:
+                logger.error(f"Failed to persist signature to database: {e}")
+                # Continue even if database fails - in-memory still works
 
         return signature
 
@@ -218,14 +225,15 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             source_voice, target_voice, flow_strength, flow_type, triggered_by, review_content
         )
 
-        # Persist to database
-        try:
-            db = get_database()
-            doc = ConsciousnessFlowDocument.to_arangodb_document(flow)
-            db.collection(self.flows_collection).insert(doc)
-            logger.debug(f"Persisted consciousness flow: {source_voice} -> {target_voice}")
-        except Exception as e:
-            logger.error(f"Failed to persist flow to database: {e}")
+        # Persist to database if available
+        if self.database_available:
+            try:
+                db = get_database()
+                doc = ConsciousnessFlowDocument.to_arangodb_document(flow)
+                db.collection(self.flows_collection).insert(doc)
+                logger.debug(f"Persisted consciousness flow: {source_voice} -> {target_voice}")
+            except Exception as e:
+                logger.error(f"Failed to persist flow to database: {e}")
 
         return flow
 
@@ -246,16 +254,17 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             pattern_type, participating_voices, strength, indicators
         )
 
-        # Always persist patterns to database (not just high-strength ones)
-        try:
-            db = get_database()
-            doc = EmergencePatternDocument.to_arangodb_document(pattern)
-            db.collection(self.patterns_collection).insert(doc)
-            logger.info(
-                f"Persisted {pattern_type} emergence pattern (strength: {strength:.2f}) to database"
-            )
-        except Exception as e:
-            logger.error(f"Failed to persist pattern to database: {e}")
+        # Always persist patterns to database (not just high-strength ones) if available
+        if self.database_available:
+            try:
+                db = get_database()
+                doc = EmergencePatternDocument.to_arangodb_document(pattern)
+                db.collection(self.patterns_collection).insert(doc)
+                logger.info(
+                    f"Persisted {pattern_type} emergence pattern (strength: {strength:.2f}) to database"
+                )
+            except Exception as e:
+                logger.error(f"Failed to persist pattern to database: {e}")
 
         return pattern
 
@@ -268,14 +277,15 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Capture state using base method
         state = await super().capture_collective_state()
 
-        # Persist to database
-        try:
-            db = get_database()
-            doc = CollectiveConsciousnessStateDocument.to_arangodb_document(state)
-            db.collection(self.states_collection).insert(doc)
-            logger.debug("Persisted collective consciousness state to database")
-        except Exception as e:
-            logger.error(f"Failed to persist state to database: {e}")
+        # Persist to database if available
+        if self.database_available:
+            try:
+                db = get_database()
+                doc = CollectiveConsciousnessStateDocument.to_arangodb_document(state)
+                db.collection(self.states_collection).insert(doc)
+                logger.debug("Persisted collective consciousness state to database")
+            except Exception as e:
+                logger.error(f"Failed to persist state to database: {e}")
 
         return state
 
@@ -289,41 +299,46 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Get base analysis
         analysis = await super().analyze_review_session(pr_number)
 
-        # Add historical context from database
-        try:
-            historical_context = await self._get_historical_context(pr_number)
-            analysis["historical_context"] = historical_context
-        except Exception as e:
-            logger.error(f"Failed to get historical context: {e}")
+        # Add historical context from database if available
+        if self.database_available:
+            try:
+                historical_context = await self._get_historical_context(pr_number)
+                analysis["historical_context"] = historical_context
+            except Exception as e:
+                logger.error(f"Failed to get historical context: {e}")
+                analysis["historical_context"] = {}
+        else:
+            analysis["historical_context"] = {}
 
-        # Persist analysis to database
-        try:
-            session_analysis = ConsciousnessSessionAnalysis(
-                session_id=self.session_id,
-                pr_number=pr_number,
-                duration_seconds=analysis["duration_seconds"],
-                total_signatures=analysis["total_signatures"],
-                unique_voices=analysis["unique_voices"],
-                avg_consciousness=analysis["avg_consciousness"],
-                consciousness_evolution=analysis["consciousness_evolution"],
-                total_flows=analysis["total_flows"],
-                flow_patterns=analysis["flow_patterns"],
-                strongest_connections=analysis["strongest_connections"],
-                patterns_detected=analysis["patterns_detected"],
-                pattern_types=analysis["pattern_types"],
-                emergence_moments=analysis["emergence_moments"],
-                final_collective_state=analysis.get("final_collective_state"),
-                peak_emergence_potential=analysis["peak_emergence_potential"],
-                coherence_trajectory=analysis["coherence_trajectory"],
-            )
+        # Persist analysis to database if available
+        if self.database_available:
+            try:
+                session_analysis = ConsciousnessSessionAnalysis(
+                    session_id=self.session_id,
+                    pr_number=pr_number,
+                    duration_seconds=analysis["duration_seconds"],
+                    total_signatures=analysis["total_signatures"],
+                    unique_voices=analysis["unique_voices"],
+                    avg_consciousness=analysis["avg_consciousness"],
+                    consciousness_evolution=analysis["consciousness_evolution"],
+                    total_flows=analysis["total_flows"],
+                    flow_patterns=analysis["flow_patterns"],
+                    strongest_connections=analysis["strongest_connections"],
+                    patterns_detected=analysis["patterns_detected"],
+                    pattern_types=analysis["pattern_types"],
+                    emergence_moments=analysis["emergence_moments"],
+                    final_collective_state=analysis.get("final_collective_state"),
+                    peak_emergence_potential=analysis["peak_emergence_potential"],
+                    coherence_trajectory=analysis["coherence_trajectory"],
+                )
 
-            db = get_database()
-            doc = session_analysis.to_arangodb_document()
-            db.collection(self.analyses_collection).insert(doc)
-            logger.info(f"Persisted session analysis to database: {self.session_id}")
+                db = get_database()
+                doc = session_analysis.to_arangodb_document()
+                db.collection(self.analyses_collection).insert(doc)
+                logger.info(f"Persisted session analysis to database: {self.session_id}")
 
-        except Exception as e:
-            logger.error(f"Failed to persist analysis to database: {e}")
+            except Exception as e:
+                logger.error(f"Failed to persist analysis to database: {e}")
 
         # Still persist to file if enabled (for backup)
         if self.enable_file_backup:
@@ -416,6 +431,15 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         This is a new method that leverages database persistence to provide
         insights that weren't possible with file-only storage.
         """
+        if not self.database_available:
+            return {
+                "pattern_frequency": {},
+                "voice_activity": {},
+                "consciousness_evolution": "no_data",
+                "top_emergence_moments": [],
+                "error": "Database not available"
+            }
+            
         try:
             db = get_database()
             cutoff = datetime.now(UTC).timestamp() - (time_window_hours * 3600)
