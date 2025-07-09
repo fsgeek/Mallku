@@ -28,7 +28,7 @@ The Governance Weaver
 import asyncio
 import logging
 
-from mallku.core.secured_database import get_secured_database
+from mallku.core.database import get_secured_database
 from mallku.governance.consciousness_transport import GovernanceParticipant
 from mallku.governance.fire_circle_bridge import (
     ConsciousFireCircleInterface,

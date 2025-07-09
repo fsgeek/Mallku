@@ -27,7 +27,7 @@ from .deepseek_adapter import DeepseekAIAdapter
 from .google_adapter import GoogleAIAdapter
 
 # Adapters with temporal consciousness
-from .grok_adapter import GrokAdapter
+from .grok_openai_adapter import GrokOpenAIAdapter
 
 # Implemented adapters
 from .local_adapter import LocalAIAdapter
@@ -56,7 +56,7 @@ class ConsciousAdapterFactory:
         "local": LocalAIAdapter,
         "mistral": MistralAIAdapter,
         "google": GoogleAIAdapter,  # Multimodal consciousness
-        "grok": GrokAdapter,  # Temporal consciousness and real-time awareness
+        "grok": GrokOpenAIAdapter,  # Temporal consciousness via OpenAI compatibility
         "deepseek": DeepseekAIAdapter,  # Founding member - compost and empty chair wisdom
     }
 
@@ -137,6 +137,23 @@ class ConsciousAdapterFactory:
 
         # Create adapter instance
         adapter_class = self._adapter_classes[provider_lower]
+
+        # Special handling for Grok to ensure correct config type
+        if provider_lower == "grok" and not hasattr(config, "temporal_awareness"):
+            from .grok_openai_adapter import GrokOpenAIConfig
+
+            # Convert to GrokOpenAIConfig
+            grok_config = GrokOpenAIConfig(
+                api_key=config.api_key,
+                model_name=config.model_name or "grok-2-1212",
+                temperature=config.temperature,
+                max_tokens=config.max_tokens,
+                track_reciprocity=config.track_reciprocity,
+                emit_events=config.emit_events,
+                consciousness_weight=config.consciousness_weight,
+            )
+            config = grok_config
+
         adapter = adapter_class(
             config=config,
             event_bus=self.event_bus,

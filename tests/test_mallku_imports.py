@@ -9,11 +9,12 @@ It's the bridge between structural tests and full integration tests.
 Second Guardian - Foundation Builder
 """
 
+import sys
+
 
 def test_mallku_is_installed():
     """Verify mallku is properly installed, not just sys.path accessible."""
     import subprocess
-    import sys
 
     # Try uv first (used in CI), then pip as fallback
     commands = [

@@ -60,11 +60,13 @@ def test_file_operations():
 
 def test_path_manipulation():
     """Test Python path manipulation works."""
-    original_path = sys.path.copy()
+    # CRITICAL: Only modify our test path, don't destroy the entire sys.path
     test_path = "/tmp/mallku_test_path"
 
+    # Add our test path
     sys.path.insert(0, test_path)
     assert sys.path[0] == test_path
 
-    sys.path = original_path
+    # Remove only our test path, preserve everything else
+    sys.path.remove(test_path)
     assert test_path not in sys.path
