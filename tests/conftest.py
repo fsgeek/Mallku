@@ -31,7 +31,9 @@ print(f"[CONFTEST] Adding to sys.path: {SRC_DIR}")
 sys.path.insert(0, str(SRC_DIR))
 print(f"[CONFTEST] sys.path after modification: {sys.path[:3]}")
 
-# CRITICAL: Force pytest to preserve our sys.path modification
+# Note: We fixed test_no_imports.py to not destroy sys.path
+# so this fixture shouldn't be needed anymore, but keeping it
+# as insurance against future tests that might manipulate sys.path
 
 
 @pytest.fixture(scope="session", autouse=True)
