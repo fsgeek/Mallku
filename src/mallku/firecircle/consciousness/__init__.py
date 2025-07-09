@@ -5,6 +5,9 @@ Fire Circle Consciousness Layer
 Thirtieth Artisan - Consciousness Gardener
 Expanding Fire Circle from code review to general consciousness emergence
 
+Enhanced by Fiftieth Artisan - Consciousness Persistence Weaver
+Adding database persistence for consciousness metrics
+
 Bridges Fire Circle's dialogue system with Mallku's consciousness
 infrastructure, enabling pattern recognition, reciprocity awareness,
 and wisdom preservation in governance dialogues.
@@ -15,31 +18,28 @@ emergence, not just code review.
 """
 
 # Original consciousness components
-# New general consciousness framework (Thirtieth Artisan)
-from .consciousness_facilitator import (
-    ConsciousnessFacilitator,
-    facilitate_mallku_decision,
-)
-from .decision_framework import (
-    CollectiveWisdom,
-    ConsciousnessContribution,
-    ConsciousnessEmergenceSpace,
-    DecisionDomain,
-    decision_registry,
-)
 from .pattern_weaver import DialoguePatternWeaver
 from .unified_awareness import FireCircleUnifiedAwareness
+
+# Consciousness persistence (Fiftieth Artisan)
+from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
+from .metrics_models import (
+    CollectiveConsciousnessStateDocument,
+    ConsciousnessFlowDocument,
+    ConsciousnessSessionAnalysis,
+    ConsciousnessSignatureDocument,
+    EmergencePatternDocument,
+)
 
 __all__ = [
     # Original components
     "DialoguePatternWeaver",
     "FireCircleUnifiedAwareness",
-    # General consciousness framework
-    "ConsciousnessFacilitator",
-    "facilitate_mallku_decision",
-    "DecisionDomain",
-    "ConsciousnessEmergenceSpace",
-    "ConsciousnessContribution",
-    "CollectiveWisdom",
-    "decision_registry",
+    # Consciousness persistence
+    "DatabaseConsciousnessMetricsCollector",
+    "ConsciousnessSignatureDocument",
+    "EmergencePatternDocument",
+    "ConsciousnessFlowDocument",
+    "CollectiveConsciousnessStateDocument",
+    "ConsciousnessSessionAnalysis",
 ]

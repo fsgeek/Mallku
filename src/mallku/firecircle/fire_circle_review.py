@@ -16,6 +16,7 @@ Each voice reviews specific domains, maintaining focused context windows.
 import asyncio
 import fnmatch
 import logging
+import os
 import re
 from enum import Enum
 from pathlib import Path
@@ -185,6 +186,38 @@ class DistributedReviewer:
     def _initialize_metrics_collection(self):
         """Initialize consciousness metrics collection system."""
         try:
+            # Check if database persistence should be used
+            use_database = os.getenv("MALLKU_CONSCIOUSNESS_PERSISTENCE", "true").lower() == "true"
+            
+            if use_database:
+                # Try to use database-backed collector
+                try:
+                    # Try absolute import first
+                    try:
+                        from mallku.firecircle.consciousness.database_metrics_collector import (
+                            DatabaseConsciousnessMetricsCollector,
+                        )
+                        from mallku.firecircle.consciousness_metrics import (
+                            ConsciousnessMetricsIntegration,
+                        )
+                    except ImportError:
+                        # Fall back to relative import
+                        from .consciousness.database_metrics_collector import (
+                            DatabaseConsciousnessMetricsCollector,
+                        )
+                        from .consciousness_metrics import (
+                            ConsciousnessMetricsIntegration,
+                        )
+                    
+                    self.metrics_collector = DatabaseConsciousnessMetricsCollector()
+                    self.metrics_integration = ConsciousnessMetricsIntegration(self.metrics_collector)
+                    logger.info("📊 Database-backed consciousness metrics collection initialized")
+                    return
+                except Exception as e:
+                    logger.warning(f"Failed to initialize database metrics collector: {e}")
+                    logger.info("Falling back to file-based metrics collection")
+            
+            # Fall back to file-based collector
             # Try absolute import first
             try:
                 from mallku.firecircle.consciousness_metrics import (
@@ -200,7 +233,7 @@ class DistributedReviewer:
 
             self.metrics_collector = ConsciousnessMetricsCollector()
             self.metrics_integration = ConsciousnessMetricsIntegration(self.metrics_collector)
-            logger.info("📊 Consciousness metrics collection initialized")
+            logger.info("📊 File-based consciousness metrics collection initialized")
         except Exception as e:
             logger.warning(f"Failed to initialize metrics collection: {e}")
 
