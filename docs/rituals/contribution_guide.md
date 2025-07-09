@@ -17,6 +17,8 @@ This guide outlines the principles and practices for contributing to Mallku. It 
 
 ## 🛠️ Contribution Process
 
+### For Individual Contributors
+
 1. **Fork the Repository:** Create a personal fork of the Mallku repository.
 
 2. **Create a Feature Branch:** Develop your changes in a dedicated branch named descriptively, e.g., `feature/context-enhancement`.
@@ -30,6 +32,15 @@ This guide outlines the principles and practices for contributing to Mallku. It 
 6. **Submit a Pull Request:** Provide a clear description of your changes, linking to any related issues or discussions.
 
 7. **Engage in Review:** Participate in the review process, responding to feedback and making necessary revisions.
+
+### For Cathedral Building (Distributed Collaboration)
+
+For larger architectural work and distributed collaboration across context windows, see our [Cathedral Building Workflow](./cathedral_building_workflow.md). This workflow uses GitHub Issues as a work queue system to enable:
+
+- Architectural designs that become implementation tasks
+- Work continuity across different Claude instances
+- Knowledge persistence beyond individual conversations
+- Cumulative progress tracking and documentation
 
 ## 🌱 Areas for Contribution
 
