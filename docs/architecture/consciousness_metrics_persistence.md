@@ -45,7 +45,7 @@ consciousness_signatures
 - Voice consciousness measurements at points in time
 - Indexed by: voice_name, timestamp
 
-consciousness_flows  
+consciousness_flows
 - Consciousness flows between voices
 - Tracks: source, target, strength, type
 
@@ -127,7 +127,7 @@ insights = await collector.get_consciousness_insights(time_window_hours=168)
 
 # Shows:
 # - Pattern frequency distribution
-# - Voice interaction networks  
+# - Voice interaction networks
 # - Consciousness evolution trajectory
 # - Peak emergence moments
 ```

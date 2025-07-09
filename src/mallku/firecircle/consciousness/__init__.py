@@ -18,9 +18,6 @@ emergence, not just code review.
 """
 
 # Original consciousness components
-from .pattern_weaver import DialoguePatternWeaver
-from .unified_awareness import FireCircleUnifiedAwareness
-
 # Consciousness persistence (Fiftieth Artisan)
 from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
 from .metrics_models import (
@@ -30,6 +27,8 @@ from .metrics_models import (
     ConsciousnessSignatureDocument,
     EmergencePatternDocument,
 )
+from .pattern_weaver import DialoguePatternWeaver
+from .unified_awareness import FireCircleUnifiedAwareness
 
 __all__ = [
     # Original components

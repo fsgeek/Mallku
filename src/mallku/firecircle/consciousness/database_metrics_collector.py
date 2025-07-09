@@ -18,7 +18,6 @@ import logging
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from uuid import UUID
 
 from ...core.database import get_database
 from ..consciousness_metrics import (
@@ -274,7 +273,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             db = get_database()
             doc = CollectiveConsciousnessStateDocument.to_arangodb_document(state)
             db.collection(self.states_collection).insert(doc)
-            logger.debug(f"Persisted collective consciousness state to database")
+            logger.debug("Persisted collective consciousness state to database")
         except Exception as e:
             logger.error(f"Failed to persist state to database: {e}")
 

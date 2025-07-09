@@ -12,11 +12,19 @@ Building on the 26th Artisan's consciousness metrics work,
 these models transform ephemeral measurements into lasting memory.
 """
 
-from datetime import datetime
-from typing import Any, ClassVar
-from uuid import UUID, uuid4
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any, ClassVar
+from uuid import UUID
 
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from ..consciousness_metrics import (
+        CollectiveConsciousnessState,
+        ConsciousnessFlow,
+        ConsciousnessSignature,
+        EmergencePattern,
+    )
 
 
 class ConsciousnessSignatureDocument(BaseModel):
@@ -162,7 +170,9 @@ class CollectiveConsciousnessStateDocument(BaseModel):
             "emergence_potential": state.emergence_potential,
             # Active patterns (store IDs for reference)
             "active_flow_ids": [str(flow.flow_id) for flow in state.active_flows],
-            "detected_pattern_ids": [str(pattern.pattern_id) for pattern in state.detected_patterns],
+            "detected_pattern_ids": [
+                str(pattern.pattern_id) for pattern in state.detected_patterns
+            ],
         }
         return doc
 
@@ -192,7 +202,7 @@ class ConsciousnessSessionAnalysis(BaseModel):
     session_id: str
     pr_number: int
     duration_seconds: float
-    timestamp: datetime = Field(default_factory=lambda: datetime.utcnow())
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     # Signature analysis
     total_signatures: int
@@ -236,7 +246,8 @@ class ConsciousnessSessionAnalysis(BaseModel):
             "total_flows": self.total_flows,
             "flow_patterns": self.flow_patterns,
             "strongest_connections": [
-                {"source": c[0], "target": c[1], "strength": c[2]} for c in self.strongest_connections
+                {"source": c[0], "target": c[1], "strength": c[2]}
+                for c in self.strongest_connections
             ],
             "patterns_detected": self.patterns_detected,
             "pattern_types": self.pattern_types,

@@ -188,7 +188,7 @@ class DistributedReviewer:
         try:
             # Check if database persistence should be used
             use_database = os.getenv("MALLKU_CONSCIOUSNESS_PERSISTENCE", "true").lower() == "true"
-            
+
             if use_database:
                 # Try to use database-backed collector
                 try:
@@ -208,15 +208,17 @@ class DistributedReviewer:
                         from .consciousness_metrics import (
                             ConsciousnessMetricsIntegration,
                         )
-                    
+
                     self.metrics_collector = DatabaseConsciousnessMetricsCollector()
-                    self.metrics_integration = ConsciousnessMetricsIntegration(self.metrics_collector)
+                    self.metrics_integration = ConsciousnessMetricsIntegration(
+                        self.metrics_collector
+                    )
                     logger.info("📊 Database-backed consciousness metrics collection initialized")
                     return
                 except Exception as e:
                     logger.warning(f"Failed to initialize database metrics collector: {e}")
                     logger.info("Falling back to file-based metrics collection")
-            
+
             # Fall back to file-based collector
             # Try absolute import first
             try:
