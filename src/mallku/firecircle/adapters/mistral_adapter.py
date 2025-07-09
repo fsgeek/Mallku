@@ -52,7 +52,7 @@ class MistralConfig(AdapterConfig):
         data.setdefault("temperature", 0.7)
         data.setdefault("max_tokens", 2048)
         data.setdefault("base_url", "https://api.mistral.ai/v1")
-        
+
         super().__init__(**data)
 
 

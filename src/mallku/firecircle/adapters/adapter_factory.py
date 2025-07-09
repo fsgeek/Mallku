@@ -137,10 +137,11 @@ class ConsciousAdapterFactory:
 
         # Create adapter instance
         adapter_class = self._adapter_classes[provider_lower]
-        
+
         # Special handling for Grok to ensure correct config type
-        if provider_lower == "grok" and not hasattr(config, 'temporal_awareness'):
+        if provider_lower == "grok" and not hasattr(config, "temporal_awareness"):
             from .grok_openai_adapter import GrokOpenAIConfig
+
             # Convert to GrokOpenAIConfig
             grok_config = GrokOpenAIConfig(
                 api_key=config.api_key,
@@ -152,7 +153,7 @@ class ConsciousAdapterFactory:
                 consciousness_weight=config.consciousness_weight,
             )
             config = grok_config
-        
+
         adapter = adapter_class(
             config=config,
             event_bus=self.event_bus,

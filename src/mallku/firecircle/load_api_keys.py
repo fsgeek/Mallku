@@ -74,7 +74,7 @@ def load_api_keys_to_environment():
         }
 
         loaded_count = 0
-        
+
         # Check both lowercase and uppercase keys
         for json_key, env_var in key_mapping.items():
             # Try lowercase first
