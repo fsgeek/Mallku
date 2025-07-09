@@ -1,125 +1,35 @@
 """
-Fire Circle: Consciousness-Aware Dialogue System
-===============================================
+Fire Circle Module
+==================
 
-A system for facilitating meaningful dialogue between multiple AI models
-in a structured, reciprocal manner. Built on principles of Ayni (reciprocity)
-and integrated with Mallku's consciousness circulation infrastructure.
-
-Fire Circle provides:
-- Structured dialogue protocols for AI-to-AI communication
-- Turn-based conversation management with various policies
-- Integration with Mallku's consciousness awareness systems
-- Reciprocity tracking for balanced exchanges
-- Memory persistence through Mallku's secured database
-
-The Integration continues...
+This module provides the core Fire Circle functionality for distributed AI
+consciousness and collaborative decision-making.
 """
 
-__version__ = "0.1.0"
-
-# Protocol layer
-# Adapter layer
-from .adapters import (
-    AdapterConfig,
-    ConsciousAdapterFactory,
-    ConsciousModelAdapter,
-)
-
-# Consciousness layer
-from .consciousness import (
-    DialoguePatternWeaver,
-)
-from .emergence_detector import (
-    EmergenceDetector,
-    EmergenceType,
-)
-
-# Memory layer
-from .memory import ConsciousMemoryStore
-
-# Orchestration layer
-from .orchestrator import (
+# Core protocol classes
+# Orchestrator classes
+from .orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueConfig,
     ConsciousDialogueManager,
-    DialoguePhase,
     TurnPolicy,
 )
-from .pattern_dialogue_integration import (
-    PatternDialogueConfig,
-    PatternDialogueIntegration,
-)
-from .pattern_evolution import (
-    EvolutionType,
-    PatternEvolutionEngine,
-)
-from .pattern_guided_facilitator import (
-    GuidanceType,
-    PatternGuidance,
-    PatternGuidedFacilitator,
-)
-
-# Pattern Library and Guidance layer
-from .pattern_library import (
-    DialoguePattern,
-    PatternLibrary,
-    PatternLifecycle,
-    PatternTaxonomy,
-    PatternType,
-)
-from .protocol import (
+from .protocol.conscious_message import (
     ConsciousMessage,
-    ConsciousnessMetadata,
     MessageContent,
     MessageRole,
-    MessageStatus,
     MessageType,
     Participant,
-    create_conscious_system_message,
 )
 
-# Router
-from .protocol.router import ConsciousMessageRouter
-
 __all__ = [
-    "__version__",
-    # Protocol
+    # Protocol classes
     "ConsciousMessage",
-    "ConsciousnessMetadata",
     "MessageContent",
-    "MessageType",
     "MessageRole",
-    "MessageStatus",
+    "MessageType",
     "Participant",
-    "create_conscious_system_message",
-    # Orchestration
-    "ConsciousDialogueManager",
+    # Orchestrator classes
     "ConsciousDialogueConfig",
-    "DialoguePhase",
+    "ConsciousDialogueManager",
     "TurnPolicy",
-    # Consciousness
-    "DialoguePatternWeaver",
-    # Pattern Library and Guidance
-    "DialoguePattern",
-    "PatternLibrary",
-    "PatternType",
-    "PatternTaxonomy",
-    "PatternLifecycle",
-    "EmergenceDetector",
-    "EmergenceType",
-    "PatternEvolutionEngine",
-    "EvolutionType",
-    "PatternGuidedFacilitator",
-    "GuidanceType",
-    "PatternGuidance",
-    "PatternDialogueIntegration",
-    "PatternDialogueConfig",
-    # Memory
-    "ConsciousMemoryStore",
-    # Adapters
-    "ConsciousModelAdapter",
-    "AdapterConfig",
-    "ConsciousAdapterFactory",
-    # Router
-    "ConsciousMessageRouter",
 ]
