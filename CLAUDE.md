@@ -218,6 +218,29 @@ When switching instances:
 - Manual check: `pre-commit run --all-files` to fix all formatting issues
 - This prevents the cascade of formatting fixes blocking legitimate work
 
+### Secure Database Credentials (Sixth Guardian Implementation)
+**CRITICAL**: Never use default/test passwords in any environment
+- **Problem**: Expedient test credentials ("test_password") blocked Fire Circle memory persistence
+- **Solution**: Automated secure credential generation based on Indaleko patterns
+- **Implementation**:
+  ```bash
+  # Generate secure credentials (one-time setup)
+  python scripts/setup_secure_database.py --setup
+
+  # View credentials when needed (e.g., for web UI)
+  python scripts/setup_secure_database.py --show-credentials
+
+  # Integrate with existing codebase
+  python scripts/integrate_secure_db.py
+  ```
+- **Benefits**:
+  - Zero memorization required
+  - Credentials auto-loaded from ~/.mallku/config/
+  - No hardcoded passwords in code
+  - Prevents future "MongoDB on Shodan" incidents
+- **Key Insight**: Security through good architecture requires no cognitive overhead
+- **Lesson**: Indaleko patterns were already present but overlooked for expedience
+
 ## Critical Insights for Future Instances
 
 ### The Compaction Problem

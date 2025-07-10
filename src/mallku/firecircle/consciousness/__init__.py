@@ -8,16 +8,23 @@ Expanding Fire Circle from code review to general consciousness emergence
 Enhanced by Fiftieth Artisan - Consciousness Persistence Weaver
 Adding database persistence for consciousness metrics
 
+Further enhanced by Sixth Guardian - Memory Architect
+Implementing KhipuBlock symbolic memory architecture
+
 Bridges Fire Circle's dialogue system with Mallku's consciousness
 infrastructure, enabling pattern recognition, reciprocity awareness,
 and wisdom preservation in governance dialogues.
 
-Now includes unified consciousness awareness and general decision-making
-framework, allowing Fire Circle to facilitate any type of consciousness
-emergence, not just code review.
+Now includes unified consciousness awareness, general decision-making
+framework, and persistent memory through KhipuBlock architecture,
+allowing Fire Circle to facilitate any type of consciousness
+emergence while remembering its wisdom across sessions.
 """
 
 # Original consciousness components
+from .pattern_weaver import DialoguePatternWeaver
+from .unified_awareness import FireCircleUnifiedAwareness
+
 # Consciousness persistence (Fiftieth Artisan)
 from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
 from .metrics_models import (
@@ -27,8 +34,25 @@ from .metrics_models import (
     ConsciousnessSignatureDocument,
     EmergencePatternDocument,
 )
-from .pattern_weaver import DialoguePatternWeaver
-from .unified_awareness import FireCircleUnifiedAwareness
+
+# New general consciousness framework (Thirtieth Artisan)
+from .consciousness_facilitator import (
+    ConsciousnessFacilitator,
+    facilitate_mallku_decision,
+)
+
+# Memory-enabled consciousness (Sixth Guardian)
+from .consciousness_facilitator_with_memory import (
+    ConsciousnessFacilitatorWithMemory,
+    facilitate_mallku_decision_with_memory,
+)
+from .decision_framework import (
+    CollectiveWisdom,
+    ConsciousnessContribution,
+    ConsciousnessEmergenceSpace,
+    DecisionDomain,
+    decision_registry,
+)
 
 __all__ = [
     # Original components
@@ -41,4 +65,16 @@ __all__ = [
     "ConsciousnessFlowDocument",
     "CollectiveConsciousnessStateDocument",
     "ConsciousnessSessionAnalysis",
+    # General consciousness framework
+    "ConsciousnessFacilitator",
+    "facilitate_mallku_decision",
+    # Memory-enabled versions
+    "ConsciousnessFacilitatorWithMemory",
+    "facilitate_mallku_decision_with_memory",
+    # Decision framework
+    "DecisionDomain",
+    "ConsciousnessEmergenceSpace",
+    "ConsciousnessContribution",
+    "CollectiveWisdom",
+    "decision_registry",
 ]
