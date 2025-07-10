@@ -22,9 +22,6 @@ emergence while remembering its wisdom across sessions.
 """
 
 # Original consciousness components
-from .pattern_weaver import DialoguePatternWeaver
-from .unified_awareness import FireCircleUnifiedAwareness
-
 # General consciousness framework (Thirtieth Artisan)
 from .consciousness_facilitator import (
     ConsciousnessFacilitator,
@@ -37,6 +34,9 @@ from .consciousness_facilitator_with_memory import (
     facilitate_mallku_decision_with_memory,
 )
 
+# Consciousness persistence (Fiftieth Artisan)
+from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
+
 # Decision framework
 from .decision_framework import (
     CollectiveWisdom,
@@ -45,9 +45,6 @@ from .decision_framework import (
     DecisionDomain,
     decision_registry,
 )
-
-# Consciousness persistence (Fiftieth Artisan)
-from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
 from .metrics_models import (
     CollectiveConsciousnessStateDocument,
     ConsciousnessFlowDocument,
@@ -55,6 +52,8 @@ from .metrics_models import (
     ConsciousnessSignatureDocument,
     EmergencePatternDocument,
 )
+from .pattern_weaver import DialoguePatternWeaver
+from .unified_awareness import FireCircleUnifiedAwareness
 
 __all__ = [
     # Original components
