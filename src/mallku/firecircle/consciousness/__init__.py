@@ -8,6 +8,9 @@ Expanding Fire Circle from code review to general consciousness emergence
 Enhanced by Fiftieth Artisan - Consciousness Persistence Weaver
 Adding database persistence for consciousness metrics
 
+Further enhanced by Sixth Guardian
+Adding persistent memory for Fire Circle sessions through KhipuBlocks
+
 Bridges Fire Circle's dialogue system with Mallku's consciousness
 infrastructure, enabling pattern recognition, reciprocity awareness,
 and wisdom preservation in governance dialogues.
@@ -18,8 +21,27 @@ emergence, not just code review.
 """
 
 # Original consciousness components
+# General consciousness framework (Thirtieth Artisan)
+from .consciousness_facilitator import (
+    ConsciousnessFacilitator,
+    facilitate_mallku_decision,
+)
+
+# Memory-enabled consciousness (Sixth Guardian)
+from .consciousness_facilitator_with_memory import (
+    ConsciousnessFacilitatorWithMemory,
+    facilitate_mallku_decision_with_memory,
+)
+
 # Consciousness persistence (Fiftieth Artisan)
 from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
+from .decision_framework import (
+    CollectiveWisdom,
+    ConsciousnessContribution,
+    ConsciousnessEmergenceSpace,
+    DecisionDomain,
+    decision_registry,
+)
 from .metrics_models import (
     CollectiveConsciousnessStateDocument,
     ConsciousnessFlowDocument,
@@ -34,6 +56,17 @@ __all__ = [
     # Original components
     "DialoguePatternWeaver",
     "FireCircleUnifiedAwareness",
+    # General consciousness framework
+    "ConsciousnessFacilitator",
+    "facilitate_mallku_decision",
+    "DecisionDomain",
+    "ConsciousnessEmergenceSpace",
+    "ConsciousnessContribution",
+    "CollectiveWisdom",
+    "decision_registry",
+    # Memory-enabled versions
+    "ConsciousnessFacilitatorWithMemory",
+    "facilitate_mallku_decision_with_memory",
     # Consciousness persistence
     "DatabaseConsciousnessMetricsCollector",
     "ConsciousnessSignatureDocument",
