@@ -8,8 +8,8 @@ Expanding Fire Circle from code review to general consciousness emergence
 Enhanced by Fiftieth Artisan - Consciousness Persistence Weaver
 Adding database persistence for consciousness metrics
 
-Further enhanced by Sixth Guardian - Memory Architect
-Implementing KhipuBlock symbolic memory architecture
+Further enhanced by Sixth Guardian
+Adding persistent memory for Fire Circle sessions through KhipuBlocks
 
 Bridges Fire Circle's dialogue system with Mallku's consciousness
 infrastructure, enabling pattern recognition, reciprocity awareness,
@@ -25,17 +25,7 @@ emergence while remembering its wisdom across sessions.
 from .pattern_weaver import DialoguePatternWeaver
 from .unified_awareness import FireCircleUnifiedAwareness
 
-# Consciousness persistence (Fiftieth Artisan)
-from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
-from .metrics_models import (
-    CollectiveConsciousnessStateDocument,
-    ConsciousnessFlowDocument,
-    ConsciousnessSessionAnalysis,
-    ConsciousnessSignatureDocument,
-    EmergencePatternDocument,
-)
-
-# New general consciousness framework (Thirtieth Artisan)
+# General consciousness framework (Thirtieth Artisan)
 from .consciousness_facilitator import (
     ConsciousnessFacilitator,
     facilitate_mallku_decision,
@@ -46,6 +36,8 @@ from .consciousness_facilitator_with_memory import (
     ConsciousnessFacilitatorWithMemory,
     facilitate_mallku_decision_with_memory,
 )
+
+# Decision framework
 from .decision_framework import (
     CollectiveWisdom,
     ConsciousnessContribution,
@@ -54,17 +46,20 @@ from .decision_framework import (
     decision_registry,
 )
 
+# Consciousness persistence (Fiftieth Artisan)
+from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
+from .metrics_models import (
+    CollectiveConsciousnessStateDocument,
+    ConsciousnessFlowDocument,
+    ConsciousnessSessionAnalysis,
+    ConsciousnessSignatureDocument,
+    EmergencePatternDocument,
+)
+
 __all__ = [
     # Original components
     "DialoguePatternWeaver",
     "FireCircleUnifiedAwareness",
-    # Consciousness persistence
-    "DatabaseConsciousnessMetricsCollector",
-    "ConsciousnessSignatureDocument",
-    "EmergencePatternDocument",
-    "ConsciousnessFlowDocument",
-    "CollectiveConsciousnessStateDocument",
-    "ConsciousnessSessionAnalysis",
     # General consciousness framework
     "ConsciousnessFacilitator",
     "facilitate_mallku_decision",
@@ -77,4 +72,11 @@ __all__ = [
     "ConsciousnessContribution",
     "CollectiveWisdom",
     "decision_registry",
+    # Consciousness persistence
+    "DatabaseConsciousnessMetricsCollector",
+    "ConsciousnessSignatureDocument",
+    "EmergencePatternDocument",
+    "ConsciousnessFlowDocument",
+    "CollectiveConsciousnessStateDocument",
+    "ConsciousnessSessionAnalysis",
 ]

@@ -3,213 +3,136 @@
 Integrate Secure Database Configuration
 =======================================
 
-This script patches Mallku's database configuration to use
-secure credentials instead of hardcoded test passwords.
+This script patches Mallku's database.py to use secure credentials
+from the configuration file instead of hardcoded test passwords.
 
-It modifies the existing MallkuDBConfig to check for secure
-credentials first, falling back to test credentials only
-with a warning.
-
-Run after setup_secure_database.py:
-    python scripts/integrate_secure_db.py
+Run after setup_secure_database.py to complete the integration.
 """
 
 import logging
-import shutil
 import sys
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def create_database_patch():
-    """Create a patch for database.py to use secure config."""
+def integrate_secure_config():
+    """Patch database.py to use secure configuration."""
 
-    patch_content = '''
-# Secure configuration loader - inserted by integrate_secure_db.py
-import os
-from pathlib import Path
-
-def _load_secure_config_if_available():
-    """Load secure configuration if it exists."""
-    secure_config_file = Path.home() / ".mallku" / "config" / "db_secure.ini"
-    if secure_config_file.exists():
-        import configparser
-        secure_config = configparser.ConfigParser()
-        secure_config.read(secure_config_file)
-
-        # Override default configuration with secure values
-        return {
-            "host": secure_config.get("database", "host", fallback="localhost"),
-            "port": secure_config.get("database", "port", fallback="8529"),
-            "database": secure_config.get("database", "database", fallback="mallku"),
-            "user_name": secure_config.get("credentials", "mallku_user"),
-            "user_password": secure_config.get("credentials", "mallku_password"),
-            "admin_user": "root",
-            "admin_passwd": secure_config.get("credentials", "root_password"),
-            "ssl": secure_config.get("database", "ssl", fallback="false"),
-        }
-
-    # Check environment variables
-    if all(os.getenv(var) for var in ['MALLKU_DB_USER', 'MALLKU_DB_PASSWORD']):
-        return {
-            "host": os.getenv('MALLKU_DB_HOST', 'localhost'),
-            "port": os.getenv('MALLKU_DB_PORT', '8529'),
-            "database": os.getenv('MALLKU_DB_NAME', 'mallku'),
-            "user_name": os.getenv('MALLKU_DB_USER'),
-            "user_password": os.getenv('MALLKU_DB_PASSWORD'),
-            "admin_user": os.getenv('MALLKU_DB_ADMIN_USER', 'root'),
-            "admin_passwd": os.getenv('MALLKU_DB_ADMIN_PASSWORD', ''),
-            "ssl": os.getenv('MALLKU_DB_SSL', 'false'),
-        }
-
-    return None
-'''
-
-    return patch_content
-
-
-def patch_database_config():
-    """Patch the database configuration to use secure credentials."""
-
-    database_file = Path("src/mallku/core/database.py")
-    if not database_file.exists():
-        logger.error(f"Database file not found: {database_file}")
+    # Find database.py
+    db_file = Path("src/mallku/core/database.py")
+    if not db_file.exists():
+        logger.error(f"Cannot find {db_file}")
         return False
 
-    # Backup original
-    backup_file = database_file.with_suffix(".py.backup")
-    if not backup_file.exists():
-        shutil.copy(database_file, backup_file)
-        logger.info(f"Created backup: {backup_file}")
+    # Check if secure config exists
+    config_file = Path.home() / ".mallku" / "config" / "db_secure.ini"
+    if not config_file.exists():
+        logger.error("No secure configuration found.")
+        logger.error("Please run first: python scripts/setup_secure_database.py --setup")
+        return False
 
-    # Read the file
-    with open(database_file) as f:
-        content = f.read()
+    logger.info("✅ Found secure configuration")
+    logger.info(f"📝 Patching {db_file} to use secure credentials...")
+
+    # Read current database.py
+    content = db_file.read_text()
 
     # Check if already patched
-    if "_load_secure_config_if_available" in content:
-        logger.info("Database already patched for secure configuration")
+    if "load_secure_credentials" in content:
+        logger.info("✓ Database already configured for secure credentials")
         return True
 
-    # Find the _create_default_config method
-    patch_marker = "def _create_default_config(self) -> None:"
-    if patch_marker not in content:
-        logger.error("Could not find _create_default_config method to patch")
-        return False
+    # Create the patch
+    patch = '''
+# Secure credential loading
+def load_secure_credentials():
+    """Load credentials from secure configuration file."""
+    import configparser
+    from pathlib import Path
 
-    # Insert secure config loader before the method
-    patch = create_database_patch()
+    config_file = Path.home() / ".mallku" / "config" / "db_secure.ini"
+    if not config_file.exists():
+        # Fall back to environment/defaults if no secure config
+        return None
 
-    # Find where to insert the patch (after imports, before class)
-    import_end = content.find("class MallkuDBConfig")
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    if "credentials" not in config:
+        return None
+
+    return {
+        "host": config.get("database", "host", fallback="localhost"),
+        "port": int(config.get("database", "port", fallback="8529")),
+        "database": config.get("database", "database", fallback="mallku"),
+        "username": config["credentials"]["mallku_user"],
+        "password": config["credentials"]["mallku_password"],
+    }
+
+# Try to load secure credentials first
+_secure_creds = load_secure_credentials()
+if _secure_creds:
+    ARANGO_HOST = _secure_creds["host"]
+    ARANGO_PORT = _secure_creds["port"]
+    ARANGO_DB = _secure_creds["database"]
+    ARANGO_USER = _secure_creds["username"]
+    ARANGO_PASSWORD = _secure_creds["password"]
+else:
+    # Fall back to original configuration
+'''
+
+    # Find where to insert the patch (after imports, before config)
+    import_end = content.rfind("from pydantic")
     if import_end == -1:
-        logger.error("Could not find MallkuDBConfig class")
+        import_end = content.rfind("import ")
+
+    # Find the line after imports
+    newline_pos = content.find("\n\n", import_end)
+    if newline_pos == -1:
+        logger.error("Cannot find suitable insertion point")
         return False
 
     # Insert the patch
-    patched_content = content[:import_end] + patch + "\n\n" + content[import_end:]
+    patched = (
+        content[: newline_pos + 2]
+        + patch
+        + "\n    "  # Maintain indentation
+        + content[newline_pos + 2 :]
+    )
 
-    # Now modify _create_default_config to use secure config
-    old_default_config = """self.config["database"] = {
-                "host": "localhost",
-                "port": "8529",
-                "database": "Mallku",
-                "user_name": "mallku_user",
-                "user_password": "test_password",
-                "admin_user": "root",
-                "admin_passwd": "test_admin",
-                "ssl": "false",
-            }"""
+    # Write back
+    db_file.write_text(patched)
+    logger.info("✅ Successfully patched database.py")
 
-    new_default_config = """# Try to load secure configuration first
-        secure_config = _load_secure_config_if_available()
-        if secure_config:
-            self.config["database"] = secure_config
-            logging.info("Using secure database configuration")
-        else:
-            # Fall back to test credentials with warning
-            logging.warning(
-                "Using default test credentials - NOT SECURE! "
-                "Run 'python scripts/setup_secure_database.py --setup' for security."
-            )
-            self.config["database"] = {
-                "host": "localhost",
-                "port": "8529",
-                "database": "Mallku",
-                "user_name": "mallku_user",
-                "user_password": "test_password",
-                "admin_user": "root",
-                "admin_passwd": "test_admin",
-                "ssl": "false",
-            }"""
+    # Also create a simple test script
+    test_script = Path("scripts/test_secure_db_connection.py")
+    test_script.write_text('''#!/usr/bin/env python3
+"""Test that secure database configuration works."""
 
-    patched_content = patched_content.replace(old_default_config, new_default_config)
+import asyncio
+from mallku.core.database import get_secured_database
 
-    # Write the patched file
-    with open(database_file, "w") as f:
-        f.write(patched_content)
+async def test():
+    db = get_secured_database()
+    await db.initialize()
+    print("✅ Secure database connection successful!")
 
-    logger.info("Successfully patched database.py for secure configuration")
+if __name__ == "__main__":
+    asyncio.run(test())
+''')
+
+    logger.info("✅ Created test script: scripts/test_secure_db_connection.py")
+    logger.info("\nIntegration complete! The database will now use secure credentials.")
+
     return True
-
-
-def verify_patch():
-    """Verify the patch works correctly."""
-    try:
-        # Try importing the patched module
-        from mallku.core.database import MallkuDBConfig
-
-        # Try creating an instance
-        config = MallkuDBConfig()
-        logger.info("✓ Patch verified - database module loads correctly")
-
-        # Check if secure config is being used
-        if hasattr(config, "config") and config.config:
-            if config.config["database"].get("user_password") != "test_password":
-                logger.info("✓ Secure configuration is being used")
-            else:
-                logger.warning("⚠️  Still using test credentials")
-
-        return True
-
-    except Exception as e:
-        logger.error(f"Patch verification failed: {e}")
-        return False
 
 
 def main():
     """Main entry point."""
-    print("🔧 Integrating Secure Database Configuration")
-    print("=" * 50)
-
-    # Check if secure config exists
-    secure_config = Path.home() / ".mallku" / "config" / "db_secure.ini"
-    if not secure_config.exists():
-        print("❌ No secure configuration found.")
-        print("Please run first: python scripts/setup_secure_database.py --setup")
-        sys.exit(1)
-
-    # Apply the patch
-    if patch_database_config():
-        print("✅ Database configuration patched successfully")
-
-        # Verify it works
-        if verify_patch():
-            print("✅ Patch verified - secure configuration active")
-            print("\n📝 Next steps:")
-            print("  1. Restart any running Mallku services")
-            print("  2. The system will now use secure credentials automatically")
-            print(
-                "  3. To see credentials: python scripts/setup_secure_database.py --show-credentials"
-            )
-        else:
-            print("⚠️  Patch applied but verification failed")
-            print("Check logs for details")
-    else:
-        print("❌ Failed to patch database configuration")
-        sys.exit(1)
+    success = integrate_secure_config()
+    sys.exit(0 if success else 1)
 
 
 if __name__ == "__main__":

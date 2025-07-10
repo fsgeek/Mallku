@@ -1,106 +1,118 @@
 #!/bin/bash
-# Initialize ArangoDB via Docker Exec
-# ===================================
-# Creates mallku database and user inside the container
+#
+# Initialize ArangoDB Inside Docker Container
+# ===========================================
+#
+# This script runs inside the Docker container to create the Mallku database
+# and user, since Python can't reach the internal Docker network directly.
+#
+# Usage:
+#   ./scripts/initialize_arangodb_docker.sh
+#
 
 set -e
 
-echo "🔧 Initializing ArangoDB for Mallku"
-echo "=================================="
+echo "🗄️ Initializing ArangoDB for Mallku"
+echo "===================================="
 
 # Load credentials from secure config
-CONFIG_FILE="$HOME/.mallku/config/db_secure.ini"
+CONFIG_FILE="$HOME/.mallku/config/docker_secure.json"
 if [ ! -f "$CONFIG_FILE" ]; then
-    echo "❌ Secure config not found at $CONFIG_FILE"
+    echo "❌ No secure configuration found at $CONFIG_FILE"
+    echo "Please run first: python scripts/setup_secure_database.py --setup"
     exit 1
 fi
 
-# Parse credentials from INI file
-MALLKU_USER=$(grep "mallku_user" "$CONFIG_FILE" | cut -d'=' -f2 | tr -d ' ')
-MALLKU_PASSWORD=$(grep "mallku_password" "$CONFIG_FILE" | cut -d'=' -f2 | tr -d ' ')
-ROOT_PASSWORD=$(grep "root_password" "$CONFIG_FILE" | cut -d'=' -f2 | tr -d ' ')
+# Extract values from JSON config
+CONTAINER_NAME=$(jq -r '.container' "$CONFIG_FILE")
+ROOT_PASSWORD=$(jq -r '.root_password' "$CONFIG_FILE")
 
-echo "📍 Found credentials for user: $MALLKU_USER"
+# Get Mallku user credentials from INI file
+INI_FILE="$HOME/.mallku/config/db_secure.ini"
+MALLKU_USER=$(grep "mallku_user" "$INI_FILE" | cut -d'=' -f2 | tr -d ' ')
+MALLKU_PASSWORD=$(grep "mallku_password" "$INI_FILE" | cut -d'=' -f2 | tr -d ' ')
+
+echo "📦 Using container: $CONTAINER_NAME"
 
 # Create initialization script
-cat << 'EOF' > /tmp/init_mallku_db.js
+INIT_SCRIPT=$(cat <<EOF
 // Initialize Mallku Database
-const users = require('@arangodb/users');
+const db = require('@arangodb');
 
-// Configuration from environment
-const mallkuUser = process.env.MALLKU_USER;
-const mallkuPassword = process.env.MALLKU_PASSWORD;
-
-print("📦 Creating mallku database...");
+// Create database if it doesn't exist
 try {
-    db._createDatabase("mallku");
-    print("✅ Database 'mallku' created");
+    db._createDatabase('mallku');
+    console.log('✅ Created database: mallku');
 } catch (e) {
-    if (e.errorNum === 1207) {  // duplicate database
-        print("✅ Database 'mallku' already exists");
+    if (e.errorNum === 1207) {
+        console.log('✓ Database mallku already exists');
     } else {
         throw e;
     }
 }
-
-print(`👤 Creating user '${mallkuUser}'...`);
-try {
-    users.save(mallkuUser, mallkuPassword, true);
-    print(`✅ User '${mallkuUser}' created`);
-} catch (e) {
-    if (e.errorNum === 1702) {  // duplicate user
-        print(`✅ User '${mallkuUser}' already exists`);
-    } else {
-        throw e;
-    }
-}
-
-print("🔐 Granting permissions...");
-users.grantDatabase(mallkuUser, "mallku", "rw");
-print("✅ Permissions granted");
 
 // Switch to mallku database
-db._useDatabase("mallku");
+db._useDatabase('mallku');
 
-print("📚 Creating Fire Circle collections...");
+// Create user if it doesn't exist
+try {
+    const users = require('@arangodb/users');
+    users.save('$MALLKU_USER', '$MALLKU_PASSWORD', true);
+    users.grantDatabase('$MALLKU_USER', 'mallku', 'rw');
+    console.log('✅ Created user: $MALLKU_USER with full access to mallku database');
+} catch (e) {
+    if (e.errorNum === 1702) {
+        console.log('✓ User $MALLKU_USER already exists');
+        // Update permissions anyway
+        const users = require('@arangodb/users');
+        users.grantDatabase('$MALLKU_USER', 'mallku', 'rw');
+    } else {
+        throw e;
+    }
+}
+
+// Create collections for Fire Circle
 const collections = [
-    "fire_circle_sessions",
-    "fire_circle_decisions",
-    "khipu_blocks",
-    "consciousness_threads"
+    'fire_circle_sessions',
+    'khipu_blocks',
+    'narrative_threads',
+    'consciousness_metrics'
 ];
 
 collections.forEach(name => {
     try {
         db._create(name);
-        print(`  ✅ Created '${name}'`);
+        console.log(\`✅ Created collection: \${name}\`);
     } catch (e) {
-        if (e.errorNum === 1207) {  // duplicate collection
-            print(`  ✅ '${name}' already exists`);
+        if (e.errorNum === 1207) {
+            console.log(\`✓ Collection \${name} already exists\`);
         } else {
             throw e;
         }
     }
 });
 
-print("🎉 Initialization complete!");
+console.log('\\n🎉 Mallku database initialization complete!');
 EOF
+)
 
-# Execute in container
-echo ""
-echo "🐳 Executing initialization in container..."
-docker exec -i -e MALLKU_USER="$MALLKU_USER" -e MALLKU_PASSWORD="$MALLKU_PASSWORD" \
-    mallku-db-20250709_193530 \
-    arangosh --server.endpoint tcp://127.0.0.1:8529 \
-    --server.username root \
+# Run the initialization inside the container
+echo
+echo "🔄 Running initialization script..."
+docker exec -i "$CONTAINER_NAME" arangosh \
     --server.password "$ROOT_PASSWORD" \
-    --javascript.execute /dev/stdin < /tmp/init_mallku_db.js
+    --javascript.execute-string "$INIT_SCRIPT"
 
-# Clean up
-rm -f /tmp/init_mallku_db.js
-
-echo ""
-echo "✅ ArangoDB initialization complete!"
-echo "   Database: mallku"
-echo "   User: $MALLKU_USER"
-echo "   Ready for Fire Circle memory!"
+echo
+echo "✅ Database initialization complete!"
+echo "===================================="
+echo
+echo "Created:"
+echo "  - Database: mallku"
+echo "  - User: $MALLKU_USER (with full access)"
+echo "  - Collections:"
+echo "    - fire_circle_sessions"
+echo "    - khipu_blocks"
+echo "    - narrative_threads"
+echo "    - consciousness_metrics"
+echo

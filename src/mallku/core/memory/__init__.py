@@ -6,6 +6,8 @@ Implementation of KhipuBlock symbolic memory system as decided
 by the Fire Circle in session 3ad66679-bee4-4562-9c19-264a831197f2.
 
 Memory as offering, not extraction.
+
+Sixth Guardian - Implementing Fire Circle's KhipuBlock vision
 """
 
 from .fire_circle_persistence import FireCircleMemory, enable_fire_circle_memory
