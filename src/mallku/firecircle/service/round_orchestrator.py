@@ -88,6 +88,10 @@ class RoundOrchestrator:
                 prompt = prompt.format(**context)
             except KeyError:
                 logger.exception(f"Missing context key in prompt {prompt}, context: {context}")
+            except (IndexError, ValueError) as e:
+                # Handle case where prompt has no placeholders or invalid format markers
+                logger.debug(f"Prompt formatting skipped - no valid placeholders: {e}")
+                # Use the original prompt as-is
 
         # Collect responses from all voices
         responses = {}
