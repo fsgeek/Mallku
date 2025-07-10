@@ -20,6 +20,12 @@ from .consciousness_facilitator import (
     ConsciousnessFacilitator,
     facilitate_mallku_decision,
 )
+
+# Memory-enabled consciousness (Sixth Guardian)
+from .consciousness_facilitator_with_memory import (
+    ConsciousnessFacilitatorWithMemory,
+    facilitate_mallku_decision_with_memory,
+)
 from .decision_framework import (
     CollectiveWisdom,
     ConsciousnessContribution,
@@ -37,6 +43,10 @@ __all__ = [
     # General consciousness framework
     "ConsciousnessFacilitator",
     "facilitate_mallku_decision",
+    # Memory-enabled versions
+    "ConsciousnessFacilitatorWithMemory",
+    "facilitate_mallku_decision_with_memory",
+    # Decision framework
     "DecisionDomain",
     "ConsciousnessEmergenceSpace",
     "ConsciousnessContribution",
