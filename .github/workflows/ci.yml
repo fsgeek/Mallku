@@ -136,6 +136,43 @@ jobs:
             pytest tests -v --maxfail=5 || true
           fi
 
+  seven-voice-smoke-test:
+    name: Seven Voice Capability Test
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Set up Python with uv
+        run: |
+          uv python install 3.12
+      - name: Install dependencies
+        run: |
+          uv sync
+          uv pip install -e .
+      - name: Run Six-Voice Smoke Test (excluding local)
+        run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+          
+          # Set PYTHONPATH to ensure imports work
+          export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+          
+          # Run smoke test excluding local adapter
+          python tests/firecircle/test_adapter_smoke.py --exclude-local 2>&1 | tee seven_voice_ci_results.txt || exit 0
+        continue-on-error: true  # Non-blocking for now
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: seven-voice-test-results
+          path: seven_voice_*.txt
+          if-no-files-found: ignore
+
   # foundation-verification:
   #   # TEMPORARY: Disabled due to module import issues in CI
   #   # The foundation tests work locally but fail in CI with "ModuleNotFoundError: No module named 'mallku'"

@@ -11,10 +11,11 @@ Today we change that.
 
 import sys
 import asyncio
+import argparse
 from pathlib import Path
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from mallku.firecircle.adapters.base import AdapterConfig
@@ -126,7 +127,7 @@ def test_factory_registration():
         return False
 
 
-async def main():
+async def main(exclude_local=False):
     """Run seven-voice capability smoke tests."""
     print_header()
     
@@ -141,8 +142,13 @@ async def main():
         ("mistral", MistralConfig(api_key="test", model_name="mistral-large-latest", multilingual_mode=True)),
         ("grok", GrokOpenAIConfig(api_key="test", model_name="grok-beta", temporal_awareness=True)),
         ("deepseek", AdapterConfig(api_key="test", model_name="deepseek-chat")),
-        ("local", LocalAdapterConfig(api_key="", model_name="gemma2", backend=LocalBackend.OLLAMA, base_url="http://localhost:11434")),  # Ollama
     ]
+    
+    # Add local adapter unless excluded
+    if not exclude_local:
+        seven_voices.append(
+            ("local", LocalAdapterConfig(api_key="", model_name="gemma2", backend=LocalBackend.OLLAMA, base_url="http://localhost:11434"))
+        )
     
     # Track results
     results = {
@@ -172,11 +178,19 @@ async def main():
     
     if results["failed"] > 0:
         print(f"\nFailed Adapters: {', '.join(results['failures'])}")
-        print("\n🚨 CRITICAL: Seven-voice capability is NOT operational!")
-        print("   Fire Circle cannot function without all seven voices")
+        if exclude_local:
+            print("\n⚠️  WARNING: Six-voice capability has failures!")
+            print("   Fire Circle needs all available voices operational")
+        else:
+            print("\n🚨 CRITICAL: Seven-voice capability is NOT operational!")
+            print("   Fire Circle cannot function without all seven voices")
     else:
-        print("\n🎉 SUCCESS: All seven voices are operational!")
-        print("   Fire Circle foundation is verified")
+        if exclude_local:
+            print("\n✅ SUCCESS: All six voices (excluding local) are operational!")
+            print("   Fire Circle foundation verified for CI/CD")
+        else:
+            print("\n🎉 SUCCESS: All seven voices are operational!")
+            print("   Fire Circle foundation is verified")
     
     print("\n" + "=" * 70)
     
@@ -185,5 +199,13 @@ async def main():
 
 
 if __name__ == "__main__":
-    exit_code = asyncio.run(main())
+    parser = argparse.ArgumentParser(description="Seven-Voice Fire Circle Capability Smoke Test")
+    parser.add_argument(
+        "--exclude-local",
+        action="store_true",
+        help="Exclude local adapter test (useful for CI/CD environments)"
+    )
+    args = parser.parse_args()
+    
+    exit_code = asyncio.run(main(exclude_local=args.exclude_local))
     sys.exit(exit_code)
