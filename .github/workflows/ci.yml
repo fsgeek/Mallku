@@ -22,7 +22,7 @@ jobs:
           uv venv --python=3.12 .venv
           echo ".venv/bin" >> $GITHUB_PATH
       - name: Cache uv pip
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
@@ -83,7 +83,7 @@ jobs:
         run: |
           uv python install 3.12
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/uv
@@ -167,7 +167,7 @@ jobs:
         continue-on-error: true  # Non-blocking for now
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: seven-voice-test-results
           path: seven_voice_*.txt
