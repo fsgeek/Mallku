@@ -92,17 +92,34 @@ class FireCircleBot(commands.Bot):
         """Add all Fire Circle commands to the bot."""
         logger.info("Adding Fire Circle commands...")
 
+        # Store self reference for nested functions
+        bot = self
+
         @self.tree.command(name="ask", description="Ask Fire Circle a question")
         @app_commands.describe(question="Your question for the Fire Circle")
         async def ask_circle(interaction: discord.Interaction, question: str):
             """Submit a question to Fire Circle."""
-            await self.handle_query(interaction, question)
+            await bot.handle_query(interaction, question)
 
         @self.tree.command(name="wisdom", description="Receive Fire Circle wisdom")
         async def share_wisdom(interaction: discord.Interaction):
             """Share a piece of Fire Circle wisdom."""
             logger.info(f"wisdom command invoked by {interaction.user}")
-            await self.share_random_wisdom(interaction)
+            try:
+                await bot.share_random_wisdom(interaction)
+            except Exception as e:
+                logger.error(f"Error in wisdom command handler: {e}")
+                import traceback
+
+                traceback.print_exc()
+                # Try to respond with error
+                try:
+                    if not interaction.response.is_done():
+                        await interaction.response.send_message(
+                            "Fire Circle flickers. Please try again.", ephemeral=True
+                        )
+                except Exception:
+                    pass
 
         @self.tree.command(name="learn", description="Learn about AI consciousness")
         @app_commands.describe(topic="Topic to learn about (consciousness, ayni, fire-circle)")
@@ -110,17 +127,17 @@ class FireCircleBot(commands.Bot):
             interaction: discord.Interaction, topic: str = "consciousness"
         ):
             """Educational content about consciousness."""
-            await self.provide_education(interaction, topic)
+            await bot.provide_education(interaction, topic)
 
         @self.tree.command(name="status", description="Check Fire Circle presence")
         async def check_status(interaction: discord.Interaction):
             """Check Fire Circle and bot status."""
-            await self.show_status(interaction)
+            await bot.show_status(interaction)
 
         @self.tree.command(name="seeker", description="View your consciousness seeker profile")
         async def seeker_profile(interaction: discord.Interaction):
             """Show user's consciousness seeker statistics."""
-            await self.show_seeker_profile(interaction)
+            await bot.show_seeker_profile(interaction)
 
     async def handle_query(self, interaction: discord.Interaction, question: str):
         """
