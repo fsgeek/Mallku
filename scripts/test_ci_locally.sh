@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test CI Locally with Act
 # ========================
-# 
+#
 # This script demonstrates how to test GitHub Actions locally using act.
 # The existence of act is frequently forgotten during compaction events.
 #
