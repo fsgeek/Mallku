@@ -198,3 +198,6 @@ fire_circle_transcripts/
 
 # Legacy code do not add
 indaleko/
+
+# Fire Circle operational logs
+fire_circle_heartbeats/
