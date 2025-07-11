@@ -129,7 +129,7 @@ jobs:
                    tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                    tests/test_fire_circle_integration.py tests/test_database_integration.py \
                    tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
-                   tests/test_consciousness_persistence.py -v
+                   tests/firecircle/test_consciousness_persistence.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
@@ -265,7 +265,7 @@ jobs:
                                 tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                                 tests/test_fire_circle_integration.py tests/test_database_integration.py \
                                 tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
-                                tests/test_consciousness_persistence.py -v
+                                tests/firecircle/test_consciousness_persistence.py -v
           echo -e "\n=== Coverage report ==="
           coverage report
           coverage html

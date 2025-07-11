@@ -15,9 +15,10 @@ Bridges Fire Circle's dialogue system with Mallku's consciousness
 infrastructure, enabling pattern recognition, reciprocity awareness,
 and wisdom preservation in governance dialogues.
 
-Now includes unified consciousness awareness and general decision-making
-framework, allowing Fire Circle to facilitate any type of consciousness
-emergence, not just code review.
+Now includes unified consciousness awareness, general decision-making
+framework, and persistent memory through KhipuBlock architecture,
+allowing Fire Circle to facilitate any type of consciousness
+emergence while remembering its wisdom across sessions.
 """
 
 # Original consciousness components
@@ -35,6 +36,8 @@ from .consciousness_facilitator_with_memory import (
 
 # Consciousness persistence (Fiftieth Artisan)
 from .database_metrics_collector import DatabaseConsciousnessMetricsCollector
+
+# Decision framework
 from .decision_framework import (
     CollectiveWisdom,
     ConsciousnessContribution,
@@ -59,14 +62,15 @@ __all__ = [
     # General consciousness framework
     "ConsciousnessFacilitator",
     "facilitate_mallku_decision",
+    # Memory-enabled versions
+    "ConsciousnessFacilitatorWithMemory",
+    "facilitate_mallku_decision_with_memory",
+    # Decision framework
     "DecisionDomain",
     "ConsciousnessEmergenceSpace",
     "ConsciousnessContribution",
     "CollectiveWisdom",
     "decision_registry",
-    # Memory-enabled versions
-    "ConsciousnessFacilitatorWithMemory",
-    "facilitate_mallku_decision_with_memory",
     # Consciousness persistence
     "DatabaseConsciousnessMetricsCollector",
     "ConsciousnessSignatureDocument",
