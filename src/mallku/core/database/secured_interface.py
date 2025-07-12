@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from ..security.registry import SecurityRegistry
+from ..security.registry_store import get_registry_store
 from ..security.secured_model import SecuredModel
 
 if TYPE_CHECKING:
@@ -85,10 +86,21 @@ class SecuredDatabaseInterface:
     - Collection policies enforce data integrity
     """
 
-    def __init__(self, database: "StandardDatabase | None"):
+    def __init__(self, database: "StandardDatabase | None", registry_path=None):
         """Initialize with database connection and security enforcement."""
         self._database = database
-        self._security_registry = SecurityRegistry()
+
+        # Load registry from persistent storage
+        self._registry_store = get_registry_store(registry_path)
+        try:
+            self._security_registry = self._registry_store.load_registry_sync()
+            logger.info("Loaded security registry from persistent storage")
+        except Exception as e:
+            logger.warning(f"Could not load registry, creating new: {e}")
+            self._security_registry = SecurityRegistry()
+            # Save the new registry immediately
+            self._registry_store.save_registry_sync(self._security_registry)
+
         self._collection_policies: dict[str, CollectionSecurityPolicy] = {}
         self._initialized = False
         self._skip_database = database is None
@@ -147,7 +159,7 @@ class SecuredDatabaseInterface:
             collection = self._database.collection(collection_name)
             logger.info(f"Retrieved existing secured collection: {collection_name}")
 
-        return SecuredCollectionWrapper(collection, policy, self._security_registry)
+        return SecuredCollectionWrapper(collection, policy, self._security_registry, self)
 
     async def get_secured_collection(self, collection_name: str) -> "SecuredCollectionWrapper":
         """
@@ -173,7 +185,7 @@ class SecuredDatabaseInterface:
         collection = self._database.collection(collection_name)
         policy = self._collection_policies[collection_name]
 
-        return SecuredCollectionWrapper(collection, policy, self._security_registry)
+        return SecuredCollectionWrapper(collection, policy, self._security_registry, self)
 
     async def execute_secured_query(
         self,
@@ -221,6 +233,15 @@ class SecuredDatabaseInterface:
             if self._security_violations
             else [],
         }
+
+    def _save_registry(self) -> None:
+        """Save the security registry to persistent storage."""
+        try:
+            self._registry_store.save_registry_sync(self._security_registry)
+            logger.debug("Saved security registry to persistent storage")
+        except Exception as e:
+            logger.error(f"Failed to save security registry: {e}")
+            # Don't fail the operation, but log the error
 
     def collections(self) -> list[str]:
         """Get list of collection names."""
@@ -382,10 +403,12 @@ class SecuredCollectionWrapper:
         collection: "StandardCollection",
         policy: CollectionSecurityPolicy,
         security_registry: SecurityRegistry,
+        parent_interface: "SecuredDatabaseInterface",
     ):
         self._collection = collection
         self._policy = policy
         self._security_registry = security_registry
+        self._parent_interface = parent_interface
         self._operation_count = 0
 
     async def insert_secured(self, model: SecuredModel) -> dict:
@@ -404,6 +427,9 @@ class SecuredCollectionWrapper:
 
         # Insert into database
         result = self._collection.insert(obfuscated_data)
+
+        # Save registry in case new field mappings were created
+        self._parent_interface._save_registry()
 
         logger.debug(f"Inserted secured document into {self._policy.collection_name}")
         return result
@@ -440,6 +466,9 @@ class SecuredCollectionWrapper:
 
         # Update in database
         result = self._collection.update({"_key": key}, obfuscated_data)
+
+        # Save registry in case new field mappings were created
+        self._parent_interface._save_registry()
 
         logger.debug(f"Updated secured document in {self._policy.collection_name}")
         return result

@@ -195,3 +195,9 @@ fire_circle_reviews/
 # Fire Circle session outputs
 fire_circle_heartbeats/
 fire_circle_transcripts/
+
+# Legacy code do not add
+indaleko/
+
+# Fire Circle operational logs
+fire_circle_heartbeats/
