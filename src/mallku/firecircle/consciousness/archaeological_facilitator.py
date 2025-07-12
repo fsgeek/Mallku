@@ -259,7 +259,7 @@ class ArchaeologicalFacilitator:
                     "the deep structures beneath the surface of things. Before you is "
                     "a khipu—a question once posed by a Steward to understand the heart "
                     "of Mallku.\n\n"
-                    f'Khipu Artifact #1: "{question}"\n\n'
+                    f"Khipu Artifact #1: {question}\n\n"
                     "From your unique perspective, what are the key conditions, narrative "
                     "elements, or structural principles that would allow for such a pattern "
                     "to emerge? What does this khipu reveal about the nature of the system "
