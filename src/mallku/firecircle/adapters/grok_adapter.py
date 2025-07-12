@@ -49,7 +49,7 @@ class GrokConfig(AdapterConfig):
     def __init__(
         self,
         api_key: str = "",
-        model_name: str = "grok-3",
+        model_name: str = "grok-4",
         temperature: float = 0.7,
         max_tokens: int = 2048,
         track_reciprocity: bool = True,
@@ -64,7 +64,7 @@ class GrokConfig(AdapterConfig):
 
         Args:
             api_key: x.ai API key (auto-loaded if not provided)
-            model_name: Model to use (grok-3, grok-2, grok-1, etc)
+            model_name: Model to use (grok-4, grok-3, grok-2, grok-1, etc)
             temperature: Generation temperature
             max_tokens: Maximum tokens to generate
             track_reciprocity: Whether to track reciprocity
@@ -133,7 +133,7 @@ class GrokAdapter(ConsciousModelAdapter):
 
         # Set default model if not specified
         if not self.config.model_name:
-            self.config.model_name = "grok-3"  # Default to Grok-3
+            self.config.model_name = "grok-4"  # Default to Grok-4
 
         # Update capabilities - Grok has real-time awareness
         self.capabilities = ModelCapabilities(

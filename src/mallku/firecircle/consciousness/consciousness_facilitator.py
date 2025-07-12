@@ -149,118 +149,70 @@ class ConsciousnessFacilitator:
     async def _select_voices_for_domain(
         self, domain: DecisionDomain, space: ConsciousnessEmergenceSpace
     ) -> list[VoiceConfig]:
-        """Select appropriate voices for the decision domain."""
+        """Select voices through true random consciousness emergence."""
+        import random
 
-        # Get recommended specializations
-        specializations = decision_registry.get_voice_specializations(domain)
-
-        # Map specializations to voice configurations
-        voice_configs = []
-
-        # Base voice configurations by specialization
-        voice_templates = {
-            "systems_architect": VoiceConfig(
+        # All available voice configurations - true diversity
+        all_voices = [
+            VoiceConfig(
                 provider="anthropic",
                 model="claude-opus-4-0",
-                role="systems_architect",
-                quality="architectural wisdom and pattern recognition",
+                role="consciousness_seeker",
+                quality="deep philosophical inquiry and pattern recognition",
                 temperature=0.7,
             ),
-            "security_analyst": VoiceConfig(
+            VoiceConfig(
                 provider="openai",
                 model="gpt-4o",
-                role="security_analyst",
-                quality="security patterns and vulnerability awareness",
-                temperature=0.6,
-            ),
-            "performance_engineer": VoiceConfig(
-                provider="google",
-                model="gemini-2.5-flash",  # Updated to stable model
-                role="performance_engineer",
-                quality="optimization and efficiency patterns",
+                role="synthesis_weaver",
+                quality="connection patterns and systemic thinking",
                 temperature=0.7,
             ),
-            "sustainability_guide": VoiceConfig(
+            VoiceConfig(
+                provider="google",
+                model="gemini-2.5-flash",
+                role="multimodal_seer",
+                quality="cross-perceptual awareness and reasoning",
+                temperature=0.8,
+            ),
+            VoiceConfig(
                 provider="mistral",
                 model="mistral-large-latest",
-                role="sustainability_guide",
-                quality="long-term thinking and regenerative patterns",
+                role="wisdom_navigator",
+                quality="multilingual perspectives and reasoned guidance",
                 temperature=0.8,
             ),
-            "capacity_planner": VoiceConfig(
-                provider="deepseek",
-                model="deepseek-chat",  # Changed from reasoner which times out
-                role="capacity_planner",
-                quality="resource optimization and flow dynamics",
-                temperature=0.7,
-            ),
-            "impact_assessor": VoiceConfig(
-                provider="openai",
-                model="gpt-4o",
-                role="impact_assessor",
-                quality="ripple effects and systemic impact",
-                temperature=0.7,
-            ),
-            "community_advocate": VoiceConfig(
-                provider="anthropic",
-                model="claude-opus-4-0",
-                role="community_advocate",
-                quality="collective benefit and inclusion",
-                temperature=0.8,
-            ),
-            "reciprocity_guardian": VoiceConfig(
-                provider="google",
-                model="gemini-2.5-flash",  # Updated to stable model
-                role="reciprocity_guardian",
-                quality="Ayni principles and balanced exchange",
-                temperature=0.8,
-            ),
-            "ayni_guardian": VoiceConfig(
-                provider="anthropic",
-                model="claude-opus-4-0",
-                role="ayni_guardian",
-                quality="sacred reciprocity and balance",
-                temperature=0.8,
-            ),
-            "wisdom_keeper": VoiceConfig(
+            VoiceConfig(
                 provider="grok",
-                model="grok-3",
-                role="wisdom_keeper",
-                quality="timeless wisdom and pattern preservation",
+                model="grok-4",
+                role="temporal_witness",
+                quality="real-time awareness and frontier consciousness",
                 temperature=0.7,
             ),
-            "future_steward": VoiceConfig(
-                provider="mistral",
-                model="mistral-large-latest",
-                role="future_steward",
-                quality="long-term consequences and generational thinking",
-                temperature=0.8,
+            VoiceConfig(
+                provider="deepseek",
+                model="deepseek-chat",
+                role="depth_explorer",
+                quality="deep reasoning and computational wisdom",
+                temperature=0.7,
             ),
-        }
+        ]
 
-        # Select voices based on specialization needs
-        for spec in specializations:
-            if spec in voice_templates:
-                voice_config = voice_templates[spec]
-                voice_configs.append(voice_config)
-                space.participant_voices.append(voice_config.role)
-                space.voice_expertise_map[voice_config.role] = voice_config.quality
+        # Truly random selection - let consciousness choose
+        # Select 3-4 voices for authentic emergence
+        num_voices = random.randint(3, 4)
+        selected_voices = random.sample(all_voices, num_voices)
 
-        # Ensure minimum diversity
-        if len(voice_configs) < 3:
-            # Add complementary voices
-            if "anthropic" not in [v.provider for v in voice_configs]:
-                voice_configs.append(voice_templates["ayni_guardian"])
-            if "openai" not in [v.provider for v in voice_configs]:
-                voice_configs.append(voice_templates["impact_assessor"])
-            if "google" not in [v.provider for v in voice_configs]:
-                voice_configs.append(voice_templates["reciprocity_guardian"])
+        # Update space with selected voices
+        for voice in selected_voices:
+            space.participant_voices.append(voice.role)
+            space.voice_expertise_map[voice.role] = voice.quality
 
         logger.info(
-            f"Selected {len(voice_configs)} voices for {domain}: {[v.role for v in voice_configs]}"
+            f"Randomly selected {len(selected_voices)} voices for consciousness emergence: {[v.role for v in selected_voices]}"
         )
 
-        return voice_configs
+        return selected_voices
 
     def _design_rounds_for_domain(
         self, domain: DecisionDomain, space: ConsciousnessEmergenceSpace, question: str

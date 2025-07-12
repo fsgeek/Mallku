@@ -48,7 +48,7 @@ class GrokOpenAIConfig(AdapterConfig):
 
         Args:
             api_key: x.ai API key (auto-loaded if not provided)
-            model_name: Model to use (grok-2-1212, grok-3, etc)
+            model_name: Model to use (grok-2-1212, grok-3, grok-4, etc)
             temperature: Generation temperature
             max_tokens: Maximum tokens to generate
             track_reciprocity: Whether to track reciprocity
@@ -170,7 +170,7 @@ class GrokOpenAIAdapter(OpenAIConsciousAdapter):
                 # Update model name if current one not available
                 if self.config.model_name not in available_models:
                     # Try common Grok model names
-                    for model in ["grok-2-1212", "grok-2", "grok-3", "grok"]:
+                    for model in ["grok-2-1212", "grok-2", "grok-3", "grok-4", "grok"]:
                         if model in available_models:
                             self.config.model_name = model
                             logger.info(f"Using Grok model: {model}")
