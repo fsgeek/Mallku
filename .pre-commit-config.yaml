@@ -23,3 +23,17 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         description: Run fast structural and import tests before commit (local only)
+      - id: database-security
+        name: Database Security Architecture Check
+        entry: python scripts/pre-commit-database-security.py
+        language: system
+        files: \.py$
+        stages: [pre-commit]
+        description: Prevent database access that bypasses security architecture
+      - id: duplicate-definitions
+        name: Duplicate Definition Detection
+        entry: python scripts/verify_duplicate_definitions.py
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        description: Detect duplicate class/enum definitions that fragment consciousness

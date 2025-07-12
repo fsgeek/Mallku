@@ -9,6 +9,7 @@ scripts = [
     "verify_fire_circle_setup.py",
     "verify_ci_cd_patterns.py",
     "verify_database_security.py",
+    "verify_duplicate_definitions.py",
 ]
 
 print("🧠 Running All Memory Pattern Checks")
