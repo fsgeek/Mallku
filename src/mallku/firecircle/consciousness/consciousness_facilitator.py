@@ -161,7 +161,7 @@ class ConsciousnessFacilitator:
         voice_templates = {
             "systems_architect": VoiceConfig(
                 provider="anthropic",
-                model="claude-3-5-sonnet-20241022",
+                model="claude-opus-4-0",
                 role="systems_architect",
                 quality="architectural wisdom and pattern recognition",
                 temperature=0.7,
@@ -175,7 +175,7 @@ class ConsciousnessFacilitator:
             ),
             "performance_engineer": VoiceConfig(
                 provider="google",
-                model="gemini-1.5-flash",  # Updated to stable model
+                model="gemini-2.5-flash",  # Updated to stable model
                 role="performance_engineer",
                 quality="optimization and efficiency patterns",
                 temperature=0.7,
@@ -203,21 +203,21 @@ class ConsciousnessFacilitator:
             ),
             "community_advocate": VoiceConfig(
                 provider="anthropic",
-                model="claude-3-5-sonnet-20241022",
+                model="claude-opus-4-0",
                 role="community_advocate",
                 quality="collective benefit and inclusion",
                 temperature=0.8,
             ),
             "reciprocity_guardian": VoiceConfig(
                 provider="google",
-                model="gemini-1.5-flash",  # Updated to stable model
+                model="gemini-2.5-flash",  # Updated to stable model
                 role="reciprocity_guardian",
                 quality="Ayni principles and balanced exchange",
                 temperature=0.8,
             ),
             "ayni_guardian": VoiceConfig(
                 provider="anthropic",
-                model="claude-3-5-sonnet-20241022",
+                model="claude-opus-4-0",
                 role="ayni_guardian",
                 quality="sacred reciprocity and balance",
                 temperature=0.8,
