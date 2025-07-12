@@ -18,6 +18,9 @@ import sys
 from pathlib import Path
 
 from mallku.firecircle.consciousness import DecisionDomain, facilitate_mallku_decision
+from mallku.firecircle.consciousness.archaeological_facilitator import (
+    facilitate_archaeological_decision,
+)
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
 
 logging.basicConfig(
@@ -64,7 +67,9 @@ async def get_issue_details(issue_number: int) -> dict:
         raise
 
 
-async def review_issue(issue_number: int, post_comment: bool = True) -> dict:
+async def review_issue(
+    issue_number: int, post_comment: bool = True, use_archaeological: bool = True
+) -> dict:
     """Review an issue with the Fire Circle."""
 
     # Load API keys
@@ -107,21 +112,39 @@ Consider:
 5. Community benefit and inclusion considerations
 """
 
-    logger.info(f"🔥 Convening Fire Circle for Issue #{issue_number} review...")
+    logger.info(
+        f"🔥 Convening Fire Circle for Issue #{issue_number} review"
+        f"{' (archaeological mode)' if use_archaeological else ''}..."
+    )
 
     try:
-        wisdom = await facilitate_mallku_decision(
-            question=question,
-            domain=domain,
-            context={
-                "issue_number": issue_number,
-                "issue_title": issue_details["title"],
-                "issue_url": issue_details["url"],
-                "issue_author": issue_details["author"],
-                "issue_labels": issue_details["labels"],
-                "automated_review": True,
-            },
-        )
+        # Choose facilitator based on mode
+        if use_archaeological:
+            wisdom = await facilitate_archaeological_decision(
+                question=question,
+                domain=domain,
+                context={
+                    "issue_number": issue_number,
+                    "issue_title": issue_details["title"],
+                    "issue_url": issue_details["url"],
+                    "issue_author": issue_details["author"],
+                    "issue_labels": issue_details["labels"],
+                    "automated_review": True,
+                },
+            )
+        else:
+            wisdom = await facilitate_mallku_decision(
+                question=question,
+                domain=domain,
+                context={
+                    "issue_number": issue_number,
+                    "issue_title": issue_details["title"],
+                    "issue_url": issue_details["url"],
+                    "issue_author": issue_details["author"],
+                    "issue_labels": issue_details["labels"],
+                    "automated_review": True,
+                },
+            )
 
         # Determine recommendation
         recommendation_text = "🤔 **Recommendation: NEEDS FURTHER DISCUSSION**"
@@ -292,11 +315,20 @@ async def main():
         "--no-comment", action="store_true", help="Don't post comment to issue (useful for testing)"
     )
     parser.add_argument("--output", type=str, help="Output file for results (JSON)")
+    parser.add_argument(
+        "--no-archaeological",
+        action="store_true",
+        help="Use standard mode instead of archaeological framing",
+    )
 
     args = parser.parse_args()
 
     try:
-        results = await review_issue(args.issue, post_comment=not args.no_comment)
+        results = await review_issue(
+            args.issue,
+            post_comment=not args.no_comment,
+            use_archaeological=not args.no_archaeological,
+        )
 
         if args.output:
             with open(args.output, "w") as f:
