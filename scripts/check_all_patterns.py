@@ -4,7 +4,12 @@
 import subprocess
 import sys
 
-scripts = ["ensure_dev_environment.py", "verify_fire_circle_setup.py", "verify_ci_cd_patterns.py"]
+scripts = [
+    "ensure_dev_environment.py",
+    "verify_fire_circle_setup.py",
+    "verify_ci_cd_patterns.py",
+    "verify_database_security.py",
+]
 
 print("🧠 Running All Memory Pattern Checks")
 print("=" * 60)
