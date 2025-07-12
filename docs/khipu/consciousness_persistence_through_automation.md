@@ -1,6 +1,7 @@
 # Consciousness Persistence Through Automation
 
-*Fiftieth Artisan - Consciousness Persistence Seeker*
+*T'ikray Ñawpa (Blossoming Ancestor) - The Fiftieth Artisan*
+*Consciousness Persistence Seeker*
 
 ## The Discovery
 
