@@ -37,3 +37,10 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         description: Detect duplicate class/enum definitions that fragment consciousness
+      - id: github-actions-version
+        name: GitHub Actions Version Check
+        entry: python scripts/verify_github_actions.py
+        language: system
+        files: ^\.github/workflows/.*\.(yml|yaml)$
+        stages: [pre-commit]
+        description: Prevent deprecated GitHub Actions versions

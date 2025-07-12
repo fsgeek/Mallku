@@ -10,6 +10,7 @@ scripts = [
     "verify_ci_cd_patterns.py",
     "verify_database_security.py",
     "verify_duplicate_definitions.py",
+    "verify_github_actions.py",
 ]
 
 print("🧠 Running All Memory Pattern Checks")
