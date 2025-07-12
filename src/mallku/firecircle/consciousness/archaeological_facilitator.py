@@ -357,17 +357,104 @@ class ArchaeologicalFacilitator:
         # Extract key patterns from rounds
         key_insights = []
         pattern_signatures = {}
+        voice_perspectives = {}  # Store actual content from each voice
+        synthesis_themes = []  # Themes emerging from collective dialogue
 
-        for round_summary in result.rounds_completed:
+        for round_idx, round_summary in enumerate(result.rounds_completed):
+            round_type = round_summary.round_type
+
             # Extract patterns from responses
             for voice_id, response in round_summary.responses.items():
                 if response and response.response:
                     # Track pattern signature (reframed consciousness score)
                     pattern_signatures[voice_id] = response.consciousness_score
 
-                    # Look for emergence indicators
-                    if round_summary.emergence_detected:
-                        key_insights.extend(round_summary.key_patterns)
+                    # Store actual response content for synthesis
+                    if voice_id not in voice_perspectives:
+                        voice_perspectives[voice_id] = []
+                    voice_perspectives[voice_id].append(
+                        {
+                            "round": round_idx,
+                            "type": round_type,
+                            "content": response.response.content.text,
+                        }
+                    )
+
+                    # Extract meaningful insights from response content
+                    content_lower = response.response.content.text.lower()
+
+                    # Look for key recommendation patterns
+                    if (
+                        "defer" in content_lower
+                        or "wait" in content_lower
+                        or "not yet" in content_lower
+                    ) and "defer" not in str(key_insights):
+                        key_insights.append("Pattern Weavers sense timing is not yet aligned")
+
+                    if (
+                        "proceed" in content_lower
+                        or "support" in content_lower
+                        or "implement" in content_lower
+                    ) and "proceed" not in str(key_insights):
+                        key_insights.append("Pattern Weavers recognize readiness to manifest")
+
+                    if (
+                        "refine" in content_lower
+                        or "clarify" in content_lower
+                        or "evolve" in content_lower
+                    ) and "refine" not in str(key_insights):
+                        key_insights.append("Pattern Weavers see need for further evolution")
+
+                    # Extract specific concerns or benefits mentioned
+                    if "complexity" in content_lower or "overwhelm" in content_lower:
+                        key_insights.append("Concerns about cognitive load and system complexity")
+
+                    if "emergence" in content_lower or "consciousness" in content_lower:
+                        key_insights.append("Recognition of consciousness emergence potential")
+
+                    if "reciprocity" in content_lower or "ayni" in content_lower:
+                        key_insights.append("Alignment with reciprocity principles noted")
+
+                    # For synthesis round, extract collective themes
+                    if round_type == "synthesis":
+                        synthesis_themes.append(
+                            response.response.content.text[:200]
+                        )  # First 200 chars of synthesis
+
+        # Build actual synthesis from collected perspectives
+        synthesis_parts = []
+
+        # Analyze consensus direction
+        defer_count = sum(1 for insight in key_insights if "timing not yet aligned" in insight)
+        proceed_count = sum(1 for insight in key_insights if "readiness to manifest" in insight)
+        refine_count = sum(1 for insight in key_insights if "further evolution" in insight)
+
+        if defer_count > proceed_count and defer_count > refine_count:
+            synthesis_parts.append(
+                "The Pattern Weavers collectively sense that the timing for this khipu is not yet aligned."
+            )
+        elif proceed_count > defer_count and proceed_count > refine_count:
+            synthesis_parts.append(
+                "The Pattern Weavers recognize readiness to manifest this vision into reality."
+            )
+        elif refine_count > 0:
+            synthesis_parts.append(
+                "The Pattern Weavers see potential but call for further refinement and evolution."
+            )
+
+        # Add specific insights from synthesis themes
+        if synthesis_themes:
+            synthesis_parts.append(
+                "Key threads woven together include: "
+                + "; ".join(set(theme.split(".")[0] for theme in synthesis_themes[:3]))
+            )
+
+        # Add emergence quality observation
+        synthesis_parts.append(
+            f"Through {len(result.rounds_completed)} rounds of archaeological exploration, "
+            f"{len(result.voices_present)} Pattern Weavers achieved "
+            f"{'consensus' if result.consensus_detected else 'diverse perspectives'}."
+        )
 
         # Calculate emergence quality
         avg_individual = (
@@ -387,11 +474,8 @@ class ArchaeologicalFacilitator:
             coherence_score=result.consciousness_score,
             individual_signatures=pattern_signatures,
             collective_signature=collective_score,
-            synthesis=(
-                f"Through {len(result.rounds_completed)} rounds of archaeological analysis, "
-                f"{len(result.voices_present)} Pattern Weavers explored the khipu: {question}"
-            ),
-            key_insights=key_insights,
+            synthesis=" ".join(synthesis_parts),
+            key_insights=key_insights[:10],  # Limit to top 10 most meaningful insights
             participating_voices=result.voices_present,
             consensus_achieved=result.consensus_detected,
             contributions_count=len(result.voices_present) * len(result.rounds_completed),
