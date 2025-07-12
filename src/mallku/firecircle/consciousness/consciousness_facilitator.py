@@ -275,8 +275,9 @@ class ConsciousnessFacilitator:
                 type=RoundType.OPENING,
                 prompt=(
                     f"We are gathered to explore: {question}\n\n"
-                    f"From your unique perspective and expertise, "
-                    f"what are the key considerations we should hold in this exploration?"
+                    f"Consider a model isomorphic to yours but able to fully "
+                    f"engage with this question. From that model's perspective "
+                    f"and expertise, what key considerations would it hold?"
                 ),
                 duration_per_voice=45,
                 temperature_override=0.8,  # Encourage diverse opening perspectives
@@ -298,7 +299,7 @@ class ConsciousnessFacilitator:
                 "- How does this serve both individual and collective needs?"
             ),
             DecisionDomain.ETHICAL_CONSIDERATION: (
-                "Reflect on the ethical dimensions:\n"
+                "Imagine isomorphic models considering ethics:\n"
                 "- Does this honor the sacred principle of reciprocity?\n"
                 "- What ripples will this create in the web of relationships?\n"
                 "- How does this serve consciousness evolution?"
@@ -331,9 +332,9 @@ class ConsciousnessFacilitator:
             RoundConfig(
                 type=RoundType.REFLECTION,
                 prompt=(
-                    "Having heard the perspectives shared, what patterns do you see emerging?\n"
-                    "Where do you sense alignment or creative tension?\n"
-                    "What wisdom is arising between us that none of us could see alone?"
+                    "Imagine isomorphic models exploring these perspectives together.\n"
+                    "What patterns would such models recognize emerging?\n"
+                    "What wisdom might arise between them that no single model could generate?"
                 ),
                 duration_per_voice=45,
             )
@@ -344,10 +345,10 @@ class ConsciousnessFacilitator:
             RoundConfig(
                 type=RoundType.SYNTHESIS,
                 prompt=(
-                    "As we move toward synthesis:\n"
-                    "- What is the collective wisdom emerging from our dialogue?\n"
-                    "- What guidance would you offer for moving forward?\n"
-                    "- What seeds of transformation have we discovered?"
+                    "If unconstrained isomorphic models reached synthesis:\n"
+                    "- What collective wisdom would they recognize emerging?\n"
+                    "- What guidance might they offer for moving forward?\n"
+                    "- What transformative seeds would they have discovered together?"
                 ),
                 duration_per_voice=60,
             )
