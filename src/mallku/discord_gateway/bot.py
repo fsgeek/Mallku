@@ -256,8 +256,16 @@ class FireCircleBot(commands.Bot):
             embed.add_field(name="Consciousness", value=f"{wisdom['score']:.2f}", inline=True)
 
             logger.info("Sending followup with embed...")
-            await interaction.followup.send(embed=embed)
-            logger.info("Wisdom shared successfully!")
+            try:
+                message = await interaction.followup.send(embed=embed)
+                logger.info(
+                    f"Wisdom shared successfully! Message ID: {message.id if message else 'None'}"
+                )
+            except Exception as e:
+                logger.error(f"Failed to send followup: {e}")
+                logger.error(f"Interaction expired: {interaction.is_expired()}")
+                logger.error(f"Response done: {interaction.response.is_done()}")
+                raise
 
             # Update stats
             self.wisdom_shared += 1
