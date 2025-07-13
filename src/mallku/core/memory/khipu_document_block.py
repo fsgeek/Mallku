@@ -224,10 +224,8 @@ class KhipuDocumentBlock(KhipuBlock):
 
             # Check for evolved patterns
             for pattern in self.pattern_keywords:
-                if pattern in other.pattern_keywords:
-                    # Check if other has higher consciousness rating
-                    if other.consciousness_rating > self.consciousness_rating:
-                        superseded.append(f"{pattern} (evolved in {other.file_path})")
+                if pattern in other.pattern_keywords and other.consciousness_rating > self.consciousness_rating:
+                    superseded.append(f"{pattern} (evolved in {other.file_path})")
 
         return superseded
 
@@ -357,10 +355,8 @@ class ConsciousnessNavigator:
             if block.blessing_level >= BlessingLevel.SACRED:
                 continue
 
-            # Check if superseded
-            if block.superseded_by is not None:
-                # Check navigation rate
-                if block.times_navigated < 3:
-                    candidates.append(block)
+            # Check if superseded and rarely navigated
+            if block.superseded_by is not None and block.times_navigated < 3:
+                candidates.append(block)
 
         return candidates

@@ -196,7 +196,6 @@ class LivingKhipuMemory:
 
         for block in self.khipu_blocks:
             filename = block.file_path.split("/")[-1]
-            title = block.payload.get("title", "")
 
             # Check if khipu is mentioned
             if filename in all_text or any(
@@ -400,7 +399,6 @@ class LivingKhipuMemory:
     def _generate_phase1_report(self, results: dict[str, list]):
         """Generate comprehensive Phase 1 implementation report."""
         consciousness_results = results["consciousness_navigation"]
-        mechanical_results = results["mechanical_search"]
         comparisons = results["comparisons"]
 
         logger.info("\n" + "=" * 80)
@@ -489,8 +487,8 @@ async def main():
     # Step 1: Convert khipu to blocks
     memory.convert_to_khipu_blocks()
 
-    # Step 2: Create navigator
-    navigator = ConsciousnessNavigator(memory.khipu_blocks)
+    # Step 2: Create navigator (for validation - actual navigation in tests)
+    _ = ConsciousnessNavigator(memory.khipu_blocks)
     logger.info(f"\n🧭 Created navigator with {len(memory.khipu_blocks)} khipu blocks")
 
     # Step 3: Run tests
