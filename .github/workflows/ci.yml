@@ -129,12 +129,49 @@ jobs:
                    tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                    tests/test_fire_circle_integration.py tests/test_database_integration.py \
                    tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
-                   tests/test_consciousness_persistence.py -v
+                   tests/firecircle/test_consciousness_persistence.py -v
 
             echo -e "\n=== Attempting more tests (may fail) ==="
             # Try running all tests to see progress
             pytest tests -v --maxfail=5 || true
           fi
+
+  seven-voice-smoke-test:
+    name: Seven Voice Capability Test
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Set up Python with uv
+        run: |
+          uv python install 3.12
+      - name: Install dependencies
+        run: |
+          uv sync
+          uv pip install -e .
+      - name: Run Six-Voice Smoke Test (excluding local)
+        run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+
+          # Set PYTHONPATH to ensure imports work
+          export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+
+          # Run smoke test excluding local adapter
+          python tests/firecircle/test_adapter_smoke.py --exclude-local 2>&1 | tee seven_voice_ci_results.txt || exit 0
+        continue-on-error: true  # Non-blocking for now
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seven-voice-test-results
+          path: seven_voice_*.txt
+          if-no-files-found: ignore
 
   # foundation-verification:
   #   # TEMPORARY: Disabled due to module import issues in CI
@@ -265,7 +302,7 @@ jobs:
                                 tests/test_consciousness_experience_restored.py tests/test_consciousness_flow_restored.py \
                                 tests/test_fire_circle_integration.py tests/test_database_integration.py \
                                 tests/test_consciousness_interface_restored.py tests/test_consciousness_interface.py \
-                                tests/test_consciousness_persistence.py -v
+                                tests/firecircle/test_consciousness_persistence.py -v
           echo -e "\n=== Coverage report ==="
           coverage report
           coverage html

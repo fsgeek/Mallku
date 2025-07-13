@@ -111,7 +111,11 @@ class SecuredModel(BaseModel):
             field_info = self.__fields__.get(field_name)
             security_config = None
 
-            if field_info and hasattr(field_info, "json_schema_extra"):
+            if (
+                field_info
+                and hasattr(field_info, "json_schema_extra")
+                and field_info.json_schema_extra
+            ):
                 config_dict = field_info.json_schema_extra.get("security_config")
                 if config_dict:
                     security_config = FieldSecurityConfig(**config_dict)

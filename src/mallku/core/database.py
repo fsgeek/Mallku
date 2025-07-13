@@ -16,6 +16,45 @@ from arango import ArangoClient
 from arango.collection import StandardCollection
 from arango.database import StandardDatabase
 
+# Secure configuration loader - inserted by integrate_secure_db.py
+
+
+def _load_secure_config_if_available():
+    """Load secure configuration if it exists."""
+    secure_config_file = Path.home() / ".mallku" / "config" / "db_secure.ini"
+    if secure_config_file.exists():
+        import configparser
+
+        secure_config = configparser.ConfigParser()
+        secure_config.read(secure_config_file)
+
+        # Override default configuration with secure values
+        return {
+            "host": secure_config.get("database", "host", fallback="localhost"),
+            "port": secure_config.get("database", "port", fallback="8529"),
+            "database": secure_config.get("database", "database", fallback="mallku"),
+            "user_name": secure_config.get("credentials", "mallku_user"),
+            "user_password": secure_config.get("credentials", "mallku_password"),
+            "admin_user": "root",
+            "admin_passwd": secure_config.get("credentials", "root_password"),
+            "ssl": secure_config.get("database", "ssl", fallback="false"),
+        }
+
+    # Check environment variables
+    if all(os.getenv(var) for var in ["MALLKU_DB_USER", "MALLKU_DB_PASSWORD"]):
+        return {
+            "host": os.getenv("MALLKU_DB_HOST", "localhost"),
+            "port": os.getenv("MALLKU_DB_PORT", "8529"),
+            "database": os.getenv("MALLKU_DB_NAME", "mallku"),
+            "user_name": os.getenv("MALLKU_DB_USER"),
+            "user_password": os.getenv("MALLKU_DB_PASSWORD"),
+            "admin_user": os.getenv("MALLKU_DB_ADMIN_USER", "root"),
+            "admin_passwd": os.getenv("MALLKU_DB_ADMIN_PASSWORD", ""),
+            "ssl": os.getenv("MALLKU_DB_SSL", "false"),
+        }
+
+    return None
+
 
 class MallkuDBConfig:
     """
@@ -82,16 +121,27 @@ class MallkuDBConfig:
                 "ssl": "false",
             }
         else:
-            self.config["database"] = {
-                "host": "localhost",
-                "port": "8529",
-                "database": "Mallku",
-                "user_name": "mallku_user",
-                "user_password": "test_password",
-                "admin_user": "root",
-                "admin_passwd": "test_admin",
-                "ssl": "false",
-            }
+            # Try to load secure configuration first
+            secure_config = _load_secure_config_if_available()
+            if secure_config:
+                self.config["database"] = secure_config
+                logging.info("Using secure database configuration")
+            else:
+                # Fall back to test credentials with warning
+                logging.warning(
+                    "Using default test credentials - NOT SECURE! "
+                    "Run 'python scripts/setup_secure_database.py --setup' for security."
+                )
+                self.config["database"] = {
+                    "host": "localhost",
+                    "port": "8529",
+                    "database": "Mallku",
+                    "user_name": "mallku_user",
+                    "user_password": "test_password",
+                    "admin_user": "root",
+                    "admin_passwd": "test_admin",
+                    "ssl": "false",
+                }
 
         # Save the default config
         os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
