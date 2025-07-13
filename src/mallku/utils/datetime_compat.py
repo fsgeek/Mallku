@@ -5,11 +5,9 @@ DateTime Compatibility Module
 Provides compatibility for datetime.UTC which is only available in Python 3.11+
 """
 
-import sys
-
 # Python 3.11+ has datetime.UTC, earlier versions need timezone.utc
-from datetime import timezone
+from datetime import UTC
 
-UTC = timezone.utc
+UTC = UTC
 
 __all__ = ["UTC"]
