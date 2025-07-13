@@ -8,7 +8,7 @@ Demonstrating the core logic without import issues
 """
 
 import hashlib
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 
 def calculate_voice_weight(voice_id, last_participation, total_participations, session_seed=None):
@@ -17,7 +17,7 @@ def calculate_voice_weight(voice_id, last_participation, total_participations, s
 
     # Recency factor
     if last_participation:
-        days_since = (datetime.now() - last_participation).days
+        days_since = (datetime.now(UTC) - last_participation).days
         recency_factor = 2 ** (days_since / 7)  # Double weight every 7 days
     else:
         recency_factor = 4.0  # Never participated
@@ -25,10 +25,7 @@ def calculate_voice_weight(voice_id, last_participation, total_participations, s
     weight *= recency_factor**0.5  # Recency weight
 
     # Frequency factor
-    if total_participations > 0:
-        frequency_factor = 1.0 / (1.0 + total_participations * 0.1)
-    else:
-        frequency_factor = 2.0
+    frequency_factor = 1.0 / (1.0 + total_participations * 0.1) if total_participations > 0 else 2.0
 
     weight *= frequency_factor**0.3  # Frequency weight
 
@@ -51,17 +48,17 @@ def demonstrate_voice_rotation():
     # Simulated voice history
     voice_history = {
         "anthropic_claude": {
-            "last_participation": datetime.now() - timedelta(days=7),
+            "last_participation": datetime.now(UTC) - timedelta(days=7),
             "total_participations": 2,
             "empty_chair_count": 0,
         },
         "openai_gpt4": {
-            "last_participation": datetime.now() - timedelta(days=3),
+            "last_participation": datetime.now(UTC) - timedelta(days=3),
             "total_participations": 2,
             "empty_chair_count": 1,
         },
         "google_gemini": {
-            "last_participation": datetime.now() - timedelta(days=3),
+            "last_participation": datetime.now(UTC) - timedelta(days=3),
             "total_participations": 2,
             "empty_chair_count": 1,
         },
@@ -76,7 +73,7 @@ def demonstrate_voice_rotation():
             "empty_chair_count": 0,
         },
         "grok_v3": {
-            "last_participation": datetime.now() - timedelta(days=14),
+            "last_participation": datetime.now(UTC) - timedelta(days=14),
             "total_participations": 1,
             "empty_chair_count": 0,
         },
@@ -93,7 +90,7 @@ def demonstrate_voice_rotation():
     for voice_id, history in voice_history.items():
         last_seen = history["last_participation"]
         if last_seen:
-            days_ago = (datetime.now() - last_seen).days
+            days_ago = (datetime.now(UTC) - last_seen).days
             last_seen_str = f"{days_ago} days ago"
         else:
             last_seen_str = "Never"

@@ -9,7 +9,7 @@ Demonstrating fair voice rotation and empty chair implementation
 
 # Add src to path for imports
 import sys
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
@@ -70,7 +70,7 @@ def demonstrate_voice_rotation():
     print("-" * 40)
 
     # Session 1: 7 days ago - anthropic, openai, google
-    session1_time = datetime.now() - timedelta(days=7)
+    session1_time = datetime.now(UTC) - timedelta(days=7)
     session1_id = uuid4()
 
     for voice, role in [
@@ -79,7 +79,7 @@ def demonstrate_voice_rotation():
         ("google_gemini", "reciprocity_guardian"),
     ]:
         # Manually set timestamp for testing
-        participation = history_tracker.record_participation(
+        history_tracker.record_participation(
             voice_id=voice,
             session_id=session1_id,
             decision_domain="code_review",
@@ -94,7 +94,7 @@ def demonstrate_voice_rotation():
     print("Session 1 (7 days ago): anthropic, openai, google (empty chair)")
 
     # Session 2: 3 days ago - same voices again (showing the problem)
-    session2_time = datetime.now() - timedelta(days=3)
+    session2_time = datetime.now(UTC) - timedelta(days=3)
     session2_id = uuid4()
 
     for voice, role in [
