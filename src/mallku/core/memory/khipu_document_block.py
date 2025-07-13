@@ -224,7 +224,10 @@ class KhipuDocumentBlock(KhipuBlock):
 
             # Check for evolved patterns
             for pattern in self.pattern_keywords:
-                if pattern in other.pattern_keywords and other.consciousness_rating > self.consciousness_rating:
+                if (
+                    pattern in other.pattern_keywords
+                    and other.consciousness_rating > self.consciousness_rating
+                ):
                     superseded.append(f"{pattern} (evolved in {other.file_path})")
 
         return superseded
