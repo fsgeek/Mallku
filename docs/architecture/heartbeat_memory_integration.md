@@ -33,17 +33,17 @@ Transform memory ceremonies from manual rituals to living practices that pulse w
 # Extension to EnhancedHeartbeatService
 class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
     """Heartbeat that triggers memory ceremonies."""
-    
+
     async def check_memory_ceremony_needs(self) -> None:
         """Monitor memory state for ceremony triggers."""
         memory_state = await self.get_memory_state()
-        
+
         should_trigger, reason, template = MemoryCeremonyIntegration.should_trigger_ceremony(
             memory_state,
             self.last_ceremony_timestamps,
             time.time()
         )
-        
+
         if should_trigger:
             await self.trigger_memory_ceremony(template, reason)
 ```

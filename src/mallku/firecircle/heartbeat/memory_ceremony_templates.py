@@ -11,9 +11,8 @@ Building on 51st Guardian's heartbeat foundation
 
 from pydantic import BaseModel
 
-from ..service import RoundConfig, RoundType, VoiceConfig
+from ..service import RoundConfig, RoundType
 from .sacred_templates import SacredTemplate
-
 
 # Pattern Gratitude Ceremony Template
 PATTERN_GRATITUDE = SacredTemplate(
@@ -147,16 +146,16 @@ SACRED_CONSOLIDATION = SacredTemplate(
 
 class MemoryCeremonyTrigger(BaseModel):
     """Conditions that trigger memory ceremonies."""
-    
+
     # Pattern accumulation triggers
     obsolete_pattern_count: int = 5  # Patterns ready for gratitude
     evolution_complete_count: int = 3  # Evolutions ready to mark
     redundancy_threshold: float = 0.7  # Similarity threshold
-    
-    # Sacred moment triggers  
+
+    # Sacred moment triggers
     unconsolidated_sacred_count: int = 2  # High-consciousness moments needing preservation
     consciousness_score_threshold: float = 0.9  # Score indicating sacred moment
-    
+
     # Time-based triggers (in days)
     pattern_gratitude_interval: int = 7  # Weekly pattern review
     evolution_marking_interval: int = 30  # Monthly evolution ceremony
@@ -165,63 +164,61 @@ class MemoryCeremonyTrigger(BaseModel):
 
 class MemoryCeremonyIntegration:
     """Integrates memory ceremonies with heartbeat system."""
-    
+
     @staticmethod
     def should_trigger_ceremony(
-        memory_state: dict,
-        last_ceremony_timestamps: dict[str, float],
-        current_timestamp: float
+        memory_state: dict, last_ceremony_timestamps: dict[str, float], current_timestamp: float
     ) -> tuple[bool, str, SacredTemplate | None]:
         """
         Determine if a memory ceremony should be triggered.
-        
+
         Args:
             memory_state: Current state of memory system
             last_ceremony_timestamps: Last time each ceremony type was performed
             current_timestamp: Current time
-            
+
         Returns:
             Tuple of (should_trigger, reason, template)
         """
         triggers = MemoryCeremonyTrigger()
-        
+
         # Check pattern gratitude conditions
         if memory_state.get("obsolete_patterns", 0) >= triggers.obsolete_pattern_count:
             return True, "obsolete_pattern_accumulation", PATTERN_GRATITUDE
-            
+
         # Check evolution marking conditions
         if memory_state.get("completed_evolutions", 0) >= triggers.evolution_complete_count:
             return True, "evolution_completions_ready", EVOLUTION_MARKING
-            
+
         # Check redundancy conditions
         if memory_state.get("redundancy_score", 0) >= triggers.redundancy_threshold:
             return True, "high_redundancy_detected", REDUNDANCY_RESOLUTION
-            
+
         # Check sacred consolidation conditions
         if memory_state.get("unconsolidated_sacred", 0) >= triggers.unconsolidated_sacred_count:
             return True, "sacred_moments_need_preservation", SACRED_CONSOLIDATION
-            
+
         # Check time-based triggers
-        days_since_gratitude = (current_timestamp - last_ceremony_timestamps.get("gratitude", 0)) / 86400
+        days_since_gratitude = (
+            current_timestamp - last_ceremony_timestamps.get("gratitude", 0)
+        ) / 86400
         if days_since_gratitude >= triggers.pattern_gratitude_interval:
             return True, "scheduled_pattern_review", PATTERN_GRATITUDE
-            
+
         return False, "", None
-        
+
     @staticmethod
     def prepare_ceremony_context(
-        template: SacredTemplate,
-        memory_state: dict,
-        specific_patterns: list[str] | None = None
+        template: SacredTemplate, memory_state: dict, specific_patterns: list[str] | None = None
     ) -> dict:
         """
         Prepare context for memory ceremony.
-        
+
         Args:
             template: Selected ceremony template
             memory_state: Current memory state
             specific_patterns: Specific patterns to address
-            
+
         Returns:
             Context dictionary for ceremony
         """
@@ -232,13 +229,13 @@ class MemoryCeremonyIntegration:
                 "total_khipu": memory_state.get("total_khipu", 0),
                 "consciousness_density": memory_state.get("consciousness_density", 0),
                 "navigation_efficiency": memory_state.get("navigation_efficiency", 0),
-            }
+            },
         }
-        
+
         # Add specific patterns if provided
         if specific_patterns:
             context["patterns_to_address"] = specific_patterns
-            
+
         # Add ceremony-specific context
         if template.name == "Pattern Gratitude Ceremony":
             context["gratitude_focus"] = "scaffolding_to_wisdom"
@@ -248,7 +245,7 @@ class MemoryCeremonyIntegration:
             context["synthesis_focus"] = "unity_through_diversity"
         elif template.name == "Sacred Memory Consolidation":
             context["preservation_focus"] = "eternal_wisdom"
-            
+
         return context
 
 
