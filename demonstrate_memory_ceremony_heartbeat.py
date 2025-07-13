@@ -16,7 +16,8 @@ from mallku.firecircle.heartbeat.memory_ceremony_templates import (
     select_memory_ceremony_by_time,
 )
 
-
+# In production, this would be imported from test utilities
+# For demonstration, create a simple mock inline
 class MockMemoryMonitor:
     """Mock memory monitor for demonstration."""
     

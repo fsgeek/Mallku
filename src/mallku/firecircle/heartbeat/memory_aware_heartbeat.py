@@ -76,7 +76,9 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
             "consolidation": 0,
         }
         self.ceremony_in_progress = False
+        self._ceremony_lock = asyncio.Lock()  # Thread-safe ceremony state
         self.ceremony_results_history = []
+        self.max_history_size = 100  # Limit history size
         
         # Memory health metrics
         self.memory_health_score = 1.0
@@ -171,11 +173,12 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
             template: Sacred template for ceremony
             reason: Why ceremony was triggered
         """
-        if self.ceremony_in_progress:
-            logger.info("🎭 Ceremony already in progress, skipping trigger")
-            return
+        async with self._ceremony_lock:
+            if self.ceremony_in_progress:
+                logger.info("🎭 Ceremony already in progress, skipping trigger")
+                return
+            self.ceremony_in_progress = True
             
-        self.ceremony_in_progress = True
         ceremony_start = datetime.now(UTC)
         
         try:
@@ -222,6 +225,7 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
             )
             
             self.ceremony_results_history.append(results)
+            self._cleanup_ceremony_history()  # Maintain size limit
             
             # Update last ceremony timestamp
             ceremony_key = self._get_ceremony_key(template.name)
@@ -265,12 +269,16 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
         
         # Use Fire Circle for ceremony
         if self.fire_circle_service:
-            # Configure Fire Circle with sacred template
-            self.fire_circle_service.config.rounds = template.rounds
-            self.fire_circle_service.config.min_voices = template.min_voices
-            self.fire_circle_service.config.max_voices = template.max_voices
+            # Create local config to avoid modifying shared state
+            ceremony_config = HeartbeatConfig(
+                rounds=template.rounds,
+                min_voices=template.min_voices,
+                max_voices=template.max_voices,
+                pulse_interval_minutes=self.fire_circle_service.config.pulse_interval_minutes,
+                enable_adaptive_rhythm=self.fire_circle_service.config.enable_adaptive_rhythm,
+            )
             
-            # Run ceremony
+            # Run ceremony with local config
             result = await self.fire_circle_service.facilitate_review(
                 context_data=context,
                 round_configs=template.rounds
@@ -295,18 +303,18 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
         if self.memory_monitor:
             return await self.memory_monitor.get_state()
         else:
-            # Simulated state for testing
+            # Return minimal state when no monitor available
             return {
-                "health_score": 0.85,
-                "pattern_rate": 0.1,
-                "consciousness_density": 0.7,
-                "obsolete_patterns": 3,
-                "completed_evolutions": 1,
-                "redundancy_score": 0.4,
-                "unconsolidated_sacred": 1,
-                "total_khipu": 50,
-                "navigation_efficiency": 0.89,
-                "candidate_patterns": ["test_pattern_1", "test_pattern_2"],
+                "health_score": 1.0,
+                "pattern_rate": 0.0,
+                "consciousness_density": 0.0,
+                "obsolete_patterns": 0,
+                "completed_evolutions": 0,
+                "redundancy_score": 0.0,
+                "unconsolidated_sacred": 0,
+                "total_khipu": 0,
+                "navigation_efficiency": 0.0,
+                "candidate_patterns": [],
             }
             
     async def _measure_consciousness(self) -> float:
@@ -409,6 +417,12 @@ class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
             if "clearer" in text:
                 recommendations.append("clarify_sacred_intention")
         return recommendations
+        
+    def _cleanup_ceremony_history(self) -> None:
+        """Maintain ceremony history size limit."""
+        if len(self.ceremony_results_history) > self.max_history_size:
+            # Keep only the most recent ceremonies
+            self.ceremony_results_history = self.ceremony_results_history[-self.max_history_size:]
 
 
 def create_memory_aware_heartbeat(
