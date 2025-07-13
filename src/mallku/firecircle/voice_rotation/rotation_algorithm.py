@@ -8,7 +8,7 @@ participation history, ensuring diversity over time.
 
 import hashlib
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 try:
     from .history_tracker import VoiceHistoryTracker
@@ -58,7 +58,7 @@ class WeightedVoiceSelector:
         # Recency factor
         last_participation = self.history_tracker.get_participation_recency(voice_id)
         if last_participation:
-            days_since = (datetime.now() - last_participation).days
+            days_since = (datetime.now(UTC) - last_participation).days
             # Exponential decay: weight increases as time since last participation increases
             recency_factor = 2 ** (days_since / self.recency_half_life_days)
         else:
@@ -119,7 +119,7 @@ class WeightedVoiceSelector:
 
         # Generate session seed if not provided (for cryptographic fairness)
         if not session_seed:
-            session_seed = datetime.now().isoformat()
+            session_seed = datetime.now(UTC).isoformat()
 
         # Calculate weights for all available voices
         voice_weights: dict[str, float] = {}

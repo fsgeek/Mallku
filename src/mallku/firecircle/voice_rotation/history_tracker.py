@@ -8,7 +8,7 @@ fair rotation and ensure all perspectives are heard over time.
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -127,7 +127,7 @@ class VoiceHistoryTracker:
         participation = VoiceParticipation(
             voice_id=voice_id,
             session_id=session_id,
-            timestamp=datetime.now(),
+            timestamp=datetime.now(UTC),
             decision_domain=decision_domain,
             role_played=role_played,
             contribution_quality=contribution_quality,
@@ -197,7 +197,7 @@ class VoiceHistoryTracker:
         sorted_voices = sorted(
             available_voices,
             key=lambda v: (
-                self.voice_histories[v].last_participation or datetime.min,
+                self.voice_histories[v].last_participation or datetime.min.replace(tzinfo=UTC),
                 self.get_participation_count(v, domain),
             ),
         )
@@ -213,7 +213,7 @@ class VoiceHistoryTracker:
             key=lambda v: (
                 self.get_empty_chair_count(v),
                 self.voice_histories.get(v, VoiceHistory(voice_id=v)).last_participation
-                or datetime.min,
+                or datetime.min.replace(tzinfo=UTC),
             ),
         )
 
