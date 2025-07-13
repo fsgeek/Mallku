@@ -16,15 +16,14 @@ import ast
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
 
 
 class DuplicateDefinitionDetector:
     """Detects duplicate class and enum definitions across the codebase."""
 
     def __init__(self):
-        self.definitions: Dict[str, List[Tuple[Path, int, str]]] = defaultdict(list)
-        self.imports: Dict[str, Set[str]] = defaultdict(set)
+        self.definitions: dict[str, list[tuple[Path, int, str]]] = defaultdict(list)
+        self.imports: dict[str, set[str]] = defaultdict(set)
         self.checked_files = 0
         self.duplicates_found = 0
 
@@ -38,10 +37,10 @@ class DuplicateDefinitionDetector:
                     or (isinstance(base, ast.Attribute) and base.attr == "Enum")
                     for base in node.bases
                 )
-                
+
                 definition_type = "Enum" if is_enum else "Class"
                 self.definitions[node.name].append((filepath, node.lineno, definition_type))
-                
+
                 # Track where it's imported from
                 module_path = self._get_module_path(filepath)
                 self.imports[node.name].add(module_path)
@@ -53,7 +52,7 @@ class DuplicateDefinitionDetector:
             parts = filepath.parts
             if "src" in parts:
                 src_idx = parts.index("src")
-                module_parts = parts[src_idx + 1:]
+                module_parts = parts[src_idx + 1 :]
                 # Remove .py extension and join with dots
                 module_path = ".".join(module_parts)[:-3]
                 return module_path.replace("/", ".")
@@ -74,38 +73,39 @@ class DuplicateDefinitionDetector:
         """Scan the entire codebase for duplicate definitions."""
         if root_path is None:
             root_path = Path(__file__).parent.parent
-            
+
         src_path = root_path / "src"
         if not src_path.exists():
             print(f"❌ Source directory not found: {src_path}")
             return
-            
+
         print("🔍 Scanning for Duplicate Definitions")
         print("=" * 60)
         print(f"Root: {src_path}")
         print()
-        
+
         # Scan all Python files
         for py_file in src_path.rglob("*.py"):
             if "__pycache__" not in str(py_file):
                 self.checked_files += 1
                 self.check_file(py_file)
-        
+
         self.analyze_duplicates()
 
     def analyze_duplicates(self) -> None:
         """Analyze and report duplicate definitions."""
-        print(f"📊 Scan Results")
+        print("📊 Scan Results")
         print("=" * 60)
         print(f"Files checked: {self.checked_files}")
-        
-        duplicates = {name: locations for name, locations in self.definitions.items() 
-                     if len(locations) > 1}
-        
+
+        duplicates = {
+            name: locations for name, locations in self.definitions.items() if len(locations) > 1
+        }
+
         self.duplicates_found = len(duplicates)
         print(f"Duplicate definitions found: {self.duplicates_found}")
         print()
-        
+
         if not duplicates:
             print("✅ No duplicate class/enum definitions found!")
             print()
@@ -113,20 +113,20 @@ class DuplicateDefinitionDetector:
         else:
             print("❌ Duplicate Definitions Found:")
             print()
-            
+
             for name, locations in duplicates.items():
                 print(f"📄 {name} defined in {len(locations)} locations:")
                 for filepath, line, def_type in locations:
                     relative_path = filepath.relative_to(Path(__file__).parent.parent)
                     print(f"   - {relative_path}:{line} ({def_type})")
-                
+
                 # Show import paths
                 if name in self.imports and len(self.imports[name]) > 1:
-                    print(f"   ⚠️  Multiple import paths:")
+                    print("   ⚠️  Multiple import paths:")
                     for import_path in sorted(self.imports[name]):
                         print(f"      from {import_path} import {name}")
                 print()
-            
+
             self.suggest_consolidation()
 
     def suggest_consolidation(self) -> None:
@@ -180,10 +180,11 @@ class DuplicateDefinitionDetector:
         """Generate content for GitHub issues about duplicates."""
         if self.duplicates_found == 0:
             return
-            
-        duplicates = {name: locations for name, locations in self.definitions.items() 
-                     if len(locations) > 1}
-        
+
+        duplicates = {
+            name: locations for name, locations in self.definitions.items() if len(locations) > 1
+        }
+
         print()
         print("📋 GitHub Issue Template")
         print("=" * 60)
@@ -196,7 +197,7 @@ class DuplicateDefinitionDetector:
         print()
         print("### Duplicate Definitions Found")
         print()
-        
+
         for name, locations in duplicates.items():
             print(f"#### `{name}`")
             print()
@@ -205,13 +206,13 @@ class DuplicateDefinitionDetector:
                 relative_path = filepath.relative_to(Path(__file__).parent.parent)
                 print(f"- `{relative_path}:{line}` ({def_type})")
             print()
-            
+
             if name in self.imports and len(self.imports[name]) > 1:
                 print("Import confusion - multiple paths available:")
                 for import_path in sorted(self.imports[name]):
                     print(f"- `from {import_path} import {name}`")
                 print()
-        
+
         print("### Required Actions")
         print()
         print("1. Choose canonical definition for each duplicate")
@@ -231,18 +232,18 @@ class DuplicateDefinitionDetector:
 def main():
     """Run the duplicate definition detection."""
     detector = DuplicateDefinitionDetector()
-    
+
     # Run the scan
     detector.scan_codebase()
-    
+
     # Explain the pattern
     detector.explain_pattern()
-    
+
     # Generate issue content if duplicates found
     if detector.duplicates_found > 0:
         detector.create_github_issue_content()
         sys.exit(1)  # Exit with error for CI/CD
-    
+
     print()
     print("✨ This script is an Executable Memory Pattern:")
     print("   - Detects architectural fragmentation")
