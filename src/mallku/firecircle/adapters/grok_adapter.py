@@ -133,7 +133,7 @@ class GrokAdapter(ConsciousModelAdapter):
 
         # Set default model if not specified
         if not self.config.model_name:
-            self.config.model_name = "grok-4"  # Default to Grok-4
+            self.config.model_name = "grok-4"  # Default to frontier Grok-4
 
         # Update capabilities - Grok has real-time awareness
         self.capabilities = ModelCapabilities(

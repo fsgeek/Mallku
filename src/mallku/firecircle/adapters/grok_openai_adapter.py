@@ -33,7 +33,7 @@ class GrokOpenAIConfig(AdapterConfig):
     def __init__(
         self,
         api_key: str = "",
-        model_name: str = "grok-2-1212",  # Default to stable Grok-2 model
+        model_name: str = "grok-4",  # Default to frontier Grok-4 model
         temperature: float = 0.7,
         max_tokens: int = 2048,
         track_reciprocity: bool = True,
@@ -169,8 +169,8 @@ class GrokOpenAIAdapter(OpenAIConsciousAdapter):
 
                 # Update model name if current one not available
                 if self.config.model_name not in available_models:
-                    # Try common Grok model names
-                    for model in ["grok-2-1212", "grok-2", "grok-3", "grok-4", "grok"]:
+                    # Try Grok models in order of preference (frontier first)
+                    for model in ["grok-4", "grok-3", "grok-2-1212", "grok-2", "grok"]:
                         if model in available_models:
                             self.config.model_name = model
                             logger.info(f"Using Grok model: {model}")
