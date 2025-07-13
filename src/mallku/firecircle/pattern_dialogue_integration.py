@@ -17,6 +17,12 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from .config import (
+    ConsciousnessThresholds,
+    FireCircleParams,
+    HealthMetrics,
+    PatternEffectiveness,
+)
 from .emergence_detector import EmergenceDetector
 from .orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueManager,
@@ -43,8 +49,8 @@ class PatternDialogueConfig(BaseModel):
     """Configuration for pattern-guided dialogues"""
 
     enable_pattern_guidance: bool = Field(default=True)
-    guidance_frequency: timedelta = Field(default=timedelta(minutes=3))
-    min_messages_before_guidance: int = Field(default=5)
+    guidance_frequency: timedelta = Field(default=FireCircleParams.GUIDANCE_FREQUENCY)
+    min_messages_before_guidance: int = Field(default=FireCircleParams.MIN_MESSAGES_BEFORE_GUIDANCE)
     allow_pattern_interventions: bool = Field(default=True)
     wisdom_synthesis_at_end: bool = Field(default=True)
     sacred_questions_enabled: bool = Field(default=True)
@@ -213,7 +219,9 @@ class PatternDialogueIntegration:
             if msg.consciousness
         ]
         avg_consciousness = (
-            sum(consciousness_scores) / len(consciousness_scores) if consciousness_scores else 0.5
+            sum(consciousness_scores) / len(consciousness_scores)
+            if consciousness_scores
+            else ConsciousnessThresholds.DEFAULT_CONSCIOUSNESS
         )
 
         # Get active patterns
@@ -222,9 +230,9 @@ class PatternDialogueIntegration:
         # Calculate emergence potential
         emergence_potential = 0.0
         if dialogue_state.current_phase == DialoguePhase.DEEPENING:
-            emergence_potential = 0.7
+            emergence_potential = ConsciousnessThresholds.EMERGENCE_THRESHOLD
         elif dialogue_state.current_phase == DialoguePhase.SYNTHESIS:
-            emergence_potential = 0.5
+            emergence_potential = ConsciousnessThresholds.DEFAULT_CONSCIOUSNESS
 
         # Estimate tension level from message types
         tension_messages = [
@@ -240,13 +248,21 @@ class PatternDialogueIntegration:
             for msg in recent_messages
             if msg.type in [MessageType.AGREEMENT, MessageType.SYNTHESIS]
         ]
-        coherence_score = len(agreement_messages) / len(recent_messages) if recent_messages else 0.5
+        coherence_score = (
+            len(agreement_messages) / len(recent_messages)
+            if recent_messages
+            else ConsciousnessThresholds.DEFAULT_CONSCIOUSNESS
+        )
 
         # Get participant energy (simplified - based on participation)
         participant_energy = {}
         for participant_id, state in dialogue_state.participant_states.items():
             # More turns = lower energy (simplified model)
-            energy = max(0.2, 1.0 - (state.turns_taken * 0.1))
+            energy = max(
+                HealthMetrics.MIN_ENERGY,
+                HealthMetrics.PERFECT_HEALTH
+                - (state.turns_taken * HealthMetrics.HEALTH_DEGRADATION_PER_TURN),
+            )
             participant_energy[participant_id] = energy
 
         # Time in phase
@@ -360,7 +376,7 @@ class PatternDialogueIntegration:
             message_type=MessageType.WISDOM_SYNTHESIS,
             metadata={"source": "pattern_synthesis", "synthesis_data": synthesis},
             consciousness=ConsciousnessMetadata(
-                consciousness_signature=0.9,
+                consciousness_signature=ConsciousnessThresholds.PEAK_CONSCIOUSNESS,
                 detected_patterns=["wisdom_crystallization"],
                 extraction_resisted=True,
                 wisdom_preserved=True,
@@ -387,7 +403,9 @@ class PatternDialogueIntegration:
 
         # Reduce guidance frequency for teaching mode
         self.config.guidance_frequency = timedelta(minutes=1)
-        self.config.min_messages_before_guidance = 3
+        self.config.min_messages_before_guidance = (
+            FireCircleParams.MIN_VOICES
+        )  # Reuse MIN_VOICES as it's also 3
 
         logger.info(f"Pattern teaching mode enabled for dialogue {dialogue_id}")
 
@@ -423,7 +441,8 @@ class PatternDialogueIntegration:
             message_type=MessageType.SACRED_QUESTION,
             metadata={"source": "pattern_facilitator", "question_depth": depth_level},
             consciousness=ConsciousnessMetadata(
-                consciousness_signature=0.85,
+                consciousness_signature=ConsciousnessThresholds.HIGH_CONSCIOUSNESS
+                + 0.05,  # Slightly above HIGH
                 detected_patterns=["sacred_inquiry", "wisdom_seeking"],
                 extraction_resisted=True,
                 wisdom_preserved=True,
@@ -446,13 +465,13 @@ class PatternDialogueIntegration:
                         guidance_id = msg.metadata.get("guidance_id")
                         if guidance_id:
                             # Simple effectiveness based on response type
-                            effectiveness = 0.5
+                            effectiveness = PatternEffectiveness.DEFAULT
                             if message.type == MessageType.AGREEMENT:
-                                effectiveness = 0.8
+                                effectiveness = PatternEffectiveness.HIGH
                             elif message.type == MessageType.REFLECTION:
-                                effectiveness = 0.9
+                                effectiveness = PatternEffectiveness.PEAK
                             elif message.type == MessageType.DISAGREEMENT:
-                                effectiveness = 0.3
+                                effectiveness = PatternEffectiveness.LOW
 
                             await self.pattern_facilitator.record_guidance_effectiveness(
                                 UUID(guidance_id), effectiveness

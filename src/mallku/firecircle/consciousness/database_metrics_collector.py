@@ -19,7 +19,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from ...core.database import get_database
+from ...core.database import get_database  # Direct access needed for internal metrics
+
+# NOTE: We use get_database() instead of get_secured_database() because:
+# 1. Consciousness metrics are internal system data, not user data
+# 2. We need AQL access for complex queries and aggregations
+# 3. The secured interface is designed for user data with UUID obfuscation
 from ..consciousness_metrics import (
     CollectiveConsciousnessState,
     ConsciousnessFlow,
