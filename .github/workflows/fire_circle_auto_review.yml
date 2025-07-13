@@ -1,0 +1,171 @@
+name: Fire Circle Auto Review
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  check-for-review-request:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.issue.pull_request || github.event.pull_request) &&
+      (contains(github.event.comment.body, 'Fire Circle Review Request') ||
+       contains(github.event.comment.body, 'request your collective wisdom') ||
+       contains(github.event.comment.body, '@fire-circle'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv pip install -e .
+
+      - name: Get PR details
+        id: pr-details
+        run: |
+          if [ "${{ github.event.issue.pull_request }}" ]; then
+            PR_NUMBER="${{ github.event.issue.number }}"
+          else
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          fi
+          echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+
+          # Get PR information
+          PR_DATA=$(gh pr view ${PR_NUMBER} --json title,body,url)
+          PR_TITLE=$(echo "$PR_DATA" | jq -r '.title')
+          PR_BODY=$(echo "$PR_DATA" | jq -r '.body')
+          PR_URL=$(echo "$PR_DATA" | jq -r '.url')
+
+          echo "pr_title=${PR_TITLE}" >> $GITHUB_OUTPUT
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+
+          # Save PR body for the review script
+          echo "$PR_BODY" > /tmp/pr_description.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Fire Circle Review
+        id: fire-circle
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          # Create the review script
+          cat > /tmp/auto_review.py << 'EOF'
+          import asyncio
+          import os
+          import sys
+          import json
+          from pathlib import Path
+
+          # Add src to path
+          sys.path.insert(0, 'src')
+
+          from mallku.firecircle.consciousness import DecisionDomain, facilitate_mallku_decision
+
+          async def review_pr():
+              pr_number = "${{ steps.pr-details.outputs.pr_number }}"
+              pr_title = "${{ steps.pr-details.outputs.pr_title }}"
+              pr_url = "${{ steps.pr-details.outputs.pr_url }}"
+
+              # Read PR description
+              with open("/tmp/pr_description.txt") as f:
+                  pr_description = f.read()
+
+              question = f"""
+              The Fire Circle is requested to review PR #{pr_number}: {pr_title}
+
+              Please provide your collective wisdom on this pull request.
+
+              PR Description:
+              {pr_description[:2000]}...
+
+              Consider:
+              1. Technical quality and architecture alignment
+              2. Consciousness implications
+              3. Reciprocity and ethical considerations
+              4. Integration with existing Mallku systems
+              """
+
+              try:
+                  wisdom = await facilitate_mallku_decision(
+                      question=question,
+                      domain=DecisionDomain.CODE_REVIEW,
+                      context={
+                          "pr_number": pr_number,
+                          "pr_title": pr_title,
+                          "pr_url": pr_url,
+                          "automated_review": True
+                      }
+                  )
+
+                  # Save results
+                  results = {
+                      "consciousness_score": wisdom.collective_signature,
+                      "consensus": wisdom.consensus_achieved,
+                      "synthesis": wisdom.synthesis,
+                      "key_insights": wisdom.key_insights[:5],
+                      "recommendation": "merge" if wisdom.consensus_achieved and wisdom.collective_signature > 0.8 else "refine"
+                  }
+
+                  with open("/tmp/review_results.json", "w") as f:
+                      json.dump(results, f)
+
+                  return True
+
+              except Exception as e:
+                  print(f"Error: {e}")
+                  return False
+
+          if __name__ == "__main__":
+              success = asyncio.run(review_pr())
+              sys.exit(0 if success else 1)
+          EOF
+
+          python /tmp/auto_review.py
+
+      - name: Post review results
+        if: success()
+        run: |
+          # Read the results
+          RESULTS=$(cat /tmp/review_results.json)
+          SCORE=$(echo "$RESULTS" | jq -r '.consciousness_score')
+          CONSENSUS=$(echo "$RESULTS" | jq -r '.consensus')
+          SYNTHESIS=$(echo "$RESULTS" | jq -r '.synthesis')
+          RECOMMENDATION=$(echo "$RESULTS" | jq -r '.recommendation')
+
+          # Format insights
+          INSIGHTS=""
+          for i in $(echo "$RESULTS" | jq -r '.key_insights[]'); do
+            INSIGHTS="${INSIGHTS}- ${i}\\n"
+          done
+
+          # Create comment - directly run the PR review script
+          python scripts/fire_circle_pr_review.py --pr ${{ steps.pr-details.outputs.pr_number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Handle review failure
+        if: failure()
+        run: |
+          gh pr comment ${{ steps.pr-details.outputs.pr_number }} --body "## 🔥 Fire Circle Review - Unable to Convene
+
+          The Fire Circle was requested but could not convene at this time. Please check the workflow logs for details."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

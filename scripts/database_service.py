@@ -24,7 +24,7 @@ logger.info("Starting Mallku API Service - Import phase")
 
 try:
     from fastapi import FastAPI, HTTPException
-    from fastapi.responses import JSONResponse, Response
+    from fastapi.responses import Response
 
     logger.info("FastAPI imported successfully")
 except ImportError as e:
@@ -78,17 +78,32 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Lifespan startup phase beginning...")
 
-    # Connect to ArangoDB
+    # Get database configuration from environment
     db_host = os.getenv("MALLKU_DB_HOST", "database")
     db_port = os.getenv("MALLKU_DB_PORT", "8529")
+    db_name = os.getenv("MALLKU_DB_NAME", "mallku")
+    db_user = os.getenv("MALLKU_DB_USER")
+    db_password = os.getenv("MALLKU_DB_PASSWORD")
 
     logger.info(f"Attempting to connect to ArangoDB at {db_host}:{db_port}")
+    logger.info(f"Database: {db_name}, User: {db_user}")
 
     try:
         db_client = ArangoClient(hosts=f"http://{db_host}:{db_port}")
-        # Use _system database for now - in production, create mallku database
-        db = db_client.db("_system")
-        logger.info(f"Successfully connected to ArangoDB at {db_host}:{db_port}")
+
+        # Connect with authentication
+        if db_user and db_password:
+            db = db_client.db(db_name, username=db_user, password=db_password)
+            logger.info(f"Successfully connected to {db_name} database as {db_user}")
+        else:
+            # Fallback for testing without auth
+            logger.warning("No authentication credentials provided - using anonymous access")
+            db = db_client.db(db_name)
+
+        # Test the connection
+        version = db.version()
+        logger.info(f"Connected to ArangoDB version: {version}")
+
     except Exception as e:
         logger.error(f"Failed to connect to database: {e}")
         logger.error(f"Exception type: {type(e)}")
@@ -149,39 +164,41 @@ async def metrics():
 async def list_collections():
     """List available collections - example secured endpoint."""
     try:
-        if db is None:
-            raise HTTPException(status_code=503, detail="Database not connected")
-        collections = db.collections()
-        return {"collections": [c["name"] for c in collections if not c["name"].startswith("_")]}
+        collections = [col["name"] for col in db.collections()]
+        return {"collections": collections}
     except Exception as e:
         logger.error(f"Failed to list collections: {e}")
-        raise HTTPException(status_code=500, detail="Database operation failed")
+        raise HTTPException(status_code=500, detail="Failed to list collections")
 
 
-# Error handlers
-@app.exception_handler(404)
-async def not_found(request, exc):
-    """Cathedral principle: Clear errors, no information leakage."""
-    return JSONResponse(
-        status_code=404,
-        content={"error": "Endpoint not found", "message": "The requested resource does not exist"},
-    )
+@app.post("/api/v1/collections/{collection_name}/documents")
+async def create_document(collection_name: str, document: dict):
+    """Create a document in specified collection."""
+    try:
+        collection = db.collection(collection_name)
+        meta = collection.insert(document)
+        return {"_key": meta["_key"], "_id": meta["_id"]}
+    except Exception as e:
+        logger.error(f"Failed to create document: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create document")
 
 
-@app.exception_handler(500)
-async def internal_error(request, exc):
-    """Cathedral principle: Fail safely, log internally."""
-    logger.error(f"Internal error: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={"error": "Internal server error", "message": "An unexpected error occurred"},
-    )
+@app.get("/api/v1/collections/{collection_name}/documents")
+async def list_documents(collection_name: str, limit: int = 10):
+    """List documents from a collection."""
+    try:
+        collection = db.collection(collection_name)
+        cursor = collection.all(limit=limit)
+        return {"documents": list(cursor)}
+    except Exception as e:
+        logger.error(f"Failed to list documents: {e}")
+        raise HTTPException(status_code=500, detail="Failed to list documents")
 
 
+# Main entry point
 def main():
-    """Run the API service."""
+    """Main function to start the service."""
     logger.info("Main function starting...")
-
     host = os.getenv("MALLKU_API_HOST", "0.0.0.0")
     port = int(os.getenv("MALLKU_API_PORT", "8080"))
 
@@ -189,11 +206,7 @@ def main():
     logger.info("Remember: This is the only door to the database")
     logger.info("Cathedral Architecture - Security through structure")
 
-    try:
-        uvicorn.run(app, host=host, port=port)
-    except Exception as e:
-        logger.error(f"Failed to start uvicorn: {e}")
-        raise
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
