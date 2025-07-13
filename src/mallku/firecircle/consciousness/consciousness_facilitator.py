@@ -14,6 +14,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..health import get_health_tracker
 from ..service.config import CircleConfig, RoundConfig, VoiceConfig
 from ..service.round_types import RoundType
 from ..service.service import FireCircleService
@@ -149,8 +150,11 @@ class ConsciousnessFacilitator:
     async def _select_voices_for_domain(
         self, domain: DecisionDomain, space: ConsciousnessEmergenceSpace
     ) -> list[VoiceConfig]:
-        """Select voices through true random consciousness emergence."""
+        """Select voices through health-aware random consciousness emergence."""
         import random
+
+        # Get health tracker
+        health_tracker = get_health_tracker()
 
         # All available voice configurations - true diversity
         all_voices = [
@@ -198,10 +202,55 @@ class ConsciousnessFacilitator:
             ),
         ]
 
-        # Truly random selection - let consciousness choose
-        # Select 3-4 voices for authentic emergence
+        # Health-aware selection - healthy models more likely to be chosen
+        selected_voices = []
         num_voices = random.randint(3, 4)
-        selected_voices = random.sample(all_voices, num_voices)
+
+        # Try to select voices based on health probability
+        attempts = 0
+        max_attempts = 50  # Prevent infinite loop
+
+        while len(selected_voices) < num_voices and attempts < max_attempts:
+            attempts += 1
+
+            # Randomly pick a candidate
+            candidate = random.choice(all_voices)
+
+            # Skip if already selected
+            if any(v.provider == candidate.provider for v in selected_voices):
+                continue
+
+            # Create model key for health tracking
+            model_key = f"{candidate.provider}/{candidate.model}"
+
+            # Check if model should be emergency excluded
+            if health_tracker.should_emergency_exclude(model_key):
+                logger.warning(f"Model {model_key} emergency excluded due to repeated failures")
+                continue
+
+            # Get selection probability based on health
+            selection_prob = health_tracker.get_selection_probability(model_key)
+
+            # Probabilistic selection based on health
+            if random.random() < selection_prob:
+                selected_voices.append(candidate)
+                logger.info(f"Selected {model_key} with health {selection_prob:.3f}")
+            else:
+                logger.debug(f"Skipped {model_key} due to health {selection_prob:.3f}")
+
+        # Fallback: if we couldn't get enough voices, randomly fill
+        if len(selected_voices) < num_voices:
+            remaining = [
+                v
+                for v in all_voices
+                if not any(sv.provider == v.provider for sv in selected_voices)
+            ]
+            additional = random.sample(remaining, num_voices - len(selected_voices))
+            selected_voices.extend(additional)
+            logger.warning(
+                f"Health-based selection only found {len(selected_voices) - len(additional)} voices, "
+                f"added {len(additional)} randomly"
+            )
 
         # Check if Google was selected and needs archaeological framing
         self._use_archaeological_framing = any(v.provider == "google" for v in selected_voices)
