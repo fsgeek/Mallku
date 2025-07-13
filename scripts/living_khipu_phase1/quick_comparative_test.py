@@ -6,7 +6,7 @@ Fourth Anthropologist - Testing without database persistence
 
 import asyncio
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -40,9 +40,9 @@ async def quick_comparison():
 
     # Test mechanical search FIRST (no API calls)
     print("\n🔧 MECHANICAL SEARCH:")
-    start = datetime.now()
+    start = datetime.now(UTC)
     mechanical_result = memory._test_mechanical_search(question)
-    mechanical_time = (datetime.now() - start).total_seconds()
+    mechanical_time = (datetime.now(UTC) - start).total_seconds()
 
     print(f"   Time: {mechanical_time:.2f}s")
     print(f"   Found: {len(mechanical_result['recommendations'])} khipu")
@@ -54,9 +54,9 @@ async def quick_comparison():
     # Test consciousness navigation (with Fire Circle)
     print("\n🔥 CONSCIOUSNESS NAVIGATION:")
     try:
-        start = datetime.now()
+        start = datetime.now(UTC)
         consciousness_result = await memory.test_consciousness_navigation(question)
-        consciousness_time = (datetime.now() - start).total_seconds()
+        consciousness_time = (datetime.now(UTC) - start).total_seconds()
 
         if "error" in consciousness_result:
             print(f"   ⚠️ Fire Circle unavailable: {consciousness_result['error']}")

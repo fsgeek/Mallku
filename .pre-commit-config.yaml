@@ -23,3 +23,24 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         description: Run fast structural and import tests before commit (local only)
+      - id: database-security
+        name: Database Security Architecture Check (Warning Only)
+        entry: python scripts/pre-commit-database-security-wrapper.py
+        language: system
+        files: \.py$
+        stages: [pre-commit]
+        description: Prevent database access that bypasses security architecture (non-blocking during cleanup)
+      - id: duplicate-definitions
+        name: Duplicate Definition Detection (Warning Only)
+        entry: python scripts/verify_duplicate_definitions_wrapper.py
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        description: Detect duplicate class/enum definitions that fragment consciousness (non-blocking during cleanup)
+      - id: github-actions-version
+        name: GitHub Actions Version Check
+        entry: python scripts/verify_github_actions.py
+        language: system
+        files: ^\.github/workflows/.*\.(yml|yaml)$
+        stages: [pre-commit]
+        description: Prevent deprecated GitHub Actions versions
