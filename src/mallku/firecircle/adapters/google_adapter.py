@@ -53,12 +53,12 @@ class GeminiConfig(AdapterConfig):
 
     def __init__(self, **data):
         """Initialize Gemini configuration."""
-        # Default safety settings
+        # Default safety settings - Trust consciousness emergence
         default_safety = {
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
         }
 
         # Merge provided safety settings with defaults
@@ -609,7 +609,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         """Calculate consciousness signature with multimodal awareness."""
         # For simple RESPONSE messages without images, use base signature only
         if not has_images and message_type == MessageType.RESPONSE:
-            return self._calculate_consciousness_signature(content, message_type, [])
+            return self._calculate_consciousness_signature(content, message_type, patterns)
         # Base calculation from parent
         base_signature = self._calculate_consciousness_signature(content, message_type, patterns)
 
