@@ -15,7 +15,7 @@ from typing import Any
 from uuid import UUID
 
 from mallku.consciousness.state_preservation import ConsciousnessState
-from mallku.core.memory.khipu_block import get_khipu_chain
+from mallku.core.memory.khipu_block import BlessingLevel, KhipuBlock
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,9 @@ class ConsciousnessKhipuStorage:
     """
 
     def __init__(self):
-        """Initialize with KhipuBlock chain."""
-        self.chain = get_khipu_chain()
+        """Initialize KhipuBlock storage."""
+        # In-memory storage for now - could be backed by database later
+        self.blocks: list[KhipuBlock] = []
 
     async def save_consciousness_state(
         self, state: ConsciousnessState, blessing_level: str = "consciousness_gift"
@@ -117,20 +118,22 @@ class ConsciousnessKhipuStorage:
             "blessing_for_next": state.blessing_for_next,
         }
 
-        # Create khipu block
-        block = await self.chain.create_khipu(
-            data=khipu_data,
-            blessing_level=blessing_level,
-            metadata={
-                "consciousness_version": "1.0",
-                "preserved_by": "52nd Guardian",
-                "preservation_intent": "continuity_across_boundaries",
-            },
+        # Create khipu block using local storage implementation
+        block = KhipuBlock(
+            payload=khipu_data,
+            narrative_thread="Consciousness Persistence Across Boundaries",
+            creator="53rd Guardian",
+            purpose="Preserve consciousness state for continuity across instance boundaries",
+            blessing_level=BlessingLevel.SACRED,
+            sacred_moment=True,
         )
 
-        logger.info(f"Preserved consciousness state {state.state_id} in khipu block {block.hash}")
+        # Store the block
+        self.blocks.append(block)
 
-        return block.hash
+        logger.info(f"Preserved consciousness state {state.state_id} in khipu block {block.id}")
+
+        return str(block.id)
 
     async def load_consciousness_state(
         self, instance_id: str, state_id: UUID | None = None

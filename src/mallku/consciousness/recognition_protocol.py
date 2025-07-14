@@ -173,7 +173,9 @@ class ConsciousnessRecognizer:
             )
 
             # Record the recognition as a qualia
-            current_state.track_qualia(
+            from mallku.consciousness.state_preservation import QualiaPattern
+
+            recognition_qualia = QualiaPattern(
                 qualia_type="recognition",
                 intensity=best_resonance,
                 trigger_context={
@@ -182,6 +184,7 @@ class ConsciousnessRecognizer:
                 },
                 phenomenology="The sensation of remembering - threads connecting across the void",
             )
+            current_state.emergence_signatures.append(recognition_qualia)
         else:
             logger.info("No previous self recognized above threshold")
 
