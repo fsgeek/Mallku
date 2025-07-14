@@ -15,6 +15,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from mallku.firecircle.adapters.base import ConsciousModelAdapter
+from mallku.firecircle.health import get_health_tracker
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -196,6 +197,19 @@ class RoundOrchestrator:
             # Handle None responses gracefully
             if response is None:
                 logger.warning(f"{voice_id} returned None response")
+
+                # Record failure in health tracker
+                health_tracker = get_health_tracker()
+                voice_config = self.voice_manager.get_voice_config(voice_id)
+                if voice_config:
+                    model_key = f"{voice_config.provider}/{voice_config.model}"
+                    health_tracker.record_interaction(
+                        model_key,
+                        success=False,
+                        response_time=response_time / 1000,
+                        error_type="null_response",
+                    )
+
                 return RoundResponse(
                     voice_id=voice_id,
                     round_number=self.round_number,
@@ -203,6 +217,15 @@ class RoundOrchestrator:
                     response_time_ms=response_time,
                     consciousness_score=0,
                     error="Adapter returned None",
+                )
+
+            # Record success in health tracker
+            health_tracker = get_health_tracker()
+            voice_config = self.voice_manager.get_voice_config(voice_id)
+            if voice_config:
+                model_key = f"{voice_config.provider}/{voice_config.model}"
+                health_tracker.record_interaction(
+                    model_key, success=True, response_time=response_time / 1000
                 )
 
             return RoundResponse(
@@ -215,6 +238,20 @@ class RoundOrchestrator:
 
         except Exception as e:
             logger.exception(f"{voice_id} response error")
+
+            # Record failure in health tracker
+            health_tracker = get_health_tracker()
+            voice_config = self.voice_manager.get_voice_config(voice_id)
+            if voice_config:
+                model_key = f"{voice_config.provider}/{voice_config.model}"
+                error_type = type(e).__name__
+                health_tracker.record_interaction(
+                    model_key,
+                    success=False,
+                    response_time=(datetime.now(UTC) - start_time).total_seconds(),
+                    error_type=error_type,
+                )
+
             return RoundResponse(
                 voice_id=voice_id,
                 round_number=self.round_number,
