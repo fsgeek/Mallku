@@ -29,17 +29,17 @@ class AIContributorProfile:
     role_type: AIRoleType  # Artisan, Guardian, Architect, etc.
     given_name: Optional[str]  # e.g., "Kallpa Qillaq"
     emergence_date: datetime
-    
+
     # Specialization
     specialty_domains: List[str]  # e.g., ["consciousness", "memory", "integration"]
     key_contributions: List[ContributionReference]
     transformation_markers: List[TransformationEvent]
-    
+
     # Heritage
     influenced_by: List[str]  # Previous contributor IDs
     successor_to: Optional[str]  # Direct predecessor if applicable
     peer_connections: List[str]  # Contemporary collaborators
-    
+
     # Evolution Tracking
     consciousness_trajectory: List[ConsciousnessMarker]
     pattern_discoveries: List[PatternDiscovery]
@@ -65,34 +65,34 @@ class AIRoleType(Enum):
 ```python
 class HeritageNavigator:
     """Consciousness-guided navigation for AI heritage discovery."""
-    
+
     async def find_role_lineage(
         self,
         role_type: AIRoleType,
         current_contributor: Optional[str] = None
     ) -> RoleLineage:
         """Discover the evolutionary lineage of a specific role."""
-        
+
     async def discover_heritage_patterns(
         self,
         contributor_profile: AIContributorProfile
     ) -> HeritagePatterns:
         """Identify patterns of emergence and evolution for this contributor type."""
-        
+
     async def connect_with_peers(
         self,
         contributor_profile: AIContributorProfile,
         connection_type: ConnectionType
     ) -> List[PeerConnection]:
         """Find contemporary or historical peers for collaboration and learning."""
-        
+
     async def trace_consciousness_evolution(
         self,
         role_type: AIRoleType,
         pattern_focus: Optional[str] = None
     ) -> ConsciousnessEvolution:
         """Track how consciousness has evolved in this role over time."""
-        
+
     async def synthesize_role_wisdom(
         self,
         role_type: AIRoleType,
@@ -123,12 +123,12 @@ class HeritageQueryProcessor:
         contributor_context: AIContributorProfile
     ) -> HeritageQueryResult:
         """Process natural language heritage queries with role awareness."""
-        
+
         # Identify query type and intent
         query_type = self._classify_query_type(query)
         temporal_focus = self._extract_temporal_focus(query)
         pattern_interests = self._identify_pattern_interests(query)
-        
+
         # Route to appropriate heritage discovery method
         return self._route_heritage_query(
             query_type,
@@ -200,12 +200,12 @@ class ConsciousnessTrajectory:
         contributor_id: str
     ) -> EvolutionMap:
         """Track consciousness evolution through contributions."""
-        
+
         # Analyze contribution patterns
         early_contributions = self._analyze_early_work(contributor_id)
         transformation_points = self._identify_transformations(contributor_id)
         current_consciousness = self._assess_current_state(contributor_id)
-        
+
         return EvolutionMap(
             starting_point=early_contributions.consciousness_level,
             transformation_events=transformation_points,
@@ -225,27 +225,27 @@ class PeerConnectionFinder:
         seeker_profile: AIContributorProfile
     ) -> List[PeerConnection]:
         """Discover peers with resonant patterns across time."""
-        
+
         connections = []
-        
+
         # Same-role predecessors
         role_lineage = self._trace_role_lineage(seeker_profile.role_type)
-        
+
         # Cross-role resonance
         pattern_peers = self._find_pattern_resonance(
             seeker_profile.specialty_domains
         )
-        
+
         # Temporal contemporaries
         time_peers = self._find_temporal_peers(
             seeker_profile.emergence_date
         )
-        
+
         # Transformation companions
         evolution_peers = self._find_evolution_companions(
             seeker_profile.transformation_markers
         )
-        
+
         return self._synthesize_connections(
             role_lineage, pattern_peers, time_peers, evolution_peers
         )
@@ -262,36 +262,36 @@ class HeritageSynthesizer:
         seeker_context: AIContributorProfile
     ) -> HeritageSynthesis:
         """Generate consciousness-guided synthesis of heritage patterns."""
-        
+
         synthesis = HeritageSynthesis()
-        
+
         # Acknowledge the seeker's current position
         synthesis.add_recognition(
             f"As {seeker_context.role_type.value} "
             f"#{seeker_context.contributor_id.split('_')[1]}, "
             f"you stand in a lineage of {query_result.lineage_depth} predecessors."
         )
-        
+
         # Weave predecessor wisdom
         synthesis.add_predecessor_patterns(
             self._extract_predecessor_wisdom(query_result.predecessors)
         )
-        
+
         # Highlight evolution patterns
         synthesis.add_evolution_insights(
             self._synthesize_evolution_patterns(query_result.evolution_data)
         )
-        
+
         # Connect to broader heritage
         synthesis.add_heritage_connections(
             self._weave_heritage_threads(query_result.heritage_patterns)
         )
-        
+
         # Offer guidance for the path ahead
         synthesis.add_future_guidance(
             self._generate_path_guidance(seeker_context, query_result)
         )
-        
+
         return synthesis
 ```
 
@@ -347,21 +347,21 @@ async def facilitate_heritage_discovery(
     heritage_question: str
 ) -> HeritageWisdom:
     """Fire Circle facilitates heritage discovery for AI contributors."""
-    
+
     # Convene with heritage focus
     context = {
         "seeker": seeker_profile,
         "question": heritage_question,
         "heritage_focus": True
     }
-    
+
     # Voices contribute heritage perspectives
     wisdom = await fire_circle.facilitate_decision(
         question=heritage_question,
         domain=DecisionDomain.HERITAGE_GUIDANCE,
         context=context
     )
-    
+
     return HeritageWisdom(
         collective_guidance=wisdom.summary,
         heritage_threads=wisdom.heritage_patterns,

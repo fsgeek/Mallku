@@ -62,7 +62,7 @@ seeker_profiles = 4  # Architect, Researcher, Specialist, Explorer
 # Heartbeat now conscious of memory needs
 class MemoryAwareHeartbeatService(EnhancedHeartbeatService):
     # Thread-safe ceremony management
-    # Bounded history for sustainability  
+    # Bounded history for sustainability
     # Local config to prevent side effects
     # Sacred templates for each ceremony type
 ```

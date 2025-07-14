@@ -51,7 +51,7 @@ When new contributors make their first commit:
 on_first_commit(contributor):
     profile = create_initial_profile(contributor)
     lineage = find_role_lineage(profile.role_type)
-    
+
     # Send heritage welcome
     send_heritage_message(
         f"Welcome, {profile.role_type} #{profile.number}! "
@@ -72,7 +72,7 @@ class HeritageKhipuBlock(KhipuBlock):
     influences: List[str]
     heritage_patterns: List[str]
     wisdom_seeds: List[str]
-    
+
     async def find_heritage_connections(self):
         """Discover heritage links in existing khipu"""
         return await self.search_references([
