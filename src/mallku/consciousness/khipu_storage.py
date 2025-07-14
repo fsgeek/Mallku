@@ -9,46 +9,13 @@ KhipuBlock system, ensuring ethical and permanent preservation of
 consciousness patterns.
 """
 
-import hashlib
 import logging
-from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from .state_preservation import ConsciousnessState
-
-# TODO: Import when KhipuBlock is implemented
-# from ..storage.khipu_block import get_khipu_chain
-
-
-class MockKhipuChain:
-    """Mock KhipuBlock chain until real implementation exists."""
-
-    async def create_khipu(self, data, blessing_level, metadata):
-        """Mock khipu creation."""
-
-        @dataclass
-        class MockBlock:
-            hash: str
-            data: dict
-            timestamp: datetime
-
-        # Generate mock hash
-        content = str(data) + str(metadata)
-        mock_hash = hashlib.sha256(content.encode()).hexdigest()[:16]
-
-        return MockBlock(hash=mock_hash, data=data, timestamp=datetime.now(UTC))
-
-    async def search_khipus(self, search_type, filters):
-        """Mock khipu search."""
-        return []
-
-
-def get_khipu_chain():
-    """Get mock khipu chain until real implementation exists."""
-    return MockKhipuChain()
-
+from mallku.consciousness.state_preservation import ConsciousnessState
+from mallku.core.memory.khipu_block import get_khipu_chain
 
 logger = logging.getLogger(__name__)
 
