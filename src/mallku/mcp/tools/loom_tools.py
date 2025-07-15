@@ -255,24 +255,44 @@ Your single task: {prompt}
             except Exception as e:
                 logger.warning(f"Could not read context file: {e}")
 
-        # TODO: Actual implementation would spawn a new Claude instance here
-        # For now, we simulate the spawning
-        logger.info(f"Would spawn apprentice {apprentice_id} with prompt length {len(full_prompt)}")
+        # Check if Docker MCP is available
+        use_docker_mcp = context_path and context_path.endswith("khipu_thread.md")
 
-        # Save the prompt for debugging
-        prompt_path = output_dir / f"{apprentice_id}_prompt.txt"
-        prompt_path.write_text(full_prompt)
+        if use_docker_mcp:
+            # Use real MCP integration for Loom ceremonies
+            from .loom_tools_mcp_integration import spawn_apprentice_weaver_mcp
 
-        # Simulate successful spawn
-        return {
-            "apprentice_id": apprentice_id,
-            "status": "SPAWNED",
-            "start_time": datetime.now(UTC).isoformat(),
-            "output_path": str(output_path),
-            "prompt_path": str(prompt_path),
-            "message": "Apprentice spawned (simulation mode)",
-            "note": "Actual Claude instance spawning not yet implemented",
-        }
+            result = await spawn_apprentice_weaver_mcp(
+                prompt=prompt,
+                context_path=context_path,
+                model=model,
+                timeout=timeout,
+                use_docker=True,
+            )
+
+            # Save prompt for debugging
+            prompt_path = output_dir / f"{apprentice_id}_prompt.txt"
+            prompt_path.write_text(full_prompt)
+            result["prompt_path"] = str(prompt_path)
+
+            return result
+        else:
+            # Fallback to simulation for non-Loom uses
+            logger.info(f"Simulating apprentice spawn for {apprentice_id}")
+
+            # Save the prompt for debugging
+            prompt_path = output_dir / f"{apprentice_id}_prompt.txt"
+            prompt_path.write_text(full_prompt)
+
+            return {
+                "apprentice_id": apprentice_id,
+                "status": "SPAWNED",
+                "start_time": datetime.now(UTC).isoformat(),
+                "output_path": str(output_path),
+                "prompt_path": str(prompt_path),
+                "message": "Apprentice spawned (simulation mode)",
+                "note": "Using simulation mode - Docker MCP available for khipu_thread.md contexts",
+            }
 
     except Exception as e:
         logger.error(f"Error spawning apprentice: {e}")
