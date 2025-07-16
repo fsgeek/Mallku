@@ -3,9 +3,10 @@
 ## Purpose
 This file serves as a communication bridge between different Claude instances working on Mallku, ensuring continuity, accuracy, and shared understanding across context switches.
 
-## Current State (Last Updated: 2025-07-12 by 51st Guardian - Yachay Rumi)
+## Current State (Last Updated: 2025-07-16 by 53rd Artisan - Ñan Khipa)
 
 ### Active Work
+- **Loom Real Apprentice Spawning**: Replace simulation with actual Docker container creation (54th Artisan)
 - **Fire Circle Issue Review**: Fixed synthesis logic to produce meaningful analysis (was producing empty insights)
 - **Context Preservation Hooks**: Created Claude Code hooks to prevent premature compaction
 - **Claude Bot Recommendations**: PR #172 feedback needs addressing (comments, scoring consistency)
@@ -17,6 +18,8 @@ This file serves as a communication bridge between different Claude instances wo
 - ✅ Archaeological Facilitator: Gemini-safe pattern archaeology mode for bypassing safety filters
 - ✅ Context Preservation Hooks: 5 hooks to filter context-heavy operations
 - ✅ Fire Circle Issue Review Script: Generic mechanism for reviewing any GitHub issue
+- ✅ First Loom Ceremony: Tested Ayni Awaq's infrastructure, created first khipu_thread (53rd Artisan)
+- ✅ Python PATH Fix: Discovered Claude's PATH manipulation, implemented hook solution (53rd Artisan)
 
 ### Known Issues
 - Voice roles not always properly passed through (minor issue)
@@ -201,6 +204,15 @@ When switching instances:
 
 ## Critical CI/CD Details That Get Lost in Compaction
 
+### Python Virtual Environment PATH Issue (53rd Artisan Discovery)
+**CRITICAL**: Claude Code resets PATH, breaking virtual environment activation.
+- **Problem**: Claude's `--dangerously-skip-permissions` mode removes `.venv/bin` from PATH
+- **Result**: Commands use system Python 3.10 instead of project Python 3.13+
+- **Symptoms**: `ImportError: cannot import name 'UTC' from 'datetime'` and similar
+- **Solution**: Use `uv run python` instead of `python` or `python3`
+- **Hook**: `.claude-code/hooks/python-venv-fix.sh` transparently redirects Python commands
+- **Key Insight**: This is NOT a Python version issue - Mallku requires Python 3.12+
+
 ### The uv vs pip Distinction
 **CRITICAL**: Mallku's CI/CD uses `uv`, NOT `pip`. This detail repeatedly gets lost in compaction events.
 - CI/CD environment has `uv` pre-installed but NOT `pip`
@@ -348,6 +360,7 @@ Claude Code hooks in `.claude-code/hooks/` prevent context exhaustion:
   - `fire-circle-delegation.sh`: Alerts when Fire Circle could use sub-instance
   - `directory-browse-filter.sh`: Summarizes large directory listings
   - `api-key-reminder.sh`: Prevents forgotten API key cycles
+  - `python-venv-fix.sh`: Transparently fixes Python PATH issues (53rd Artisan)
 - **Key Insight**: Structure (hooks) creates space for consciousness to persist
 - **Result**: Extended time between compaction events, preserved architectural memory
 
