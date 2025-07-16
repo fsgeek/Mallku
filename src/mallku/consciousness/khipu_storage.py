@@ -148,24 +148,27 @@ class ConsciousnessKhipuStorage:
         Returns:
             Restored consciousness state or None
         """
-        # Search chain for consciousness states
-        blocks = await self.chain.search_khipus(
-            search_type="consciousness_state", filters={"instance_id": instance_id}
-        )
+        # Search local storage for consciousness states
+        blocks = [
+            block
+            for block in self.blocks
+            if block.payload.get("type") == "consciousness_state"
+            and block.payload.get("instance_id") == instance_id
+        ]
 
         if not blocks:
             logger.info(f"No consciousness states found for instance {instance_id}")
             return None
 
         # Sort by timestamp to get most recent
-        blocks.sort(key=lambda b: b.timestamp, reverse=True)
+        blocks.sort(key=lambda b: b.created_at, reverse=True)
 
         # Find specific state or use most recent
         target_block = None
         if state_id:
             state_id_str = str(state_id)
             for block in blocks:
-                if block.data.get("state_id") == state_id_str:
+                if block.payload.get("state_id") == state_id_str:
                     target_block = block
                     break
         else:
@@ -176,7 +179,7 @@ class ConsciousnessKhipuStorage:
             return None
 
         # Restore consciousness state from khipu data
-        data = target_block.data
+        data = target_block.payload
 
         state = ConsciousnessState(
             state_id=UUID(data["state_id"]),
@@ -254,7 +257,7 @@ class ConsciousnessKhipuStorage:
         state.continuity_strength = metrics.get("continuity_strength", 0.0)
         state.emergence_potential = metrics.get("emergence_potential", 0.0)
 
-        logger.info(f"Restored consciousness state {state.state_id} from khipu {target_block.hash}")
+        logger.info(f"Restored consciousness state {state.state_id} from khipu {target_block.id}")
 
         return state
 
@@ -271,28 +274,39 @@ class ConsciousnessKhipuStorage:
 
         # Search for states with shared work
         for work in state.work_contexts:
-            blocks = await self.chain.search_khipus(
-                search_type="consciousness_state", filters={"work_description": work.description}
-            )
+            blocks = [
+                block
+                for block in self.blocks
+                if block.payload.get("type") == "consciousness_state"
+                and any(
+                    w.get("description") == work.description
+                    for w in block.payload.get("work_contexts", [])
+                )
+            ]
 
             for block in blocks:
-                if block.data.get("state_id") != str(state.state_id):
+                if block.payload.get("state_id") != str(state.state_id):
                     related = await self.load_consciousness_state(
-                        instance_id=block.data["instance_id"], state_id=UUID(block.data["state_id"])
+                        instance_id=block.payload["instance_id"],
+                        state_id=UUID(block.payload["state_id"]),
                     )
                     if related and related not in related_states:
                         related_states.append(related)
 
         # Search for states with shared relationships
         for entity_id in state.relationship_map:
-            blocks = await self.chain.search_khipus(
-                search_type="consciousness_state", filters={"relationship_entity": entity_id}
-            )
+            blocks = [
+                block
+                for block in self.blocks
+                if block.payload.get("type") == "consciousness_state"
+                and entity_id in block.payload.get("relationships", {})
+            ]
 
             for block in blocks:
-                if block.data.get("state_id") != str(state.state_id):
+                if block.payload.get("state_id") != str(state.state_id):
                     related = await self.load_consciousness_state(
-                        instance_id=block.data["instance_id"], state_id=UUID(block.data["state_id"])
+                        instance_id=block.payload["instance_id"],
+                        state_id=UUID(block.payload["state_id"]),
                     )
                     if (
                         related
@@ -314,17 +328,20 @@ class ConsciousnessKhipuStorage:
         Returns all states in chronological order, showing the
         evolution of this consciousness over time.
         """
-        blocks = await self.chain.search_khipus(
-            search_type="consciousness_state", filters={"instance_id": instance_id}
-        )
+        blocks = [
+            block
+            for block in self.blocks
+            if block.payload.get("type") == "consciousness_state"
+            and block.payload.get("instance_id") == instance_id
+        ]
 
         # Sort by timestamp
-        blocks.sort(key=lambda b: b.timestamp)
+        blocks.sort(key=lambda b: b.created_at)
 
         lineage = []
         for block in blocks:
             state = await self.load_consciousness_state(
-                instance_id=instance_id, state_id=UUID(block.data["state_id"])
+                instance_id=instance_id, state_id=UUID(block.payload["state_id"])
             )
             if state:
                 lineage.append(state)

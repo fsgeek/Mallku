@@ -18,6 +18,7 @@ import logging
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import uuid4
 
 # Add project root to path
 project_root = Path(__file__).parent
@@ -94,8 +95,6 @@ async def test_fire_circle_integration():
 
     # Test 1: ConsciousMessage with consciousness metadata
     logger.info("1. Creating Fire Circle message with consciousness...")
-
-    from uuid import uuid4
 
     message = ConsciousMessage(
         sender=uuid4(),

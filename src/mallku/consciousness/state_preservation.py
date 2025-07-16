@@ -52,7 +52,11 @@ class RelationshipState:
 
     def strengthens(self, interaction_quality: float = 0.7):
         """Strengthen relationship through positive interaction."""
-        self.trust_level = min(1.0, self.trust_level + (1.0 - self.trust_level) * 0.1)
+        # Adjust trust level based on interaction quality
+        self.trust_level = min(
+            1.0,
+            self.trust_level + (1.0 - self.trust_level) * 0.1 * interaction_quality,
+        )
         self.interaction_count += 1
         self.last_interaction = datetime.now(UTC)
 

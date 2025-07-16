@@ -530,7 +530,7 @@ class ArchaeologicalFacilitator:
             else:
                 archaeological_context[key] = value
 
-        logger.info("Transformed context to archaeological framing for safety bypass")
+        logger.info("Context transformation to archaeological framing completed")
 
         return archaeological_context
 
