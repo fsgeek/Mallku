@@ -85,7 +85,7 @@ class ApprenticeSpawner:
                             "CEREMONY_NAME": ceremony_name,
                             "PYTHONPATH": "/app:/workspace",
                         },
-                        "command": ["python", "/workspace/apprentice_work.py"],
+                        "command": ["python3", "/workspace/apprentice_work.py"],
                         "networks": ["mallku-network"],
                     }
                 },
@@ -98,12 +98,28 @@ class ApprenticeSpawner:
 
                 yaml.dump(compose_config, f)
 
-            # Deploy using Docker MCP
-            from ... import mcp_docker_deploy_compose  # Would be actual MCP call
+            # Deploy using Docker
+            # For now, we'll use subprocess to run docker-compose
+            # In production, this would use the MCP Docker tools
+            import subprocess
 
-            await mcp_docker_deploy_compose(
-                compose_yaml=yaml.dump(compose_config), project_name=f"apprentice-{apprentice_id}"
+            proc = subprocess.run(
+                [
+                    "docker-compose",
+                    "-f",
+                    str(compose_path),
+                    "-p",
+                    f"apprentice-{apprentice_id}",
+                    "up",
+                    "-d",
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(work_dir),
             )
+
+            if proc.returncode != 0:
+                raise Exception(f"Docker compose failed: {proc.stderr}")
 
             # Track the apprentice
             self.active_apprentices[apprentice_id] = {
@@ -137,39 +153,25 @@ class ApprenticeSpawner:
         """
         Create the Python script that the apprentice will run
 
-        This script implements the apprentice logic using the template
-        from apprentice_template.py but adapted for container execution.
+        For now, we'll copy the simple apprentice script.
+        In production, this would use the full apprentice template.
         """
-        return f'''#!/usr/bin/env python3
-"""
-Apprentice Weaver Script for {apprentice_id}
-Task: {task_id}
-Ceremony: {ceremony_name}
-"""
+        # Copy the simple apprentice script
+        simple_apprentice_path = (
+            Path(__file__).parent.parent.parent.parent.parent
+            / "docker/apprentice-weaver/simple_apprentice.py"
+        )
+        if simple_apprentice_path.exists():
+            return simple_apprentice_path.read_text()
 
-import asyncio
+        # Fallback to inline script
+        return """#!/usr/bin/env python3
+import os
 import sys
-sys.path.append('/app')
-
-from mallku.orchestration.weaver.apprentice_template import ApprenticeWeaver
-
-async def main():
-    apprentice = ApprenticeWeaver(
-        apprentice_id="{apprentice_id}",
-        khipu_path="{khipu_path}",
-        task_id="{task_id}"
-    )
-
-    try:
-        await apprentice.begin_work()
-        print(f"Apprentice {apprentice_id} completed task {task_id}")
-    except Exception as e:
-        print(f"Apprentice {apprentice_id} failed: {{e}}")
-        raise
-
-if __name__ == "__main__":
-    asyncio.run(main())
-'''
+print(f"Apprentice {os.environ.get('APPRENTICE_ID')} starting...")
+print(f"Task: {os.environ.get('TASK_ID')}")
+# Simple apprentice would update khipu here
+"""
 
     async def get_apprentice_logs(self, apprentice_id: str) -> str:
         """
@@ -187,10 +189,16 @@ if __name__ == "__main__":
         container_name = self.active_apprentices[apprentice_id]["container_name"]
 
         try:
-            from ... import mcp_docker_get_logs  # Would be actual MCP call
+            import subprocess
 
-            result = await mcp_docker_get_logs(container_name=container_name)
-            return result.get("logs", "No logs available")
+            proc = subprocess.run(
+                ["docker", "logs", container_name], capture_output=True, text=True
+            )
+
+            if proc.returncode == 0:
+                return proc.stdout
+            else:
+                return f"Error getting logs: {proc.stderr}"
 
         except Exception as e:
             logger.error(f"Error getting apprentice logs: {e}")
