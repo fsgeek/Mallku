@@ -85,11 +85,13 @@ async def review_issue(
     if any(label in issue_details["labels"] for label in ["architecture", "design"]):
         domain = DecisionDomain.ARCHITECTURE
     elif any(label in issue_details["labels"] for label in ["feature", "enhancement"]):
-        domain = DecisionDomain.FEATURE_PRIORITIZATION
+        domain = DecisionDomain.STRATEGIC_PLANNING  # Features require strategic planning
     elif any(label in issue_details["labels"] for label in ["resources", "infrastructure"]):
         domain = DecisionDomain.RESOURCE_ALLOCATION
     elif any(label in issue_details["labels"] for label in ["ethics", "policy"]):
         domain = DecisionDomain.ETHICAL_CONSIDERATION
+    elif any(label in issue_details["labels"] for label in ["consciousness", "research"]):
+        domain = DecisionDomain.CONSCIOUSNESS_EXPLORATION
 
     # Prepare the question
     question = f"""
