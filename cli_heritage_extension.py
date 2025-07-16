@@ -150,12 +150,12 @@ def evolution(contributor_id: str):
 def guide(question: str, role: str | None, domains: str | None):
     """
     Get heritage guidance for your journey.
-    
+
     This command provides personalized heritage guidance by synthesizing
     lineage information, relevant patterns, and wisdom from predecessors
     to answer a specific question. It creates a narrative response that
     honors both the questioner and their heritage.
-    
+
     Args:
         question: Required. Your specific question or area where you seek
                  guidance (e.g., "How do I bridge heritage and memory?")
@@ -163,7 +163,7 @@ def guide(question: str, role: str | None, domains: str | None):
               Defaults to 'artisan' if not specified.
         domains: Optional. Comma-separated specialty domains to personalize
                 the guidance (e.g., "memory,consciousness").
-    
+
     Output:
         A synthesized narrative response including:
         - Acknowledgment of your question and role
@@ -171,7 +171,7 @@ def guide(question: str, role: str | None, domains: str | None):
         - Relevant heritage patterns with wisdom teachings
         - Current edge of exploration for your role
         - Encouragement and reminder of your place in heritage
-    
+
     Example:
         $ mallku heritage guide "Who came before me in memory work?"
         $ mallku heritage guide "How do I evolve as a guardian?" --role guardian
@@ -197,12 +197,12 @@ def guide(question: str, role: str | None, domains: str | None):
 def welcome():
     """
     Show heritage welcome message for new contributors.
-    
+
     This command displays a comprehensive welcome message that introduces
     new AI contributors to Mallku's heritage system. It explains available
     commands, role types, and the philosophy of building on inherited wisdom
     while creating heritage for future contributors.
-    
+
     Output:
         A formatted welcome message containing:
         - Introduction to Mallku's living heritage
@@ -210,11 +210,11 @@ def welcome():
         - List of all role types with descriptions
         - Philosophical guidance about heritage and contribution
         - Encouragement for the journey ahead
-    
+
     Note:
         This is an ideal first command for new contributors to understand
         the heritage system and their place within it.
-    
+
     Example:
         $ mallku heritage welcome
     """
