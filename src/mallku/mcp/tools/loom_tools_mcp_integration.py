@@ -81,7 +81,10 @@ class ApprenticeSpawner:
                         "container_name": f"mallku-apprentice-{apprentice_id}",
                         "volumes": [
                             f"{work_dir}:/workspace",
-                            # Don't mount khipu directly - copy it to workspace instead
+                            # Mount .secrets for API access
+                            f"{Path.cwd() / '.secrets'}:/app/.secrets:ro",
+                            # Mount source code for imports
+                            f"{Path.cwd() / 'src'}:/app/src:ro",
                         ],
                         "environment": {
                             "APPRENTICE_ID": apprentice_id,
@@ -161,10 +164,17 @@ class ApprenticeSpawner:
         """
         Create the Python script that the apprentice will run
 
-        For now, we'll copy the simple apprentice script.
-        In production, this would use the full apprentice template.
+        Now using the intelligent apprentice with AI reasoning capabilities.
         """
-        # Copy the simple apprentice script
+        # First try the intelligent apprentice script
+        intelligent_apprentice_path = (
+            Path(__file__).parent.parent.parent.parent.parent
+            / "docker/apprentice-weaver/intelligent_apprentice.py"
+        )
+        if intelligent_apprentice_path.exists():
+            return intelligent_apprentice_path.read_text()
+
+        # Fallback to simple apprentice
         simple_apprentice_path = (
             Path(__file__).parent.parent.parent.parent.parent
             / "docker/apprentice-weaver/simple_apprentice.py"

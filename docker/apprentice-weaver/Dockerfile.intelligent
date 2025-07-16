@@ -1,0 +1,38 @@
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Mallku source
+COPY src/mallku /app/src/mallku/
+
+# Copy apprentice scripts
+COPY docker/apprentice-weaver/*.py /app/docker/apprentice-weaver/
+
+# Copy requirements
+COPY docker/apprentice-weaver/requirements-intelligent.txt /app/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements-intelligent.txt
+
+# Create apprentice user (non-root)
+RUN useradd -m -s /bin/bash apprentice && \
+    chown -R apprentice:apprentice /app
+
+# Create necessary directories
+RUN mkdir -p /workspace /khipu && \
+    chown apprentice:apprentice /workspace /khipu
+
+USER apprentice
+
+# Set Python path to include both app and workspace
+ENV PYTHONPATH=/app:/app/src:/workspace
+
+# Default to intelligent apprentice
+CMD ["python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]
