@@ -1,0 +1,29 @@
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /mallku
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only necessary files
+COPY src/mallku /mallku/src/mallku/
+COPY docker/apprentice-weaver/requirements-minimal.txt /mallku/
+
+# Install minimal Python dependencies
+RUN pip install --no-cache-dir -r requirements-minimal.txt
+
+# Create apprentice user (non-root)
+RUN useradd -m -s /bin/bash apprentice && \
+    chown -R apprentice:apprentice /mallku
+
+USER apprentice
+
+# Set Python path
+ENV PYTHONPATH=/mallku/src:/workspace
+
+# Default command
+CMD ["python", "-m", "mallku.orchestration.weaver.apprentice_template"]

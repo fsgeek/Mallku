@@ -365,24 +365,36 @@ Failed: 0
                 session.khipu_path, f"Apprentice {apprentice_id} spawned for {task.task_id}"
             )
 
-            # Here we would actually spawn the AI instance
-            # For now, this is a placeholder that will be implemented
-            # when we have the MCP tools ready
-            logger.info(f"Would spawn {apprentice_id} for task {task.task_id}")
+            # Real apprentice spawning using MCP integration
+            from ...mcp.tools.loom_tools_mcp_integration import MCPLoomIntegration
 
-            # Simulate apprentice work (to be replaced with real spawning)
-            await asyncio.sleep(5)
+            logger.info(f"Spawning real apprentice {apprentice_id} for task {task.task_id}")
 
-            # Mark as complete (temporary - real implementation will monitor)
-            task.status = TaskStatus.COMPLETE
-            task.completed_at = datetime.now(UTC)
+            # Get task description
+            task_description = self._get_task_description(session, task.task_id)
 
-            await self._update_task_in_khipu(
-                session.khipu_path,
-                task.task_id,
-                status="COMPLETE",
-                completed=task.completed_at.isoformat(),
+            # Spawn the apprentice container
+            mcp_integration = MCPLoomIntegration()
+            spawn_result = await mcp_integration.spawn_for_task(
+                task_id=task.task_id,
+                task_description=task_description,
+                khipu_path=str(session.khipu_path),
+                ceremony_id=session.ceremony_id,
             )
+
+            if spawn_result["status"] == "spawned":
+                logger.info(
+                    f"Successfully spawned {apprentice_id}: {spawn_result['container_name']}"
+                )
+
+                # Monitor the apprentice's progress by watching the khipu
+                await self._monitor_apprentice_progress(
+                    session, task, apprentice_id, spawn_result["container_name"]
+                )
+            else:
+                raise Exception(
+                    f"Failed to spawn apprentice: {spawn_result.get('error', 'Unknown error')}"
+                )
 
         except Exception as e:
             logger.error(f"Error spawning apprentice for {task.task_id}: {e}")
@@ -494,6 +506,56 @@ Failed: 0
         )
 
         logger.info(f"Ceremony {session.ceremony_id} complete")
+
+    def _get_task_description(self, session: LoomSession, task_id: str) -> str:
+        """Get the full task description from session"""
+        task = session.tasks.get(task_id)
+        if not task:
+            return f"Task {task_id} - no description available"
+
+        return f"""Task: {task.name}
+Description: {task.description}
+Priority: {task.priority}
+Dependencies: {", ".join(task.dependencies) if task.dependencies else "None"}"""
+
+    async def _monitor_apprentice_progress(
+        self, session: LoomSession, task: LoomTask, apprentice_id: str, container_name: str
+    ):
+        """Monitor an apprentice's progress by watching khipu updates"""
+        max_wait_time = self.apprentice_timeout
+        check_interval = 10  # Check every 10 seconds
+        elapsed_time = 0
+
+        while elapsed_time < max_wait_time:
+            # Check if task status has been updated in khipu
+            await self._update_session_from_khipu(session)
+
+            # Get current task status
+            current_task = session.tasks.get(task.task_id)
+
+            if current_task.status == TaskStatus.COMPLETE:
+                logger.info(f"Apprentice {apprentice_id} completed task {task.task_id}")
+                task.completed_at = datetime.now(UTC)
+                break
+            elif current_task.status == TaskStatus.FAILED:
+                logger.error(f"Apprentice {apprentice_id} failed task {task.task_id}")
+                break
+
+            # Wait before next check
+            await asyncio.sleep(check_interval)
+            elapsed_time += check_interval
+
+            # Log heartbeat
+            if elapsed_time % 60 == 0:  # Log every minute
+                logger.info(
+                    f"Apprentice {apprentice_id} still working on {task.task_id} ({elapsed_time}s)"
+                )
+
+        if elapsed_time >= max_wait_time:
+            logger.error(f"Apprentice {apprentice_id} timed out on task {task.task_id}")
+            task.status = TaskStatus.FAILED
+            task.error = "Apprentice timeout"
+            await self._update_task_in_khipu(session.khipu_path, task.task_id, status="FAILED")
 
     async def _update_ceremony_status(self, khipu_path: Path, status: str):
         """Update ceremony status in khipu header"""
