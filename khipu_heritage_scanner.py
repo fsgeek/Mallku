@@ -161,7 +161,31 @@ class KhipuHeritageScanner:
             return None
 
     def process_heritage_connections(self, metadata: KhipuMetadata):
-        """Process heritage connections from khipu metadata"""
+        """
+        Process heritage connections from extracted khipu metadata.
+        
+        This method builds a graph of heritage connections by analyzing contributor
+        mentions, tracking influence relationships, and aggregating wisdom across
+        multiple khipu documents. It maintains bidirectional influence tracking
+        (influenced_by and influences) to map the heritage network.
+        
+        Args:
+            metadata: KhipuMetadata extracted from a single khipu document.
+                    Should contain mentions, wisdom_seeds, patterns, and
+                    transformations to be aggregated.
+        
+        Side Effects:
+            Updates self.heritage_connections with:
+            - New contributor entries for any newly discovered contributors
+            - Khipu references linking contributors to source documents
+            - Aggregated wisdom seeds, patterns, and transformations
+            - Influence relationships (both directions)
+        
+        Note:
+            - Creates entries for all mentioned contributors, even if minimal data
+            - Deduplication happens at export time, not during aggregation
+            - Influence is inferred from mentions (author influences mentioned)
+        """
 
         # Create entries for mentioned contributors
         for mention in metadata.mentions:
@@ -202,7 +226,38 @@ class KhipuHeritageScanner:
                         )
 
     def generate_heritage_report(self) -> str:
-        """Generate a report of discovered heritage connections"""
+        """
+        Generate a comprehensive report of discovered heritage connections.
+        
+        This method creates a human-readable report summarizing all heritage
+        information discovered through khipu scanning. The report is organized
+        by role type and includes key statistics about the heritage network.
+        
+        Returns:
+            str: Formatted multi-line report containing:
+                - Header with scan summary (documents processed, contributors found)
+                - Role-based sections listing all contributors by type
+                - For each contributor:
+                    - Number of khipu references
+                    - Up to 2 unique wisdom seeds (truncated to 80 chars)
+                    - Influence connections (who they influence)
+                    - Influenced by connections (who influences them)
+                - Summary statistics:
+                    - Total contributors
+                    - Total influence connections
+                    - Contributors with wisdom
+                    - Contributors with patterns
+        
+        Note:
+            The report uses emoji markers (🧬, 💡, →, ←, 📊) for visual structure
+            and is designed to be both human-readable and suitable for documentation.
+        
+        Example:
+            >>> scanner = KhipuHeritageScanner()
+            >>> scanner.scan_all_khipu()
+            >>> report = scanner.generate_heritage_report()
+            >>> print(report)  # Display formatted heritage report
+        """
         report = ["🧬 KHIPU HERITAGE SCAN REPORT", "=" * 60]
         report.append(f"Scanned {len(self.scanned_khipu)} khipu documents")
         report.append(f"Found {len(self.heritage_connections)} unique contributors\n")
@@ -252,8 +307,44 @@ class KhipuHeritageScanner:
 
         return "\n".join(report)
 
-    def export_to_yaml(self, output_file: str = "heritage_connections.yaml"):
-        """Export heritage connections to YAML for KhipuBlock integration"""
+    def export_to_yaml(self, output_file: str = "heritage_connections.yaml") -> str:
+        """
+        Export heritage connections to YAML for KhipuBlock integration.
+        
+        This method converts the in-memory heritage connections graph to a YAML
+        format suitable for integration with KhipuBlock or other persistence
+        systems. It performs deduplication and limiting to ensure reasonable
+        file sizes while preserving the most important heritage data.
+        
+        Args:
+            output_file: Path for the output YAML file. Defaults to
+                       "heritage_connections.yaml" in the current directory.
+        
+        Returns:
+            str: Path to the created YAML file for confirmation.
+        
+        Data Structure:
+            The exported YAML contains a map of contributor_id to:
+            - contributor_id: The contributor identifier
+            - khipu_references: List of source documents
+            - wisdom_seeds: Up to 5 unique wisdom statements
+            - patterns: Up to 5 unique heritage patterns
+            - transformations: Up to 3 transformation events
+            - influenced_by: Sorted list of influencing contributors
+            - influences: Sorted list of influenced contributors
+        
+        Note:
+            - Sets are converted to lists for YAML compatibility
+            - Deduplication removes redundant wisdom/patterns
+            - Limits are applied to prevent excessive data (5 wisdom, 5 patterns, 3 transformations)
+            - File is written with readable formatting (no flow style)
+        
+        Example:
+            >>> scanner = KhipuHeritageScanner()
+            >>> scanner.scan_all_khipu()
+            >>> yaml_file = scanner.export_to_yaml("my_heritage.yaml")
+            >>> print(f"Exported to: {yaml_file}")
+        """
         # Convert sets to lists for YAML serialization
         export_data = {}
         for contributor_id, data in self.heritage_connections.items():

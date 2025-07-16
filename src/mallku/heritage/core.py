@@ -63,6 +63,10 @@ class ContributorIDParser:
         """
         Parse a contributor ID into role and number.
 
+        Validates format, role type, and number range to prevent malformed IDs
+        from causing issues downstream. This addresses security concerns about
+        untrusted input processing.
+
         Args:
             contributor_id: String like "artisan_42" or None
 
@@ -72,42 +76,69 @@ class ContributorIDParser:
         Example:
             >>> parse("artisan_42")
             ("artisan", 42)
+            >>> parse("guardian_7")  
+            ("guardian", 7)
             >>> parse("invalid")
             None
+            >>> parse("artisan_abc")  # Non-numeric ID
+            None
+            >>> parse("unknown_role_5")  # Invalid role
+            None
+
+        Note:
+            IDs are case-insensitive and limited to 50 characters to prevent DoS.
         """
         if not contributor_id:
             logger.debug("Empty contributor ID provided")
             return None
 
         if not isinstance(contributor_id, str):
-            logger.warning(f"Non-string contributor ID: {type(contributor_id)}")
+            logger.warning(
+                f"Non-string contributor ID: {type(contributor_id).__name__} "
+                f"(expected str)"
+            )
             return None
 
         # Prevent overly long IDs (potential DoS)
         if len(contributor_id) > 50:
-            logger.warning(f"Contributor ID too long: {len(contributor_id)} chars")
+            logger.warning(
+                f"Contributor ID exceeds maximum length: {len(contributor_id)} chars "
+                f"(max 50)"
+            )
             return None
 
         match = cls.ID_PATTERN.match(contributor_id.lower())
         if not match:
-            logger.debug(f"Invalid contributor ID format: {contributor_id}")
+            logger.debug(
+                f"Invalid contributor ID format: '{contributor_id}' "
+                f"(expected format: role_number, e.g., 'artisan_42')"
+            )
             return None
 
         role, number_str = match.groups()
 
         # Validate role
         if role not in cls.VALID_ROLES:
-            logger.debug(f"Unknown role type: {role}")
+            logger.debug(
+                f"Unknown role type: '{role}' "
+                f"(valid roles: {', '.join(sorted(cls.VALID_ROLES))})"
+            )
             return None
 
         # Parse number safely
         try:
             number = int(number_str)
             if number < 1 or number > 99999:
-                logger.debug(f"Contributor number out of range: {number}")
+                logger.debug(
+                    f"Contributor number out of valid range: {number} "
+                    f"(must be between 1 and 99999)"
+                )
                 return None
         except ValueError:
-            logger.debug(f"Invalid contributor number: {number_str}")
+            logger.debug(
+                f"Invalid contributor number: '{number_str}' "
+                f"(must be a valid integer)"
+            )
             return None
 
         return (role, number)
@@ -138,14 +169,45 @@ class PathValidator:
         """
         Check if a path is safe to access.
 
+        Prevents directory traversal attacks by:
+        1. Rejecting paths with traversal sequences (.., ./, etc.)
+        2. Resolving to absolute paths
+        3. Ensuring resolved path is within allowed directories
+
         Args:
             path: Path to validate
             allowed_dirs: List of allowed base directories
 
         Returns:
-            True if path is within allowed directories
+            True if path is within allowed directories and contains no
+            traversal attempts
+
+        Security Note:
+            This method explicitly blocks common traversal patterns before
+            resolution to prevent attacks like "../../../etc/passwd"
         """
         if not path:
+            logger.debug("Empty path provided for validation")
+            return False
+
+        path_str = str(path)
+        
+        # Explicitly reject common traversal patterns
+        dangerous_patterns = ['..', './', '.\\', '..\\', '../', '..\\']
+        for pattern in dangerous_patterns:
+            if pattern in path_str:
+                logger.warning(
+                    f"Path contains traversal pattern '{pattern}': {path_str}"
+                )
+                return False
+        
+        # Reject absolute paths that try to escape
+        if path_str.startswith('/') and not any(
+            path_str.startswith(str(allowed)) for allowed in allowed_dirs
+        ):
+            logger.warning(
+                f"Absolute path outside allowed directories: {path_str}"
+            )
             return False
 
         try:
@@ -158,15 +220,24 @@ class PathValidator:
                 try:
                     # This will raise ValueError if target is not relative to allowed
                     target.relative_to(allowed_resolved)
+                    logger.debug(
+                        f"Path validated: {path} -> {target} "
+                        f"(within {allowed_resolved})"
+                    )
                     return True
                 except ValueError:
                     continue
 
-            logger.warning(f"Path outside allowed directories: {path}")
+            logger.warning(
+                f"Path outside allowed directories: {path} -> {target} "
+                f"(allowed: {[str(d) for d in allowed_dirs]})"
+            )
             return False
 
         except Exception as e:
-            logger.warning(f"Path validation error for {path}: {e}")
+            logger.warning(
+                f"Path validation error for '{path}': {type(e).__name__}: {e}"
+            )
             return False
 
     @staticmethod

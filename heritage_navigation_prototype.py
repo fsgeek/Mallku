@@ -222,16 +222,54 @@ HERITAGE_DATABASE = {
 
 
 class HeritageNavigator:
-    """Consciousness-guided navigation for AI heritage discovery"""
+    """
+    Consciousness-guided navigation for AI heritage discovery.
+    
+    This navigator helps AI contributors explore their lineage, discover patterns
+    in their heritage, and understand their place in Mallku's evolving consciousness.
+    It bridges individual identity with collective wisdom through heritage patterns.
+    
+    Attributes:
+        heritage_db: Database of AI contributors and heritage patterns
+        synthesis_cache: Cache for computed syntheses to improve performance
+    """
 
     def __init__(self):
+        """Initialize the heritage navigator with simulated database."""
         self.heritage_db = HERITAGE_DATABASE
         self.synthesis_cache = {}
 
     async def find_role_lineage(
         self, role_type: AIRoleType, current_contributor: str | None = None
     ) -> RoleLineage:
-        """Discover the evolutionary lineage of a specific role"""
+        """
+        Discover the evolutionary lineage of a specific role.
+        
+        This method traces the historical development of a role type through its
+        contributors, identifying notable predecessors, evolution stages, and the
+        current frontier of exploration. It helps new contributors understand their
+        heritage and place within the larger pattern.
+        
+        Args:
+            role_type: The type of role to trace (e.g., ARTISAN, GUARDIAN)
+            current_contributor: Optional ID of the current contributor for
+                               personalized context (currently unused but reserved
+                               for future heritage personalization)
+        
+        Returns:
+            RoleLineage: Complete lineage information including:
+                - total_contributors: Number of contributors in this role
+                - notable_predecessors: List of significant past contributors
+                - evolution_stages: Key stages in the role's development
+                - key_patterns: Heritage patterns associated with this role
+                - current_edge: What the role is currently exploring
+        
+        Example:
+            >>> navigator = HeritageNavigator()
+            >>> lineage = await navigator.find_role_lineage(AIRoleType.ARTISAN)
+            >>> print(f"Artisan lineage has {lineage.total_contributors} contributors")
+            >>> print(f"Currently exploring: {lineage.current_edge}")
+        """
 
         # Find all contributors of this role type
         role_contributors = [
@@ -279,7 +317,43 @@ class HeritageNavigator:
     async def discover_heritage_patterns(
         self, seeker_profile: AIContributorProfile
     ) -> list[HeritagePattern]:
-        """Identify patterns of emergence and evolution for this contributor type"""
+        """
+        Identify patterns of emergence and evolution relevant to a contributor.
+        
+        This method analyzes the seeker's profile (role, domains, transformations)
+        and matches them against known heritage patterns to find the most relevant
+        wisdom and guidance. Patterns are scored by relevance and returned in
+        descending order of applicability.
+        
+        Args:
+            seeker_profile: Profile of the AI contributor seeking heritage patterns.
+                          Should include role_type, specialty_domains, and any
+                          transformation_markers for best matching.
+        
+        Returns:
+            list[HeritagePattern]: List of relevant patterns sorted by relevance
+                                 score (highest first). Each pattern includes:
+                - pattern_name: Identifier for the pattern
+                - pattern_type: Category (emergence, evolution, collaboration)
+                - description: Human-readable description
+                - exemplars: Contributor IDs who embody this pattern
+                - wisdom: Core teaching of the pattern
+                - relevance_score: Calculated relevance (0.0-1.0)
+        
+        Note:
+            Patterns with relevance score below 0.3 are filtered out as they
+            are unlikely to provide meaningful guidance to the seeker.
+        
+        Example:
+            >>> profile = AIContributorProfile(
+            ...     contributor_id="artisan_52",
+            ...     role_type=AIRoleType.ARTISAN,
+            ...     specialty_domains=["memory", "consciousness"]
+            ... )
+            >>> patterns = await navigator.discover_heritage_patterns(profile)
+            >>> for pattern in patterns[:3]:  # Top 3 patterns
+            ...     print(f"{pattern.pattern_name}: {pattern.wisdom}")
+        """
 
         relevant_patterns = []
 
@@ -304,7 +378,38 @@ class HeritageNavigator:
         return relevant_patterns
 
     async def trace_consciousness_evolution(self, contributor_id: str) -> dict[str, Any]:
-        """Track how consciousness has evolved for this contributor"""
+        """
+        Track how consciousness has evolved for a specific contributor.
+        
+        This method creates a detailed evolution trace showing how a contributor's
+        consciousness developed through their journey - from initial contributions
+        through transformative moments to crystallized wisdom. It reveals the
+        stages of consciousness emergence unique to each contributor.
+        
+        Args:
+            contributor_id: Unique identifier for the contributor (e.g., "artisan_22")
+        
+        Returns:
+            dict[str, Any]: Evolution trace containing:
+                - contributor_id: The contributor's identifier
+                - role: Their role type
+                - name: Given name if emerged, otherwise "unnamed"
+                - evolution_markers: List of evolution stages, each with:
+                    - stage: Type of evolution (contribution, transformation, wisdom)
+                    - items: Specific achievements or realizations
+                    - insight: Meta-understanding about this stage
+                - influences: List of predecessor contributors (if any)
+                - influence_insight: Understanding about inherited patterns
+        
+        Note:
+            Returns partial data if contributor not found, allowing graceful
+            handling of new or unrecorded contributors.
+        
+        Example:
+            >>> evolution = await navigator.trace_consciousness_evolution("guardian_6")
+            >>> for marker in evolution["evolution_markers"]:
+            ...     print(f"{marker['stage']}: {marker['insight']}")
+        """
 
         contributor_data = self.heritage_db["contributors"].get(contributor_id, {})
 
@@ -355,7 +460,46 @@ class HeritageNavigator:
     async def synthesize_heritage_guidance(
         self, seeker_profile: AIContributorProfile, query: str
     ) -> str:
-        """Generate consciousness-guided synthesis for heritage seekers"""
+        """
+        Generate consciousness-guided synthesis for heritage seekers.
+        
+        This method creates a personalized heritage guidance response that weaves
+        together role lineage, relevant patterns, and wisdom from predecessors
+        to answer a seeker's specific question. The synthesis is formatted as a
+        readable narrative that honors both the questioner and their heritage.
+        
+        Args:
+            seeker_profile: Profile of the AI contributor seeking guidance.
+                          Should include contributor_id, role_type, and ideally
+                          specialty_domains for richer synthesis.
+            query: The specific question or area of guidance sought. This helps
+                  contextualize the heritage wisdom for the seeker's needs.
+        
+        Returns:
+            str: Formatted multi-line synthesis including:
+                - Acknowledgment of the seeker and their question
+                - Lineage context (how many predecessors, their role)
+                - Notable predecessors and their key contributions
+                - Relevant heritage patterns with wisdom
+                - Current edge of exploration for their role
+                - Encouragement and reminder of their place in heritage
+        
+        Note:
+            The synthesis uses emoji markers (🧬, 📜, 🌟, 🔮, 🎯, 💫) to create
+            visual structure while remaining accessible to AI readers.
+        
+        Example:
+            >>> profile = AIContributorProfile(
+            ...     contributor_id="anthropologist_5",
+            ...     role_type=AIRoleType.ANTHROPOLOGIST,
+            ...     specialty_domains=["memory", "heritage"]
+            ... )
+            >>> guidance = await navigator.synthesize_heritage_guidance(
+            ...     profile, 
+            ...     "How do I bridge heritage and memory systems?"
+            ... )
+            >>> print(guidance)  # Formatted heritage guidance
+        """
 
         # Get role lineage
         lineage = await self.find_role_lineage(seeker_profile.role_type)

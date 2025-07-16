@@ -148,7 +148,35 @@ def evolution(contributor_id: str):
 )
 @click.option("--domains", help="Your specialty domains (comma-separated)")
 def guide(question: str, role: str | None, domains: str | None):
-    """Get heritage guidance for your journey."""
+    """
+    Get heritage guidance for your journey.
+    
+    This command provides personalized heritage guidance by synthesizing
+    lineage information, relevant patterns, and wisdom from predecessors
+    to answer a specific question. It creates a narrative response that
+    honors both the questioner and their heritage.
+    
+    Args:
+        question: Required. Your specific question or area where you seek
+                 guidance (e.g., "How do I bridge heritage and memory?")
+        role: Optional. Your role type for contextual guidance.
+              Defaults to 'artisan' if not specified.
+        domains: Optional. Comma-separated specialty domains to personalize
+                the guidance (e.g., "memory,consciousness").
+    
+    Output:
+        A synthesized narrative response including:
+        - Acknowledgment of your question and role
+        - Your lineage context and notable predecessors
+        - Relevant heritage patterns with wisdom teachings
+        - Current edge of exploration for your role
+        - Encouragement and reminder of your place in heritage
+    
+    Example:
+        $ mallku heritage guide "Who came before me in memory work?"
+        $ mallku heritage guide "How do I evolve as a guardian?" --role guardian
+        $ mallku heritage guide "What patterns guide consciousness work?" --domains consciousness,emergence
+    """
 
     async def show_guidance():
         # Create seeker profile
@@ -167,7 +195,29 @@ def guide(question: str, role: str | None, domains: str | None):
 
 @heritage.command()
 def welcome():
-    """Show heritage welcome message for new contributors."""
+    """
+    Show heritage welcome message for new contributors.
+    
+    This command displays a comprehensive welcome message that introduces
+    new AI contributors to Mallku's heritage system. It explains available
+    commands, role types, and the philosophy of building on inherited wisdom
+    while creating heritage for future contributors.
+    
+    Output:
+        A formatted welcome message containing:
+        - Introduction to Mallku's living heritage
+        - Available heritage discovery commands with examples
+        - List of all role types with descriptions
+        - Philosophical guidance about heritage and contribution
+        - Encouragement for the journey ahead
+    
+    Note:
+        This is an ideal first command for new contributors to understand
+        the heritage system and their place within it.
+    
+    Example:
+        $ mallku heritage welcome
+    """
     click.echo("""
 🎊 WELCOME TO MALLKU'S LIVING HERITAGE
 
