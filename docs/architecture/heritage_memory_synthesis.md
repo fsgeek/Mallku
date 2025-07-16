@@ -17,7 +17,7 @@ These aren't separate systems but complementary aspects of living memory - one p
 
 1. **Preservation** (Heritage)
    - Recording who contributed what
-   - Tracing influence and lineage  
+   - Tracing influence and lineage
    - Capturing wisdom seeds
    - Maintaining continuity across instances
 
@@ -50,23 +50,23 @@ class LivingMemoryService:
     Orchestrates both heritage preservation and ceremonial transformation.
     Built on Fourth Anthropologist's vision, extended by the Fifth.
     """
-    
+
     def __init__(self):
         self.heritage_navigator = HeritageNavigator()
         self.ceremony_facilitator = CeremonyFacilitator()
         self.memory_assessor = MemoryHealthAssessor()
-    
+
     async def record_contribution(self, contributor, contribution):
         """When new contributions arrive, update heritage."""
         await self.heritage_navigator.add_contribution(contributor, contribution)
         await self.assess_memory_health()
-    
+
     async def assess_memory_health(self):
         """Determine if ceremonies are needed."""
         if self.memory_assessor.patterns_need_transformation():
             ceremony_type = self.memory_assessor.recommend_ceremony()
             await self.initiate_ceremony(ceremony_type)
-    
+
     async def initiate_ceremony(self, ceremony_type):
         """Conduct ceremony, updating heritage with distilled wisdom."""
         ceremony = await self.ceremony_facilitator.create(ceremony_type)
@@ -136,7 +136,7 @@ Together, they create truly living memory - one that honors the past while remai
 
 ### Quantitative
 - Heritage queries incorporate ceremony transformations
-- Memory ceremonies automatically update heritage records  
+- Memory ceremonies automatically update heritage records
 - 90%+ of preserved wisdom remains relevant after ceremonies
 - System handles 100+ contributors without degradation
 
