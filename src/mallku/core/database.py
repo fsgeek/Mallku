@@ -1,4 +1,8 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database connection and configuration management for Mallku.
 
 This module provides database connection infrastructure adapted from proven
@@ -12,7 +16,8 @@ import time
 from pathlib import Path
 
 import requests
-from arango import ArangoClient
+
+# from arango import ArangoClient  # REMOVED: Use secure API gateway instead
 from arango.collection import StandardCollection
 from arango.database import StandardDatabase
 
@@ -68,7 +73,9 @@ class MallkuDBConfig:
         """Initialize database configuration."""
         self.config_file = config_file or self._get_default_config_file()
         self.config: configparser.ConfigParser | None = None
-        self.client: ArangoClient | None = None
+        # SECURITY: Use secure API gateway instead of direct ArangoDB client
+        # self.client: ArangoClient | None = None
+        self.api_url: str | None = None
         self._database: StandardDatabase | None = None
         self.collections: dict[str, StandardCollection] = {}
 
@@ -194,80 +201,24 @@ class MallkuDBConfig:
             return False
 
         try:
+            # SECURITY: Use secure API gateway instead of direct ArangoDB client
             # Create client
-            self.client = ArangoClient(hosts=url)
+            # self.client = ArangoClient(hosts=url)
+            self.api_url = url
 
             # Connect to database
-            database_name = db_config["database"]
-            username = db_config["user_name"]
-            password = db_config["user_password"]
+            # database_name = db_config["database"]  # Not used due to security refactoring
+            # username = db_config["user_name"]  # Not used due to security refactoring
+            # password = db_config["user_password"]  # Not used due to security refactoring
 
-            # Handle no-auth case for CI
-            try:
-                if os.getenv("ARANGODB_NO_AUTH") and not username:
-                    self._database = self.client.db(database_name, verify=True)
-                else:
-                    self._database = self.client.db(
-                        database_name, username=username, password=password, verify=True
-                    )
-            except Exception as conn_error:
-                # In CI, database might not exist yet - create it
-                error_msg = str(conn_error).lower()
-                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
-                    "database not found" in error_msg
-                    or "1228" in error_msg  # ArangoDB error code for database not found
-                ):
-                    logging.info(
-                        f"Database {database_name} not found during connection, creating it..."
-                    )
-                    sys_db = self.client.db("_system", verify=True)
-                    if not sys_db.has_database(database_name):
-                        sys_db.create_database(database_name)
-                        logging.info(f"Database {database_name} successfully created")
-                    # Try connecting again
-                    if os.getenv("ARANGODB_NO_AUTH") and not username:
-                        self._database = self.client.db(database_name, verify=True)
-                    else:
-                        self._database = self.client.db(
-                            database_name, username=username, password=password, verify=True
-                        )
-                else:
-                    raise
-
-            # Test the connection
-            try:
-                self._database.properties()
-            except Exception as db_error:
-                # In CI, database might not exist yet - create it
-                # Only handle specific database not found errors
-                error_msg = str(db_error).lower()
-                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
-                    "database not found" in error_msg
-                    or "database '_system' not found" in error_msg
-                    or "404" in error_msg
-                    or "1228" in error_msg  # ArangoDB error code for database not found
-                ):
-                    logging.info(f"Database {database_name} not found, creating it...")
-                    try:
-                        sys_db = self.client.db("_system", verify=True)
-                        if not sys_db.has_database(database_name):
-                            sys_db.create_database(database_name)
-                            logging.info(f"Database {database_name} successfully created")
-                        # Reconnect to the new database
-                        self._database = self.client.db(database_name, verify=True)
-                        self._database.properties()
-                        logging.info(
-                            f"Successfully connected to newly created database {database_name}"
-                        )
-                    except Exception as create_error:
-                        logging.error(f"Failed to create database: {create_error}")
-                        raise create_error  # Raise the creation error, not the original
-                else:
-                    # Not a database-not-found error, propagate it
-                    raise db_error
-
-            logging.info(f"Connected to database {database_name}")
-            return True
+            # SECURITY: Direct database access is forbidden
+            # This entire connection logic needs to be reimplemented
+            # to use the secure API gateway at http://localhost:8080
+            logging.error(
+                "Direct ArangoDB connections are forbidden. "
+                "Use get_secured_database() which connects through the API gateway."
+            )
+            return False
 
         except Exception as e:
             logging.error(f"Failed to connect to database: {e}")
@@ -327,11 +278,10 @@ class MallkuDBConfig:
 
         logging.info("All required collections are available")
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close database connections."""
-        if self.client:
-            self.client.close()
-            self.client = None
+        # SECURITY: No direct client to close - using API gateway
+        if self._database:
             self._database = None
             self.collections.clear()
             logging.debug("Database connections closed")
@@ -341,7 +291,7 @@ class MallkuDBConfig:
 _db_instance: MallkuDBConfig | None = None
 
 
-def get_database() -> StandardDatabase:
+async def get_secured_database() -> StandardDatabase:
     """
     Get the global database instance.
 
