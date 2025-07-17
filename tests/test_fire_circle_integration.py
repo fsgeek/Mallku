@@ -218,7 +218,7 @@ class TestFireCircleReadiness:
         # Skip this test in CI since we don't have a working secure API gateway
         import os
 
-        if os.getenv("CI_DATABASE_AVAILABLE") == "1":
+        if os.getenv("CI") and not os.getenv("CI_DATABASE_AVAILABLE"):
             self.skipTest(
                 "Skipping database-dependent test in CI - secure API gateway not available"
             )
