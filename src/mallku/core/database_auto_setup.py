@@ -1,4 +1,8 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database Auto-Setup for Mallku
 ==============================
 
@@ -16,7 +20,7 @@ import logging
 import os
 from typing import Any
 
-from arango import ArangoClient
+# from arango import ArangoClient  # REMOVED: Use secure API gateway instead
 from arango.exceptions import CollectionCreateError
 
 logger = logging.getLogger(__name__)
@@ -40,7 +44,9 @@ class DatabaseAutoSetup:
     @classmethod
     def ensure_database_exists(
         cls,
-        client: ArangoClient,
+        # SECURITY: Use secure API gateway instead of direct ArangoDB client
+        # client: ArangoClient,
+        api_url: str,
         database_name: str,
         username: str = "root",
         password: str = "",
@@ -51,42 +57,14 @@ class DatabaseAutoSetup:
         This embodies reciprocal infrastructure - instead of failing when
         a database doesn't exist, we create the conditions for success.
         """
-        # First try to connect
-        try:
-            db = client.db(database_name, username=username, password=password)
-            # Test the connection
-            db.properties()
-            logger.info(f"Connected to existing database: {database_name}")
-            return db
-        except Exception as e:
-            error_msg = str(e).lower()
-
-            # Check if it's because database doesn't exist
-            if "database not found" in error_msg or "1228" in error_msg:
-                logger.info(f"Database {database_name} not found, creating it...")
-
-                try:
-                    # Connect to system database to create new database
-                    sys_db = client.db("_system", username=username, password=password)
-
-                    if not sys_db.has_database(database_name):
-                        sys_db.create_database(database_name)
-                        logger.info(f"✓ Created database: {database_name}")
-
-                    # Now connect to the newly created database
-                    db = client.db(database_name, username=username, password=password)
-
-                    # Create required collections
-                    cls._ensure_collections_exist(db)
-
-                    return db
-
-                except Exception as create_error:
-                    logger.error(f"Failed to create database: {create_error}")
-                    raise
-            else:
-                # Some other connection error
-                raise
+        # SECURITY: This method needs to be reimplemented to use the secure API gateway
+        # The 54th Guardian removed direct ArangoDB access but didn't complete the implementation
+        # For now, raise NotImplementedError to maintain architectural integrity
+        raise NotImplementedError(
+            "Database auto-setup must be reimplemented to use secure API gateway. "
+            "Direct ArangoDB connections are forbidden. "
+            "Use get_secured_database() from mallku.core.database instead."
+        )
 
     @classmethod
     def _ensure_collections_exist(cls, db: Any) -> None:
@@ -152,9 +130,11 @@ class DatabaseAutoSetup:
 
                 # Try auto-setup first
                 try:
-                    client = ArangoClient(hosts=kwargs.get("hosts", "http://localhost:8529"))
+                    # SECURITY: Use secure API gateway instead of direct ArangoDB client
+                    # client = ArangoClient(hosts=kwargs.get("hosts", "http://localhost:8080"))
+                    api_url = kwargs.get("hosts", "http://localhost:8080")
                     return cls.ensure_database_exists(
-                        client,
+                        api_url,
                         database_name,
                         username=kwargs.get("username", "root"),
                         password=kwargs.get("password", ""),

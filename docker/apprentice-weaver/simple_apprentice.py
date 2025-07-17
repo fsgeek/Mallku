@@ -65,10 +65,10 @@ def main():
     log(f"Assigned to task: {task_id}")
     log(f"Ceremony: {ceremony_name}")
 
-    # Find khipu
-    khipu_path = Path("/khipu/khipu_thread.md")
+    # Find khipu (now in workspace)
+    khipu_path = Path("/workspace/khipu_thread.md")
     if not khipu_path.exists():
-        khipu_path = Path("/workspace/khipu_thread.md")
+        khipu_path = Path("/khipu/khipu_thread.md")  # Fallback
 
     if not khipu_path.exists():
         log("ERROR: Cannot find khipu_thread.md")

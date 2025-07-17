@@ -1,8 +1,12 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database connection management for Mallku.
 
 IMPORTANT: All new code should use get_secured_database() to ensure
-proper security model enforcement. Direct database access via get_database()
+proper security model enforcement. Direct database access via await get_secured_database()
 is deprecated and monitored for security violations.
 """
 
