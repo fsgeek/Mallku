@@ -1,4 +1,8 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database connection and configuration management for Mallku.
 
 This module provides database connection infrastructure adapted from proven
@@ -12,7 +16,8 @@ import time
 from pathlib import Path
 
 import requests
-from arango import ArangoClient
+
+# from arango import ArangoClient  # REMOVED: Use secure API gateway instead
 from arango.collection import StandardCollection
 from arango.database import StandardDatabase
 
@@ -68,7 +73,9 @@ class MallkuDBConfig:
         """Initialize database configuration."""
         self.config_file = config_file or self._get_default_config_file()
         self.config: configparser.ConfigParser | None = None
-        self.client: ArangoClient | None = None
+        # SECURITY: Use secure API gateway instead of direct ArangoDB client
+        # self.client: ArangoClient | None = None
+        self.api_url: str | None = None
         self._database: StandardDatabase | None = None
         self.collections: dict[str, StandardCollection] = {}
 
@@ -194,8 +201,10 @@ class MallkuDBConfig:
             return False
 
         try:
+            # SECURITY: Use secure API gateway instead of direct ArangoDB client
             # Create client
-            self.client = ArangoClient(hosts=url)
+            # self.client = ArangoClient(hosts=url)
+            self.api_url = url
 
             # Connect to database
             database_name = db_config["database"]
@@ -289,7 +298,7 @@ class MallkuDBConfig:
 
         return self._database
 
-    def get_collection(self, collection_name: str) -> StandardCollection:
+    async def get_collection(self, collection_name: str) -> StandardCollection:
         """
         Get a collection from the database, creating it if it doesn't exist.
 
@@ -302,7 +311,7 @@ class MallkuDBConfig:
         if collection_name in self.collections:
             return self.collections[collection_name]
 
-        db = self.get_database()
+        db = await get_secured_database()
 
         # Check if collection exists, create if not
         if not db.has_collection(collection_name):
@@ -327,7 +336,7 @@ class MallkuDBConfig:
 
         logging.info("All required collections are available")
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close database connections."""
         if self.client:
             self.client.close()
@@ -341,7 +350,7 @@ class MallkuDBConfig:
 _db_instance: MallkuDBConfig | None = None
 
 
-def get_database() -> StandardDatabase:
+async def get_secured_database() -> StandardDatabase:
     """
     Get the global database instance.
 

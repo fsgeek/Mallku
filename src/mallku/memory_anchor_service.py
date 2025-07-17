@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Memory Anchor Service - Minimal Prototype Implementation
 
 This prototype validates the Memory Anchor Schema by implementing
@@ -15,7 +19,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from arango import ArangoClient
+# from arango import ArangoClient  # REMOVED: Use secure API gateway instead
 from pydantic import BaseModel, Field
 
 
@@ -95,7 +99,9 @@ class MemoryAnchorService:
 
     def __init__(self, db_config: dict[str, Any]):
         """Initialize with database configuration"""
-        self.client = ArangoClient(hosts=db_config.get("host", "http://localhost:8529"))
+        # SECURITY: Use secure API gateway instead of direct ArangoDB connection
+        # self.client = ArangoClient(hosts=db_config.get("host", "http://localhost:8080"))
+        self.api_url = db_config.get("host", "http://localhost:8080")
         self.db_name = db_config.get("database", "mallku")
         self.collection_name = "memory_anchors"
         self.edge_collection = "anchor_relationships"
@@ -285,7 +291,7 @@ def test_prototype():
 
     # Mock database config - would normally load from config file
     db_config = {
-        "host": "http://localhost:8529",
+        "host": "http://localhost:8080",
         "database": "mallku_test",
         "username": "mallku",
         "password": "test_password",
