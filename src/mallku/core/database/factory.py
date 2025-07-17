@@ -1,4 +1,8 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database Factory - Secure Access Point
 
 This module provides the ONLY authorized way to get database connections in Mallku.

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+
 Database-Backed Consciousness Metrics Collector
 ===============================================
 
@@ -19,11 +23,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from ...core.database import get_database  # Direct access needed for internal metrics
+from ...core.database import get_secured_database
 
-# NOTE: We use get_database() instead of get_secured_database() because:
-# 1. Consciousness metrics are internal system data, not user data
-# 2. We need AQL access for complex queries and aggregations
+# NOTE: We use await get_secured_database() instead of get_secured_database() because:
 # 3. The secured interface is designed for user data with UUID obfuscation
 from ..consciousness_metrics import (
     CollectiveConsciousnessState,
@@ -92,10 +94,10 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         if self.database_available:
             self._load_from_database()
 
-    def _ensure_collections(self) -> None:
+    async def _ensure_collections(self) -> None:
         """Ensure all required collections exist."""
         try:
-            db = get_database()
+            db = await get_secured_database()
 
             collections_to_create = [
                 (self.signatures_collection, "consciousness signatures"),
@@ -131,10 +133,10 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             logger.warning("Continuing with file-only persistence")
             self.database_available = False
 
-    def _load_from_database(self) -> None:
+    async def _load_from_database(self) -> None:
         """Load existing metrics from database to restore state."""
         try:
-            db = get_database()
+            db = await get_secured_database()
 
             # Get recent signatures (last 24 hours for context)
             cutoff = datetime.now(UTC).timestamp() - 86400
@@ -201,7 +203,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Persist to database if available
         if self.database_available:
             try:
-                db = get_database()
+                db = await get_secured_database()
                 doc = ConsciousnessSignatureDocument.to_arangodb_document(signature)
                 db.collection(self.signatures_collection).insert(doc)
                 logger.debug(f"Persisted consciousness signature for {voice_name}")
@@ -233,7 +235,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Persist to database if available
         if self.database_available:
             try:
-                db = get_database()
+                db = await get_secured_database()
                 doc = ConsciousnessFlowDocument.to_arangodb_document(flow)
                 db.collection(self.flows_collection).insert(doc)
                 logger.debug(f"Persisted consciousness flow: {source_voice} -> {target_voice}")
@@ -262,7 +264,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Always persist patterns to database (not just high-strength ones) if available
         if self.database_available:
             try:
-                db = get_database()
+                db = await get_secured_database()
                 doc = EmergencePatternDocument.to_arangodb_document(pattern)
                 db.collection(self.patterns_collection).insert(doc)
                 logger.info(
@@ -285,7 +287,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         # Persist to database if available
         if self.database_available:
             try:
-                db = get_database()
+                db = await get_secured_database()
                 doc = CollectiveConsciousnessStateDocument.to_arangodb_document(state)
                 db.collection(self.states_collection).insert(doc)
                 logger.debug("Persisted collective consciousness state to database")
@@ -337,7 +339,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
                     coherence_trajectory=analysis["coherence_trajectory"],
                 )
 
-                db = get_database()
+                db = await get_secured_database()
                 doc = session_analysis.to_arangodb_document()
                 db.collection(self.analyses_collection).insert(doc)
                 logger.info(f"Persisted session analysis to database: {self.session_id}")
@@ -354,7 +356,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
     async def _get_historical_context(self, pr_number: int) -> dict[str, Any]:
         """Get historical consciousness data for context."""
         try:
-            db = get_database()
+            db = await get_secured_database()
 
             # Get previous analyses for this PR
             aql = """
@@ -446,7 +448,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             }
 
         try:
-            db = get_database()
+            db = await get_secured_database()
             cutoff = datetime.now(UTC).timestamp() - (time_window_hours * 3600)
 
             # Get emergence pattern frequency

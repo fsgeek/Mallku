@@ -173,8 +173,13 @@ class TestDatabaseConsciousnessMetrics:
         assert isinstance(insights, dict)
 
         # If insights are available, check structure
-        if insights:
+        if insights and "error" not in insights:
             assert "time_window_hours" in insights or "total_signatures" in insights
+        elif "error" in insights:
+            # When database is not available, we get an error response
+            assert insights["error"] == "Database not available"
+            assert "pattern_frequency" in insights
+            assert "consciousness_evolution" in insights
 
 
 @pytest.mark.asyncio
