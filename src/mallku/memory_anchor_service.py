@@ -106,12 +106,13 @@ class MemoryAnchorService:
         self.collection_name = "memory_anchors"
         self.edge_collection = "anchor_relationships"
 
-        # Connect to database
-        self.db = self.client.db(
-            self.db_name, username=db_config.get("username"), password=db_config.get("password")
+        # SECURITY: This service needs to be reimplemented to use the secure API gateway
+        # For now, raise NotImplementedError to maintain architectural integrity
+        raise NotImplementedError(
+            "Memory Anchor Service must be reimplemented to use secure API gateway. "
+            "Direct ArangoDB connections are forbidden. "
+            "Use get_secured_database() from mallku.core.database instead."
         )
-
-        self._ensure_collections()
 
     def _ensure_collections(self):
         """Ensure required collections exist"""

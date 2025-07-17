@@ -208,17 +208,18 @@ class MallkuDBConfig:
 
             # Connect to database
             database_name = db_config["database"]
-            username = db_config["user_name"]
-            password = db_config["user_password"]
+            # username = db_config["user_name"]  # Not used due to security refactoring
+            # password = db_config["user_password"]  # Not used due to security refactoring
 
             # Handle no-auth case for CI
             try:
-                if os.getenv("ARANGODB_NO_AUTH") and not username:
-                    self._database = self.client.db(database_name, verify=True)
-                else:
-                    self._database = self.client.db(
-                        database_name, username=username, password=password, verify=True
-                    )
+                # SECURITY: Direct database access is forbidden
+                # This entire connection logic needs to be reimplemented
+                # to use the secure API gateway at http://localhost:8080
+                raise NotImplementedError(
+                    "Direct ArangoDB connections are forbidden. "
+                    "Use get_secured_database() which connects through the API gateway."
+                )
             except Exception as conn_error:
                 # In CI, database might not exist yet - create it
                 error_msg = str(conn_error).lower()
@@ -229,17 +230,11 @@ class MallkuDBConfig:
                     logging.info(
                         f"Database {database_name} not found during connection, creating it..."
                     )
-                    sys_db = self.client.db("_system", verify=True)
-                    if not sys_db.has_database(database_name):
-                        sys_db.create_database(database_name)
-                        logging.info(f"Database {database_name} successfully created")
-                    # Try connecting again
-                    if os.getenv("ARANGODB_NO_AUTH") and not username:
-                        self._database = self.client.db(database_name, verify=True)
-                    else:
-                        self._database = self.client.db(
-                            database_name, username=username, password=password, verify=True
-                        )
+                    # SECURITY: Cannot create database through direct connection
+                    raise NotImplementedError(
+                        "Database creation must be done through secure API gateway. "
+                        "Direct ArangoDB operations are forbidden."
+                    )
                 else:
                     raise
 
@@ -258,12 +253,11 @@ class MallkuDBConfig:
                 ):
                     logging.info(f"Database {database_name} not found, creating it...")
                     try:
-                        sys_db = self.client.db("_system", verify=True)
-                        if not sys_db.has_database(database_name):
-                            sys_db.create_database(database_name)
-                            logging.info(f"Database {database_name} successfully created")
-                        # Reconnect to the new database
-                        self._database = self.client.db(database_name, verify=True)
+                        # SECURITY: Cannot create database through direct connection
+                        raise NotImplementedError(
+                            "Database creation must be done through secure API gateway. "
+                            "Direct ArangoDB operations are forbidden."
+                        )
                         self._database.properties()
                         logging.info(
                             f"Successfully connected to newly created database {database_name}"
@@ -298,7 +292,7 @@ class MallkuDBConfig:
 
         return self._database
 
-    async def get_collection(self, collection_name: str) -> StandardCollection:
+    def get_collection(self, collection_name: str) -> StandardCollection:
         """
         Get a collection from the database, creating it if it doesn't exist.
 
@@ -311,7 +305,7 @@ class MallkuDBConfig:
         if collection_name in self.collections:
             return self.collections[collection_name]
 
-        db = await get_secured_database()
+        db = self.get_database()
 
         # Check if collection exists, create if not
         if not db.has_collection(collection_name):
@@ -338,9 +332,8 @@ class MallkuDBConfig:
 
     async def close(self) -> None:
         """Close database connections."""
-        if self.client:
-            self.client.close()
-            self.client = None
+        # SECURITY: No direct client to close - using API gateway
+        if self._database:
             self._database = None
             self.collections.clear()
             logging.debug("Database connections closed")
