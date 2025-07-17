@@ -1,0 +1,43 @@
+name: Database Security Check
+
+on:
+  pull_request:
+    paths:
+      - 'src/**/*.py'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**/*.py'
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Check Database Security
+      run: |
+        python scripts/verify_database_security.py
+
+    - name: Verify Structural Barriers
+      run: |
+        # Ensure get_database is not exported
+        if grep -q '"get_database"' src/mallku/core/database/__init__.py; then
+          echo "ERROR: get_database is still exported!"
+          exit 1
+        fi
+
+        # Ensure deprecation wrapper exists
+        if [ ! -f src/mallku/core/database/deprecated.py ]; then
+          echo "ERROR: Deprecation wrapper missing!"
+          exit 1
+        fi
+
+        echo "✅ Structural barriers in place"
