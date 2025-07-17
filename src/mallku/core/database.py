@@ -207,70 +207,18 @@ class MallkuDBConfig:
             self.api_url = url
 
             # Connect to database
-            database_name = db_config["database"]
+            # database_name = db_config["database"]  # Not used due to security refactoring
             # username = db_config["user_name"]  # Not used due to security refactoring
             # password = db_config["user_password"]  # Not used due to security refactoring
 
-            # Handle no-auth case for CI
-            try:
-                # SECURITY: Direct database access is forbidden
-                # This entire connection logic needs to be reimplemented
-                # to use the secure API gateway at http://localhost:8080
-                raise NotImplementedError(
-                    "Direct ArangoDB connections are forbidden. "
-                    "Use get_secured_database() which connects through the API gateway."
-                )
-            except Exception as conn_error:
-                # In CI, database might not exist yet - create it
-                error_msg = str(conn_error).lower()
-                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
-                    "database not found" in error_msg
-                    or "1228" in error_msg  # ArangoDB error code for database not found
-                ):
-                    logging.info(
-                        f"Database {database_name} not found during connection, creating it..."
-                    )
-                    # SECURITY: Cannot create database through direct connection
-                    raise NotImplementedError(
-                        "Database creation must be done through secure API gateway. "
-                        "Direct ArangoDB operations are forbidden."
-                    )
-                else:
-                    raise
-
-            # Test the connection
-            try:
-                self._database.properties()
-            except Exception as db_error:
-                # In CI, database might not exist yet - create it
-                # Only handle specific database not found errors
-                error_msg = str(db_error).lower()
-                if os.getenv("CI_DATABASE_AVAILABLE") == "1" and (
-                    "database not found" in error_msg
-                    or "database '_system' not found" in error_msg
-                    or "404" in error_msg
-                    or "1228" in error_msg  # ArangoDB error code for database not found
-                ):
-                    logging.info(f"Database {database_name} not found, creating it...")
-                    try:
-                        # SECURITY: Cannot create database through direct connection
-                        raise NotImplementedError(
-                            "Database creation must be done through secure API gateway. "
-                            "Direct ArangoDB operations are forbidden."
-                        )
-                        self._database.properties()
-                        logging.info(
-                            f"Successfully connected to newly created database {database_name}"
-                        )
-                    except Exception as create_error:
-                        logging.error(f"Failed to create database: {create_error}")
-                        raise create_error  # Raise the creation error, not the original
-                else:
-                    # Not a database-not-found error, propagate it
-                    raise db_error
-
-            logging.info(f"Connected to database {database_name}")
-            return True
+            # SECURITY: Direct database access is forbidden
+            # This entire connection logic needs to be reimplemented
+            # to use the secure API gateway at http://localhost:8080
+            logging.error(
+                "Direct ArangoDB connections are forbidden. "
+                "Use get_secured_database() which connects through the API gateway."
+            )
+            return False
 
         except Exception as e:
             logging.error(f"Failed to connect to database: {e}")
