@@ -225,7 +225,7 @@ class MallkuDBConfig:
             self._database = None
             return False
 
-    def get_database(self) -> StandardDatabase:
+    def get_database(self) -> StandardDatabase | None:
         """
         Get the connected database instance.
 
@@ -254,6 +254,10 @@ class MallkuDBConfig:
             return self.collections[collection_name]
 
         db = self.get_database()
+
+        # Check if database is available
+        if db is None:
+            raise ValueError("Database connection is not available")
 
         # Check if collection exists, create if not
         if not db.has_collection(collection_name):
@@ -291,7 +295,7 @@ class MallkuDBConfig:
 _db_instance: MallkuDBConfig | None = None
 
 
-async def get_secured_database() -> StandardDatabase:
+async def get_secured_database() -> StandardDatabase | None:
     """
     Get the global database instance.
 
