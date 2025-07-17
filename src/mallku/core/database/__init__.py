@@ -19,11 +19,6 @@ __all__ = [
     "SecuredDatabaseInterface",
     "CollectionSecurityPolicy",
     "get_security_status",
-    # Legacy compatibility (deprecated, will log warnings)
-    "get_database_raw",
-    "get_database",
-    "get_db_config",
-    "MallkuDBConfig",
 ]
 
 # ---------------------------------------------------------------------------

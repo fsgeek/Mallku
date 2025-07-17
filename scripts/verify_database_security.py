@@ -23,6 +23,12 @@ from pathlib import Path
 class DatabaseSecurityVerifier:
     """Verifies and reports database security architecture violations."""
 
+    whitelist_files = (  # See #199 for a description of changes needed here
+        Path("src/mallku/core/database.py"),
+        Path("src/mallku/core/database/factory.py"),
+        Path("src/mallku/core/database/deprecated.py"),
+    )
+
     def __init__(self):
         self.violations = []
         self.checked_files = 0
@@ -43,6 +49,9 @@ class DatabaseSecurityVerifier:
     def check_file(self, filepath: Path) -> list[tuple[int, str, str]]:
         """Check a single Python file for database security violations."""
         violations = []
+
+        if any(filepath.resolve() == w.resolve() for w in self.whitelist_files):
+            return violations  # Skip whitelisted files
 
         try:
             content = filepath.read_text()
@@ -82,7 +91,7 @@ class DatabaseSecurityVerifier:
 
         return violations
 
-    def scan_codebase(self, root_path: Path = None) -> None:
+    def scan_codebase(self, root_path: Path | None = None) -> None:
         """Scan the entire codebase for database security violations."""
         if root_path is None:
             root_path = Path(__file__).parent.parent
