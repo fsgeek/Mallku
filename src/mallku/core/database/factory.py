@@ -64,6 +64,7 @@ def get_secured_database() -> "SecuredDatabaseInterface":
             from .secured_interface import SecuredDatabaseInterface
 
             skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
+            dev_mode = os.getenv("MALLKU_DEV_MODE", "").lower() == "true"
 
             if skip_database:
                 # Verify this is a legitimate use case
@@ -103,8 +104,23 @@ def get_secured_database() -> "SecuredDatabaseInterface":
 
                 # Create a mock secured interface without database connection
                 _secured_interface = SecuredDatabaseInterface(None)
+            elif dev_mode:
+                # Development mode: Allow limited database functionality with warnings
+                logger.warning(
+                    "DEVELOPMENT MODE ENABLED: Database security is relaxed. "
+                    "This mode should NEVER be used in production!"
+                )
+                logger.warning(
+                    "Set MALLKU_DEV_MODE=false and implement proper API gateway "
+                    "before deploying to production."
+                )
+                
+                # Create a development-mode secured interface
+                # This provides basic functionality for local development
+                from .dev_interface import DevDatabaseInterface
+                _secured_interface = DevDatabaseInterface()
             else:
-                # Get raw database directly from legacy module
+                # Production mode: Strict security enforcement
                 raw_database = get_database_raw()
                 _secured_interface = SecuredDatabaseInterface(raw_database)
 
