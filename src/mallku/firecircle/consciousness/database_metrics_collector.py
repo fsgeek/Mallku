@@ -25,7 +25,8 @@ from typing import Any
 
 from ...core.database import get_secured_database
 
-# NOTE: get_secured_database() is a sync function that returns the secured database interface
+# NOTE: get_secured_database() is now synchronous (returns sync proxy)
+# The secured interface is designed for user data with UUID obfuscation
 from ..consciousness_metrics import (
     CollectiveConsciousnessState,
     ConsciousnessFlow,
@@ -86,14 +87,21 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         self.states_collection = f"{collection_prefix}states"
         self.analyses_collection = f"{collection_prefix}analyses"
 
-        # Ensure collections exist
-        self._ensure_collections()
+        # NOTE: Async initialization moved out of __init__ to avoid async/await bug
+        # Collections will be created on first use instead
+        # This is the fix for Issue #198
+        self._needs_initialization = True
+        logger.info("Database metrics collector created - initialization deferred to first use")
 
-        # Load existing metrics from database only if available
-        if self.database_available:
-            self._load_from_database()
+    async def _ensure_initialization(self) -> None:
+        """Ensure the collector is initialized before use."""
+        if getattr(self, "_needs_initialization", True):
+            await self._ensure_collections()
+            if self.database_available:
+                await self._async_load_from_database()
+            self._needs_initialization = False
 
-    def _ensure_collections(self) -> None:
+    async def _ensure_collections(self) -> None:
         """Ensure all required collections exist."""
         try:
             db = get_secured_database()
@@ -132,7 +140,11 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             logger.warning("Continuing with file-only persistence")
             self.database_available = False
 
-    def _load_from_database(self) -> None:
+    async def _async_load_from_database(self) -> None:
+        """Async version of load from database."""
+        await self._load_from_database()
+
+    async def _load_from_database(self) -> None:
         """Load existing metrics from database to restore state."""
         try:
             db = get_secured_database()
@@ -194,6 +206,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
 
         Extends base method to also persist to database.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         # Create signature using base method
         signature = await super().record_consciousness_signature(
             voice_name, signature_value, chapter_id, review_context
@@ -226,6 +241,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
 
         Extends base method to also persist to database.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         # Create flow using base method
         flow = await super().record_consciousness_flow(
             source_voice, target_voice, flow_strength, flow_type, triggered_by, review_content
@@ -255,6 +273,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
 
         Extends base method to also persist to database.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         # Create pattern using base method
         pattern = await super().detect_emergence_pattern(
             pattern_type, participating_voices, strength, indicators
@@ -280,6 +301,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
 
         Extends base method to also persist to database.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         # Capture state using base method
         state = await super().capture_collective_state()
 
@@ -302,6 +326,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         Extends base method to persist analysis to database and
         include historical context from previous sessions.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         # Get base analysis
         analysis = await super().analyze_review_session(pr_number)
 
@@ -437,6 +464,9 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
         This is a new method that leverages database persistence to provide
         insights that weren't possible with file-only storage.
         """
+        # Ensure initialization before first use
+        await self._ensure_initialization()
+
         if not self.database_available:
             return {
                 "pattern_frequency": {},

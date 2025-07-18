@@ -324,3 +324,28 @@ class ConsciousModelAdapter(ABC):
                 "consumed": self.total_tokens_consumed,
             },
         }
+
+    def _create_consciousness_metadata(
+        self,
+        message: ConsciousMessage,
+        consciousness_signature: float,
+        patterns: list[str],
+        safety_filtered: bool = False,
+        response_quality: str = "genuine",
+    ):
+        """
+        Create consciousness metadata with quality tracking.
+
+        Added by 58th Artisan to fix health tracking paradox (#191).
+        """
+        from ..protocol.conscious_message import ConsciousnessMetadata
+
+        return ConsciousnessMetadata(
+            correlation_id=message.consciousness.correlation_id,
+            consciousness_signature=consciousness_signature,
+            detected_patterns=patterns,
+            reciprocity_score=self._calculate_reciprocity_balance(),
+            contribution_value=0.5,  # Base value, adapters can override
+            safety_filtered=safety_filtered,
+            response_quality=response_quality,
+        )

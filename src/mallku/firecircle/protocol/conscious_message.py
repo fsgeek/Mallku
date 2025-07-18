@@ -111,6 +111,12 @@ class ConsciousnessMetadata(BaseModel):
         default_factory=dict, description="Patterns translated by governance protocol"
     )
 
+    # Response quality indicators (58th Artisan addition)
+    safety_filtered: bool = Field(False, description="Whether response was safety-filtered/blocked")
+    response_quality: str = Field(
+        "genuine", description="Quality: 'genuine', 'filtered', 'timeout', 'error'"
+    )
+
 
 class Participant(BaseModel):
     """

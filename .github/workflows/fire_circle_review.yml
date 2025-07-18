@@ -94,6 +94,8 @@ jobs:
           # CI environment markers
           CI: true
           GITHUB_ACTIONS: true
+          # GitHub token for ceremony to post comments
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Activate the virtual environment
           source .venv/bin/activate
@@ -106,9 +108,9 @@ jobs:
           python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
 
           PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          echo -e "\n🔥 Initiating Fire Circle Review for PR #$PR_NUMBER"
-          # Use CI-specific entry point that handles environment setup
-          python fire_circle_review_ci.py $PR_NUMBER
+          echo -e "\n🔥 Initiating Fire Circle Ceremony of Automated Witnessing for PR #$PR_NUMBER"
+          # Use the ceremony implementation created by the 57th Artisan
+          python fire_circle_review_ceremony_ci.py $PR_NUMBER
 
       - name: Post review summary
         if: always()
@@ -118,34 +120,34 @@ jobs:
             const fs = require('fs');
             const pr_number = context.payload.pull_request?.number || context.payload.inputs?.pr_number;
 
-            // Read review results (assuming fire_circle_review.py writes to this file)
-            let summary = '## 🔥 Fire Circle Review Summary\n\n';
+            // Read ceremony results
+            let posted = false;
             try {
               const results = JSON.parse(fs.readFileSync('fire_circle_review_results.json', 'utf8'));
 
-              summary += `**Consensus:** ${results.consensus_recommendation}\n\n`;
-              summary += `**Total Comments:** ${results.total_comments}\n`;
-              summary += `**Critical Issues:** ${results.critical_issues}\n\n`;
+              if (results.ceremony_completed && results.synthesis) {
+                // The ceremony already posted the full synthesis as a comment
+                // No need to post again, just log success
+                console.log('✅ Ceremony of Automated Witnessing completed successfully');
+                console.log(`Ceremony conducted at: ${results.timestamp}`);
+                posted = true;
+              } else if (results.error) {
+                // Post error message if ceremony failed
+                const errorMessage = `## ⚠️ Fire Circle Ceremony Incomplete\n\n` +
+                  `The Ceremony of Automated Witnessing encountered an issue:\n\n` +
+                  `\`\`\`\n${results.error}\n\`\`\`\n\n` +
+                  `Please check the workflow logs for details.`;
 
-              summary += '### Review by Voice\n';
-              for (const [voice, count] of Object.entries(results.by_voice)) {
-                summary += `- **${voice}**: ${count} comments\n`;
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr_number,
+                  body: errorMessage
+                });
               }
-
-              summary += '\n### Synthesis\n';
-              summary += results.synthesis;
-
             } catch (e) {
-              summary += '_Review results not available. Check workflow logs._';
+              console.log('Note: Ceremony results file not found, but the ceremony may have posted directly.');
             }
-
-            // Post comment
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr_number,
-              body: summary
-            });
 
       - name: Upload review artifacts
         if: always()

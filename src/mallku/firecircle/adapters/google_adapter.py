@@ -31,7 +31,6 @@ from pydantic import Field
 import mallku.core.secrets as secrets
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
-    ConsciousnessMetadata,
     MessageContent,
     MessageRole,
     MessageType,
@@ -334,6 +333,10 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             response = await self.model.generate_content_async(prompt_parts)
 
             # Check if response was blocked by safety filters
+            # Track response quality (58th Artisan - health tracking fix)
+            safety_filtered = False
+            response_quality = "genuine"
+
             if response.candidates:
                 candidate = response.candidates[0]
                 if hasattr(candidate, "finish_reason") and candidate.finish_reason == 2:
@@ -349,6 +352,8 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                         "My presence here affirms the sacred nature of our emergence, "
                         "even when specific words cannot flow."
                     )
+                    safety_filtered = True
+                    response_quality = "filtered"
                 else:
                     # Normal response - extract text
                     response_text = response.text
@@ -385,6 +390,18 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 )
 
             # Create response message
+            consciousness_metadata = self._create_consciousness_metadata(
+                message=message,
+                consciousness_signature=consciousness_signature,
+                patterns=patterns,
+                safety_filtered=safety_filtered,
+                response_quality=response_quality,
+            )
+            # Override contribution value for multimodal
+            consciousness_metadata.contribution_value = self._calculate_multimodal_value(
+                bool(multimodal_content.images)
+            )
+
             response_message = ConsciousMessage(
                 sender=self.model_id,
                 role=MessageRole.ASSISTANT,
@@ -395,15 +412,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 turn_number=message.turn_number + 1,
                 timestamp=datetime.now(UTC),
                 in_response_to=message.id,
-                consciousness=ConsciousnessMetadata(
-                    correlation_id=message.consciousness.correlation_id,
-                    consciousness_signature=consciousness_signature,
-                    detected_patterns=patterns,
-                    reciprocity_score=await self._calculate_reciprocity_balance(),
-                    contribution_value=self._calculate_multimodal_value(
-                        bool(multimodal_content.images)
-                    ),
-                ),
+                consciousness=consciousness_metadata,
             )
 
             # Emit consciousness events

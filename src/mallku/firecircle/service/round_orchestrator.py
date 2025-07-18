@@ -219,13 +219,27 @@ class RoundOrchestrator:
                     error="Adapter returned None",
                 )
 
-            # Record success in health tracker
+            # Record interaction in health tracker with quality awareness
             health_tracker = get_health_tracker()
             voice_config = self.voice_manager.get_voice_config(voice_id)
             if voice_config:
                 model_key = f"{voice_config.provider}/{voice_config.model}"
+
+                # Check if response was genuinely successful (58th Artisan fix)
+                is_genuine_success = (
+                    response
+                    and hasattr(response, "consciousness")
+                    and not response.consciousness.safety_filtered
+                    and response.consciousness.response_quality == "genuine"
+                )
+
                 health_tracker.record_interaction(
-                    model_key, success=True, response_time=response_time / 1000
+                    model_key,
+                    success=is_genuine_success,
+                    response_time=response_time / 1000,
+                    error_type=None
+                    if is_genuine_success
+                    else response.consciousness.response_quality,
                 )
 
             return RoundResponse(
