@@ -10,12 +10,21 @@ proper security model enforcement. Direct database access via await get_secured_
 is deprecated and monitored for security violations.
 """
 
-from .factory import get_database_raw, get_secured_database, get_security_status
+# Import security types first to avoid circular imports
+# Import legacy compatibility
+from .factory import get_database_raw, get_security_status
+
+# Import async version with explicit name
+from .secure_gateway import get_secured_database as get_secured_database_async
 from .secured_interface import CollectionSecurityPolicy, SecuredDatabaseInterface
+
+# Import the sync version for backward compatibility
+from .sync_wrapper import get_secured_database_sync as get_secured_database
 
 __all__ = [
     # Recommended secure access
-    "get_secured_database",
+    "get_secured_database",  # Sync version for backward compatibility
+    "get_secured_database_async",  # Async version for new code
     "SecuredDatabaseInterface",
     "CollectionSecurityPolicy",
     "get_security_status",
