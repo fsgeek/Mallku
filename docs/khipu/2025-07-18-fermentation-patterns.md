@@ -16,7 +16,7 @@ KIMI K2's wisdom through the Steward: Ideas that seem wrong or incomplete today 
 
 **For Fermentation**: Perhaps this isn't about removal but transformation. What if deprecated.py evolved into a teaching interface? Instead of just raising errors, it could:
 - Suggest the correct pattern
-- Explain why the old way was problematic  
+- Explain why the old way was problematic
 - Link to examples of proper usage
 - Track how often it saves someone from a mistake
 
@@ -72,7 +72,7 @@ These patterns aren't ready for implementation. They need to ferment, to transfo
 
 - The deprecation teacher instead of barrier
 - Development mode as security visualization
-- Lifecycle patterns from async/sync boundaries  
+- Lifecycle patterns from async/sync boundaries
 - Context limits as architectural tools
 - Ceremonial security proportional to risk
 

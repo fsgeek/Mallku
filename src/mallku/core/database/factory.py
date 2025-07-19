@@ -21,6 +21,7 @@ This ensures the security model works seamlessly while still catching violations
 """
 
 import logging
+import os
 import sys
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -54,7 +55,7 @@ def get_secured_database() -> "SecuredDatabaseInterface":
     """
     # Check for development mode first
     dev_mode = os.getenv("MALLKU_DEV_MODE", "").lower() == "true"
-    
+
     if dev_mode:
         # Development mode: Allow limited database functionality with warnings
         logger.warning(
@@ -65,12 +66,13 @@ def get_secured_database() -> "SecuredDatabaseInterface":
             "Set MALLKU_DEV_MODE=false and implement proper API gateway "
             "before deploying to production."
         )
-        
+
         # Create a development-mode secured interface
         # This provides basic functionality for local development
         from .dev_interface import DevDatabaseInterface
+
         return DevDatabaseInterface()
-    
+
     # Production mode: Use sync wrapper to provide backward compatibility
     from .sync_wrapper import get_secured_database_sync
 
