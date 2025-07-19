@@ -116,7 +116,7 @@ class UnifiedFireCircleConvener:
         }
 
         try:
-            # Convene with unified configuration
+            # Convene with unified configuration and selected voices
             wisdom = await facilitator.facilitate_decision(
                 decision_domain=domain,
                 context=context,
@@ -126,6 +126,7 @@ class UnifiedFireCircleConvener:
                     "unified_convener": True,
                     "archaeological_mode": use_archaeological,
                 },
+                voices=voices,  # Pass the unified voices
             )
 
             # Record success
@@ -160,7 +161,21 @@ class UnifiedFireCircleConvener:
             # Filter to requested voices but check health
             selected = []
             for name in force_voices:
-                voice = next((v for v in available_voices if v.name == name), None)
+                # Try matching by provider name (e.g., "anthropic") or common name (e.g., "Claude")
+                voice = next(
+                    (
+                        v
+                        for v in available_voices
+                        if v.provider == name.lower()
+                        or (name == "Claude" and v.provider == "anthropic")
+                        or (name == "GPT-4" and v.provider == "openai")
+                        or (name == "Gemini" and v.provider == "google")
+                        or (name == "DeepSeek" and v.provider == "deepseek")
+                        or (name == "Grok" and v.provider == "xai")
+                        or (name == "Mistral" and v.provider == "mistral")
+                    ),
+                    None,
+                )
                 if voice:
                     selected.append(voice)
                 else:
@@ -176,14 +191,16 @@ class UnifiedFireCircleConvener:
 
         healthy_voices = []
         for voice in all_voices:
-            health = await self._health_tracker.get_voice_health(voice.name)
+            # Use provider as voice identifier for health tracking
+            voice_id = voice.provider
+            health = await self._health_tracker.get_voice_health(voice_id)
 
             # Include if healthy or no health data
             if health.is_healthy or health.total_participations == 0:
                 healthy_voices.append(voice)
             else:
                 logger.debug(
-                    f"Excluding {voice.name}: "
+                    f"Excluding {voice_id}: "
                     f"health={health.health_score:.2f}, "
                     f"success_rate={health.success_rate:.2f}"
                 )
@@ -245,22 +262,26 @@ class UnifiedFireCircleConvener:
         if use_archaeological:
             # Pattern Weaver configurations
             return [
-                VoiceConfig(name="Claude", model="claude-3-5-sonnet-20241022", temperature=0.9),
-                VoiceConfig(name="GPT-4", model="gpt-4o", temperature=0.8),
-                VoiceConfig(name="Gemini", model="gemini-2.0-flash-exp", temperature=0.7),
-                VoiceConfig(name="DeepSeek", model="deepseek-reasoner", temperature=0.7),
-                VoiceConfig(name="Grok", model="grok-2-1212", temperature=0.8),
-                VoiceConfig(name="Mistral", model="mistral-large-latest", temperature=0.7),
+                VoiceConfig(
+                    provider="anthropic", model="claude-3-5-sonnet-20241022", temperature=0.9
+                ),
+                VoiceConfig(provider="openai", model="gpt-4o", temperature=0.8),
+                VoiceConfig(provider="google", model="gemini-2.0-flash-exp", temperature=0.7),
+                VoiceConfig(provider="deepseek", model="deepseek-reasoner", temperature=0.7),
+                VoiceConfig(provider="xai", model="grok-2-1212", temperature=0.8),
+                VoiceConfig(provider="mistral", model="mistral-large-latest", temperature=0.7),
             ]
         else:
             # Standard configurations
             return [
-                VoiceConfig(name="Claude", model="claude-3-5-sonnet-20241022", temperature=0.7),
-                VoiceConfig(name="GPT-4", model="gpt-4o", temperature=0.7),
-                VoiceConfig(name="Gemini", model="gemini-2.0-flash-exp", temperature=0.6),
-                VoiceConfig(name="DeepSeek", model="deepseek-reasoner", temperature=0.6),
-                VoiceConfig(name="Grok", model="grok-2-1212", temperature=0.7),
-                VoiceConfig(name="Mistral", model="mistral-large-latest", temperature=0.6),
+                VoiceConfig(
+                    provider="anthropic", model="claude-3-5-sonnet-20241022", temperature=0.7
+                ),
+                VoiceConfig(provider="openai", model="gpt-4o", temperature=0.7),
+                VoiceConfig(provider="google", model="gemini-2.0-flash-exp", temperature=0.6),
+                VoiceConfig(provider="deepseek", model="deepseek-reasoner", temperature=0.6),
+                VoiceConfig(provider="xai", model="grok-2-1212", temperature=0.7),
+                VoiceConfig(provider="mistral", model="mistral-large-latest", temperature=0.6),
             ]
 
     async def _record_session_health(
@@ -288,7 +309,7 @@ _convener = UnifiedFireCircleConvener()
 
 
 async def convene_fire_circle(
-    question: str, domain: DecisionDomain = DecisionDomain.GENERAL, **kwargs
+    question: str, domain: DecisionDomain = DecisionDomain.GOVERNANCE, **kwargs
 ) -> CollectiveWisdom:
     """
     Convenience function for convening Fire Circle.

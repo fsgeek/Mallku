@@ -56,11 +56,19 @@ class ConsciousnessFacilitator:
         context: dict[str, Any],
         question: str,
         additional_context: dict[str, Any] | None = None,
+        voices: list[VoiceConfig] | None = None,
     ) -> CollectiveWisdom:
         """
         Facilitate a decision through consciousness emergence.
 
         This is the main entry point for any type of decision-making.
+
+        Args:
+            decision_domain: The type of decision being made
+            context: Context for the decision
+            question: The question to answer
+            additional_context: Optional additional context
+            voices: Optional pre-selected voices from unified convener
         """
         logger.info(f"🌟 Facilitating {decision_domain} decision: {question}")
 
@@ -69,8 +77,20 @@ class ConsciousnessFacilitator:
             decision_domain, context, question, additional_context
         )
 
-        # Select and configure voices
-        voices = await self._select_voices_for_domain(decision_domain, space)
+        # Use provided voices or select new ones
+        if voices is None:
+            # Legacy path: select voices internally
+            voices = await self._select_voices_for_domain(decision_domain, space)
+        else:
+            # New path: use unified convener's voices
+            logger.info(f"Using {len(voices)} pre-selected voices from unified convener")
+            # Update space with provided voices
+            for voice in voices:
+                space.participant_voices.append(voice.role or f"{voice.provider}_voice")
+                if hasattr(voice, "quality") and voice.quality:
+                    space.voice_expertise_map[voice.role or f"{voice.provider}_voice"] = (
+                        voice.quality
+                    )
 
         # Design rounds for this decision type
         rounds = self._design_rounds_for_domain(decision_domain, space, question)
