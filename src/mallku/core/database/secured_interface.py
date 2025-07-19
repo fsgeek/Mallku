@@ -249,6 +249,36 @@ class SecuredDatabaseInterface:
             return []
         return [col.name for col in self._database.collections()] if self._database else []
 
+    def collection(self, name: str) -> "StandardCollection":
+        """Get a collection (compatibility method).
+
+        WARNING: This bypasses security policies. Use get_secured_collection() instead.
+        """
+        self._warn_once(f"Direct collection access for '{name}' - use get_secured_collection()")
+
+        if self._skip_database:
+            # Return a mock collection in dev mode
+            from .dev_interface import MockCollection
+
+            return MockCollection(name)
+
+        if not self._database:
+            raise RuntimeError("No database connection available")
+
+        return self._database.collection(name)
+
+    def has_collection(self, name: str) -> bool:
+        """Check if a collection exists."""
+        self._warn_once(f"Checking collection existence for '{name}'")
+
+        if self._skip_database:
+            return True  # Always true in dev mode
+
+        if not self._database:
+            return False
+
+        return self._database.has_collection(name)
+
     def create_collection(self, name: str) -> None:
         """Create a collection (legacy compatibility)."""
         if self._skip_database:
@@ -256,6 +286,83 @@ class SecuredDatabaseInterface:
             return
         if self._database:
             self._database.create_collection(name)
+
+    @property
+    def aql(self):
+        """Get AQL interface (compatibility method).
+
+        WARNING: Direct AQL access bypasses security. Use execute_secured_query() instead.
+        """
+        self._warn_once("Direct AQL access - use execute_secured_query()")
+
+        if self._skip_database:
+            from .dev_interface import MockAQL
+
+            return MockAQL(self)
+
+        if not self._database:
+            raise RuntimeError("No database connection available")
+
+        return self._database.aql
+
+    async def query(self, collection: str, filters: dict[str, Any]) -> list[dict]:
+        """Query a collection with filters (compatibility method).
+
+        WARNING: This is a simplified query interface. Use execute_secured_query() for complex queries.
+        """
+        self._warn_once(f"Using simplified query on '{collection}'")
+
+        if self._skip_database:
+            logger.info(f"DEV MODE: Query on {collection} with filters {filters} - returning empty")
+            return []
+
+        # Build a simple AQL query from filters
+        conditions = []
+        bind_vars = {"@collection": collection}
+
+        for i, (key, value) in enumerate(filters.items()):
+            conditions.append(f"doc.{key} == @value{i}")
+            bind_vars[f"value{i}"] = value
+
+        where_clause = " AND ".join(conditions) if conditions else "true"
+        query = f"FOR doc IN @@collection FILTER {where_clause} RETURN doc"
+
+        return await self.execute_secured_query(query, bind_vars, collection)
+
+    async def batch_insert(self, collection: str, documents: list[dict]) -> None:
+        """Batch insert documents (compatibility method).
+
+        WARNING: This bypasses security policies. Use SecuredCollectionWrapper.insert_secured() instead.
+        """
+        self._warn_once(f"Batch inserting to '{collection}' without security")
+
+        if self._skip_database:
+            logger.info(f"DEV MODE: Would insert {len(documents)} documents to {collection}")
+            return
+
+        if not self._database:
+            raise RuntimeError("No database connection available")
+
+        # Get or create collection
+        if not self._database.has_collection(collection):
+            self._database.create_collection(collection)
+
+        col = self._database.collection(collection)
+        col.insert_many(documents)
+
+    def _warn_once(self, operation: str) -> None:
+        """Warn about an operation once per session."""
+        if not hasattr(self, "_warned_operations"):
+            self._warned_operations = set()
+
+        # Extract operation type (before ' for ' or ' on ')
+        op_type = operation.split(" for ")[0].split(" on ")[0].strip()
+
+        if op_type not in self._warned_operations:
+            self._warned_operations.add(op_type)
+            logger.warning(
+                f"COMPATIBILITY MODE: {operation} - Consider using secured methods for production"
+            )
 
     def _ensure_initialized(self) -> None:
         """Ensure the interface is initialized before operations."""
@@ -481,12 +588,63 @@ class SecuredCollectionWrapper:
         """Check if collection exists (safe operation)."""
         return True  # We wouldn't have a wrapper if it didn't exist
 
+    def insert(self, document: dict) -> dict:
+        """Insert a document (compatibility method).
+
+        WARNING: This bypasses security policies. Use insert_secured() instead.
+        """
+        self._parent_interface._warn_once(f"Direct insert into '{self._policy.collection_name}'")
+        return self._collection.insert(document)
+
+    def insert_many(self, documents: list[dict]) -> list[dict]:
+        """Insert multiple documents (compatibility method).
+
+        WARNING: This bypasses security policies. Use insert_secured() instead.
+        """
+        self._parent_interface._warn_once(
+            f"Direct insert_many into '{self._policy.collection_name}'"
+        )
+        return self._collection.insert_many(documents)
+
+    def all(self, limit: int | None = None) -> list[dict]:
+        """Get all documents (compatibility method).
+
+        WARNING: This may return sensitive data. Use with caution.
+        """
+        self._parent_interface._warn_once(f"Direct all() on '{self._policy.collection_name}'")
+        if limit:
+            return list(self._collection.all(limit=limit))
+        return list(self._collection.all())
+
+    def find(self, filters: dict[str, Any]) -> list[dict]:
+        """Find documents with filters (compatibility method).
+
+        WARNING: This bypasses security transformations. Use parent's query() instead.
+        """
+        self._parent_interface._warn_once(f"Direct find() on '{self._policy.collection_name}'")
+        # Build simple AQL query
+        conditions = []
+        bind_vars = {"@collection": self._policy.collection_name}
+
+        for i, (key, value) in enumerate(filters.items()):
+            conditions.append(f"doc.{key} == @value{i}")
+            bind_vars[f"value{i}"] = value
+
+        where_clause = " AND ".join(conditions) if conditions else "true"
+        query = f"FOR doc IN @@collection FILTER {where_clause} RETURN doc"
+
+        cursor = self._parent_interface._database.aql.execute(query, bind_vars=bind_vars)
+        return list(cursor)
+
+    def add_persistent_index(self, fields: list[str], unique: bool = False) -> dict:
+        """Add a persistent index (compatibility method)."""
+        self._parent_interface._warn_once(f"Creating index on '{self._policy.collection_name}'")
+        return self._collection.add_persistent_index(fields=fields, unique=unique)
+
     # Block direct access to potentially unsafe operations
     def __getattr__(self, name: str) -> Any:
         """Block direct access to unsafe collection operations."""
         unsafe_operations = {
-            "insert",
-            "insert_many",
             "update",
             "update_many",
             "replace",
@@ -494,8 +652,6 @@ class SecuredCollectionWrapper:
             "delete",
             "delete_many",
             "get",
-            "find",
-            "all",
             "random",
             "truncate",
         }

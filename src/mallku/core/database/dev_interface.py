@@ -30,11 +30,23 @@ class DevDatabaseInterface(SecuredDatabaseInterface):
 
     def __init__(self):
         """Initialize development mode interface."""
-        super().__init__(None)  # No real database yet
+        # Initialize base class attributes without going through full init
+        self._database = None
+        self._skip_database = True
+        self._initialized = True  # Skip initialization in dev mode
+        self._operation_count = 0
+        self._security_violations = []
+        self._collection_policies = {}
+        self._warned_operations = set()
 
+        # Dev mode specific
         self._dev_mode = True
         self._collections = {}
-        self._warned_operations = set()
+
+        # Create a minimal security registry without file I/O
+        from ..security.registry import SecurityRegistry
+
+        self._security_registry = SecurityRegistry()
 
         warnings.warn(
             "DevDatabaseInterface is for DEVELOPMENT ONLY. "
@@ -59,61 +71,38 @@ class DevDatabaseInterface(SecuredDatabaseInterface):
 
     def _warn_once(self, operation: str) -> None:
         """Warn about an operation once per session."""
-        if operation not in self._warned_operations:
-            self._warned_operations.add(operation)
+        # Extract operation type (before ' for ' or ' on ')
+        op_type = operation.split(" for ")[0].split(" on ")[0].strip()
+
+        if op_type not in self._warned_operations:
+            self._warned_operations.add(op_type)
             logger.warning(
                 f"DEV MODE: {operation} - In production, this must go through API gateway"
             )
 
     def collection(self, name: str) -> "MockCollection":
         """Get a mock collection for development."""
-        self._warn_once(f"Accessing collection '{name}'")
+        self._warn_once(f"Direct collection access for '{name}' - use get_secured_collection()")
 
         if name not in self._collections:
             self._collections[name] = MockCollection(name)
 
         return self._collections[name]
 
-    def has_collection(self, name: str) -> bool:
-        """Check if collection exists (always returns True in dev mode)."""
-        self._warn_once(f"Checking collection existence '{name}'")
-        return True
-
-    def create_collection(self, name: str) -> None:
-        """Create a collection (no-op in dev mode)."""
-        self._warn_once(f"Creating collection '{name}'")
-        if name not in self._collections:
-            self._collections[name] = MockCollection(name)
-
-    async def query(self, collection: str, filters: dict[str, Any]) -> list[dict]:
-        """Mock query implementation for development."""
-        self._warn_once(f"Querying collection '{collection}'")
-
-        # Return empty results in dev mode
-        logger.info(f"DEV MODE: Query on {collection} with filters {filters} - returning empty")
-        return []
-
-    async def batch_insert(self, collection: str, documents: list[dict]) -> None:
-        """Mock batch insert for development."""
-        self._warn_once(f"Batch inserting to '{collection}'")
-
-        logger.info(f"DEV MODE: Would insert {len(documents)} documents to {collection}")
-        # In dev mode, just log the operation
-
     def get_security_metrics(self) -> dict[str, Any]:
         """Get security metrics for development mode."""
+        # Track collections accessed through the base class collection() method
+        collections_accessed = []
+        if hasattr(self, "_collections"):
+            collections_accessed = list(self._collections.keys())
+
         return {
             "mode": "development",
             "operations_count": len(self._warned_operations),
             "security_violations": 0,  # None in dev mode
-            "collections_accessed": list(self._collections.keys()),
+            "collections_accessed": collections_accessed,
             "warning": "Development mode - no real security enforcement",
         }
-
-    @property
-    def aql(self):
-        """Provide mock AQL interface for development."""
-        return MockAQL(self)
 
 
 class MockCollection:

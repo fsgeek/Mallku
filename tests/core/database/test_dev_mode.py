@@ -127,7 +127,7 @@ class TestDevelopmentMode:
         with patch("logging.Logger.warning") as mock_warning:
             dev_db.collection("test1")
             assert mock_warning.call_count == 1
-            assert "Accessing collection" in mock_warning.call_args[0][0]
+            assert "Direct collection access" in mock_warning.call_args[0][0]
 
         # Second collection access should not warn
         with patch("logging.Logger.warning") as mock_warning:
