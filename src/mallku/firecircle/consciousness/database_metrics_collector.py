@@ -142,6 +142,7 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
 
     async def _async_load_from_database(self) -> None:
         """Async version of load from database."""
+        # This method is kept for backward compatibility
         await self._load_from_database()
 
     async def _load_from_database(self) -> None:

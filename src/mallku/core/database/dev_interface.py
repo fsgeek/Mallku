@@ -110,6 +110,11 @@ class DevDatabaseInterface(SecuredDatabaseInterface):
             "warning": "Development mode - no real security enforcement",
         }
 
+    @property
+    def aql(self):
+        """Provide mock AQL interface for development."""
+        return MockAQL(self)
+
 
 class MockCollection:
     """Mock collection for development mode."""
@@ -141,4 +146,26 @@ class MockCollection:
     def find(self, filters: dict) -> list[dict]:
         """Mock find operation."""
         logger.debug(f"DEV MODE: Finding documents in {self.name} with filters {filters}")
+        return []
+
+    def add_persistent_index(self, fields: list[str], unique: bool = False) -> dict:
+        """Mock index creation."""
+        logger.debug(f"DEV MODE: Creating index on {self.name} for fields {fields}")
+        return {"id": f"idx_{self.name}_{'_'.join(fields)}", "type": "persistent"}
+
+
+class MockAQL:
+    """Mock AQL interface for development mode."""
+
+    def __init__(self, dev_interface):
+        self.dev_interface = dev_interface
+
+    def execute(self, query: str, bind_vars: dict[str, Any] | None = None) -> list[dict]:
+        """Mock AQL execution."""
+        self.dev_interface._warn_once(f"Executing AQL query: {query[:50]}...")
+        logger.info(
+            f"DEV MODE: AQL query execution requested but returns empty results.\n"
+            f"Query: {query}\n"
+            f"Bind vars: {bind_vars}"
+        )
         return []

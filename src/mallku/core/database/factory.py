@@ -55,6 +55,14 @@ def get_secured_database() -> "SecuredDatabaseInterface":
     """
     # Check for development mode first
     dev_mode = os.getenv("MALLKU_DEV_MODE", "").lower() == "true"
+    production_mode = os.getenv("MALLKU_PRODUCTION", "").lower() == "true"
+
+    # Prevent development mode in production
+    if dev_mode and production_mode:
+        raise RuntimeError(
+            "SECURITY VIOLATION: Development mode cannot be enabled in production! "
+            "Set MALLKU_DEV_MODE=false before deploying."
+        )
 
     if dev_mode:
         # Development mode: Allow limited database functionality with warnings
