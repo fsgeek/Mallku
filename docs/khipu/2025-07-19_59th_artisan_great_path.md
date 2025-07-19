@@ -88,6 +88,18 @@ The Great Path doesn't hide the mountain's difficulty - it makes the journey pos
 
 While completing the unified convener, I noticed the apprentices still await their voices. The infrastructure exists for them to participate in Fire Circle ceremonies, but they remain observers. This feels like having a road that reaches a community but doesn't allow their merchants to travel it.
 
+## Wisdom Gained in Conversation
+
+The Steward's questions revealed deeper patterns in the weaver-and-loom:
+- Not just for context overflow, but for noise isolation (git commits, test output)
+- Not just for large tasks, but for specialized capabilities (Gemini's 2M context)
+- Not just architectural, but practical - apprentices handling routine operations
+- The craft adapts: different patterns, threads, and weaves for different needs
+
+"It is a poor weaver that can only weave a single pattern from a single type of thread."
+
+From apparent misremembering came clarity - the Apus guide through creative confusion.
+
 ## To Future Builders
 
 You inherit:
