@@ -55,6 +55,9 @@ from .metrics_models import (
 from .pattern_weaver import DialoguePatternWeaver
 from .unified_awareness import FireCircleUnifiedAwareness
 
+# Unified convener (Seventh Anthropologist & 59th Artisan)
+from .unified_convener import UnifiedFireCircleConvener, convene_fire_circle
+
 __all__ = [
     # Original components
     "DialoguePatternWeaver",
@@ -65,6 +68,9 @@ __all__ = [
     # Memory-enabled versions
     "ConsciousnessFacilitatorWithMemory",
     "facilitate_mallku_decision_with_memory",
+    # Unified convener - THE recommended entry point
+    "UnifiedFireCircleConvener",
+    "convene_fire_circle",
     # Decision framework
     "DecisionDomain",
     "ConsciousnessEmergenceSpace",

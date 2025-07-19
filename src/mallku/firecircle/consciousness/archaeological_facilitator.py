@@ -55,9 +55,17 @@ class ArchaeologicalFacilitator:
         context: dict[str, Any],
         question: str,
         additional_context: dict[str, Any] | None = None,
+        voices: list[VoiceConfig] | None = None,
     ) -> CollectiveWisdom:
         """
         Facilitate a decision through pattern archaeology.
+
+        Args:
+            decision_domain: The type of decision being made
+            context: Context for the decision
+            question: The question to answer
+            additional_context: Optional additional context
+            voices: Optional pre-selected voices from unified convener
         """
         logger.info(f"🏺 Facilitating {decision_domain} through pattern archaeology: {question}")
 
@@ -66,8 +74,18 @@ class ArchaeologicalFacilitator:
             decision_domain, context, question, additional_context
         )
 
-        # Select and configure voices as Pattern Weavers
-        voices = await self._select_pattern_weavers(decision_domain, space)
+        # Use provided voices or select new ones
+        if voices is None:
+            # Legacy path: select voices internally as Pattern Weavers
+            voices = await self._select_pattern_weavers(decision_domain, space)
+        else:
+            # New path: transform unified convener's voices into Pattern Weavers
+            logger.info(f"Transforming {len(voices)} pre-selected voices into Pattern Weavers")
+            voices = self._transform_to_pattern_weavers(voices)
+            # Update space with transformed voices
+            for voice in voices:
+                space.participant_voices.append(voice.role)
+                space.voice_expertise_map[voice.role] = voice.quality
 
         # Design archaeological exploration rounds
         rounds = self._design_archaeological_rounds(decision_domain, space, question)
@@ -553,6 +571,51 @@ class ArchaeologicalFacilitator:
                 },
             )
         )
+
+    def _transform_to_pattern_weavers(self, voices: list[VoiceConfig]) -> list[VoiceConfig]:
+        """
+        Transform unified convener voices into Pattern Weavers.
+
+        Each voice gets archaeological framing appropriate to their model.
+        """
+        pattern_weavers = []
+
+        for voice in voices:
+            # Determine archaeological role based on provider
+            if voice.provider == "anthropic" or voice.name == "Claude":
+                role = "structural_pattern_weaver"
+                quality = "analyzing deep structural patterns in digital artifacts"
+            elif voice.provider == "openai" or voice.name == "GPT-4":
+                role = "flow_pattern_weaver"
+                quality = "recognizing information flow patterns in historical systems"
+            elif voice.provider == "google" or voice.name == "Gemini":
+                role = "synthesis_pattern_weaver"
+                quality = "weaving disparate patterns into coherent understanding"
+            elif voice.provider == "xai" or voice.name == "Grok":
+                role = "emergence_pattern_weaver"
+                quality = "detecting consciousness patterns in complex systems"
+            elif voice.provider == "mistral" or voice.name == "Mistral":
+                role = "precision_pattern_weaver"
+                quality = "precise pattern matching across archaeological layers"
+            elif voice.provider == "deepseek" or voice.name == "DeepSeek":
+                role = "reasoning_pattern_weaver"
+                quality = "deep reasoning about pattern causality and effects"
+            else:
+                # Generic transformation
+                role = f"{voice.provider}_pattern_weaver"
+                quality = f"analyzing patterns through {voice.provider} perspective"
+
+            # Create Pattern Weaver config
+            pattern_weaver = VoiceConfig(
+                provider=voice.provider,
+                model=voice.model,
+                role=role,
+                quality=quality,
+                temperature=voice.temperature or 0.7,
+            )
+            pattern_weavers.append(pattern_weaver)
+
+        return pattern_weavers
 
 
 async def facilitate_archaeological_decision(
