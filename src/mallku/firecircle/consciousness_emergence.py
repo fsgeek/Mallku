@@ -22,10 +22,9 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-logger = logging.getLogger("mallku.firecircle.consciousness")
-
-
 from .consciousness.decision_framework import DecisionDomain
+
+logger = logging.getLogger("mallku.firecircle.consciousness")
 
 
 class VoicePerspective(str, Enum):
