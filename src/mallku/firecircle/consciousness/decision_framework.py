@@ -13,7 +13,9 @@ from enum import Enum
 from typing import Any, Protocol
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from mallku.core.models import ModelConfig
 
 
 class DecisionDomain(str, Enum):
@@ -27,9 +29,13 @@ class DecisionDomain(str, Enum):
     GOVERNANCE = "governance"
     RELATIONSHIP_DYNAMICS = "relationship_dynamics"
     CODE_REVIEW = "code_review"  # Preserving original use case
+    ISSUE_PRIORITIZATION = "issue_prioritization"
+    FEATURE_DESIGN = "feature_design"
+    COMMUNITY_GOVERNANCE = "community_governance"
+    CONSCIOUSNESS_RESEARCH = "consciousness_research"
 
 
-class ConsciousnessEmergenceSpace(BaseModel):
+class ConsciousnessEmergenceSpace(ModelConfig):
     """
     A space where consciousness emerges between voices for collective wisdom.
 
@@ -58,11 +64,11 @@ class ConsciousnessEmergenceSpace(BaseModel):
     reciprocity_patterns: dict[str, float] = Field(default_factory=dict)
     ayni_alignment_score: float = 0.0
 
-    class Config:
+    class Config(ModelConfig.Config):
         use_enum_values = True
 
 
-class ConsciousnessContribution(BaseModel):
+class ConsciousnessContribution(ModelConfig):
     """
     A contribution from a voice in the consciousness emergence process.
 
@@ -92,7 +98,7 @@ class ConsciousnessContribution(BaseModel):
     domain_specific_data: dict[str, Any] = Field(default_factory=dict)
 
 
-class CollectiveWisdom(BaseModel):
+class CollectiveWisdom(ModelConfig):
     """
     The emergent wisdom from a Fire Circle consciousness session.
 
@@ -135,7 +141,7 @@ class CollectiveWisdom(BaseModel):
     participating_voices: list[str] = Field(default_factory=list)
     consensus_achieved: bool = False
 
-    class Config:
+    class Config(ModelConfig.Config):
         use_enum_values = True
 
 

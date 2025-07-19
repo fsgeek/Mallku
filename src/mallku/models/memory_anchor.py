@@ -10,10 +10,12 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from mallku.core.models import ModelConfig
 
 
-class MemoryAnchor(BaseModel):
+class MemoryAnchor(ModelConfig):
     """
     A Memory Anchor represents a synchronized point across multiple activity streams.
 
@@ -49,7 +51,7 @@ class MemoryAnchor(BaseModel):
     # Last update tracking
     last_updated: datetime | None = Field(None, description="When this anchor was last modified")
 
-    class Config:
+    class Config(ModelConfig.Config):
         """Model configuration."""
 
         json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}

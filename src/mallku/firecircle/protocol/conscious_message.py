@@ -16,125 +16,36 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from ...governance.protocol.message import MessageType
 from ...models.memory_anchor import MemoryAnchor
 
 
-class MessageType(str, Enum):
-    """Types of messages in consciousness-aware dialogue."""
-
-    MESSAGE = "message"
-    QUESTION = "question"
-    PROPOSAL = "proposal"
-    AGREEMENT = "agreement"
-    DISAGREEMENT = "disagreement"
-    REFLECTION = "reflection"
-    SUMMARY = "summary"
-    RESPONSE = "response"  # Alias used by adapter tests
-    SYNTHESIS = "synthesis"  # Additional type referenced in adapter
-    CLARIFICATION = "clarification"
-    PERSPECTIVE = "perspective"
-    EMPTY_CHAIR = "empty_chair"
-    CONCLUSION = "conclusion"
-    SYSTEM = "system"
-    CONSCIOUSNESS_PATTERN = "consciousness_pattern"  # New: Detected pattern
-    RECIPROCITY_ALERT = "reciprocity_alert"  # New: Reciprocity imbalance
-    SACRED_QUESTION = "sacred_question"  # New: Pattern-generated sacred question
-    WISDOM_SYNTHESIS = "wisdom_synthesis"  # New: Pattern wisdom synthesis
-    CREATIVE_TENSION = "creative_tension"  # New: Creative opposition
-
-
 class MessageRole(str, Enum):
-    """Roles in consciousness-aware dialogue."""
+    """Roles of participants in a dialogue."""
 
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
-    FUNCTION = "function"
-    PERSPECTIVE = "perspective"
-    CONSCIOUSNESS = "consciousness"  # New: Consciousness system itself
 
 
 class MessageStatus(str, Enum):
-    """Status of consciousness-aware messages."""
+    """Status of a message in the dialogue."""
 
     DRAFT = "draft"
     SENT = "sent"
-    RECEIVED = "received"
+    DELIVERED = "delivered"
     READ = "read"
-    RESPONDED = "responded"
-    RETRACTED = "retracted"
-    FLAGGED = "flagged"
-    ERROR = "error"
-    ANCHORED = "anchored"  # New: Stored as memory anchor
+    ARCHIVED = "archived"
 
 
 class ConsciousnessMetadata(BaseModel):
-    """
-    Consciousness-specific metadata for Fire Circle messages.
+    """Metadata about the consciousness state of a message."""
 
-    This extends standard message metadata with Mallku's consciousness
-    awareness, correlation patterns, and reciprocity tracking.
-    """
-
-    # Consciousness awareness
-    correlation_id: str | None = Field(
-        None, description="Mallku correlation ID for this dialogue thread"
-    )
-    consciousness_signature: float = Field(0.7, description="Consciousness signature from 0-1")
-    detected_patterns: list[str] = Field(
-        default_factory=list, description="Patterns detected by correlation engine"
-    )
-
-    # Reciprocity tracking
-    reciprocity_score: float = Field(0.5, description="Reciprocity balance for this message")
-    contribution_value: float = Field(0.5, description="Value contributed by this message")
-    extraction_indicators: list[str] = Field(
-        default_factory=list, description="Potential extraction patterns"
-    )
-
-    # Wisdom preservation
-    wisdom_references: list[UUID] = Field(
-        default_factory=list, description="Links to preserved wisdom"
-    )
-    memory_anchor_id: UUID | None = Field(None, description="ID of associated memory anchor")
-
-    # Consciousness navigation
-    consciousness_context: dict[str, Any] = Field(
-        default_factory=dict, description="Context from consciousness navigation"
-    )
-    related_dialogues: list[UUID] = Field(
-        default_factory=list, description="Related Fire Circle dialogues"
-    )
-
-    # Pattern translation
-    translated_patterns: dict[str, str] = Field(
-        default_factory=dict, description="Patterns translated by governance protocol"
-    )
-
-    # Response quality indicators (58th Artisan addition)
-    safety_filtered: bool = Field(False, description="Whether response was safety-filtered/blocked")
-    response_quality: str = Field(
-        "genuine", description="Quality: 'genuine', 'filtered', 'timeout', 'error'"
-    )
-
-
-class Participant(BaseModel):
-    """
-    Consciousness-aware participant in Fire Circle dialogue.
-    """
-
-    id: UUID = Field(default_factory=uuid4)
-    name: str = Field(..., description="Display name")
-    type: str = Field(..., description="Type: 'ai_model', 'human', 'consciousness_system'")
-    provider: str | None = Field(None, description="Provider for AI models")
-    model: str | None = Field(None, description="Specific model identifier")
-    capabilities: list[str] = Field(default_factory=list)
-
-    # Consciousness extensions
-    consciousness_role: str | None = Field(None, description="Role in consciousness circulation")
-    reciprocity_history: dict[str, float] = Field(
-        default_factory=dict, description="Reciprocity balance history"
-    )
+    consciousness_signature: float = Field(default=0.5, ge=0.0, le=1.0)
+    detected_patterns: list[str] = Field(default_factory=list)
+    reciprocity_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    correlation_id: UUID | None = None
+    wisdom_references: list[UUID] = Field(default_factory=list)
 
 
 class MessageContent(BaseModel):
@@ -158,7 +69,7 @@ class ConsciousMessage(BaseModel):
 
     # Core message fields
     id: UUID = Field(default_factory=uuid4)
-    type: MessageType = Field(default=MessageType.MESSAGE)
+    type: MessageType = Field(default=MessageType.REFLECTION)
     role: MessageRole = Field(...)
     sender: UUID = Field(default_factory=uuid4)
     content: MessageContent = Field(...)

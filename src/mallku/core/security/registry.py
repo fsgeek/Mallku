@@ -10,15 +10,16 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from ...core.models import ModelConfig
 from .field_strategies import FieldSecurityConfig
 from .temporal import TemporalOffsetConfig
 
 logger = logging.getLogger(__name__)
 
 
-class FieldMapping(BaseModel):
+class FieldMapping(ModelConfig):
     """Mapping between semantic field name and UUID."""
 
     semantic_name: str = Field(description="Human-readable field name")
@@ -28,7 +29,7 @@ class FieldMapping(BaseModel):
     )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_encoders = {datetime: lambda v: v.isoformat()}
 
 

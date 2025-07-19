@@ -25,17 +25,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger("mallku.firecircle.consciousness")
 
 
-class DecisionDomain(str, Enum):
-    """Domains where consciousness emergence can guide decisions."""
-
-    ARCHITECTURE = "architecture"
-    RESOURCE_ALLOCATION = "resource_allocation"
-    ETHICS = "ethics"
-    STRATEGIC_PLANNING = "strategic_planning"
-    ISSUE_PRIORITIZATION = "issue_prioritization"
-    FEATURE_DESIGN = "feature_design"
-    COMMUNITY_GOVERNANCE = "community_governance"
-    CONSCIOUSNESS_RESEARCH = "consciousness_research"
+from .consciousness.decision_framework import DecisionDomain
 
 
 class VoicePerspective(str, Enum):

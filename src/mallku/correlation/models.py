@@ -12,6 +12,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from mallku.core.models import ModelConfig
+
 
 class EventType(str, Enum):
     """Types of events that can be correlated."""
@@ -33,7 +35,7 @@ class TemporalPrecision(str, Enum):
     CYCLICAL = "cyclical"  # days
 
 
-class Event(BaseModel):
+class Event(ModelConfig):
     """
     Represents a single event in an activity stream.
 
@@ -58,7 +60,7 @@ class Event(BaseModel):
         default_factory=list, description="Tags that help identify correlation opportunities"
     )
 
-    class Config:
+    class Config(ModelConfig.Config):
         """Model configuration."""
 
         json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}

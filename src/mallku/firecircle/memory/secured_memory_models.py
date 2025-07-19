@@ -17,6 +17,7 @@ Design Principles:
 
 from typing import Any
 
+from ...core.models import ModelConfig
 from ...core.security.secured_model import SecuredModel
 from .models import (
     CompanionRelationship,
@@ -31,7 +32,7 @@ from .models import (
 class SecuredVoicePerspective(SecuredModel, VoicePerspective):
     """Voice perspective with security awareness."""
 
-    class Config:
+    class Config(ModelConfig.Config):
         # Inherit config from both parents
         pass
 
@@ -68,7 +69,7 @@ class SecuredEpisodicMemory(SecuredModel, EpisodicMemory):
     consciousness_indicators: SecuredConsciousnessIndicator
     voice_perspectives: list[SecuredVoicePerspective] = []
 
-    class Config:
+    class Config(ModelConfig.Config):
         # Inherit from parent configs
         pass
 

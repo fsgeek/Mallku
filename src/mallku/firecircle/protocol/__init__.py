@@ -6,6 +6,7 @@ Consciousness-aware message protocol for Fire Circle dialogues.
 Extends the base Fire Circle protocol with Mallku's consciousness integration.
 """
 
+from ...governance.protocol.participants import Participant
 from .conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -13,7 +14,6 @@ from .conscious_message import (
     MessageRole,
     MessageStatus,
     MessageType,
-    Participant,
     create_conscious_system_message,
 )
 

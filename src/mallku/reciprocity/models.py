@@ -10,7 +10,9 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from mallku.core.models import ModelConfig
 
 
 class ParticipantType(str, Enum):
@@ -99,7 +101,7 @@ class ExtractionType(str, Enum):
     CARE_DEFICIT = "care_deficit"  # Operations proceeding without reflective pauses
 
 
-class InteractionRecord(BaseModel):
+class InteractionRecord(ModelConfig):
     def __init__(self, **data: Any):
         # Handle legacy parameters for primary/secondary participants and metadata
         primary = data.pop("primary_participant", None)
@@ -152,7 +154,7 @@ class InteractionRecord(BaseModel):
     environmental_context: dict[str, Any] = Field(default_factory=dict)
     related_memory_anchor_id: UUID | None = None
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_schema_extra = {
             "example": {
                 "interaction_type": "knowledge_exchange",
@@ -180,7 +182,7 @@ class InteractionRecord(BaseModel):
         }
 
 
-class SystemHealthMetrics(BaseModel):
+class SystemHealthMetrics(ModelConfig):
     """
     Macroscopic indicators of system health and collective wellbeing.
 
@@ -218,7 +220,7 @@ class SystemHealthMetrics(BaseModel):
     health_trend_direction: str = "stable"  # improving, declining, stable
     areas_of_concern: list[str] = Field(default_factory=list)
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_schema_extra = {
             "example": {
                 "total_interactions": 147,
@@ -232,7 +234,7 @@ class SystemHealthMetrics(BaseModel):
         }
 
 
-class ReciprocityPattern(BaseModel):
+class ReciprocityPattern(ModelConfig):
     """
     Detected pattern in reciprocal interactions requiring interpretation.
 
@@ -265,7 +267,7 @@ class ReciprocityPattern(BaseModel):
     questions_for_deliberation: list[str] = Field(default_factory=list)
     suggested_areas_of_inquiry: list[str] = Field(default_factory=list)
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_schema_extra = {
             "example": {
                 "pattern_type": "resource_flow_anomaly",
@@ -281,7 +283,7 @@ class ReciprocityPattern(BaseModel):
         }
 
 
-class ExtractionAlert(BaseModel):
+class ExtractionAlert(ModelConfig):
     """
     Alert about potential extraction patterns detected in the system.
 
@@ -313,7 +315,7 @@ class ExtractionAlert(BaseModel):
     potential_responses: list[str] = Field(default_factory=list)
     urgency_factors: list[str] = Field(default_factory=list)
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_schema_extra = {
             "example": {
                 "severity": "concern",
@@ -330,7 +332,7 @@ class ExtractionAlert(BaseModel):
         }
 
 
-class FireCircleReport(BaseModel):
+class FireCircleReport(ModelConfig):
     """
     Structured report for Fire Circle deliberation on reciprocity patterns.
 
@@ -364,7 +366,7 @@ class FireCircleReport(BaseModel):
     actionable_insights: list[str] = Field(default_factory=list)
     monitoring_recommendations: list[str] = Field(default_factory=list)
 
-    class Config:
+    class Config(ModelConfig.Config):
         json_schema_extra = {
             "example": {
                 "priority_questions": [

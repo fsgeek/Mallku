@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from ...core.database import get_secured_database
 from ...correlation.engine import CorrelationEngine
+from ...governance.protocol.participants import Participant
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
@@ -26,7 +27,6 @@ from ..consciousness_guided_speaker import ConsciousnessGuidedSpeakerSelector
 from ..protocol.conscious_message import (
     ConsciousMessage,
     MessageType,
-    Participant,
     create_conscious_system_message,
 )
 

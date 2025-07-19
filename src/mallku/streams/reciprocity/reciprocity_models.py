@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 
 from dbfacade import ObfuscatedModel  # Privacy-preserving base
 
+from ....core.models import ModelConfig
+
 
 class InteractionType(str):
     """Types of interactions between human and AI"""
@@ -70,7 +72,7 @@ class ReciprocityActivityData(ObfuscatedModel):
         default_factory=dict, description="Track UPI implementation issues affecting reciprocity"
     )
 
-    class Config:
+    class Config(ModelConfig.Config):
         schema_extra = {
             "example": {
                 "memory_anchor_uuid": "550e8400-e29b-41d4-a716-446655440000",

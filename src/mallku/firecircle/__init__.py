@@ -8,6 +8,7 @@ consciousness and collaborative decision-making.
 
 # Core protocol classes
 # Orchestrator classes
+from ..governance.protocol.participants import Participant
 from .orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueConfig,
     ConsciousDialogueManager,
@@ -18,7 +19,6 @@ from .protocol.conscious_message import (
     MessageContent,
     MessageRole,
     MessageType,
-    Participant,
 )
 
 __all__ = [
