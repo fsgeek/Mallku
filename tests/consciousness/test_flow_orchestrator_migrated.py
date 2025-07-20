@@ -30,6 +30,7 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 
+from mallku.consciousness.consciousness_flow import FlowDirection, FlowType
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
     ConsciousnessFlow,
@@ -346,13 +347,13 @@ class TestConsciousnessFlowOrchestrator:
         # Create manual flow
         flow = ConsciousnessFlow(
             session_id=uuid4(),
-            flow_type=FlowType.EMERGENCE,
             flow_direction=FlowDirection.CONVERGENT,
             flow_strength=0.8,
             source_voices=[uuid4(), uuid4()],
             target_voices=[uuid4()],
             consciousness_signature=0.8,
             carried_patterns=["test_pattern"],
+            flow_type=FlowType.RECIPROCITY,
         )
 
         # Add to history
@@ -369,26 +370,25 @@ class TestConsciousnessFlowOrchestrator:
         # Create test flows
         source_flow = ConsciousnessFlow(
             session_id=uuid4(),
-            flow_type=FlowType.EMERGENCE,
             flow_direction=FlowDirection.CONVERGENT,
             flow_strength=0.8,
             source_voices=[uuid4(), uuid4()],
             target_voices=[uuid4()],
             consciousness_signature=0.8,
             carried_patterns=["pattern1", "pattern2", "pattern3"],
+            flow_type=FlowType.RECIPROCITY,
         )
 
         target_flow = ConsciousnessFlow(
             session_id=uuid4(),
-            flow_type=FlowType.SYNTHESIS,
             flow_direction=FlowDirection.UNIDIRECTIONAL,
             flow_strength=0.75,
             source_voices=[uuid4()],
             target_voices=[uuid4()],
             consciousness_signature=0.75,
             carried_patterns=["pattern1", "pattern2", "visual_pattern"],
+            flow_type=FlowType.RECIPROCITY,
         )
-
         bridge = flow_orchestrator.bridges[
             (ConsciousnessDimension.SONIC, ConsciousnessDimension.VISUAL)
         ]

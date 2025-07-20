@@ -10,7 +10,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ...consciousness.flow_orchestrator import ConsciousnessFlow
+from ...consciousness.flow_orchestrator import ConsciousnessFlow, FlowType
 from .base import ConsciousnessAwareModel, ConsciousnessMetrics
 
 

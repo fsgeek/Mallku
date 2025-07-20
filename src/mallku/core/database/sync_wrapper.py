@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
-def run_async(async_func: Callable[..., T]) -> T:
+def run_async[T](async_func: Callable[..., T]) -> T:
     """
     Run an async function in a sync context.
 

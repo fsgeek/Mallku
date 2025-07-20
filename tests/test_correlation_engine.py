@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-Comprehensive test suite for the Correlation Engine.
-
-This test suite validates the sophisticated temporal correlation detection
-system, from basic pattern recognition through adaptive learning to
-memory anchor integration.
-"""
-
 import asyncio
 import logging
 import sys
@@ -18,7 +10,7 @@ from uuid import uuid4
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from mallku.correlation import (
+from mallku.correlation import (  # noqa: E402
     AdaptiveThresholds,
     ConcurrentPattern,
     ConfidenceScorer,
@@ -29,8 +21,16 @@ from mallku.correlation import (
     SequentialPattern,
     TemporalCorrelation,
 )
-from mallku.correlation.models import ConsciousnessEventType, Event, TemporalPrecision
-from mallku.services.memory_anchor_service import MemoryAnchorService
+from mallku.correlation.models import ConsciousnessEventType, Event, TemporalPrecision  # noqa: E402
+from mallku.services.memory_anchor_service import MemoryAnchorService  # noqa: E402
+
+"""
+Comprehensive test suite for the Correlation Engine.
+
+This test suite validates the sophisticated temporal correlation detection
+system, from basic pattern recognition through adaptive learning to
+memory anchor integration.
+"""
 
 
 class CorrelationEngineTests:

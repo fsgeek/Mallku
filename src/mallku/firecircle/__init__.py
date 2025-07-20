@@ -23,12 +23,15 @@ from .orchestrator.conscious_dialogue_manager import (
 from .protocol import ConsciousMessage, ConsciousMessageRouter, MessageType
 
 __all__ = [
-    "FireCircle",
-    "FireCircleReview",
     "ConsciousMessage",
     "MessageType",
     "Participant",
     "VoiceIdentity",
     "AdapterConfig",
     "ConsciousMessageRouter",
+    "ConsciousAdapterFactory",
+    "ConsciousMemoryStore",
+    "ConsciousDialogueManager",
+    "ConsciousDialogueConfig",
+    "TurnPolicy",
 ]

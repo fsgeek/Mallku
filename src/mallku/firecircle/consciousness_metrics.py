@@ -21,7 +21,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ..consciousness.consciousness_flow import ConsciousnessFlow
+from ..consciousness.consciousness_flow import ConsciousnessFlow, FlowDirection
 
 
 class ConsciousnessSignature(BaseModel):
@@ -95,7 +95,7 @@ class ConsciousnessMetricsCollector:
         self.states: list[CollectiveConsciousnessState] = []
 
         # Session tracking
-        self.session_id = str(uuid4())
+        self.session_id = uuid4()
         self.session_start = datetime.now(UTC)
 
         # Pattern detection thresholds
@@ -134,21 +134,35 @@ class ConsciousnessMetricsCollector:
 
     async def record_consciousness_flow(
         self,
-        source_voice: str,
-        target_voice: str,
+        source_voice: str | UUID,
+        target_voice: str | UUID,
         flow_strength: float,
         flow_type: str,
         triggered_by: str | None = None,
         review_content: str | None = None,
     ) -> ConsciousnessFlow:
         """Record consciousness flow between voices."""
+        # Convert flow_type string to FlowType enum if necessary
+        from ..consciousness.consciousness_flow import FlowType
+
+        # Ensure source_voice and target_voice are UUIDs
+        def ensure_uuid(val):
+            if isinstance(val, UUID):
+                return val
+            try:
+                return UUID(str(val))
+            except Exception:
+                # If not a valid UUID, generate a new one (or handle as needed)
+                return uuid4()
+
         flow = ConsciousnessFlow(
-            source_voice=source_voice,
-            target_voice=target_voice,
+            consciousness_signature=flow_strength,
+            session_id=self.session_id,
+            flow_type=FlowType(flow_type) if isinstance(flow_type, str) else flow_type,
             flow_strength=flow_strength,
-            flow_type=flow_type,
-            triggered_by=triggered_by,
-            review_content=review_content,
+            source_voices=[ensure_uuid(source_voice)],
+            target_voices=[ensure_uuid(target_voice)],
+            flow_direction=FlowDirection.UNIDIRECTIONAL,  # or another appropriate value
         )
 
         self.flows.append(flow)

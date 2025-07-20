@@ -167,4 +167,9 @@ class MemoryAnchor(ModelConfig):
         if "last_updated" in doc and doc["last_updated"] and isinstance(doc["last_updated"], str):
             doc["last_updated"] = datetime.fromisoformat(doc["last_updated"].replace("Z", "+00:00"))
 
+        # Remove ArangoDB metadata fields
+        doc.pop("_key", None)
+        doc.pop("_id", None)
+        doc.pop("_rev", None)
+
         return cls(**doc)

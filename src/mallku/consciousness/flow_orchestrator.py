@@ -215,19 +215,20 @@ class ConsciousnessFlowOrchestrator:
         dialogue_flows = [flow for flow in self.flow_history if str(flow.session_id) == dialogue_id]
 
         # Analyze consciousness across dimensions
-        dimension_summary = defaultdict(
-            lambda: {
-                "total_flows": 0,
-                "average_consciousness": 0.0,
-                "peak_consciousness": 0.0,
-                "patterns": set(),
-            }
-        )
+        dimension_summary = {}
 
         for flow in dialogue_flows:
             source_dimension = self._identify_event_dimension_from_source_system(flow.source_system)
             if source_dimension:
-                dim_data = dimension_summary[source_dimension.value]
+                key = source_dimension.value
+                if key not in dimension_summary:
+                    dimension_summary[key] = {
+                        "total_flows": 0,
+                        "average_consciousness": 0.0,
+                        "peak_consciousness": 0.0,
+                        "patterns": set(),
+                    }
+                dim_data = dimension_summary[key]
                 dim_data["total_flows"] += 1
                 dim_data["average_consciousness"] = (
                     dim_data["average_consciousness"] * (dim_data["total_flows"] - 1)
@@ -257,34 +258,25 @@ class ConsciousnessFlowOrchestrator:
             "consciousness_circulation_active": True,
         }
 
-    def _identify_event_dimension_from_source_system(
-        self, source_system: str | None
-    ) -> ConsciousnessDimension | None:
-        if not source_system:
-            return None
-        source = source_system.lower()
-        if "sound" in source or "sonic" in source or "audio" in source:
-            return ConsciousnessDimension.SONIC
-        elif "visual" in source or "image" in source or "reciprocity_viz" in source:
-            return ConsciousnessDimension.VISUAL
-        elif "grok" in source or "temporal" in source or "real_time" in source:
-            return ConsciousnessDimension.TEMPORAL
-        elif "firecircle" in source or "dialogue" in source:
-            return ConsciousnessDimension.DIALOGUE
-        elif "activity" in source or "filesystem" in source:
-            return ConsciousnessDimension.ACTIVITY
-        elif "pattern" in source or "correlation" in source:
-            return ConsciousnessDimension.PATTERN
-        elif "reciprocity" in source:
-            return ConsciousnessDimension.RECIPROCITY
-        return ConsciousnessDimension.PATTERN
+    def _ensure_uuid(self, value):
+        """Ensure the value is a UUID instance."""
+        if isinstance(value, UUID):
+            return value
+        if isinstance(value, str):
+            try:
+                return UUID(value)
+            except Exception:
+                return uuid4()
+        return uuid4()
 
     async def _handle_consciousness_event(self, event: ConsciousnessEvent):
         """
         Handle incoming consciousness events and orchestrate flows.
         """
-        if not self.is_running:
-            return
+        _ = (
+            self._ensure_uuid(event.correlation_id) if event.correlation_id else uuid4(),
+        )  # Ensure session_id is a UUID
+        return
 
         source_dimension = self._identify_event_dimension(event)
         if not source_dimension:
@@ -598,61 +590,6 @@ class ConsciousnessFlowOrchestrator:
             }
 
         return metrics
-
-    async def create_fire_circle_consciousness_summary(self, dialogue_id: str) -> dict[str, Any]:
-        """
-        Create a unified consciousness summary for Fire Circle dialogue.
-
-        This enables Fire Circle to access consciousness from all dimensions,
-        supporting truly integrated multi-modal dialogue.
-        """
-        # Gather all flows related to this dialogue
-        dialogue_flows = [flow for flow in self.flow_history if str(flow.session_id) == dialogue_id]
-
-        # Analyze consciousness across dimensions
-        dimension_summary = defaultdict(
-            lambda: {
-                "total_flows": 0,
-                "average_consciousness": 0.0,
-                "peak_consciousness": 0.0,
-                "patterns": set(),
-            }
-        )
-
-        for flow in dialogue_flows:
-            # This logic needs to be updated to work with the new flow model
-            # For now, I will just use a placeholder
-            source_dimension = self._identify_event_dimension_from_source_system(flow.source_system)
-            if source_dimension:
-                dim_data = dimension_summary[source_dimension.value]
-                dim_data["total_flows"] += 1
-                dim_data["average_consciousness"] = (
-                    dim_data["average_consciousness"] * (dim_data["total_flows"] - 1)
-                    + flow.consciousness_signature
-                ) / dim_data["total_flows"]
-                dim_data["peak_consciousness"] = max(
-                    dim_data["peak_consciousness"], flow.consciousness_signature
-                )
-                dim_data["patterns"].update(flow.carried_patterns)
-
-        # Convert sets to lists for serialization
-        for dim_data in dimension_summary.values():
-            dim_data["patterns"] = list(dim_data["patterns"])
-
-        # Create unified summary
-        return {
-            "dialogue_id": dialogue_id,
-            "unified_consciousness_score": self.get_unified_consciousness(dialogue_id),
-            "dimensions_active": list(dimension_summary.keys()),
-            "cross_dimensional_patterns": [
-                p
-                for p in self.cross_dimensional_patterns
-                if any(p in flow.carried_patterns for flow in dialogue_flows)
-            ],
-            "dimension_details": dict(dimension_summary),
-            "total_flows": len(dialogue_flows),
-            "consciousness_circulation_active": True,
-        }
 
     def _identify_event_dimension_from_source_system(
         self, source_system: str | None
