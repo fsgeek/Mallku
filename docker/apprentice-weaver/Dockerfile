@@ -7,11 +7,12 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Mallku source (will be mounted in production)
 # This is just for the base image
-COPY src/mallku /app/mallku
+COPY src /app/src
 
 # Install Python dependencies
 COPY pyproject.toml /app/
