@@ -19,6 +19,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from ...governance.protocol.participants import Participant
 from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..pattern_library import DialoguePattern, PatternQuery, PatternTaxonomy
 from ..protocol.conscious_message import (
@@ -27,7 +28,6 @@ from ..protocol.conscious_message import (
     MessageContent,
     MessageRole,
     MessageType,
-    Participant,
 )
 from .config import MemorySystemConfig
 from .episodic_memory_service import EpisodicMemoryService

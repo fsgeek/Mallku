@@ -154,33 +154,6 @@ class InteractionRecord(ModelConfig):
     environmental_context: dict[str, Any] = Field(default_factory=dict)
     related_memory_anchor_id: UUID | None = None
 
-    class Config(ModelConfig.Config):
-        json_schema_extra = {
-            "example": {
-                "interaction_type": "knowledge_exchange",
-                "initiator": "human",
-                "responder": "ai",
-                "contributions_offered": ["creative_input", "cultural_wisdom"],
-                "needs_expressed": ["growth", "understanding"],
-                "needs_fulfilled": ["growth"],
-                "initiator_capacity_indicators": {
-                    "attention_availability": 0.8,
-                    "emotional_state": 0.7,
-                    "time_pressure": 0.3,
-                },
-                "responder_capacity_indicators": {
-                    "computational_load": 0.4,
-                    "knowledge_relevance": 0.9,
-                    "response_quality": 0.8,
-                },
-                "interaction_quality_indicators": {
-                    "mutual_understanding": 0.9,
-                    "creative_emergence": 0.7,
-                    "satisfaction_expressed": 0.8,
-                },
-            }
-        }
-
 
 class SystemHealthMetrics(ModelConfig):
     """
@@ -220,19 +193,6 @@ class SystemHealthMetrics(ModelConfig):
     health_trend_direction: str = "stable"  # improving, declining, stable
     areas_of_concern: list[str] = Field(default_factory=list)
 
-    class Config(ModelConfig.Config):
-        json_schema_extra = {
-            "example": {
-                "total_interactions": 147,
-                "unique_participants": 23,
-                "voluntary_return_rate": 0.89,
-                "need_fulfillment_rates": {"growth": 0.85, "belonging": 0.92, "contribution": 0.78},
-                "overall_health_score": 0.83,
-                "health_trend_direction": "improving",
-                "areas_of_concern": ["capacity_utilization_imbalance"],
-            }
-        }
-
 
 class ReciprocityPattern(ModelConfig):
     """
@@ -267,21 +227,6 @@ class ReciprocityPattern(ModelConfig):
     questions_for_deliberation: list[str] = Field(default_factory=list)
     suggested_areas_of_inquiry: list[str] = Field(default_factory=list)
 
-    class Config(ModelConfig.Config):
-        json_schema_extra = {
-            "example": {
-                "pattern_type": "resource_flow_anomaly",
-                "pattern_description": "Sudden increase in resource requests from subset of participants without corresponding contribution increase",
-                "confidence_level": 0.78,
-                "affected_participants": ["participant_group_A"],
-                "questions_for_deliberation": [
-                    "Are these participants experiencing external stress?",
-                    "Is this a natural response to environmental changes?",
-                    "Should the community adjust resource allocation?",
-                ],
-            }
-        }
-
 
 class ExtractionAlert(ModelConfig):
     """
@@ -314,22 +259,6 @@ class ExtractionAlert(ModelConfig):
     suggested_investigation_areas: list[str] = Field(default_factory=list)
     potential_responses: list[str] = Field(default_factory=list)
     urgency_factors: list[str] = Field(default_factory=list)
-
-    class Config(ModelConfig.Config):
-        json_schema_extra = {
-            "example": {
-                "severity": "concern",
-                "extraction_type": "attention_monopolizing",
-                "description": "Single participant consuming disproportionate system attention",
-                "evidence_summary": "85% of system responses directed to one participant over 48 hours",
-                "false_positive_probability": 0.2,
-                "suggested_investigation_areas": [
-                    "Is participant experiencing crisis requiring extra support?",
-                    "Are other participants being adequately served?",
-                    "Should attention allocation be rebalanced?",
-                ],
-            }
-        }
 
 
 class FireCircleReport(ModelConfig):
@@ -365,19 +294,3 @@ class FireCircleReport(ModelConfig):
     # Implementation readiness
     actionable_insights: list[str] = Field(default_factory=list)
     monitoring_recommendations: list[str] = Field(default_factory=list)
-
-    class Config(ModelConfig.Config):
-        json_schema_extra = {
-            "example": {
-                "priority_questions": [
-                    "How should the community respond to increased support needs?",
-                    "Are current resource allocation patterns sustainable?",
-                    "What adaptations would improve collective wellbeing?",
-                ],
-                "areas_requiring_wisdom": [
-                    "Balancing individual needs with collective capacity",
-                    "Adapting to changing external pressures",
-                    "Maintaining system health during transition",
-                ],
-            }
-        }

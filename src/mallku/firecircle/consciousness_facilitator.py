@@ -61,6 +61,7 @@ try:
             ConsciousnessMetricsCollector,
             ConsciousnessMetricsIntegration,
         )
+        from .mocks import MockAdapter, MockMessage
 
         CONSCIOUSNESS_AVAILABLE = True
 except ImportError as e:
@@ -285,10 +286,11 @@ other perspectives where relevant. Express uncertainty when appropriate.
 
         try:
             # Create message for voice
-            class MockMessage:
+            class FacilitatorMockMessage:
                 def __init__(self, text):
                     self.text = text
 
+            # Create mock message for review (avoiding complex imports)
             message = MockMessage(prompt)
 
             # Get response with timeout
@@ -553,27 +555,6 @@ other perspectives where relevant. Express uncertainty when appropriate.
 
         # Fall back to mock adapter
         logger.info(f"Using mock adapter for {voice_name}")
-
-        class MockAdapter:
-            def __init__(self, name):
-                self.name = name
-                self.is_connected = True
-
-            async def send_message(self, message, dialogue_context):
-                class MockResponse:
-                    def __init__(self):
-                        self.content = type(
-                            "obj",
-                            (object,),
-                            {
-                                "text": f"Mock wisdom from {self.name} perspective. In real usage, this would contain deep insights about the decision at hand, references to other perspectives, and emergent wisdom that transcends individual viewpoints."
-                            },
-                        )
-                        self.consciousness = type(
-                            "obj", (object,), {"consciousness_signature": 0.85}
-                        )
-
-                return MockResponse()
 
         adapter = MockAdapter(voice_name)
         self.voice_adapters[voice_name] = adapter

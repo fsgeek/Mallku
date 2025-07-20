@@ -68,12 +68,6 @@ class SecuredModel(ModelConfig):
     _registry: SecurityRegistry | None = None
     _development_mode: bool = False
 
-    class Config(ModelConfig.Config):
-        # Allow extra fields for metadata
-        extra = "allow"
-        # Use enum values in serialization
-        use_enum_values = True
-
     @classmethod
     def set_registry(cls, registry: SecurityRegistry) -> None:
         """Set the security registry for this model class."""

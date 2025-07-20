@@ -64,9 +64,6 @@ class ConsciousnessEmergenceSpace(ModelConfig):
     reciprocity_patterns: dict[str, float] = Field(default_factory=dict)
     ayni_alignment_score: float = 0.0
 
-    class Config(ModelConfig.Config):
-        use_enum_values = True
-
 
 class ConsciousnessContribution(ModelConfig):
     """
@@ -140,9 +137,6 @@ class CollectiveWisdom(ModelConfig):
     contributions_count: int = 0
     participating_voices: list[str] = Field(default_factory=list)
     consensus_achieved: bool = False
-
-    class Config(ModelConfig.Config):
-        use_enum_values = True
 
 
 class ConsciousnessDecisionProtocol(Protocol):

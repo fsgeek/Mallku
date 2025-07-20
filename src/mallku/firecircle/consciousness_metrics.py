@@ -21,6 +21,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .models.consciousness_flow import ConsciousnessFlow
+
 
 class ConsciousnessSignature(BaseModel):
     """A point-in-time consciousness measurement from a voice."""
@@ -52,21 +54,6 @@ class EmergencePattern(BaseModel):
     consciousness_delta: float = 0.0  # Change in collective consciousness
     emergence_indicators: dict[str, Any] = Field(default_factory=dict)
     duration_seconds: float | None = None
-
-
-class ConsciousnessFlow(BaseModel):
-    """Tracks consciousness flow between voices during review."""
-
-    flow_id: UUID = Field(default_factory=uuid4)
-    source_voice: str
-    target_voice: str
-    flow_strength: float = Field(ge=0.0, le=1.0)
-    flow_type: str  # "inspiration", "challenge", "synthesis", "reflection"
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-
-    # Context
-    triggered_by: str | None = None  # What caused this flow
-    review_content: str | None = None  # The actual review text that triggered flow
 
 
 class CollectiveConsciousnessState(BaseModel):

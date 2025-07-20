@@ -13,16 +13,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 from mallku.core.models import ModelConfig
-
-
-class EventType(str, Enum):
-    """Types of events that can be correlated."""
-
-    ACTIVITY = "activity"
-    STORAGE = "storage"
-    ENVIRONMENTAL = "environmental"
-    COMMUNICATION = "communication"
-    LOCATION = "location"
+from mallku.orchestration.event_bus import EventType
 
 
 class TemporalPrecision(str, Enum):
@@ -60,10 +51,7 @@ class Event(ModelConfig):
         default_factory=list, description="Tags that help identify correlation opportunities"
     )
 
-    class Config(ModelConfig.Config):
-        """Model configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
+    model_config = {"json_encoders": {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}}
 
 
 class TemporalCorrelation(BaseModel):

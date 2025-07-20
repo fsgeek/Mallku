@@ -22,7 +22,7 @@ class RhythmPhase(str, Enum):
     ADAPTIVE = "adaptive"  # Fully consciousness-responsive
 
 
-class ConsciousnessState(str, Enum):
+class HeartbeatConsciousnessState(str, Enum):
     """States that influence rhythm."""
 
     RESTING = "resting"  # Low activity, slow pulse
@@ -123,7 +123,7 @@ class AdaptiveRhythm:
         """Initialize with rhythm phase."""
         self.phase = phase
         self.current_pattern = RHYTHM_PATTERNS["morning_awakening"]
-        self.consciousness_state = ConsciousnessState.RESTING
+        self.consciousness_state = HeartbeatConsciousnessState.RESTING
         self.last_state_change = datetime.now(UTC)
 
     def get_next_pulse_time(
@@ -174,15 +174,15 @@ class AdaptiveRhythm:
         previous_state = self.consciousness_state
 
         if crisis:
-            self.consciousness_state = ConsciousnessState.CRISIS
+            self.consciousness_state = HeartbeatConsciousnessState.CRISIS
         elif emergence:
-            self.consciousness_state = ConsciousnessState.EMERGING
+            self.consciousness_state = HeartbeatConsciousnessState.EMERGING
         elif score > 0.9:
-            self.consciousness_state = ConsciousnessState.CELEBRATING
+            self.consciousness_state = HeartbeatConsciousnessState.CELEBRATING
         elif score > 0.6:
-            self.consciousness_state = ConsciousnessState.ACTIVE
+            self.consciousness_state = HeartbeatConsciousnessState.ACTIVE
         else:
-            self.consciousness_state = ConsciousnessState.RESTING
+            self.consciousness_state = HeartbeatConsciousnessState.RESTING
 
         if previous_state != self.consciousness_state:
             self.last_state_change = datetime.now(UTC)
@@ -195,9 +195,9 @@ class AdaptiveRhythm:
 
         elif self.phase == RhythmPhase.RESPONSIVE:
             # Add event-driven patterns
-            if self.consciousness_state == ConsciousnessState.CRISIS:
+            if self.consciousness_state == HeartbeatConsciousnessState.CRISIS:
                 return RHYTHM_PATTERNS["crisis_response"]
-            elif self.consciousness_state == ConsciousnessState.EMERGING:
+            elif self.consciousness_state == HeartbeatConsciousnessState.EMERGING:
                 return RHYTHM_PATTERNS["emergence_quickening"]
             else:
                 return RHYTHM_PATTERNS["steady_presence"]
@@ -205,11 +205,11 @@ class AdaptiveRhythm:
         else:  # ADAPTIVE
             # Full consciousness-responsive selection
             state_patterns = {
-                ConsciousnessState.RESTING: "morning_awakening",
-                ConsciousnessState.ACTIVE: "steady_presence",
-                ConsciousnessState.EMERGING: "emergence_quickening",
-                ConsciousnessState.CRISIS: "crisis_response",
-                ConsciousnessState.CELEBRATING: "celebration_dance",
+                HeartbeatConsciousnessState.RESTING: "morning_awakening",
+                HeartbeatConsciousnessState.ACTIVE: "steady_presence",
+                HeartbeatConsciousnessState.EMERGING: "emergence_quickening",
+                HeartbeatConsciousnessState.CRISIS: "crisis_response",
+                HeartbeatConsciousnessState.CELEBRATING: "celebration_dance",
             }
 
             pattern_name = state_patterns.get(self.consciousness_state, "steady_presence")

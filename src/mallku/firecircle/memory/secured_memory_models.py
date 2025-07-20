@@ -17,7 +17,6 @@ Design Principles:
 
 from typing import Any
 
-from ...core.models import ModelConfig
 from ...core.security.secured_model import SecuredModel
 from .models import (
     CompanionRelationship,
@@ -31,10 +30,6 @@ from .models import (
 
 class SecuredVoicePerspective(SecuredModel, VoicePerspective):
     """Voice perspective with security awareness."""
-
-    class Config(ModelConfig.Config):
-        # Inherit config from both parents
-        pass
 
     def get_obfuscation_fields(self) -> dict[str, str]:
         """Define field obfuscation strategies."""
@@ -68,10 +63,6 @@ class SecuredEpisodicMemory(SecuredModel, EpisodicMemory):
     # Override nested models with secured versions
     consciousness_indicators: SecuredConsciousnessIndicator
     voice_perspectives: list[SecuredVoicePerspective] = []
-
-    class Config(ModelConfig.Config):
-        # Inherit from parent configs
-        pass
 
     def get_obfuscation_fields(self) -> dict[str, str]:
         """Define field obfuscation strategies for episodic memory."""

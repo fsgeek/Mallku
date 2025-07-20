@@ -29,9 +29,6 @@ class FieldMapping(ModelConfig):
     )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    class Config(ModelConfig.Config):
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class SecurityRegistry:
     """

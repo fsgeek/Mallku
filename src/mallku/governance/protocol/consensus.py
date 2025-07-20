@@ -147,35 +147,3 @@ class ConsensusTracker(BaseModel):
         duration = last_transition.timestamp - first_transition.timestamp
 
         return duration.total_seconds() / 3600  # Convert to hours
-
-
-class ConsensusMetrics(BaseModel):
-    """Metrics for understanding consensus patterns across dialogues."""
-
-    # Outcome distribution
-    state_distribution: dict[ConsensusState, int] = Field(default_factory=dict)
-
-    # Process metrics
-    average_transitions: float = 0.0
-    average_duration_hours: float = 0.0
-
-    # Participation metrics
-    average_participants: float = 0.0
-    fork_percentage: float = 0.0
-    compost_percentage: float = 0.0
-
-    # Wisdom metrics
-    insights_per_dialogue: float = 0.0
-
-    def update_from_tracker(self, tracker: ConsensusTracker) -> None:
-        """Update metrics based on a completed consensus tracker."""
-        # Update state distribution
-        state = tracker.current_state
-        self.state_distribution[state] = self.state_distribution.get(state, 0) + 1
-
-        # Update other metrics (would need proper averaging logic in production)
-        wisdom = tracker.extract_journey_wisdom()
-        if wisdom["achieved_fork"]:
-            self.fork_percentage = (self.fork_percentage + 1.0) / 2  # Simple averaging
-        if wisdom["preserved_dissent"]:
-            self.compost_percentage = (self.compost_percentage + 1.0) / 2

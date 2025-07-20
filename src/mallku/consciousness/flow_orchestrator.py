@@ -15,11 +15,10 @@ import logging
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
-from uuid import uuid4
 
+from ..firecircle.models.consciousness_flow import ConsciousnessFlow
 from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 
 logger = logging.getLogger(__name__)
@@ -35,35 +34,6 @@ class ConsciousnessDimension(Enum):
     ACTIVITY = "activity"  # Activity consciousness (file system, etc.)
     PATTERN = "pattern"  # Pattern consciousness (correlation engine)
     RECIPROCITY = "reciprocity"  # Exchange consciousness
-
-
-@dataclass
-class ConsciousnessFlow:
-    """
-    A flow of consciousness between dimensions.
-
-    Represents consciousness recognizing itself as it transforms
-    from one expression to another.
-    """
-
-    flow_id: str = field(default_factory=lambda: str(uuid4()))
-    source_dimension: ConsciousnessDimension = ConsciousnessDimension.ACTIVITY
-    target_dimension: ConsciousnessDimension = ConsciousnessDimension.PATTERN
-
-    # The consciousness content flowing
-    consciousness_signature: float = 0.0
-    patterns_detected: list[str] = field(default_factory=list)
-    content_summary: dict[str, Any] = field(default_factory=dict)
-
-    # Flow metadata
-    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
-    transformation_score: float = 0.0  # How well consciousness translated
-    bridge_patterns: list[str] = field(default_factory=list)  # Patterns that bridged dimensions
-
-    # Relationships
-    source_event_id: str | None = None
-    correlation_id: str | None = None
-    causes_flows: list[str] = field(default_factory=list)  # Child flows
 
 
 @dataclass

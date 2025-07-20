@@ -51,31 +51,7 @@ class MemoryAnchor(ModelConfig):
     # Last update tracking
     last_updated: datetime | None = Field(None, description="When this anchor was last modified")
 
-    class Config(ModelConfig.Config):
-        """Model configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
-
-        json_schema_extra = {
-            "example": {
-                "anchor_id": "550e8400-e29b-41d4-a716-446655440000",
-                "timestamp": "2024-01-15T10:30:00Z",
-                "predecessor_id": "550e8400-e29b-41d4-a716-446655440001",
-                "cursors": {
-                    "temporal": "2024-01-15T10:30:00Z",
-                    "spatial": {"latitude": 49.2827, "longitude": -123.1207},
-                    "filesystem": "/Users/alice/Documents/project.md",
-                    "email": "msg-id-12345",
-                    "spotify": "track:4iV5W9uYEdYUVa79Axb7Rh",
-                },
-                "metadata": {
-                    "providers": ["filesystem", "email", "spotify"],
-                    "creation_trigger": "temporal_threshold",
-                    "confidence": 0.85,
-                },
-                "last_updated": "2024-01-15T10:35:00Z",
-            }
-        }
+    model_config = {"json_encoders": {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}}
 
     def add_cursor(self, cursor_type: str, cursor_value: Any) -> None:
         """

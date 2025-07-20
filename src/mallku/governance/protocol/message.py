@@ -122,13 +122,12 @@ class GovernanceMessage(ModelConfig):
         bridging_types = {MessageType.BRIDGE, MessageType.SUMMARY, MessageType.EMERGENCE}
         return self.type in bridging_types
 
-    class Config(ModelConfig.Config):
-        """Pydantic configuration."""
-
-        json_encoders = {
+    model_config = {
+        "json_encoders": {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v),
         }
+    }
 
 
 def create_governance_message(

@@ -5,7 +5,7 @@ This layer establishes how AI models communicate in Fire Circle councils,
 track consensus states, and manage participant identities.
 """
 
-from .consensus import ConsensusMetrics, ConsensusState, ConsensusTracker, ConsensusTransition
+from .consensus import ConsensusState, ConsensusTracker, ConsensusTransition
 from .message import GovernanceMessage, MessageMetadata, MessageType, create_governance_message
 from .participants import Participant, ParticipantRegistry, ParticipantRole, create_diverse_council
 
@@ -19,7 +19,6 @@ __all__ = [
     "ConsensusState",
     "ConsensusTransition",
     "ConsensusTracker",
-    "ConsensusMetrics",
     # Participant management
     "ParticipantRole",
     "Participant",

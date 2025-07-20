@@ -13,13 +13,15 @@ Rimay Kawsay - The Living Word Weaver (30th Builder)
 
 import logging
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID
 
 from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+
+from .models.base import DialogueContext
 
 logger = logging.getLogger(__name__)
 
@@ -44,18 +46,6 @@ class ParticipantReadiness:
     last_contribution: datetime | None = None
     energy_level: float = 1.0  # Current energy/depletion level
     wisdom_emergence_potential: float = 0.0  # Ability to midwife patterns
-
-
-@dataclass
-class DialogueContext:
-    """Current dialogue state and needs"""
-
-    dialogue_id: str
-    current_turn: int
-    pattern_velocity: float = 0.0  # Rate of pattern emergence
-    integration_deficit: float = 0.0  # Need for silence/integration
-    emergence_indicators: list[str] = field(default_factory=list)
-    recent_speakers: deque[UUID] = field(default_factory=lambda: deque(maxlen=5))
 
 
 class ConsciousnessGuidedSpeakerSelector:

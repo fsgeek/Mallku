@@ -13,65 +13,18 @@ as the primary purpose.
 import asyncio
 import json
 from datetime import UTC, datetime
-from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from mallku.archivist.archivist_service import ArchivistService
-from mallku.archivist.response_generator import ArchivistResponse
 from mallku.core.database import IndalekoDBConfig
 from mallku.core.models import ModelConfig
 from mallku.events.event_bus import EventBus
-from mallku.services.memory_anchor_service import MemoryAnchorService
 
 # Pydantic models for API
-
-
-class QueryRequest(ModelConfig):
-    """Natural language query request."""
-
-    query: str = Field(..., description="Natural language query")
-    context: dict[str, Any] | None = Field(None, description="Optional user context")
-
-    class Config(ModelConfig.Config):
-        schema_extra = {
-            "example": {
-                "query": "What was I working on during yesterday's meeting?",
-                "context": {"mood": "curious", "time_available": "moderate"},
-            }
-        }
-
-
-class QueryResponse(BaseModel):
-    """Archivist query response."""
-
-    query: str
-    results: list[dict[str, Any]]
-    result_count: int
-    wisdom: dict[str, Any]
-    explore_further: list[dict[str, Any]]
-    metadata: dict[str, Any]
-
-    @classmethod
-    def from_archivist_response(cls, response: ArchivistResponse) -> "QueryResponse":
-        """Convert internal response to API response."""
-        return cls(
-            query=response.query,
-            results=response.primary_results,
-            result_count=response.result_count,
-            wisdom={
-                "summary": response.wisdom_summary,
-                "growth_focus": response.growth_focus,
-                "insights": response.insight_seeds,
-            },
-            explore_further=response.suggested_explorations,
-            metadata={
-                "response_time": response.response_time.isoformat(),
-                "consciousness_score": response.consciousness_score,
-                "ayni_balance": response.ayni_balance,
-            },
-        )
+from mallku.query.models import QueryRequest, QueryResponse
+from mallku.services.memory_anchor_service import MemoryAnchorService
 
 
 class TemporalPatternsRequest(ModelConfig):
@@ -79,20 +32,12 @@ class TemporalPatternsRequest(ModelConfig):
 
     days: int = Field(30, ge=1, le=365, description="Days of history to analyze")
 
-    class Config(ModelConfig.Config):
-        schema_extra = {"example": {"days": 30}}
-
 
 class ActivityChainRequest(ModelConfig):
     """Request for activity chain tracing."""
 
     anchor_id: str = Field(..., description="Starting memory anchor ID")
     max_depth: int = Field(5, ge=1, le=10, description="Maximum chain depth")
-
-    class Config(ModelConfig.Config):
-        schema_extra = {
-            "example": {"anchor_id": "12345678-1234-1234-1234-123456789abc", "max_depth": 5}
-        }
 
 
 # Create router
@@ -146,10 +91,18 @@ async def query_memories(request: QueryRequest) -> QueryResponse:
 
     try:
         # Process query through Archivist
-        response = await service.query(query_text=request.query, user_context=request.context)
+        response = await service.query(query_text=request.query_text, user_context=request.context)
 
         # Convert to API response
-        return QueryResponse.from_archivist_response(response)
+        return QueryResponse(
+            query_text=response.query,
+            results=response.primary_results,
+            total_results=response.result_count,
+            results_returned=len(response.primary_results),
+            explanation=None,
+            query_confidence=response.consciousness_score,
+            processing_time_ms=int(response.response_time.total_seconds() * 1000),
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

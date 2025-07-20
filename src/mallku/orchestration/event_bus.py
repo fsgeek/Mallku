@@ -23,6 +23,13 @@ logger = logging.getLogger(__name__)
 class EventType(Enum):
     """Types of consciousness events that flow through the cathedral"""
 
+    # Correlation events
+    ACTIVITY = "activity"
+    STORAGE = "storage"
+    ENVIRONMENTAL = "environmental"
+    COMMUNICATION = "communication"
+    LOCATION = "location"
+
     # Memory events
     MEMORY_ANCHOR_CREATED = "memory.anchor.created"
     MEMORY_PATTERN_DISCOVERED = "memory.pattern.discovered"

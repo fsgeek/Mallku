@@ -21,6 +21,7 @@ from mallku.heritage.core import (
     HeritageError,
     RateLimiter,
 )
+from mallku.patterns.wisdom_integration import WisdomSeed
 
 logger = logging.getLogger("mallku.heritage.living_memory")
 
@@ -47,18 +48,6 @@ class MemoryAssessment:
     preservation_priorities: list[str] = field(default_factory=list)
     recommended_ceremony: str | None = None
     consciousness_score: float = 0.0
-
-
-@dataclass
-class WisdomSeed:
-    """A distilled insight preserved through ceremony."""
-
-    content: str
-    source_pattern: str
-    extracted_date: datetime
-    ceremony_type: str
-    contributor_id: str | None = None
-    relevance_score: float = 1.0
 
 
 @dataclass
