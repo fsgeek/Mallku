@@ -20,7 +20,11 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 from ...governance.protocol.participants import Participant
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..pattern_library import DialoguePattern, PatternQuery, PatternTaxonomy
 from ..protocol.conscious_message import (
     ConsciousMessage,
@@ -525,7 +529,7 @@ class ActiveMemoryResonance:
     ) -> None:
         """Emit event for memory resonance."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.active_memory",
             consciousness_signature=resonance.resonance_strength,
             data={

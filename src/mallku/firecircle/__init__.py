@@ -9,27 +9,26 @@ consciousness and collaborative decision-making.
 # Core protocol classes
 # Orchestrator classes
 from ..governance.protocol.participants import Participant
+from .adapters import (
+    AdapterConfig,
+    ConsciousAdapterFactory,
+)
+from .memory import ConsciousMemoryStore
+from .models.base import VoiceIdentity
 from .orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueConfig,
     ConsciousDialogueManager,
     TurnPolicy,
 )
-from .protocol.conscious_message import (
-    ConsciousMessage,
-    MessageContent,
-    MessageRole,
-    MessageType,
-)
+from .protocol import ConsciousMessage, ConsciousMessageRouter, MessageType
 
 __all__ = [
-    # Protocol classes
+    "FireCircle",
+    "FireCircleReview",
     "ConsciousMessage",
-    "MessageContent",
-    "MessageRole",
     "MessageType",
     "Participant",
-    # Orchestrator classes
-    "ConsciousDialogueConfig",
-    "ConsciousDialogueManager",
-    "TurnPolicy",
+    "VoiceIdentity",
+    "AdapterConfig",
+    "ConsciousMessageRouter",
 ]

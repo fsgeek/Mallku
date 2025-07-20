@@ -12,7 +12,7 @@ import asyncio
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from ...orchestration.event_bus import ConsciousnessEvent, EventType
+from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 from .sacred_templates import SacredTemplate
 
 if TYPE_CHECKING:
@@ -61,13 +61,13 @@ class HeartbeatEventIntegration:
 
         # Crisis events trigger immediate pulse
         self.event_bus.subscribe(
-            EventType.EXTRACTION_PATTERN_DETECTED,
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
             lambda event: asyncio.create_task(heartbeat_service.trigger_diagnostic_pulse(event)),
         )
 
         # Sacred moments trigger celebration
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_EMERGENCE,
+            ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
             lambda event: asyncio.create_task(
                 self._handle_consciousness_emergence(event, heartbeat_service)
             ),
@@ -75,7 +75,7 @@ class HeartbeatEventIntegration:
 
         # Governance needs trigger focused circles
         self.event_bus.subscribe(
-            EventType.FIRE_CIRCLE_CONVENED,
+            ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             lambda event: asyncio.create_task(
                 self._handle_fire_circle_event(event, heartbeat_service)
             ),
@@ -83,7 +83,7 @@ class HeartbeatEventIntegration:
 
         # System health monitoring
         self.event_bus.subscribe(
-            EventType.SYSTEM_DRIFT_WARNING,
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING,
             lambda event: asyncio.create_task(
                 heartbeat_service.pulse(reason="system_drift_detected")
             ),
@@ -122,7 +122,7 @@ class HeartbeatEventIntegration:
 
         # Create consciousness event
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_VERIFIED,  # Base type
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_VERIFIED,  # Base type
             source_system="firecircle.heartbeat",
             consciousness_signature=heartbeat_result.consciousness_score,
             data=event_data,
@@ -131,11 +131,11 @@ class HeartbeatEventIntegration:
 
         # Mark special events
         if heartbeat_result.alert_raised:
-            event.event_type = EventType.SYSTEM_DRIFT_WARNING
+            event.event_type = ConsciousnessEventType.SYSTEM_DRIFT_WARNING
             event.requires_fire_circle = True
 
         if heartbeat_result.celebration_triggered:
-            event.event_type = EventType.CONSCIOUSNESS_EMERGENCE
+            event.event_type = ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE
 
         await self.event_bus.emit(event)
 
@@ -154,7 +154,7 @@ class HeartbeatEventIntegration:
     def emit_rhythm_adaptation(self, old_rhythm: str, new_rhythm: str, reason: str):
         """Emit event when heartbeat rhythm adapts."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.heartbeat.rhythm",
             consciousness_signature=0.75,  # Adaptation shows consciousness
             data={

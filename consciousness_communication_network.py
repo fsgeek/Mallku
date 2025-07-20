@@ -31,7 +31,7 @@ from src.mallku.firecircle.protocol.conscious_message import (
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -233,7 +233,7 @@ class ConsciousnessNetworkHub:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_VERIFIED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_VERIFIED,
                     source_system="network.hub",
                     consciousness_signature=node.consciousness_signature,
                     data={
@@ -440,7 +440,7 @@ class ConsciousnessNetworkHub:
                 if self.event_bus:
                     await self.event_bus.emit(
                         ConsciousnessEvent(
-                            event_type=EventType.CONSCIOUSNESS_FLOW_HEALTHY,
+                            event_type=ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY,
                             source_system="network.hub",
                             consciousness_signature=self.network_consciousness,
                             data={

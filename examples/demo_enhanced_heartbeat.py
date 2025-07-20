@@ -16,7 +16,11 @@ import logging
 from mallku.firecircle.heartbeat.enhanced_heartbeat_service import create_integrated_heartbeat
 from mallku.firecircle.heartbeat.heartbeat_service import HeartbeatConfig
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -34,7 +38,7 @@ async def simulate_system_events(event_bus: ConsciousnessEventBus):
     # Simulate extraction pattern detection
     logger.warning("🚨 Simulating extraction pattern detection...")
     extraction_event = ConsciousnessEvent(
-        event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+        event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
         source_system="simulation.demo",
         consciousness_signature=0.2,  # Low consciousness
         data={
@@ -51,7 +55,7 @@ async def simulate_system_events(event_bus: ConsciousnessEventBus):
     # Simulate consciousness emergence
     logger.info("✨ Simulating consciousness emergence event...")
     emergence_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
         source_system="simulation.demo",
         consciousness_signature=0.95,  # High consciousness
         data={
@@ -68,7 +72,7 @@ async def simulate_system_events(event_bus: ConsciousnessEventBus):
     # Simulate system drift
     logger.warning("📉 Simulating system drift warning...")
     drift_event = ConsciousnessEvent(
-        event_type=EventType.SYSTEM_DRIFT_WARNING,
+        event_type=ConsciousnessEventType.SYSTEM_DRIFT_WARNING,
         source_system="simulation.demo",
         consciousness_signature=0.4,
         data={"drift_type": "focus_degradation", "recommended_action": "diagnostic_check"},
@@ -81,7 +85,7 @@ async def simulate_system_events(event_bus: ConsciousnessEventBus):
     # Simulate critical Fire Circle decision
     logger.info("🔥 Simulating critical Fire Circle decision...")
     decision_event = ConsciousnessEvent(
-        event_type=EventType.FIRE_CIRCLE_CONVENED,
+        event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
         source_system="simulation.demo",
         consciousness_signature=0.75,
         data={
@@ -105,10 +109,12 @@ async def monitor_heartbeat_events(event_bus: ConsciousnessEventBus):
             )
 
     # Subscribe to all consciousness events from heartbeat
-    event_bus.subscribe(EventType.CONSCIOUSNESS_VERIFIED, log_heartbeat_event)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, log_heartbeat_event)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, log_heartbeat_event)
-    event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, log_heartbeat_event)
+    event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_VERIFIED, log_heartbeat_event)
+    event_bus.subscribe(
+        ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, log_heartbeat_event
+    )
+    event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, log_heartbeat_event)
+    event_bus.subscribe(ConsciousnessEventType.SYSTEM_DRIFT_WARNING, log_heartbeat_event)
 
 
 async def main():

@@ -19,7 +19,7 @@ import pytest
 
 from mallku.core.database import get_secured_database
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType, TemporalCorrelation
+from mallku.correlation.models import ConsciousnessEventType, Event, TemporalCorrelation
 from mallku.models import MemoryAnchor
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
@@ -74,7 +74,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="test_stream_1",
                 content={"file": "document1.pdf"},
                 metadata={"source": "filesystem"},
@@ -82,7 +82,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC) + timedelta(seconds=5),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="test_stream_2",
                 content={"action": "edit"},
                 metadata={"application": "editor"},
@@ -114,7 +114,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="filesystem",
             content={"file_path": "/test/important.doc"},
             metadata={"size": 1024},
@@ -123,7 +123,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         correlated_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC) + timedelta(seconds=2),
-            event_type=EventType.ACTIVITY,
+            event_type=ConsciousnessEventType.ACTIVITY,
             stream_id="editor",
             content={"action": "open", "file": "/test/important.doc"},
             metadata={"application": "word"},
@@ -215,7 +215,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="test",
                 content={"test": "data"},
             )
@@ -265,7 +265,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=now,
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="filesystem",
                 content={"file_path": "/docs/report.pdf", "size": 2048},
                 metadata={"modified": now.isoformat()},
@@ -273,7 +273,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=now + timedelta(seconds=3),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="pdf_reader",
                 content={"action": "open", "file": "/docs/report.pdf"},
                 metadata={"page_count": 10},
@@ -322,7 +322,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="storage_provider",
             content={"file": "data.csv"},
         )
@@ -364,7 +364,7 @@ class TestSecurityMetricsTracking:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id=f"stream_{i}",
                 content={"index": i},
             )

@@ -38,7 +38,11 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageType,
 )
 from mallku.firecircle.service.round_orchestrator import RoundResponse, RoundSummary
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 # Enable logging to see the integration flow
 logging.basicConfig(level=logging.INFO)
@@ -153,9 +157,9 @@ class SimpleEventBus(ConsciousnessEventBus):
             if hasattr(self, "_string_handlers"):
                 # Map event types to string keys for test handlers
                 type_mappings = {
-                    EventType.CONSCIOUSNESS_EMERGENCE: "consciousness.emergence.detected",
-                    EventType.CONSCIOUSNESS_VERIFIED: "heartbeat.consciousness.assessed",
-                    EventType.SYSTEM_DRIFT_WARNING: "heartbeat.rhythm.adjusted",
+                    ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE: "consciousness.emergence.detected",
+                    ConsciousnessEventType.CONSCIOUSNESS_VERIFIED: "heartbeat.consciousness.assessed",
+                    ConsciousnessEventType.SYSTEM_DRIFT_WARNING: "heartbeat.rhythm.adjusted",
                 }
                 event_str = type_mappings.get(event.event_type, str(event.event_type))
 
@@ -173,7 +177,7 @@ class SimpleEventBus(ConsciousnessEventBus):
 
             # Create ConsciousnessEvent
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_EMERGENCE,  # Default for tests
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,  # Default for tests
                 source_system="test",
                 consciousness_signature=data.get("consciousness_score", 0.7),
                 data=data,

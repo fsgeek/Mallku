@@ -7,8 +7,8 @@ import asyncio
 
 import pytest
 
-from mallku.consciousness import ConsciousnessVerificationSuite
 from mallku.consciousness.enhanced_search import ConsciousnessEnhancedSearch
+from mallku.consciousness.verification import ConsciousnessVerificationSuite
 from mallku.core.database import get_secured_database
 from mallku.models import MemoryAnchor
 

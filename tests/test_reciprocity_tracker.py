@@ -33,7 +33,7 @@ class ReciprocityTrackerTests:
 
     def __init__(self):
         self.db = None
-        self.tracker: ReciprocityTracker = None
+        self.tracker: ReciprocityTracker | None = None
         self.test_interactions: list[InteractionRecord] = []
 
     async def setup(self) -> bool:

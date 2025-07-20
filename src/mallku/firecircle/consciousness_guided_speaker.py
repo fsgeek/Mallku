@@ -19,7 +19,11 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 from .models.base import DialogueContext
 
@@ -88,16 +92,20 @@ class ConsciousnessGuidedSpeakerSelector:
     def _subscribe_to_events(self):
         """Subscribe to relevant consciousness events"""
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
+            ConsciousnessEventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
         )
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
+            ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
         )
         self.event_bus.subscribe(
-            EventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction_detected
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction_detected
         )
-        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._handle_drift_warning)
-        self.event_bus.subscribe(EventType.CONSCIOUSNESS_FLOW_HEALTHY, self._handle_health_update)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING, self._handle_drift_warning
+        )
+        self.event_bus.subscribe(
+            ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY, self._handle_health_update
+        )
 
     async def _handle_consciousness_verified(self, event: ConsciousnessEvent):
         """Update consciousness coherence from verification events"""

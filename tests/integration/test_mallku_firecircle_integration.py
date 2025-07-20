@@ -23,10 +23,10 @@ from mallku.firecircle import (
     ConsciousMemoryStore,
     ConsciousMessageRouter,
     MessageType,
-    Participant,
     TurnPolicy,
 )
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.governance.protocol import Participant
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 from mallku.reciprocity.tracker import ReciprocityTracker
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
@@ -99,8 +99,8 @@ class TestFireCircleIntegration:
         async def event_handler(event):
             events_received.append(event)
 
-        event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, event_handler)
-        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
+        event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, event_handler)
+        event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
 
         # Create dialogue
         config = ConsciousDialogueConfig(
@@ -137,14 +137,18 @@ class TestFireCircleIntegration:
 
         # Check Fire Circle convened event
         convened_events = [
-            e for e in events_received if e.event_type == EventType.FIRE_CIRCLE_CONVENED
+            e
+            for e in events_received
+            if e.event_type == ConsciousnessEventType.FIRE_CIRCLE_CONVENED
         ]
         assert len(convened_events) == 1
         assert convened_events[0].data["title"] == "Test Integration Dialogue"
 
         # Check consciousness events
         pattern_events = [
-            e for e in events_received if e.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
+            e
+            for e in events_received
+            if e.event_type == ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
         ]
         assert len(pattern_events) >= 1
 

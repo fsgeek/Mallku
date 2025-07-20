@@ -21,7 +21,12 @@ from mallku.core.database.secured_interface import (
     SecuredDatabaseInterface,
 )
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType, TemporalCorrelation, TemporalPrecision
+from mallku.correlation.models import (
+    ConsciousnessEventType,
+    Event,
+    TemporalCorrelation,
+    TemporalPrecision,
+)
 from mallku.models import MemoryAnchor
 from mallku.query.service import MemoryAnchorQueryService
 
@@ -139,7 +144,7 @@ class TestArchitecturalBoundaries:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="filesystem",
             content={"file": "test.pdf"},
         )

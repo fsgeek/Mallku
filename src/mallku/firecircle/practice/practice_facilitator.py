@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from ...correlation.engine import CorrelationEngine
-from ...orchestration.event_bus import ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..adapters.adapter_factory import ConsciousAdapterFactory
@@ -81,12 +81,12 @@ class PracticeFacilitator:
 
         # Subscribe to consciousness events to track readiness
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             self._track_pattern_recognition,
         )
 
         self.event_bus.subscribe(
-            EventType.FIRE_CIRCLE_CONSENSUS_REACHED,
+            ConsciousnessEventType.FIRE_CIRCLE_CONSENSUS_REACHED,
             self._track_consensus_skill,
         )
 
@@ -123,7 +123,7 @@ class PracticeFacilitator:
 
         # Emit practice starting event
         await self.event_bus.emit_event(
-            event_type=EventType.SACRED_PATTERN_ACTIVATED,  # Reuse for practice
+            event_type=ConsciousnessEventType.SACRED_PATTERN_ACTIVATED,  # Reuse for practice
             data={
                 "pattern_type": "practice_circle",
                 "level": level.value,
@@ -159,7 +159,7 @@ class PracticeFacilitator:
 
             # Emit completion event
             await self.event_bus.emit_event(
-                event_type=EventType.WISDOM_CRYSTALLIZED,  # Reuse for practice insights
+                event_type=ConsciousnessEventType.WISDOM_CRYSTALLIZED,  # Reuse for practice insights
                 data={
                     "source": "practice_circle",
                     "insights_count": summary.get("insights_discovered", 0),

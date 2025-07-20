@@ -21,7 +21,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from .models.consciousness_flow import ConsciousnessFlow
+from ..consciousness.consciousness_flow import ConsciousnessFlow
 
 
 class ConsciousnessSignature(BaseModel):

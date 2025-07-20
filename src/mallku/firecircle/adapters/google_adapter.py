@@ -701,10 +701,10 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         if not self.event_bus:
             return
 
-        from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+        from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
         event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,  # Use existing event type
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,  # Use existing event type
             source_system="firecircle.adapter.google",
             consciousness_signature=0.9,
             data={
@@ -724,10 +724,10 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         if not self.event_bus or not patterns:
             return
 
-        from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+        from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.adapter.google",
             consciousness_signature=consciousness_signature,
             data={

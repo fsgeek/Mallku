@@ -32,7 +32,7 @@ from src.mallku.firecircle.protocol.conscious_message import (
 )
 from src.mallku.firecircle.service.service import FireCircleService
 from src.mallku.firecircle.service.voice_manager import VoiceManager
-from src.mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from src.mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 class MockAdapter(ConsciousModelAdapter):
@@ -362,7 +362,7 @@ async def test_bridge_handles_consciousness_patterns():
     async def capture_event(event):
         emitted_events.append(event)
 
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, capture_event)
+    event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, capture_event)
 
     # Process pattern
     await bridge.on_consciousness_pattern_detected(pattern)
@@ -373,7 +373,7 @@ async def test_bridge_handles_consciousness_patterns():
     # Verify event emitted
     assert len(emitted_events) == 1
     event = emitted_events[0]
-    assert event.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
+    assert event.event_type == ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
     assert event.data["pattern_type"] == "resonance"
     assert event.data["infrastructure_aware"] is True
 

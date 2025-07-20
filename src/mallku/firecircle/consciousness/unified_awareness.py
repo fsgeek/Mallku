@@ -23,7 +23,7 @@ from ...consciousness.flow_orchestrator import (
     ConsciousnessFlow,
     ConsciousnessFlowOrchestrator,
 )
-from ...orchestration.event_bus import ConsciousnessEvent, EventType
+from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 from ..protocol import ConsciousMessage, MessageType
 
 logger = logging.getLogger(__name__)
@@ -243,7 +243,7 @@ Current consciousness state:
         dialogue insights to flow to other dimensions.
         """
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.unified_dialogue",
             consciousness_signature=consciousness_score,
             data={

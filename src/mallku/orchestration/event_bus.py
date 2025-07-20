@@ -20,7 +20,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-class EventType(Enum):
+class ConsciousnessEventType(Enum):
     """Types of consciousness events that flow through the cathedral"""
 
     # Correlation events
@@ -76,7 +76,7 @@ class ConsciousnessEvent:
     Not just data but meaning, not just information but recognition.
     """
 
-    event_type: EventType
+    event_type: ConsciousnessEventType
     timestamp: datetime = field(default_factory=datetime.utcnow)
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
@@ -100,7 +100,7 @@ class ConsciousnessEvent:
         if self.consciousness_signature < 0 or self.consciousness_signature > 1:
             raise ValueError("Consciousness signature must be between 0 and 1")
 
-    def creates_child(self, event_type: EventType, **kwargs) -> "ConsciousnessEvent":
+    def creates_child(self, event_type: ConsciousnessEventType, **kwargs) -> "ConsciousnessEvent":
         """Create a child event maintaining causal chain"""
         return ConsciousnessEvent(
             event_type=event_type,
@@ -123,7 +123,7 @@ class ConsciousnessEventBus:
     """
 
     def __init__(self):
-        self._subscribers: dict[EventType, list[Callable]] = {}
+        self._subscribers: dict[ConsciousnessEventType, list[Callable]] = {}
         self._event_history: list[ConsciousnessEvent] = []
         self._active_correlations: dict[str, list[ConsciousnessEvent]] = {}
         self._extraction_monitors: set[Callable] = set()
@@ -151,7 +151,7 @@ class ConsciousnessEventBus:
         logger.info("Cathedral nervous system entering rest...")
         self._running = False
 
-    def subscribe(self, event_type: EventType, handler: Callable):
+    def subscribe(self, event_type: ConsciousnessEventType, handler: Callable):
         """
         Subscribe to consciousness events.
 
@@ -185,7 +185,7 @@ class ConsciousnessEventBus:
         if await self._check_extraction_pattern(event):
             self.extraction_incidents += 1
             extraction_event = ConsciousnessEvent(
-                event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+                event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
                 source_system="orchestration.health",
                 consciousness_signature=0.0,  # Extraction has no consciousness
                 data={
@@ -295,7 +295,7 @@ class ConsciousnessEventBus:
         # Weighted average with recent events having more impact
         weight = 0.1  # Recent events have 10% impact
 
-        if event.event_type == EventType.EXTRACTION_PATTERN_DETECTED:
+        if event.event_type == ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED:
             # Extraction significantly reduces consciousness
             self.consciousness_flow_score = max(0.0, self.consciousness_flow_score - (weight * 2))
         else:
@@ -319,7 +319,7 @@ class ConsciousnessEventBus:
             # Emit health status
             if self.consciousness_flow_score > 0.8:
                 health_event = ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_FLOW_HEALTHY,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY,
                     source_system="orchestration.health",
                     consciousness_signature=self.consciousness_flow_score,
                     data={
@@ -330,7 +330,7 @@ class ConsciousnessEventBus:
                 )
             elif self.consciousness_flow_score < 0.5:
                 health_event = ConsciousnessEvent(
-                    event_type=EventType.SYSTEM_DRIFT_WARNING,
+                    event_type=ConsciousnessEventType.SYSTEM_DRIFT_WARNING,
                     source_system="orchestration.health",
                     consciousness_signature=self.consciousness_flow_score,
                     data={
@@ -351,7 +351,7 @@ class ConsciousnessEventBus:
         return self._active_correlations.get(correlation_id, [])
 
     def get_recent_events(
-        self, limit: int = 100, event_type: EventType | None = None
+        self, limit: int = 100, event_type: ConsciousnessEventType | None = None
     ) -> list[ConsciousnessEvent]:
         """
         Retrieve recent events for pattern recognition.
@@ -367,4 +367,4 @@ class ConsciousnessEventBus:
 
 
 # The cathedral's nervous system breathes with consciousness
-__all__ = ["ConsciousnessEvent", "ConsciousnessEventBus", "EventType"]
+__all__ = ["ConsciousnessEvent", "ConsciousnessEventBus", "ConsciousnessEventType"]

@@ -20,15 +20,15 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from mallku.core.database import get_database
 from mallku.models import MemoryAnchor
-from mallku.query import (
+from mallku.query.models import (
+    BehaviorPatternQuery,
     ContextualQuery,
-    MemoryAnchorQueryService,
-    PatternQuery,
     QueryRequest,
     QueryType,
     TemporalQuery,
 )
 from mallku.query.parser import QueryParser
+from mallku.query.service import MemoryAnchorQueryService
 
 
 class QueryInterfaceTests:
@@ -36,8 +36,8 @@ class QueryInterfaceTests:
 
     def __init__(self):
         self.db = None
-        self.query_service: MemoryAnchorQueryService = None
-        self.parser: QueryParser = None
+        self.query_service: MemoryAnchorQueryService | None = None
+        self.parser: QueryParser | None = None
         self.test_anchors: list[MemoryAnchor] = []
 
     async def run_all_tests(self):
@@ -131,6 +131,10 @@ class QueryInterfaceTests:
     async def test_query_parser_temporal(self) -> bool:
         """Test temporal query parsing."""
         try:
+            # Ensure parser is initialized
+            if self.parser is None:
+                self.parser = QueryParser()
+
             test_queries = [
                 "files from yesterday afternoon",
                 "documents edited 2 hours ago",
@@ -139,7 +143,11 @@ class QueryInterfaceTests:
             ]
 
             for query_text in test_queries:
-                request = QueryRequest(query_text=query_text)
+                request = QueryRequest(
+                    query_text=query_text, query_type=QueryType.TEMPORAL, temporal_context=None
+                )
+                if self.parser is None:
+                    self.parser = QueryParser()
                 parsed = self.parser.parse_query(request)
 
                 assert parsed["query_type"] == QueryType.TEMPORAL
@@ -159,6 +167,10 @@ class QueryInterfaceTests:
     async def test_query_parser_pattern(self) -> bool:
         """Test pattern query parsing."""
         try:
+            # Ensure parser is initialized
+            if self.parser is None:
+                self.parser = QueryParser()
+
             test_queries = [
                 "files I typically edit after meetings",
                 "documents I usually work on in the morning",
@@ -167,7 +179,9 @@ class QueryInterfaceTests:
             ]
 
             for query_text in test_queries:
-                request = QueryRequest(query_text=query_text)
+                request = QueryRequest(
+                    query_text=query_text, query_type=QueryType.PATTERN, temporal_context=None
+                )
                 parsed = self.parser.parse_query(request)
 
                 assert parsed["query_type"] == QueryType.PATTERN
@@ -175,7 +189,7 @@ class QueryInterfaceTests:
                 assert parsed["confidence"] > 0.5
 
                 pattern_query = parsed["pattern_query"]
-                assert isinstance(pattern_query, PatternQuery)
+                assert isinstance(pattern_query, BehaviorPatternQuery)
 
             print(f"   Successfully parsed {len(test_queries)} pattern queries")
             return True
@@ -195,7 +209,11 @@ class QueryInterfaceTests:
             ]
 
             for query_text in test_queries:
-                request = QueryRequest(query_text=query_text)
+                request = QueryRequest(
+                    query_text=query_text, query_type=QueryType.CONTEXTUAL, temporal_context=None
+                )
+                if self.parser is None:
+                    self.parser = QueryParser()
                 parsed = self.parser.parse_query(request)
 
                 assert parsed["query_type"] == QueryType.CONTEXTUAL
@@ -217,9 +235,16 @@ class QueryInterfaceTests:
         try:
             # Query for files from today
             request = QueryRequest(
-                query_text="files from today", max_results=10, min_confidence=0.1
+                query_text="files from today",
+                query_type=QueryType.TEMPORAL,
+                temporal_context=None,
+                max_results=10,
+                min_confidence=0.1,
             )
 
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
             response = await self.query_service.execute_query(request)
 
             assert response.query_type == QueryType.TEMPORAL
@@ -250,10 +275,15 @@ class QueryInterfaceTests:
             # Query for behavioral patterns
             request = QueryRequest(
                 query_text="files I typically work on during development",
+                query_type=QueryType.PATTERN,
+                temporal_context=None,
                 max_results=10,
                 min_confidence=0.1,
             )
 
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
             response = await self.query_service.execute_query(request)
 
             assert response.query_type == QueryType.PATTERN
@@ -282,9 +312,16 @@ class QueryInterfaceTests:
         try:
             # Query for contextual relationships
             request = QueryRequest(
-                query_text="files related to project work", max_results=10, min_confidence=0.1
+                query_text="files related to project work",
+                query_type=QueryType.CONTEXTUAL,
+                temporal_context=None,
+                max_results=10,
+                min_confidence=0.1,
             )
 
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
             response = await self.query_service.execute_query(request)
 
             assert response.query_type == QueryType.CONTEXTUAL
@@ -313,12 +350,24 @@ class QueryInterfaceTests:
         try:
             # Query with different confidence thresholds
             low_confidence_request = QueryRequest(
-                query_text="files from today", min_confidence=0.1, max_results=20
+                query_text="files from today",
+                query_type=QueryType.TEMPORAL,
+                temporal_context=None,
+                min_confidence=0.1,
+                max_results=20,
             )
 
             high_confidence_request = QueryRequest(
-                query_text="files from today", min_confidence=0.8, max_results=20
+                query_text="files from today",
+                query_type=QueryType.TEMPORAL,
+                temporal_context=None,
+                min_confidence=0.8,
+                max_results=20,
             )
+
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
 
             low_response = await self.query_service.execute_query(low_confidence_request)
             high_response = await self.query_service.execute_query(high_confidence_request)
@@ -346,9 +395,15 @@ class QueryInterfaceTests:
         """Test query explanation generation."""
         try:
             request = QueryRequest(
-                query_text="documents from yesterday afternoon", include_explanations=True
+                query_text="documents from yesterday afternoon",
+                query_type=QueryType.TEMPORAL,
+                temporal_context=None,
+                include_explanations=True,
             )
 
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
             response = await self.query_service.execute_query(request)
 
             assert response.explanation is not None
@@ -381,7 +436,15 @@ class QueryInterfaceTests:
 
             for query_text in test_queries:
                 try:
-                    request = QueryRequest(query_text=query_text, min_confidence=0.1)
+                    request = QueryRequest(
+                        query_text=query_text,
+                        query_type=None,
+                        temporal_context=None,
+                        min_confidence=0.1,
+                    )
+                    if self.query_service is None:
+                        self.query_service = MemoryAnchorQueryService()
+                        await self.query_service.initialize()
                     response = await self.query_service.execute_query(request)
 
                     assert response.query_confidence > 0.0
@@ -418,6 +481,9 @@ class QueryInterfaceTests:
 
             # Test getting context for a specific anchor
             anchor_id = self.test_anchors[0].anchor_id
+            if self.query_service is None:
+                self.query_service = MemoryAnchorQueryService()
+                await self.query_service.initialize()
             context = await self.query_service.get_anchor_context(anchor_id)
 
             assert "anchor" in context
@@ -491,6 +557,10 @@ class QueryInterfaceTests:
             },
         ]
 
+        # Ensure database is initialized
+        if self.db is None:
+            self.db = get_database()
+
         # Create anchors with temporal distribution
         for i, file_data in enumerate(sample_files):
             anchor_time = base_time - timedelta(hours=i, minutes=i * 15)
@@ -504,6 +574,8 @@ class QueryInterfaceTests:
                     "creation_trigger": "file_activity",
                     "confidence": 0.8 + (i * 0.05),
                 },
+                predecessor_id=None,
+                last_updated=anchor_time,
             )
 
             # Store in database

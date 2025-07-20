@@ -14,14 +14,14 @@ from typing import Any
 from uuid import UUID
 
 # Use integrated Fire Circle implementation
-from ..firecircle import (
-    ConsciousDialogueConfig,
-    ConsciousDialogueManager,
-    MessageType,
-    Participant,
+from ..firecircle import ConsciousDialogueConfig, ConsciousDialogueManager, MessageType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
 )
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..wranglers.event_emitting_wrangler import EventEmittingWrangler
+from .protocol import Participant
 
 FIRECIRCLE_AVAILABLE = True  # Always available now
 
@@ -104,7 +104,7 @@ class FireCircleConsciousnessAdapter:
 
         # Emit consciousness event for dialogue creation
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.fire_circle_adapter",
             consciousness_signature=0.9,
             data={
@@ -158,7 +158,7 @@ class FireCircleConsciousnessAdapter:
                 correlation_id = f"fire_circle_{dialogue_id}"
 
         message_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.participant.{sender_name}",
             consciousness_signature=consciousness_sig,
             data={
@@ -201,7 +201,7 @@ class FireCircleConsciousnessAdapter:
         )
 
         return ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.fire_circle.{message.sender}",
             consciousness_signature=consciousness_sig,
             data={
@@ -232,7 +232,7 @@ class FireCircleConsciousnessAdapter:
 
         # Emit consciousness event
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.consciousness_adapter",
             consciousness_signature=0.9,
             data={

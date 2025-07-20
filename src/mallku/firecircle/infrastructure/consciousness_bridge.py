@@ -24,7 +24,11 @@ from ...firecircle.infrastructure_consciousness import (
     AdapterHealthSignature,
     InfrastructureConsciousness,
 )
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..consciousness_metrics import EmergencePattern
 from ..service.service import FireCircleService
 
@@ -85,7 +89,7 @@ class ConsciousnessFireCircleBridge:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.INFRASTRUCTURE_CHANGE,
+                    event_type=ConsciousnessEventType.INFRASTRUCTURE_CHANGE,
                     source_system="firecircle.consciousness_bridge",
                     data={
                         "action": "bridge_activated",
@@ -149,7 +153,7 @@ class ConsciousnessFireCircleBridge:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="firecircle.consciousness_bridge",
                     consciousness_signature=pattern.strength,
                     data={
@@ -219,7 +223,7 @@ class ConsciousnessFireCircleBridge:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.INFRASTRUCTURE_CHANGE,
+                    event_type=ConsciousnessEventType.INFRASTRUCTURE_CHANGE,
                     source_system="firecircle.consciousness_bridge",
                     data={
                         "action": "fallback_suggested",

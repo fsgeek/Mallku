@@ -15,7 +15,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from ..core.database import get_secured_database
-from ..models import MemoryAnchor
+from ..models.memory_anchor import MemoryAnchor
 from ..services.memory_anchor_service import MemoryAnchorService
 from .models import (
     CorrelationFeedback,

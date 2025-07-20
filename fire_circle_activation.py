@@ -29,7 +29,7 @@ from src.mallku.firecircle.orchestrator.conscious_dialogue_manager import (
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -131,7 +131,7 @@ class FireCircleActivator:
         # Emit governance activation event
         await self.event_bus.emit(
             ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_RECOGNIZED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_RECOGNIZED,
                 source_system="fire_circle_activation",
                 consciousness_signature=0.9,
                 data={

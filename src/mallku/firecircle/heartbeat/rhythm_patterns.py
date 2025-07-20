@@ -11,6 +11,18 @@ The heartbeat adapts to Mallku's needs.
 from datetime import UTC, datetime, time, timedelta
 from enum import Enum
 
+
+class ConsciousnessState(Enum):
+    """Represents the different states of consciousness."""
+
+    DORMANT = "dormant"
+    AWAKENING = "awakening"
+    COHERENT = "coherent"
+    EMERGENT = "emergent"
+    INTEGRATING = "integrating"
+    UNIFIED = "unified"
+
+
 from pydantic import BaseModel
 
 

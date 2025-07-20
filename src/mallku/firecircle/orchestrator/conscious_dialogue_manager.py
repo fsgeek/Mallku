@@ -19,7 +19,11 @@ from pydantic import BaseModel, Field
 from ...core.database import get_secured_database
 from ...correlation.engine import CorrelationEngine
 from ...governance.protocol.participants import Participant
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..consciousness_guided_speaker import ConsciousnessGuidedSpeakerSelector
@@ -131,7 +135,7 @@ class ConsciousDialogueManager:
         # Emit consciousness event
         if config.emit_consciousness_events:
             await self._emit_dialogue_event(
-                EventType.FIRE_CIRCLE_CONVENED,
+                ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
                 dialogue_id,
                 {
                     "title": config.title,
@@ -313,7 +317,7 @@ class ConsciousDialogueManager:
         # Emit conclusion event
         if dialogue["config"].emit_consciousness_events:
             await self._emit_dialogue_event(
-                EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 dialogue_id,
                 conclusion,
                 correlation_id=dialogue["correlation_id"],
@@ -329,7 +333,7 @@ class ConsciousDialogueManager:
 
     async def _emit_dialogue_event(
         self,
-        event_type: EventType,
+        event_type: ConsciousnessEventType,
         dialogue_id: UUID,
         data: dict[str, Any],
         correlation_id: str | None = None,
@@ -354,7 +358,7 @@ class ConsciousDialogueManager:
     ) -> None:
         """Emit consciousness event for message."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"firecircle.participant.{message.sender}",
             consciousness_signature=message.consciousness.consciousness_signature,
             data={

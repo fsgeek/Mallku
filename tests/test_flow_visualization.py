@@ -21,7 +21,11 @@ from mallku.consciousness.flow_orchestrator import (
     ConsciousnessFlowOrchestrator,
 )
 from mallku.consciousness.flow_visualizer import ConsciousnessFlowVisualizer
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 @pytest_asyncio.fixture
@@ -80,7 +84,7 @@ class TestConsciousnessFlowMonitor:
         # Emit test events
         for i in range(5):
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system="test_sonic_provider",
                 consciousness_signature=0.7 + i * 0.05,
                 data={"patterns": ["test_pattern", f"pattern_{i}"]},
@@ -298,7 +302,7 @@ class TestIntegration:
             # Emit events
             for i in range(3):
                 event = ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="integration_test",
                     consciousness_signature=0.7,
                     data={"patterns": ["integration_pattern"]},
@@ -324,7 +328,7 @@ class TestIntegration:
 
             # Simulate consciousness flow
             sonic_event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system="sound_consciousness",
                 consciousness_signature=0.8,
                 data={"patterns": ["harmonic_reciprocity", "sonic_meditation"]},

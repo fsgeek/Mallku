@@ -14,7 +14,7 @@ import pytest
 
 from mallku.discord_gateway import ConsciousnessDefender, QueryRouter
 from mallku.discord_gateway.defense import DefenseConfig, QueryAnalysis
-from mallku.discord_gateway.router import QueryContext, QueryType
+from mallku.discord_gateway.router import QueryContext, UserQueryType
 
 
 class TestConsciousnessDefender:
@@ -89,7 +89,7 @@ class TestQueryRouter:
 
         assert decision.use_cached
         assert decision.cache_key == "what_is_fire_circle"
-        assert decision.query_type == QueryType.EDUCATION
+        assert decision.query_type == UserQueryType.EDUCATION
 
     @pytest.mark.asyncio
     async def test_wisdom_routing(self):
@@ -112,7 +112,7 @@ class TestQueryRouter:
 
         decision = await router.route_query(context)
 
-        assert decision.query_type == QueryType.META_QUESTION  # About AI/consciousness
+        assert decision.query_type == UserQueryType.META_QUESTION  # About AI/consciousness
         assert decision.use_full_circle
         assert not decision.use_heartbeat
 
@@ -134,7 +134,7 @@ class TestQueryRouter:
 
         decision = await router.route_query(context)
 
-        assert decision.query_type == QueryType.QUICK_QUESTION
+        assert decision.query_type == UserQueryType.QUICK_QUESTION
         assert decision.use_heartbeat
         assert not decision.use_full_circle
 

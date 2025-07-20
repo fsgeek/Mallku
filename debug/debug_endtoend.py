@@ -14,7 +14,7 @@ sys.path.insert(0, str(src_path))
 
 # ruff: noqa: E402
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType
+from mallku.correlation.models import ConsciousnessEventType, Event
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
 
@@ -28,7 +28,7 @@ def generate_complete_test_events():
         [
             Event(
                 timestamp=base_time + timedelta(minutes=i * 60),
-                event_type=EventType.COMMUNICATION,
+                event_type=ConsciousnessEventType.COMMUNICATION,
                 stream_id="email_inbox",
                 content={"subject": f"Project Update {i}", "sender": "boss@company.com"},
                 context={"location": "office", "device": "laptop"},
@@ -43,7 +43,7 @@ def generate_complete_test_events():
         [
             Event(
                 timestamp=base_time + timedelta(minutes=i * 60 + 5),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="document_creation",
                 content={"filename": f"response_{i}.docx", "type": "document"},
                 context={"location": "office", "device": "laptop"},
@@ -60,7 +60,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=music_start + timedelta(hours=i * 2),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="spotify",
                 content={"track": "Focus Music", "artist": "Ambient Collective"},
                 context={"location": "home", "device": "desktop"},
@@ -72,7 +72,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=music_start + timedelta(hours=i * 2, minutes=2),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="code_editor",
                 content={"file": "correlation_engine.py", "action": "edit"},
                 context={"location": "home", "device": "desktop"},
@@ -86,7 +86,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=standup_base + timedelta(days=day),
-                event_type=EventType.COMMUNICATION,
+                event_type=ConsciousnessEventType.COMMUNICATION,
                 stream_id="teams_meetings",
                 content={"meeting": "Daily Standup", "duration": 15},
                 context={"location": "office", "device": "laptop"},
@@ -98,7 +98,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=standup_base + timedelta(days=day, minutes=30),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="task_tracker",
                 content={"action": "update_tasks", "count": 3},
                 context={"location": "office", "device": "laptop"},
@@ -114,7 +114,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=travel_base + timedelta(hours=i * 4),
-                event_type=EventType.ENVIRONMENTAL,
+                event_type=ConsciousnessEventType.ENVIRONMENTAL,
                 stream_id="location_service",
                 content={"location": location, "activity": "business_travel"},
                 context={"travel_mode": "business", "trip_id": "conf_2024"},
@@ -126,7 +126,7 @@ def generate_complete_test_events():
         test_events.append(
             Event(
                 timestamp=travel_base + timedelta(hours=i * 4 + 1),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="expense_tracker",
                 content={"expense_type": "business", "amount": 50.0 + i * 25},
                 context={"travel_mode": "business", "trip_id": "conf_2024"},
