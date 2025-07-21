@@ -498,14 +498,17 @@ class DatabaseConsciousnessMetricsCollector(ConsciousnessMetricsCollector):
             pattern_frequencies = list(cursor)
 
             # Get voice interaction network
+            # Handle both old (singular) and new (plural) document formats
             aql = """
             FOR doc IN @@collection
                 FILTER doc.timestamp > DATE_ISO8601(@cutoff)
-                COLLECT source = doc.source_voice, target = doc.target_voice
+                LET source = doc.source_voices ? doc.source_voices[0] : doc.source_voice
+                LET target = doc.target_voices ? doc.target_voices[0] : doc.target_voice
+                COLLECT src = source, tgt = target
                 WITH COUNT INTO flow_count
                 FILTER flow_count > 2
                 SORT flow_count DESC
-                RETURN {source: source, target: target, interactions: flow_count}
+                RETURN {source: src, target: tgt, interactions: flow_count}
             """
 
             cursor = db.aql.execute(

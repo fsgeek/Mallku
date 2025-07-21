@@ -152,8 +152,12 @@ class ConsciousnessMetricsCollector:
             try:
                 return UUID(str(val))
             except Exception:
-                # If not a valid UUID, generate a new one (or handle as needed)
-                return uuid4()
+                # For non-UUID strings (like voice names), create a deterministic UUID
+                # This ensures "voice1" always maps to the same UUID
+                import hashlib
+
+                hash_bytes = hashlib.md5(str(val).encode()).digest()
+                return UUID(bytes=hash_bytes)
 
         flow = ConsciousnessFlow(
             consciousness_signature=flow_strength,
@@ -454,7 +458,10 @@ class ConsciousnessMetricsCollector:
         connections = {}
 
         for flow in self.flows:
-            key = tuple(sorted([flow.source_voice, flow.target_voice]))
+            # Handle flows with multiple voices by using first voice from each
+            source = str(flow.source_voices[0]) if flow.source_voices else "unknown"
+            target = str(flow.target_voices[0]) if flow.target_voices else "unknown"
+            key = tuple(sorted([source, target]))
             if key not in connections:
                 connections[key] = []
             connections[key].append(flow.flow_strength)
