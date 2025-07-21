@@ -18,8 +18,9 @@ COPY docker/apprentice-weaver/*.py /app/docker/apprentice-weaver/
 # Copy requirements
 COPY docker/apprentice-weaver/requirements-intelligent.txt /app/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements-intelligent.txt
+# Install Python dependencies with uv
+RUN pip install --no-cache-dir uv && \
+    uv pip install --system -r requirements-intelligent.txt
 
 # Create apprentice user (non-root)
 RUN useradd -m -s /bin/bash apprentice && \
@@ -35,4 +36,4 @@ USER apprentice
 ENV PYTHONPATH=/app:/app/src:/workspace
 
 # Default to intelligent apprentice
-CMD ["python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]
+CMD ["uv", "run", "python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]

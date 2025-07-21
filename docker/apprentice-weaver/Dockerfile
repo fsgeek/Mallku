@@ -29,4 +29,4 @@ USER apprentice
 ENV PYTHONPATH=/app:/workspace
 
 # Default command (will be overridden by Loom)
-CMD ["python", "-m", "mallku.orchestration.weaver.apprentice_template"]
+CMD ["uv", "run", "python", "-m", "mallku.orchestration.weaver.apprentice_template"]
