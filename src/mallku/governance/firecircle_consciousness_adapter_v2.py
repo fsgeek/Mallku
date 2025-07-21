@@ -108,7 +108,7 @@ class FireCircleConsciousnessAdapterV2:
         dialogue_id: UUID,
         sender_id: UUID,
         content: str,
-        message_type: MessageType = MessageType.MESSAGE,
+        message_type: MessageType = MessageType.RESPONSE,
     ) -> None:
         """
         Send a message in a Fire Circle dialogue.

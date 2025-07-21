@@ -20,10 +20,18 @@ from .orchestrator.conscious_dialogue_manager import (
     ConsciousDialogueManager,
     TurnPolicy,
 )
-from .protocol import ConsciousMessage, ConsciousMessageRouter, MessageType
+from .protocol import (
+    ConsciousMessage,
+    ConsciousMessageRouter,
+    MessageContent,
+    MessageRole,
+    MessageType,
+)
 
 __all__ = [
     "ConsciousMessage",
+    "MessageContent",
+    "MessageRole",
     "MessageType",
     "Participant",
     "VoiceIdentity",
