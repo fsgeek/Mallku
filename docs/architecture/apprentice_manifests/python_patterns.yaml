@@ -1,0 +1,38 @@
+# Apprentice Manifest: Python Patterns Analyzer
+# This apprentice specializes in analyzing and improving Python code patterns
+
+apprentice_type: python_patterns
+description: "Analyzes Python code for patterns, architecture, and best practices"
+specialization: "Python async patterns, decorators, context managers, type hints"
+
+# Tools this apprentice MUST have to function
+required_tools:
+  - read_file         # Read Python source files
+  - grep              # Search for code patterns
+  - edit_file         # Suggest improvements
+
+# Tools that enhance capability but aren't essential
+optional_tools:
+  - multi_edit        # Batch improvements
+  - write_file        # Create new pattern examples
+  - bash              # Run simple Python checks
+  - glob              # Find Python files
+
+# Tools that should never be given to this apprentice
+forbidden_tools:
+  - docker_*          # No container management
+  - database_*        # No database operations
+  - github_*          # No repository management
+  - mcp__discord_*    # No chat operations
+
+# Context about tool usage
+tool_notes:
+  read_file: "Primary tool for analyzing code"
+  grep: "Used to find pattern instances across codebase"
+  edit_file: "For suggesting inline improvements"
+  bash: "Only for running 'python -m py_compile' checks"
+
+# Feedback preferences
+feedback:
+  channel: "khipu"    # Write feedback to khipu thread
+  verbose: true       # Detailed feedback about tool limitations
