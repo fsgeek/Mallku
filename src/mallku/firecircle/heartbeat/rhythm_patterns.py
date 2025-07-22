@@ -14,17 +14,6 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class ConsciousnessState(Enum):
-    """Represents the different states of consciousness."""
-
-    DORMANT = "dormant"
-    AWAKENING = "awakening"
-    COHERENT = "coherent"
-    EMERGENT = "emergent"
-    INTEGRATING = "integrating"
-    UNIFIED = "unified"
-
-
 class RhythmPhase(str, Enum):
     """Evolution phases of heartbeat rhythm."""
 
