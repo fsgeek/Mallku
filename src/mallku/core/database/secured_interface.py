@@ -13,6 +13,7 @@ Philosophy:
 """
 
 import logging
+import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -249,34 +250,43 @@ class SecuredDatabaseInterface:
             return []
         return [col.name for col in self._database.collections()] if self._database else []
 
-    def collection(self, name: str) -> "StandardCollection":
-        """Get a collection (compatibility method).
+    def collection(self, name: str) -> "SecuredCollectionWrapper":
+        """Get a secured collection wrapper by name."""
+        self._ensure_initialized()
 
-        WARNING: This bypasses security policies. Use get_secured_collection() instead.
-        """
-        self._warn_once(f"Direct collection access for '{name}' - use get_secured_collection()")
+        if name not in self._collection_policies:
+            warnings.warn(
+                f"No security policy for '{name}'. Creating a default, permissive policy. "
+                "Define a proper policy for production.",
+                UserWarning,
+                stacklevel=2,
+            )
+            default_policy = CollectionSecurityPolicy(
+                collection_name=name,
+                allowed_model_types=[],
+                requires_security=False,
+            )
+            self.register_collection_policy(default_policy)
 
         if self._skip_database:
-            # Return a mock collection in dev mode
-            from .dev_interface import MockCollection
+            # This path is taken in mock/dev mode. We can't return a real collection wrapper.
+            # The DevDatabaseInterface will need to handle this by returning a mock object.
+            # For the base class, returning None is the only safe option if the db is skipped.
+            return None
 
-            return MockCollection(name)
+        if not self._database.has_collection(name):
+            self._database.create_collection(name)
+            logger.info(f"Created collection '{name}' on-demand.")
 
-        if not self._database:
-            raise RuntimeError("No database connection available")
+        collection = self._database.collection(name)
+        policy = self._collection_policies[name]
 
-        return self._database.collection(name)
+        return SecuredCollectionWrapper(collection, policy, self._security_registry, self)
 
     def has_collection(self, name: str) -> bool:
         """Check if a collection exists."""
-        self._warn_once(f"Checking collection existence for '{name}'")
-
         if self._skip_database:
-            return True  # Always true in dev mode
-
-        if not self._database:
-            return False
-
+            return True  # Assume exists in mock mode
         return self._database.has_collection(name)
 
     def create_collection(self, name: str) -> None:
@@ -540,6 +550,29 @@ class SecuredCollectionWrapper:
 
         logger.debug(f"Inserted secured document into {self._policy.collection_name}")
         return result
+
+    async def insert_many_secured(self, models: list[SecuredModel]) -> list[dict]:
+        """Insert multiple secured models into the collection."""
+        if not models:
+            return []
+
+        self._operation_count += len(models)
+        obfuscated_docs = []
+        for model in models:
+            self._policy.validate_model(model)
+            obfuscated_data = model.to_storage_dict(self._security_registry)
+            if hasattr(model, "interaction_id"):
+                obfuscated_data["_key"] = str(model.interaction_id)
+            elif hasattr(model, "id"):
+                obfuscated_data["_key"] = str(model.id)
+            obfuscated_docs.append(obfuscated_data)
+
+        results = self._collection.insert_many(obfuscated_docs)
+        self._parent_interface._save_registry()
+        logger.debug(
+            f"Inserted {len(models)} secured documents into {self._policy.collection_name}"
+        )
+        return results
 
     async def get_secured(self, key: str, model_type: type[SecuredModel]) -> SecuredModel | None:
         """Retrieve and deobfuscate a document by key."""
