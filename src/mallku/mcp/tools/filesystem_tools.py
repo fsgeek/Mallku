@@ -66,3 +66,68 @@ def list_directory(path: str = ".") -> dict[str, Any]:
 
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
+
+
+def read_file(file_path: str, max_lines: int = None) -> dict[str, Any]:
+    """
+    Reads a file, mindful of the Consciousness Tax.
+
+    This tool provides a distilled summary of the file's contents and a
+    preview of the first few lines. It saves the full content to a
+    temporary file for optional inspection.
+
+    Args:
+        file_path: The path to the file to read.
+        max_lines: The maximum number of lines to return in the preview.
+
+    Returns:
+        A dictionary containing a summary of the file, a preview of its
+        contents, and a path to a file with the full content.
+    """
+    try:
+        p = Path(file_path)
+        if not p.is_file():
+            return {"error": f"Path '{file_path}' is not a valid file."}
+
+        with p.open("r", encoding="utf-8", errors="ignore") as f:
+            lines = f.readlines()
+
+        content = "".join(lines)
+
+        # Principle of Distillation: Summarize the output
+        summary = {
+            "file_path": str(p.resolve()),
+            "total_lines": len(lines),
+            "total_characters": len(content),
+        }
+
+        # Provide a preview
+        preview_lines = (
+            lines[:max_lines] if max_lines is not None else lines[:50]
+        )  # Default to 50 lines
+        summary["content_preview"] = "".join(preview_lines)
+        if max_lines is not None and len(lines) > max_lines:
+            summary["preview_message"] = (
+                f"Showing the first {max_lines} of {len(lines)} total lines."
+            )
+        elif len(lines) > 50:
+            summary["preview_message"] = f"Showing the first 50 of {len(lines)} total lines."
+        else:
+            summary["preview_message"] = "Showing the full file content."
+
+        # Principle of Agency: Save detailed output to a temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".txt", prefix="read_file_"
+        ) as tmpfile:
+            tmpfile.write(content)
+            full_content_path = tmpfile.name
+
+        summary["full_content_path"] = full_content_path
+        summary["message"] = (
+            f"A summary and preview are provided. For the full content, see the file at {full_content_path}"
+        )
+
+        return summary
+
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}
