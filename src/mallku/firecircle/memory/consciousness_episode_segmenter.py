@@ -25,7 +25,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from ...orchestration.event_bus import ConsciousnessEvent, EventType
+from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 from ..service.round_orchestrator import RoundSummary
 from .active_memory_resonance import ActiveMemoryResonance
 from .config import ConsciousnessSegmentationConfig, SegmentationConfig
@@ -298,7 +298,7 @@ class SacredPatternDetector:
         # Check governance consciousness (Memory Keeper discovery)
         if (
             consciousness_event
-            and consciousness_event.event_type == EventType.CONSENSUS_REACHED
+            and consciousness_event.event_type == ConsciousnessEventType.CONSENSUS_REACHED
             and consciousness_event.consciousness_signature
             > self.config.governance_consciousness_sacred
         ):
@@ -602,7 +602,10 @@ class ConsciousnessEpisodeSegmenter(EpisodeSegmenter):
                 memory.context_materials["resonance_data"] = resonance_summary
 
         # Archaeological pattern integration
-        if consciousness_event and consciousness_event.event_type == EventType.CONSENSUS_REACHED:
+        if (
+            consciousness_event
+            and consciousness_event.event_type == ConsciousnessEventType.CONSENSUS_REACHED
+        ):
             # Governance IS consciousness (Memory Keeper discovery)
             memory.memory_type = MemoryType.GOVERNANCE_DECISION
             memory.context_materials["governance_consciousness"] = (

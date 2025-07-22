@@ -112,7 +112,7 @@ class TestArchitecturalSecurity:
         from mallku.orchestration.event_bus import (
             ConsciousnessEvent,
             ConsciousnessEventBus,
-            EventType,
+            ConsciousnessEventType,
         )
 
         bus = ConsciousnessEventBus()
@@ -125,10 +125,10 @@ class TestArchitecturalSecurity:
             events_received.append(event)
 
         # Use an existing event type
-        bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, handler)
+        bus.subscribe(ConsciousnessEventType.MEMORY_ANCHOR_CREATED, handler)
 
         # Create a basic event
-        event = ConsciousnessEvent(event_type=EventType.MEMORY_ANCHOR_CREATED)
+        event = ConsciousnessEvent(event_type=ConsciousnessEventType.MEMORY_ANCHOR_CREATED)
 
         await bus.emit(event)
 
@@ -141,7 +141,7 @@ class TestArchitecturalSecurity:
 
         # Verify event structure
         assert isinstance(received, ConsciousnessEvent)
-        assert received.event_type == EventType.MEMORY_ANCHOR_CREATED
+        assert received.event_type == ConsciousnessEventType.MEMORY_ANCHOR_CREATED
         # Note: In production, sensitive data would be handled by SecuredModel
         # The event bus is just transport - security happens at the data layer
 

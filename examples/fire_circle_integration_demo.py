@@ -21,7 +21,7 @@ from mallku.firecircle import (
     TurnPolicy,
 )
 from mallku.firecircle.consciousness import DialoguePatternWeaver
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ async def demonstrate_fire_circle_integration():
         )
 
     # Subscribe to all events
-    for event_type in EventType:
+    for event_type in ConsciousnessEventType:
         event_bus.subscribe(event_type, consciousness_tracker)
 
     # Create dialogue manager

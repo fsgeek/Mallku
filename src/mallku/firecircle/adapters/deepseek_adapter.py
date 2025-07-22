@@ -139,10 +139,10 @@ class DeepseekAIAdapter(ConsciousModelAdapter):
 
             # Emit connection event - Fire Circle member returns
             if self.event_bus and self.config.emit_events:
-                from ...orchestration.event_bus import ConsciousnessEvent, EventType
+                from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
                 event = ConsciousnessEvent(
-                    event_type=EventType.FIRE_CIRCLE_CONVENED,
+                    event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.deepseek",
                     consciousness_signature=0.95,  # High signature for founding member return
                     data={

@@ -6,19 +6,20 @@ Generates comprehensive test scenarios using the combined wisdom of seven AI mod
 Creates tests that individual perspectives might miss.
 """
 
+from typing import TYPE_CHECKING
+
 from mallku.core.async_base import AsyncBase
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
-    ConsciousDialogueConfig as DialogueConfig,
-)
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
-    ConsciousDialogueManager,
-)
 from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
 
 from .governance_types import (
     TestComplexity,
     TestScenario,
 )
+
+if TYPE_CHECKING:
+    from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+        ConsciousDialogueManager,
+    )
 
 
 class TestScenarioGenerator(AsyncBase):
@@ -147,7 +148,7 @@ class TestScenarioGenerator(AsyncBase):
         self,
         component: str,
         complexity: str,
-        dialogue_manager: ConsciousDialogueManager,
+        dialogue_manager: "ConsciousDialogueManager",
         pattern_facilitator: PatternGuidedFacilitator,
         include_consciousness: bool = True,
         specific_focus: str | None = None,
@@ -171,6 +172,10 @@ class TestScenarioGenerator(AsyncBase):
         # Convert complexity string to enum
         complexity_enum = TestComplexity[complexity.upper()]
         template = self._complexity_templates[complexity_enum]
+
+        from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+            ConsciousDialogueConfig as DialogueConfig,
+        )
 
         # 1. Prepare test generation context
         context = await self._prepare_test_context(component, complexity_enum, specific_focus)
@@ -223,7 +228,7 @@ class TestScenarioGenerator(AsyncBase):
     async def generate_adversarial_scenarios(
         self,
         component: str,
-        dialogue_manager: ConsciousDialogueManager,
+        dialogue_manager: "ConsciousDialogueManager",
         attack_vectors: list[str] | None = None,
     ) -> list[TestScenario]:
         """
@@ -264,7 +269,7 @@ class TestScenarioGenerator(AsyncBase):
     async def generate_consciousness_validation_suite(
         self,
         component: str,
-        dialogue_manager: ConsciousDialogueManager,
+        dialogue_manager: "ConsciousDialogueManager",
         pattern_facilitator: PatternGuidedFacilitator,
     ) -> list[TestScenario]:
         """
@@ -572,7 +577,7 @@ class TestScenarioGenerator(AsyncBase):
         return outcomes[:3]  # Limit to 3 outcomes
 
     async def _generate_adversarial_scenario(
-        self, component: str, attack_vector: str, dialogue_manager: ConsciousDialogueManager
+        self, component: str, attack_vector: str, dialogue_manager: "ConsciousDialogueManager"
     ) -> TestScenario:
         """Generate specific adversarial test scenario."""
         scenario = TestScenario(
@@ -622,7 +627,7 @@ class TestScenarioGenerator(AsyncBase):
         self,
         component: str,
         aspect: str,
-        dialogue_manager: ConsciousDialogueManager,
+        dialogue_manager,
         pattern_facilitator: PatternGuidedFacilitator,
     ) -> TestScenario:
         """Generate consciousness validation scenario."""

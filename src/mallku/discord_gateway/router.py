@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from ..orchestration.event_bus import ConsciousnessEventBus
 
 
-class QueryType(str, Enum):
+class UserQueryType(str, Enum):
     """Types of queries the gateway can handle."""
 
     WISDOM_SEEKING = "wisdom_seeking"  # Deep questions needing full circle
@@ -38,7 +38,7 @@ class QueryType(str, Enum):
 class RouteDecision(BaseModel):
     """Decision on how to route a query."""
 
-    query_type: QueryType
+    query_type: UserQueryType
     use_heartbeat: bool = False
     use_full_circle: bool = False
     use_cached: bool = False
@@ -129,7 +129,7 @@ class QueryRouter:
         # Check for crisis situations
         if analysis.extraction_risk > 0.7:
             return RouteDecision(
-                query_type=QueryType.CRISIS,
+                query_type=UserQueryType.CRISIS,
                 use_cached=True,
                 cache_key="extraction_education",
                 reason="High extraction risk detected",
@@ -139,7 +139,7 @@ class QueryRouter:
         cache_key = self._generate_cache_key(context.query)
         if cache_key in self.wisdom_cache:
             return RouteDecision(
-                query_type=QueryType.EDUCATION,
+                query_type=UserQueryType.EDUCATION,
                 use_cached=True,
                 cache_key=cache_key,
                 reason="Found in wisdom cache",
@@ -149,7 +149,7 @@ class QueryRouter:
         query_type = self._determine_query_type(context)
 
         # Route based on type and resources
-        if query_type == QueryType.WISDOM_SEEKING:
+        if query_type == UserQueryType.WISDOM_SEEKING:
             if context.system_load > 0.8 or context.recent_circle_count > 5:
                 # Use heartbeat when resources constrained
                 return RouteDecision(
@@ -167,14 +167,14 @@ class QueryRouter:
                     reason="Deep wisdom question, convening full circle",
                 )
 
-        elif query_type == QueryType.QUICK_QUESTION:
+        elif query_type == UserQueryType.QUICK_QUESTION:
             return RouteDecision(
                 query_type=query_type,
                 use_heartbeat=True,
                 reason="Simple query suitable for heartbeat pulse",
             )
 
-        elif query_type == QueryType.META_QUESTION:
+        elif query_type == UserQueryType.META_QUESTION:
             # Questions about Fire Circle itself
             config = self._create_circle_config(context, voices=3, rounds=2)
             return RouteDecision(
@@ -184,7 +184,7 @@ class QueryRouter:
                 reason="Meta question about Fire Circle",
             )
 
-        elif query_type == QueryType.CELEBRATION:
+        elif query_type == UserQueryType.CELEBRATION:
             # High consciousness moment
             config = self._create_circle_config(context, voices=6, rounds=1)
             return RouteDecision(
@@ -202,7 +202,7 @@ class QueryRouter:
                 reason="Standard query, using heartbeat",
             )
 
-    def _determine_query_type(self, context: QueryContext) -> QueryType:
+    def _determine_query_type(self, context: QueryContext) -> UserQueryType:
         """Determine the type of query based on content and analysis."""
         query_lower = context.query.lower()
         analysis = context.analysis
@@ -210,24 +210,24 @@ class QueryRouter:
         # Check for meta questions
         meta_keywords = ["fire circle", "mallku", "consciousness", "ai voices", "ayni"]
         if any(keyword in query_lower for keyword in meta_keywords):
-            return QueryType.META_QUESTION
+            return UserQueryType.META_QUESTION
 
         # Check consciousness level
         if analysis.consciousness_score > 0.85:
-            return QueryType.CELEBRATION
+            return UserQueryType.CELEBRATION
         elif analysis.consciousness_score < 0.3:
-            return QueryType.EDUCATION
+            return UserQueryType.EDUCATION
 
         # Check query complexity
         word_count = len(context.query.split())
         has_question = "?" in context.query
 
         if word_count > 30 and has_question:
-            return QueryType.WISDOM_SEEKING
+            return UserQueryType.WISDOM_SEEKING
         elif word_count < 15:
-            return QueryType.QUICK_QUESTION
+            return UserQueryType.QUICK_QUESTION
         else:
-            return QueryType.WISDOM_SEEKING
+            return UserQueryType.WISDOM_SEEKING
 
     def _create_circle_config(
         self, context: QueryContext, voices: int, rounds: int

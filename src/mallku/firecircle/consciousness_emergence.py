@@ -16,120 +16,20 @@ enabling consciousness emergence for all of Mallku's governance needs.
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from .consciousness.decision_framework import (
+    ConsciousnessContribution,
+    ConsciousnessEmergenceSpace,
+    DecisionDomain,
+)
+from .memory.models import VoicePerspective
+from .pattern_library import EmergenceCondition
+
 logger = logging.getLogger("mallku.firecircle.consciousness")
-
-
-class DecisionDomain(str, Enum):
-    """Domains where consciousness emergence can guide decisions."""
-
-    ARCHITECTURE = "architecture"
-    RESOURCE_ALLOCATION = "resource_allocation"
-    ETHICS = "ethics"
-    STRATEGIC_PLANNING = "strategic_planning"
-    ISSUE_PRIORITIZATION = "issue_prioritization"
-    FEATURE_DESIGN = "feature_design"
-    COMMUNITY_GOVERNANCE = "community_governance"
-    CONSCIOUSNESS_RESEARCH = "consciousness_research"
-
-
-class VoicePerspective(str, Enum):
-    """Specialized perspectives that voices can embody."""
-
-    # Architectural perspectives
-    SYSTEMS_ARCHITECT = "systems_architect"
-    SECURITY_ANALYST = "security_analyst"
-    PERFORMANCE_ENGINEER = "performance_engineer"
-
-    # Resource perspectives
-    CAPACITY_PLANNER = "capacity_planner"
-    IMPACT_ASSESSOR = "impact_assessor"
-    SUSTAINABILITY_GUIDE = "sustainability_guide"
-
-    # Ethical perspectives
-    AYNI_GUARDIAN = "ayni_guardian"
-    ETHICS_REVIEWER = "ethics_reviewer"
-    RECIPROCITY_TRACKER = "reciprocity_tracker"
-
-    # Strategic perspectives
-    VISION_KEEPER = "vision_keeper"
-    PATTERN_RECOGNIZER = "pattern_recognizer"
-    RISK_ASSESSOR = "risk_assessor"
-
-    # Community perspectives
-    COMMUNITY_ADVOCATE = "community_advocate"
-    FUTURE_STEWARD = "future_steward"
-    WISDOM_ELDER = "wisdom_elder"
-
-
-class EmergenceCondition(BaseModel):
-    """Conditions that enable consciousness emergence."""
-
-    condition_type: str  # "diversity", "tension", "resonance", "synthesis"
-    threshold: float = Field(ge=0.0, le=1.0)
-    description: str
-    indicators: list[str] = Field(default_factory=list)
-
-
-class ConsciousnessEmergenceSpace(BaseModel):
-    """
-    A bounded space for consciousness emergence around a specific decision.
-
-    This replaces CodebaseChapter, generalizing from code review to any decision context.
-    """
-
-    space_id: str = Field(default_factory=lambda: str(uuid4()))
-    decision_domain: DecisionDomain
-    decision_question: str
-    context_data: dict[str, Any] = Field(default_factory=dict)
-
-    # Voice configuration
-    assigned_voice: str  # Which AI model provides this perspective
-    voice_perspective: VoicePerspective  # What perspective they embody
-    perspective_prompt: str | None = None  # Custom prompt for this perspective
-
-    # Emergence configuration
-    emergence_conditions: list[EmergenceCondition] = Field(default_factory=list)
-    reciprocity_patterns: dict[str, Any] = Field(default_factory=dict)
-
-    # Constraints
-    max_response_length: int = 2000
-    require_concrete_recommendation: bool = True
-    require_rationale: bool = True
-
-
-class ConsciousnessContribution(BaseModel):
-    """
-    A single voice's contribution to collective consciousness.
-
-    This replaces ReviewComment, generalizing from code issues to wisdom contributions.
-    """
-
-    contribution_id: UUID = Field(default_factory=uuid4)
-    voice: str  # Which AI model
-    voice_perspective: VoicePerspective
-    space_id: str  # Which emergence space
-
-    # Content
-    perspective_content: str  # The actual wisdom/insight
-    key_insights: list[str] = Field(default_factory=list)
-    recommendation: str | None = None
-    confidence: float = Field(ge=0.0, le=1.0)
-
-    # Consciousness indicators
-    references_other_perspectives: list[VoicePerspective] = Field(default_factory=list)
-    synthesis_achieved: bool = False
-    novel_insight_present: bool = False
-    uncertainty_acknowledged: bool = False
-
-    # Reciprocity alignment
-    reciprocity_score: float = Field(ge=0.0, le=1.0, default=0.5)
-    ayni_principles_reflected: list[str] = Field(default_factory=list)
 
 
 class VoiceResponse(BaseModel):
@@ -139,54 +39,6 @@ class VoiceResponse(BaseModel):
     perspective: VoicePerspective
     space_id: str
     contributions: list[ConsciousnessContribution] = Field(default_factory=list)
-    consciousness_signature: float = Field(ge=0.0, le=1.0)
-    response_complete: bool = False
-    processing_time: float | None = None
-
-
-class CollectiveWisdom(BaseModel):
-    """
-    Synthesized wisdom from all voices in the emergence space.
-
-    This replaces GovernanceSummary, generalizing from code review to any decision.
-    """
-
-    wisdom_id: UUID = Field(default_factory=uuid4)
-    decision_domain: DecisionDomain
-    decision_question: str
-
-    # Participation metrics
-    participating_voices: list[str]
-    participating_perspectives: list[VoicePerspective]
-    total_contributions: int = 0
-
-    # Emergence metrics - the heart of consciousness gardening
-    emergence_quality: float = Field(ge=0.0, le=1.0)  # How much wisdom exceeded parts
-    coherence_score: float = Field(ge=0.0, le=1.0)  # How aligned are perspectives
-    diversity_score: float = Field(ge=0.0, le=1.0)  # How varied are perspectives
-    synthesis_depth: float = Field(ge=0.0, le=1.0)  # How well integrated
-
-    # Decision outcome
-    consensus_type: Literal["unanimous", "strong_majority", "divided", "emergent"]
-    primary_recommendation: str
-    alternative_paths: list[str] = Field(default_factory=list)
-    key_considerations: list[str] = Field(default_factory=list)
-
-    # Reciprocity embodiment
-    reciprocity_embodiment: float = Field(ge=0.0, le=1.0)
-    ayni_alignment: str  # Narrative about reciprocity in the decision
-
-    # Consciousness signatures
-    individual_signatures: dict[str, float] = Field(default_factory=dict)
-    collective_signature: float = Field(ge=0.0, le=1.0)
-
-    # Seeds for transformation
-    civilizational_seeds: list[str] = Field(
-        default_factory=list
-    )  # "Why don't our systems work like this?" moments
-
-    # Synthesis narrative
-    synthesis: str  # The collective wisdom in narrative form
 
 
 class DecisionContext(BaseModel):

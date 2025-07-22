@@ -8,18 +8,21 @@ sacred dialogue rather than simple voting or averaging.
 
 from collections import defaultdict
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from mallku.core.async_base import AsyncBase
 from mallku.firecircle.emergence_detector import EmergenceDetector
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
-    ConsciousDialogueManager,
-)
 from mallku.firecircle.protocol.conscious_message import ConsciousMessage
 
 from .governance_types import (
     AyniAssessment,
     ConsensusMetrics,
 )
+
+if TYPE_CHECKING:
+    from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+        ConsciousDialogueManager,
+    )
 
 # Type alias for dialogue exchanges
 DialogueExchange = ConsciousMessage
@@ -37,7 +40,7 @@ class ConsensusEngine(AsyncBase):
     5. Decision documentation for future pattern guidance
     """
 
-    def __init__(self, dialogue_manager: ConsciousDialogueManager):
+    def __init__(self, dialogue_manager: "ConsciousDialogueManager"):
         super().__init__()
         self.dialogue_manager = dialogue_manager
         self.emergence_detector = EmergenceDetector()

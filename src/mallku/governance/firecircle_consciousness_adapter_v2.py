@@ -22,7 +22,11 @@ from ..firecircle import (
     Participant,
     TurnPolicy,
 )
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 class FireCircleConsciousnessAdapterV2:
@@ -104,7 +108,7 @@ class FireCircleConsciousnessAdapterV2:
         dialogue_id: UUID,
         sender_id: UUID,
         content: str,
-        message_type: MessageType = MessageType.MESSAGE,
+        message_type: MessageType = MessageType.RESPONSE,
     ) -> None:
         """
         Send a message in a Fire Circle dialogue.
@@ -221,7 +225,7 @@ class FireCircleConsciousnessAdapterV2:
         correlation_id = self.get_dialogue_consciousness_flow(actual_id)
 
         return ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.participant.{sender_name}",
             consciousness_signature=0.7,
             data={

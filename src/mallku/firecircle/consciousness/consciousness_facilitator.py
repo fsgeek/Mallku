@@ -13,7 +13,11 @@ import logging
 from typing import Any
 from uuid import UUID, uuid4
 
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..health import get_health_tracker
 from ..service.config import CircleConfig, RoundConfig, VoiceConfig
 from ..service.round_types import RoundType
@@ -662,7 +666,7 @@ class ConsciousnessFacilitator:
 
         await self.event_bus.emit(
             ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
                 source_system="firecircle.consciousness_facilitator",
                 data={
                     "wisdom_id": str(wisdom.wisdom_id),

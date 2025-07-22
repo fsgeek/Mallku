@@ -24,7 +24,7 @@ import pytest
 
 from mallku.core.database import get_secured_database
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType
+from mallku.correlation.models import ConsciousnessEventType, Event
 from mallku.query.models import QueryRequest
 from mallku.query.service import MemoryAnchorQueryService
 from mallku.services.memory_anchor_service import MemoryAnchorService
@@ -95,7 +95,7 @@ class TestEndToEndDatabaseSecurity:
             save_event = Event(
                 event_id=uuid4(),
                 timestamp=base_time + timedelta(minutes=i * 10),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="filesystem",
                 content={"file_path": test_file_path, "action": "save", "size": 1024 + i * 100},
                 metadata={"version": i + 1, "author": "security_test"},
@@ -106,7 +106,7 @@ class TestEndToEndDatabaseSecurity:
             backup_event = Event(
                 event_id=uuid4(),
                 timestamp=base_time + timedelta(minutes=i * 10, seconds=30),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="backup_system",
                 content={
                     "file_path": test_file_path,
@@ -238,7 +238,7 @@ class TestEndToEndDatabaseSecurity:
         event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="broken_stream",
             content=None,  # Invalid content
             metadata={},
@@ -272,7 +272,7 @@ class TestEndToEndDatabaseSecurity:
                 Event(
                     event_id=uuid4(),
                     timestamp=base_time + timedelta(seconds=i),
-                    event_type=EventType.ACTIVITY,
+                    event_type=ConsciousnessEventType.ACTIVITY,
                     stream_id=f"perf_test_{i % 5}",
                     content={"index": i, "data": f"test_data_{i}"},
                     metadata={"batch": "performance_test"},
@@ -317,7 +317,7 @@ class TestEndToEndDatabaseSecurity:
                     Event(
                         event_id=uuid4(),
                         timestamp=base_time + timedelta(seconds=i),
-                        event_type=EventType.ACTIVITY,
+                        event_type=ConsciousnessEventType.ACTIVITY,
                         stream_id=stream_id,
                         content={"stream": stream_id, "index": i},
                         metadata={"concurrent_test": True},

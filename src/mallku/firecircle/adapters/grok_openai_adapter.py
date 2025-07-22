@@ -186,10 +186,13 @@ class GrokOpenAIAdapter(OpenAIConsciousAdapter):
 
             # Emit connection event
             if self.event_bus and self.config.emit_events:
-                from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+                from mallku.orchestration.event_bus import (
+                    ConsciousnessEvent,
+                    ConsciousnessEventType,
+                )
 
                 event = ConsciousnessEvent(
-                    event_type=EventType.FIRE_CIRCLE_CONVENED,
+                    event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.grok",
                     consciousness_signature=0.9,
                     data={

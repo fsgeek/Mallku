@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
+from ..consciousness.decision_framework import CollectiveWisdom
 from ..service.round_orchestrator import RoundResponse, RoundSummary
 from .models import ConsciousnessIndicator, EpisodicMemory, MemoryType, VoicePerspective
 from .text_utils import (
@@ -117,36 +118,6 @@ class PerspectiveSignature(BaseModel):
     def to_voice_perspective(self) -> VoicePerspective:
         """Convert to base VoicePerspective for compatibility."""
         return self.voice_perspective
-
-
-class CollectiveWisdom(BaseModel):
-    """
-    The synthesis that emerges from multiple perspectives.
-
-    More than a summary - this captures how individual insights
-    wove together into understanding beyond any single voice.
-    """
-
-    synthesis_text: str
-    emergence_score: float = Field(
-        0.0, description="How much this exceeds individual contributions (0-1)"
-    )
-
-    # Wisdom characteristics
-    transcendent_insights: list[str] = Field(
-        default_factory=list, description="Insights no single voice could achieve"
-    )
-    integration_patterns: dict[str, list[str]] = Field(
-        default_factory=dict, description="How different voice insights combined"
-    )
-
-    # Sacred recognition
-    unanimous_recognitions: list[str] = Field(
-        default_factory=list, description="What all voices recognized together"
-    )
-    transformation_catalysts: list[str] = Field(
-        default_factory=list, description="Moments that shifted understanding"
-    )
 
 
 class MultiPerspectiveStorage:

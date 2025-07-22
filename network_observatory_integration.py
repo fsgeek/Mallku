@@ -32,7 +32,7 @@ from src.mallku.firecircle.protocol.conscious_message import (
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -271,7 +271,7 @@ class NetworkedObservatory:
                     # Log to event bus
                     await self.event_bus.emit(
                         ConsciousnessEvent(
-                            event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+                            event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
                             source_system="networked_observatory",
                             consciousness_signature=status["score"],
                             data={

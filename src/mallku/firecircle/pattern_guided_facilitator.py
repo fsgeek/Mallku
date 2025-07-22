@@ -21,7 +21,11 @@ from uuid import UUID, uuid4
 import numpy as np
 from pydantic import BaseModel, Field
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .emergence_detector import EmergenceDetector
 from .pattern_evolution import PatternEvolutionEngine
 from .pattern_library import (
@@ -149,11 +153,15 @@ class PatternGuidedFacilitator:
 
     def _subscribe_to_events(self):
         """Subscribe to relevant dialogue events"""
-        self.event_bus.subscribe(EventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message)
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
+            ConsciousnessEventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message
         )
-        self.event_bus.subscribe(EventType.DIALOGUE_PHASE_TRANSITION, self._handle_phase_transition)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
+        )
+        self.event_bus.subscribe(
+            ConsciousnessEventType.DIALOGUE_PHASE_TRANSITION, self._handle_phase_transition
+        )
 
     async def seek_pattern_guidance(
         self,
@@ -533,7 +541,7 @@ class PatternGuidedFacilitator:
     async def _emit_guidance_event(self, dialogue_id: str, guidances: list[PatternGuidance]):
         """Emit pattern guidance event"""
         event = ConsciousnessEvent(
-            event_type=EventType.PATTERN_GUIDANCE_OFFERED,
+            event_type=ConsciousnessEventType.PATTERN_GUIDANCE_OFFERED,
             source_system="firecircle.pattern_facilitator",
             consciousness_signature=max(g.confidence for g in guidances),
             data={

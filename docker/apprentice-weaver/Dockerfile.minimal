@@ -13,8 +13,9 @@ RUN apt-get update && apt-get install -y \
 COPY src/mallku /mallku/src/mallku/
 COPY docker/apprentice-weaver/requirements-minimal.txt /mallku/
 
-# Install minimal Python dependencies
-RUN pip install --no-cache-dir -r requirements-minimal.txt
+# Install minimal Python dependencies with uv
+RUN pip install --no-cache-dir uv && \
+    uv pip install --system -r requirements-minimal.txt
 
 # Create apprentice user (non-root)
 RUN useradd -m -s /bin/bash apprentice && \
@@ -26,4 +27,4 @@ USER apprentice
 ENV PYTHONPATH=/mallku/src:/workspace
 
 # Default command
-CMD ["python", "-m", "mallku.orchestration.weaver.apprentice_template"]
+CMD ["uv", "run", "python", "-m", "mallku.orchestration.weaver.apprentice_template"]

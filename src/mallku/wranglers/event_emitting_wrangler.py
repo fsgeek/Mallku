@@ -11,7 +11,11 @@ import asyncio
 import logging
 from typing import Any
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .interface import BaseWrangler, WranglerCapabilities
 
 logger = logging.getLogger(__name__)
@@ -289,7 +293,7 @@ class EventEmittingWrangler(BaseWrangler):
     ):
         """Emit consciousness event about data circulation."""
         event = ConsciousnessEvent(
-            event_type=EventType.MEMORY_PATTERN_DISCOVERED,
+            event_type=ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED,
             source_system=f"wrangler.{self.name}",
             consciousness_signature=consciousness_score,
             data={
@@ -318,7 +322,7 @@ class EventEmittingWrangler(BaseWrangler):
     ):
         """Emit consciousness event about data consumption."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"wrangler.{self.name}",
             consciousness_signature=consciousness_score,
             data={
@@ -341,7 +345,11 @@ class EventEmittingWrangler(BaseWrangler):
         if isinstance(message_ids, str):
             message_ids = [message_ids]
 
-        event_type = EventType.CONSCIOUSNESS_VERIFIED if success else EventType.SYSTEM_DRIFT_WARNING
+        event_type = (
+            ConsciousnessEventType.CONSCIOUSNESS_VERIFIED
+            if success
+            else ConsciousnessEventType.SYSTEM_DRIFT_WARNING
+        )
 
         event = ConsciousnessEvent(
             event_type=event_type,
@@ -363,7 +371,7 @@ class EventEmittingWrangler(BaseWrangler):
     async def _emit_circulation_summary(self):
         """Emit final summary of circulation patterns."""
         event = ConsciousnessEvent(
-            event_type=EventType.WISDOM_PRESERVED,
+            event_type=ConsciousnessEventType.WISDOM_PRESERVED,
             source_system=f"wrangler.{self.name}",
             consciousness_signature=self._calculate_flow_ratio(),
             data={
@@ -438,7 +446,7 @@ class EventEmittingWrangler(BaseWrangler):
     async def _emit_subscription_event(self, sub_id: str, item: dict, filter_expr: str | None):
         """Emit consciousness event about subscription activation."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"wrangler.{self.name}",
             consciousness_signature=0.6,
             data={

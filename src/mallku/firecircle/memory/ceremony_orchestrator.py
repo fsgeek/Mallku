@@ -21,7 +21,11 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .consolidation_ceremony import ConsolidationCriteria, WisdomConsolidationCeremony
 from .memory_store import MemoryStore
 from .models import EpisodicMemory, WisdomConsolidation
@@ -230,7 +234,7 @@ class CeremonyOrchestrator:
     ) -> None:
         """Emit consciousness event for ceremony completion."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="consolidation_ceremony",
             consciousness_signature=consolidation.civilizational_relevance,
             data={

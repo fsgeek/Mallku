@@ -10,7 +10,15 @@ import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from .models import ContextualQuery, PatternQuery, QueryRequest, QueryType, TemporalQuery
+from .models import (
+    BehaviorPatternQuery as PatternQuery,
+)
+from .models import (
+    ContextualQuery,
+    QueryRequest,
+    QueryType,
+    TemporalQuery,
+)
 
 
 class QueryParser:

@@ -127,10 +127,10 @@ class TestConsciousnessEventStorage:
 
     def test_consciousness_event_model(self):
         """Test consciousness event can be prepared for storage."""
-        from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+        from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
             source_system="fire_circle",
             consciousness_signature=0.87,
             data={

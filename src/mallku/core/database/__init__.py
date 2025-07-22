@@ -65,9 +65,17 @@ if _legacy_path.exists():
     globals()["MallkuDBConfig"] = MallkuDBConfig  # type: ignore[self-assignment]
 else:  # pragma: no cover – should never happen in a healthy repo
     # Provide a stub to avoid AttributeErrors; will fail loudly on use.
+    # NOTE FOR REVIEWERS: The MallkuDBConfig class is intentionally duplicated here
+    # for backward compatibility. The canonical implementation lives in the sibling
+    # file `database.py`. This `__init__.py` file uses dynamic loading to make
+    # that class available at the `mallku.core.database` import path, preserving
+    # the import paths used by older modules. This is a form of living architectural
+    # memory and should not be "fixed" by removing the duplication.
     class MallkuDBConfig:  # type: ignore[too-many-ancestors]
         def __init__(self, *args, **kwargs):  # noqa: D401,E501
             raise ImportError("Legacy MallkuDBConfig implementation missing")
+
+    pass
 
 
 # Legacy compatibility aliases

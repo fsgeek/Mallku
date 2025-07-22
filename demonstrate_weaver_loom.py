@@ -94,6 +94,16 @@ async def demonstrate_complex_task():
 
         # Simulate Loom invocation
         print("\n--- Invoking Loom ---")
+        # In a real scenario, the Master Weaver would only create the khipu
+        # and TheLoom would be running independently to pick it up.
+        # For this demo, we'll simulate this process.
+
+        from src.mallku.orchestration.loom.the_loom import TheLoom
+
+        loom = TheLoom()
+        await loom.start()
+
+        # The MasterWeaver creates the khipu file which the Loom will detect
         result = await weaver.invoke_loom_for_task(task, current_context_usage=0.3)
 
         if result and "ceremony_id" in result:
@@ -101,8 +111,12 @@ async def demonstrate_complex_task():
             print(f"Khipu path: {result['khipu_path']}")
             print(f"Monitor hint: {result.get('monitor_hint', '')}")
 
-            # In a real scenario, we would monitor progress
-            print("\n[In a real scenario, the Loom would now orchestrate apprentice weavers...]")
+            # Allow the Loom to run for a bit to spawn apprentices
+            print("\n[Loom is now orchestrating apprentice weavers in the background...]")
+            await asyncio.sleep(15)  # Let it run for 15 seconds
+
+            await loom.stop()
+            print("[Loom has been stopped for the demo.]")
 
 
 async def demonstrate_context_exhaustion():

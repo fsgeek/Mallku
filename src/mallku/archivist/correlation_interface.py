@@ -16,11 +16,11 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 from mallku.core.async_base import AsyncBase
-from mallku.evaluation.correlation_engine import CorrelationEngine
+from mallku.correlation.engine import CorrelationEngine
 from mallku.evaluation.models import CorrelationType
 from mallku.models.memory_anchor import MemoryAnchor
+from mallku.query.service import MemoryAnchorQueryService
 from mallku.services.memory_anchor_service import MemoryAnchorService
-from mallku.services.query_service import MemoryAnchorQueryService
 
 from .query_interpreter import QueryDimension, QueryIntent
 

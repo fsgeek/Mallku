@@ -6,6 +6,7 @@ making conscious trade-offs for each field.
 """
 
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Literal
 from uuid import UUID
 
@@ -15,6 +16,17 @@ from ...core.security.field_strategies import (
     SearchCapability,
 )
 from ...core.security.secured_model import SecuredField, SecuredModel
+
+
+class ValueType(str, Enum):
+    """Types of value exchanged in interactions"""
+
+    KNOWLEDGE = "knowledge"
+    COMPUTATION = "computation"
+    CREATIVITY = "creativity"
+    EMOTIONAL_SUPPORT = "emotional_support"
+    TASK_COMPLETION = "task_completion"
+    ERROR_CORRECTION = "error_correction"
 
 
 class ReciprocityActivityData(SecuredModel):
@@ -187,4 +199,64 @@ class ReciprocityBalance(SecuredModel):
         obfuscation_level=FieldObfuscationLevel.NONE,
         index_strategy=FieldIndexStrategy.IDENTITY,
         security_notes="Configuration parameter, not user data",
+    )
+
+
+class AyniConfiguration(SecuredModel):
+    """
+    Configuration for Ayni scoring algorithms with security considerations.
+    """
+
+    # Scoring weights - configuration, not sensitive
+    weights: dict[str, float] = SecuredField(
+        default_factory=lambda: {
+            ValueType.KNOWLEDGE: 1.0,
+            ValueType.COMPUTATION: 0.8,
+            ValueType.CREATIVITY: 1.2,
+            ValueType.EMOTIONAL_SUPPORT: 1.1,
+            ValueType.TASK_COMPLETION: 0.9,
+            ValueType.ERROR_CORRECTION: 1.5,
+        },
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+        security_notes="System configuration, not sensitive",
+    )
+
+    # Decay settings - configuration, not sensitive
+    decay_enabled: bool = SecuredField(
+        default=True,
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+    )
+    decay_rate: float = SecuredField(
+        default=0.01,
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+    )
+    decay_interval_days: int = SecuredField(
+        default=30,
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+    )
+
+    # Balance thresholds - configuration, not sensitive
+    refusal_threshold: float = SecuredField(
+        default=-0.8,
+        description="Balance below which AI may refuse requests",
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+    )
+    rebalancing_suggestion_threshold: float = SecuredField(
+        default=-0.5,
+        description="Balance below which to suggest rebalancing",
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
+    )
+
+    # System health settings - configuration, not sensitive
+    penalize_system_failures: bool = SecuredField(
+        default=False,
+        description="Whether to count system failures against user balance",
+        obfuscation_level=FieldObfuscationLevel.NONE,
+        index_strategy=FieldIndexStrategy.IDENTITY,
     )

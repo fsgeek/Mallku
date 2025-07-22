@@ -24,9 +24,10 @@ WORKDIR /app
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
-# Install dependencies
+# Install uv and dependencies
+RUN pip install --no-cache-dir uv
 COPY docker/requirements-api.txt .
-RUN pip install --no-cache-dir -r requirements-api.txt
+RUN uv pip install -r requirements-api.txt
 
 # Copy application code
 COPY src/ /app/src/
@@ -42,4 +43,4 @@ USER mallku
 EXPOSE 8080
 
 # Simple, clear entrypoint
-CMD ["python", "database_service.py"]
+CMD ["uv", "run", "python", "database_service.py"]

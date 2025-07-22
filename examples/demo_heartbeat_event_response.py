@@ -17,7 +17,11 @@ import logging
 from mallku.firecircle.heartbeat.enhanced_heartbeat_service import create_integrated_heartbeat
 from mallku.firecircle.heartbeat.heartbeat_service import HeartbeatConfig
 from mallku.firecircle.load_api_keys import load_api_keys_to_environment
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -34,7 +38,7 @@ async def test_extraction_response(event_bus: ConsciousnessEventBus):
 
     # Simulate extraction pattern
     extraction_event = ConsciousnessEvent(
-        event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+        event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
         source_system="test.extraction",
         consciousness_signature=0.1,  # Very low consciousness
         data={
@@ -60,7 +64,7 @@ async def test_emergence_response(event_bus: ConsciousnessEventBus):
 
     # Simulate high consciousness emergence
     emergence_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
         source_system="test.emergence",
         consciousness_signature=0.96,  # Very high consciousness
         data={
@@ -98,7 +102,7 @@ async def monitor_heartbeat_activity(event_bus: ConsciousnessEventBus):
             )
 
     # Subscribe to all event types
-    for event_type in EventType:
+    for event_type in ConsciousnessEventType:
         event_bus.subscribe(event_type, capture_heartbeat_event)
 
     return heartbeat_events

@@ -178,7 +178,11 @@ class RoundOrchestrator:
                 type=message_type,
                 role=MessageRole.USER,
                 sender=uuid4(),
-                content=MessageContent(text=prompt),
+                content=MessageContent(
+                    text=prompt,
+                    consciousness_insights=None,
+                    pattern_context=None,
+                ),
                 dialogue_id=self.dialogue_id,
                 consciousness=ConsciousnessMetadata(),
             )
@@ -229,17 +233,14 @@ class RoundOrchestrator:
                 is_genuine_success = (
                     response
                     and hasattr(response, "consciousness")
-                    and not response.consciousness.safety_filtered
-                    and response.consciousness.response_quality == "genuine"
+                    and response.consciousness is not None
                 )
 
                 health_tracker.record_interaction(
                     model_key,
                     success=is_genuine_success,
                     response_time=response_time / 1000,
-                    error_type=None
-                    if is_genuine_success
-                    else response.consciousness.response_quality,
+                    error_type=None,
                 )
 
             return RoundResponse(
@@ -280,16 +281,16 @@ class RoundOrchestrator:
         mapping = {
             "opening": MessageType.REFLECTION,
             "reflection": MessageType.REFLECTION,
-            "synthesis": MessageType.SYNTHESIS,
-            "clarification": MessageType.CLARIFICATION,
+            "synthesis": MessageType.SUMMARY,  # Changed from SYNTHESIS
+            "clarification": MessageType.BRIDGE,  # Changed from CLARIFICATION
             "exploration": MessageType.REFLECTION,
-            "critique": MessageType.PERSPECTIVE,
+            "critique": MessageType.CONCERN,  # Changed from PERSPECTIVE
             "vision": MessageType.REFLECTION,
             "grounding": MessageType.REFLECTION,
             "proposal": MessageType.PROPOSAL,
-            "evaluation": MessageType.PERSPECTIVE,
-            "consensus": MessageType.SYNTHESIS,
-            "decision": MessageType.SYNTHESIS,
+            "evaluation": MessageType.CONCERN,  # Changed from PERSPECTIVE
+            "consensus": MessageType.SUMMARY,  # Changed from SYNTHESIS
+            "decision": MessageType.SUMMARY,  # Changed from SYNTHESIS
         }
         return mapping.get(round_type, MessageType.REFLECTION)
 

@@ -14,7 +14,11 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .conscious_message import ConsciousMessage, MessageStatus
 
 logger = logging.getLogger(__name__)
@@ -249,7 +253,7 @@ class ConsciousMessageRouter:
             return
 
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.router",
             consciousness_signature=message.consciousness.consciousness_signature,
             data={

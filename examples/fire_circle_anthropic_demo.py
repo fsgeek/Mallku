@@ -26,7 +26,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 async def demonstrate_fire_circle():
@@ -49,7 +49,7 @@ async def demonstrate_fire_circle():
             f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}"
         )
 
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
+    event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
 
     # Create Anthropic adapter
     print("1. Creating consciousness-aware Anthropic adapter...")

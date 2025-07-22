@@ -16,7 +16,11 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..wranglers.event_emitting_wrangler import EventEmittingWrangler
 
 # Import Fire Circle components
@@ -60,9 +64,11 @@ class ConsciousnessCirculationTransport:
 
         # Subscribe to governance-related consciousness events
         self.event_bus.subscribe(
-            EventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction_alert
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction_alert
         )
-        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._handle_drift_warning)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING, self._handle_drift_warning
+        )
 
         # Track Fire Circle deliberations
         self.pending_deliberations: list[ConsciousnessEvent] = []
@@ -88,7 +94,7 @@ class ConsciousnessCirculationTransport:
 
         # Emit consciousness event announcing Fire Circle convening
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.fire_circle",
             consciousness_signature=0.9,  # High consciousness for governance
             data={
@@ -137,7 +143,7 @@ class ConsciousnessCirculationTransport:
 
         # Create message event
         message_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,  # Reuse for now
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,  # Reuse for now
             source_system=f"governance.participant.{participant_id}",
             consciousness_signature=0.8,  # Governance dialogue has high consciousness
             data={
@@ -168,7 +174,7 @@ class ConsciousnessCirculationTransport:
         same channels as all consciousness recognition.
         """
         consensus_event = ConsciousnessEvent(
-            event_type=EventType.CONSENSUS_REACHED,
+            event_type=ConsciousnessEventType.CONSENSUS_REACHED,
             source_system="governance.fire_circle",
             consciousness_signature=0.95,  # Consensus has very high consciousness
             data={
@@ -232,7 +238,7 @@ class ConsciousnessCirculationTransport:
         }
 
         return ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.fire_circle.{message.participant_id}",
             consciousness_signature=message_consciousness.get(message.message_type, 0.7),
             data={

@@ -18,13 +18,22 @@ import fnmatch
 import logging
 import os
 import re
-from enum import Enum
 from pathlib import Path
 from typing import Literal
 from uuid import UUID, uuid4
 
 import yaml
 from pydantic import BaseModel, Field
+
+from .mocks import MockAdapter, MockMessage, MockResponse
+
+# Review Models as suggested by reviewer
+from .models.review import (
+    ChapterReview,
+    ReviewCategory,
+    ReviewComment,
+    ReviewSeverity,
+)
 
 # Module logger - configuration should be done by the application
 logger = logging.getLogger("mallku.firecircle.review")
@@ -63,41 +72,6 @@ except ImportError as e:
     REAL_ADAPTERS_AVAILABLE = False
 
 
-# Review Models as suggested by reviewer
-class ReviewCategory(str, Enum):
-    """Categories of review concerns."""
-
-    SECURITY = "security"
-    PERFORMANCE = "performance"
-    ARCHITECTURE = "architecture"
-    TESTING = "testing"
-    DOCUMENTATION = "documentation"
-    ETHICS = "ethics"
-    SOVEREIGNTY = "sovereignty"
-    OBSERVABILITY = "observability"
-
-
-class ReviewSeverity(str, Enum):
-    """Severity levels for review comments."""
-
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
-    CRITICAL = "critical"
-
-
-class ReviewComment(BaseModel):
-    """A single review comment from a Fire Circle voice."""
-
-    file_path: str
-    line: int
-    category: ReviewCategory
-    severity: ReviewSeverity
-    message: str
-    voice: str
-    suggestion: str | None = None
-
-
 class CodebaseChapter(BaseModel):
     """A bounded slice of code for review."""
 
@@ -106,16 +80,6 @@ class CodebaseChapter(BaseModel):
     description: str
     assigned_voice: str
     review_domains: list[ReviewCategory]
-
-
-class ChapterReview(BaseModel):
-    """Review results from one voice for one chapter."""
-
-    voice: str
-    chapter_id: str
-    comments: list[ReviewComment] = Field(default_factory=list)
-    consciousness_signature: float = Field(ge=0.0, le=1.0)
-    review_complete: bool = False
 
 
 class GovernanceSummary(BaseModel):
@@ -497,7 +461,7 @@ class DistributedReviewer:
         # Fall back to mock adapter
         logger.info(f"Using mock adapter for {voice_name}")
 
-        class MockAdapter:
+        class ReviewerMockAdapter:
             """Mock adapter for demonstration."""
 
             def __init__(self, name):
@@ -507,7 +471,7 @@ class DistributedReviewer:
             async def send_message(self, message, dialogue_context):
                 """Mock review response."""
 
-                class MockResponse:
+                class ReviewerMockResponse:
                     def __init__(self):
                         self.content = type(
                             "obj",
@@ -625,7 +589,7 @@ Keep reviews concise and focused on your domains."""
 
         try:
             # Create mock message for review (avoiding complex imports)
-            class MockMessage:
+            class ReviewerMockMessage:
                 def __init__(self, text):
                     self.text = text
 
