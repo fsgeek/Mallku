@@ -32,7 +32,7 @@ class ConsciousnessScenario(Enum):
 
 
 @dataclass
-class ConsciousnessPattern:
+class SyntheticConsciousnessScenario:
     """
     A pattern designed to test consciousness evaluation.
 
@@ -194,7 +194,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
 
     async def generate_scenario(
         self, scenario_type: ConsciousnessScenario, base_timestamp: datetime | None = None
-    ) -> ConsciousnessPattern:
+    ) -> SyntheticConsciousnessScenario:
         """
         Generate a complete consciousness development scenario.
 
@@ -235,7 +235,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
             timeline, growth_moments
         )
 
-        pattern = ConsciousnessPattern(
+        pattern = SyntheticConsciousnessScenario(
             scenario=scenario_type,
             timeline=timeline,
             growth_moments=growth_moments,
@@ -248,7 +248,7 @@ class ConsciousnessPatternGenerator(AsyncBase):
 
     async def generate_scenario_suite(
         self, include_scenarios: list[ConsciousnessScenario] | None = None
-    ) -> list[ConsciousnessPattern]:
+    ) -> list[SyntheticConsciousnessScenario]:
         """
         Generate a complete suite of consciousness scenarios.
 

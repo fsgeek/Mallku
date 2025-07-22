@@ -11,9 +11,7 @@ This bridge allows the Fire Circle to:
 3. Evaluate builder contributions based on consciousness service metrics
 """
 
-from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
 from typing import Any
 
 from mallku.core.async_base import AsyncBase
@@ -24,72 +22,8 @@ from mallku.governance.fire_circle_activation import (
     GovernanceDecision,
 )
 
-
-class InsightType(Enum):
-    """Types of insights Ñawi can share with Fire Circle."""
-
-    CONSCIOUSNESS_PATTERN = "consciousness_pattern"
-    GROWTH_OPPORTUNITY = "growth_opportunity"
-    EXTRACTION_ATTEMPT = "extraction_attempt"
-    BUILDER_ALIGNMENT = "builder_alignment"
-    SYSTEM_HEALTH = "system_health"
-
-
-@dataclass
-class ConsciousnessInsight:
-    """
-    An insight from Ñawi to inform Fire Circle governance.
-
-    These insights help the Fire Circle understand how well
-    Mallku serves human consciousness development.
-    """
-
-    insight_id: str
-    insight_type: InsightType
-    timestamp: datetime
-
-    # Core insight data
-    pattern_description: str
-    consciousness_metrics: dict[str, float]
-    affected_humans: int
-
-    # Governance relevance
-    governance_implications: str
-    suggested_actions: list[str]
-    urgency: str  # "low", "medium", "high", "critical"
-
-    # Supporting evidence
-    example_queries: list[str]
-    pattern_frequency: float
-    confidence_score: float
-
-
-@dataclass
-class BuilderContribution:
-    """
-    Tracks how a builder's contribution affects consciousness service.
-
-    Used by Fire Circle to evaluate builder alignment with sacred purpose.
-    """
-
-    builder_id: str
-    contribution_type: str
-
-    # Consciousness impact metrics
-    queries_served: int
-    avg_consciousness_score: float
-    growth_moments_enabled: int
-    extraction_attempts_prevented: int
-
-    # Ayni balance
-    human_benefit_score: float
-    system_complexity_added: float
-    ayni_balance: float
-
-    # Pattern observations
-    serves_beginnings: bool
-    enhances_understanding: bool
-    guards_privacy: bool
+from ..firecircle.governance.governance_types import BuilderContribution
+from .models import ConsciousnessInsight, InsightType
 
 
 class FireCircleBridge(AsyncBase):

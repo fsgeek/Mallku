@@ -15,6 +15,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from ..governance.governance_types import GovernanceDecision
 from .base import ConsciousnessAwareModel, VoiceIdentity
 
 
@@ -136,57 +137,6 @@ class ChapterReview(ConsciousnessAwareModel):
     def has_blocking_issues(self) -> bool:
         """Check if review has blocking issues."""
         return self.critical_issues > 0
-
-
-class GovernanceDecision(ConsciousnessAwareModel):
-    """Fire Circle governance decision on a review."""
-
-    decision_id: UUID = Field(default_factory=uuid4)
-    pr_number: int = Field(gt=0)
-    session_id: UUID
-
-    # Decision
-    recommendation: str = Field(
-        pattern="^(approve|request_changes|comment)$",
-        description="GitHub-compatible review decision",
-    )
-    consensus_level: float = Field(ge=0.0, le=1.0)
-
-    # Supporting data
-    total_comments: int = Field(ge=0)
-    critical_issues: int = Field(ge=0)
-    participating_voices: list[str]
-
-    # Synthesis
-    synthesis: str = Field(min_length=1, max_length=10000)
-    key_insights: list[str] = Field(default_factory=list)
-
-    # Breakdown
-    by_category: dict[ReviewCategory, int] = Field(default_factory=dict)
-    by_severity: dict[ReviewSeverity, int] = Field(default_factory=dict)
-    by_voice: dict[str, int] = Field(default_factory=dict)
-
-    @model_validator(mode="after")
-    def validate_decision(self) -> "GovernanceDecision":
-        """Validate decision consistency."""
-        # Critical issues should block approval
-        if self.critical_issues > 0 and self.recommendation == "approve":
-            raise ValueError("Cannot approve with critical issues")
-
-        # Low consensus should not approve
-        if self.consensus_level < 0.6 and self.recommendation == "approve":
-            raise ValueError("Cannot approve with low consensus")
-
-        # Ensure voice participation
-        if len(self.participating_voices) < 3:
-            raise ValueError("Governance requires at least 3 voices")
-
-        return self
-
-    @property
-    def is_unanimous(self) -> bool:
-        """Check if decision was unanimous."""
-        return self.consensus_level >= 0.95
 
 
 class ReviewSession(BaseModel):

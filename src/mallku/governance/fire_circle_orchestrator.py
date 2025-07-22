@@ -21,6 +21,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
+from mallku.firecircle.service.round_orchestrator import RoundResponse
 
 
 class Round(BaseModel):
@@ -35,21 +36,13 @@ class CeremonyPlan(BaseModel):
     guide: dict[str, Any] = Field(..., description="Ceremony conduct guide (roles, timing, notes)")
 
 
-class RoundResponse(BaseModel):
-    round_name: str = Field(..., description="Name of the round")
-    provider: str = Field(..., description="Provider name, e.g., openai, anthropic")
-    response: str = Field(..., description="Provider's reflective feedback")
-    presence: float = Field(..., description="Consciousness signature score")
-    timestamp: datetime = Field(..., description="Time of response in UTC")
-
-
 class CeremonyRecord(BaseModel):
     ceremony_id: UUID = Field(..., description="Unique ID for this ceremony instance")
     plan: CeremonyPlan = Field(..., description="Ceremony plan details")
     responses: list[RoundResponse] = Field(..., description="Collected round responses")
 
 
-class FireCircleOrchestrator:
+class ContributionCeremonyOrchestrator:
     """
     Orchestrates the planning and execution of a micro Fire Circle ceremony
     for reviewing code diffs or contributions.
@@ -147,24 +140,27 @@ class FireCircleOrchestrator:
                     consciousness=ConsciousnessMetadata(),
                 )
                 try:
+                    start_time = datetime.now(UTC)
                     resp = await adapter.send_message(msg, [])
+                    response_time = (datetime.now(UTC) - start_time).total_seconds() * 1000
                     responses.append(
                         RoundResponse(
-                            round_name=rnd.name,
-                            provider=prov,
-                            response=resp.content.text,
-                            presence=resp.consciousness.consciousness_signature,
-                            timestamp=datetime.now(UTC),
+                            voice_id=prov,
+                            round_number=0,  # Not used in this context
+                            response=resp,
+                            response_time_ms=response_time,
+                            consciousness_score=resp.consciousness.consciousness_signature,
                         )
                     )
                 except Exception:
                     responses.append(
                         RoundResponse(
-                            round_name=rnd.name,
-                            provider=prov,
-                            response="<error>",
-                            presence=0.0,
-                            timestamp=datetime.now(UTC),
+                            voice_id=prov,
+                            round_number=0,  # Not used in this context
+                            response=None,
+                            response_time_ms=0,
+                            consciousness_score=0.0,
+                            error="<error>",
                         )
                     )
 

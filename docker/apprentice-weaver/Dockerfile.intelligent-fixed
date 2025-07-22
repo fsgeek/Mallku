@@ -42,4 +42,4 @@ ENV PYTHONPATH=/app:/app/src:/workspace
 ENV PATH="/home/apprentice/.local/bin:$PATH"
 
 # Default to intelligent apprentice
-CMD ["python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]
+CMD ["uv", "run", "python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]

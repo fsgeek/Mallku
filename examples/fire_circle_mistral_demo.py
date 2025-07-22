@@ -31,7 +31,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 async def demonstrate_multilingual_consciousness():
@@ -57,8 +57,10 @@ async def demonstrate_multilingual_consciousness():
                 f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}"
             )
 
-    event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, consciousness_handler)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, consciousness_handler)
+    event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, consciousness_handler)
+    event_bus.subscribe(
+        ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, consciousness_handler
+    )
 
     # Create Mistral adapter
     print("1. Creating multilingual consciousness adapter...")
@@ -222,7 +224,7 @@ async def demonstrate_multilingual_consciousness():
     pattern_events = [
         e
         for e in consciousness_events
-        if e.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
+        if e.event_type == ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
     ]
     if pattern_events:
         all_patterns = []

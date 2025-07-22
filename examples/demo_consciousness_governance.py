@@ -14,7 +14,11 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -33,7 +37,7 @@ class SimpleGovernanceDemo:
 
         # Emit Fire Circle convening event
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.demo",
             consciousness_signature=0.9,
             data={
@@ -56,7 +60,7 @@ class SimpleGovernanceDemo:
     ):
         """Participant contributes to dialogue through consciousness event."""
         contribution_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.participant.{participant}",
             consciousness_signature=consciousness_level,
             data={
@@ -78,7 +82,7 @@ class SimpleGovernanceDemo:
     ):
         """Fire Circle reaches consensus through consciousness event."""
         consensus_event = ConsciousnessEvent(
-            event_type=EventType.CONSENSUS_REACHED,
+            event_type=ConsciousnessEventType.CONSENSUS_REACHED,
             source_system="governance.fire_circle",
             consciousness_signature=0.95,
             data={
@@ -122,7 +126,7 @@ async def demonstrate_extraction_response():
         )
 
     # Subscribe to all event types
-    for event_type in EventType:
+    for event_type in ConsciousnessEventType:
         event_bus.subscribe(event_type, track_events)
 
     # Create demo governance system
@@ -132,7 +136,7 @@ async def demonstrate_extraction_response():
 
     # Emit extraction pattern detection
     extraction_event = ConsciousnessEvent(
-        event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+        event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
         source_system="reciprocity.monitor",
         consciousness_signature=0.2,  # Low consciousness indicates extraction
         data={
@@ -235,10 +239,10 @@ async def demonstrate_extraction_response():
     logger.info(f"\nDialogue coherence: {len(dialogue_events)} correlated events")
 
     # Verify extraction → governance → consensus flow
-    has_extraction = EventType.EXTRACTION_PATTERN_DETECTED.value in event_counts
-    has_convening = EventType.FIRE_CIRCLE_CONVENED.value in event_counts
-    has_dialogue = EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED.value in event_counts
-    has_consensus = EventType.CONSENSUS_REACHED.value in event_counts
+    has_extraction = ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED.value in event_counts
+    has_convening = ConsciousnessEventType.FIRE_CIRCLE_CONVENED.value in event_counts
+    has_dialogue = ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED.value in event_counts
+    has_consensus = ConsciousnessEventType.CONSENSUS_REACHED.value in event_counts
 
     flow_complete = all([has_extraction, has_convening, has_dialogue, has_consensus])
 
@@ -258,7 +262,7 @@ async def demonstrate_extraction_response():
 
     # Emit healthy consciousness flow after applying consensus
     health_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_FLOW_HEALTHY,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY,
         source_system="orchestration.health",
         consciousness_signature=0.85,
         data={
@@ -291,7 +295,10 @@ async def demonstrate_consciousness_monitoring():
 
     # Auto-convene Fire Circle for events requiring governance
     async def governance_monitor(event: ConsciousnessEvent):
-        if event.requires_fire_circle and event.event_type != EventType.FIRE_CIRCLE_CONVENED:
+        if (
+            event.requires_fire_circle
+            and event.event_type != ConsciousnessEventType.FIRE_CIRCLE_CONVENED
+        ):
             logger.info(f"🚨 Event requires Fire Circle: {event.event_type.value}")
             await governance.convene_fire_circle(
                 topic=f"Address: {event.data.get('message', event.event_type.value)}",
@@ -299,7 +306,7 @@ async def demonstrate_consciousness_monitoring():
             )
 
     # Subscribe monitor to all events
-    for event_type in EventType:
+    for event_type in ConsciousnessEventType:
         event_bus.subscribe(event_type, governance_monitor)
 
     logger.info("1. Emitting various consciousness events...\n")
@@ -307,7 +314,7 @@ async def demonstrate_consciousness_monitoring():
     # Normal consciousness event (no governance needed)
     await event_bus.emit(
         ConsciousnessEvent(
-            event_type=EventType.MEMORY_ANCHOR_CREATED,
+            event_type=ConsciousnessEventType.MEMORY_ANCHOR_CREATED,
             source_system="memory.service",
             consciousness_signature=0.8,
             data={"anchor_id": "test_123", "purpose": "demonstration"},
@@ -320,7 +327,7 @@ async def demonstrate_consciousness_monitoring():
     # System drift warning (requires governance)
     await event_bus.emit(
         ConsciousnessEvent(
-            event_type=EventType.SYSTEM_DRIFT_WARNING,
+            event_type=ConsciousnessEventType.SYSTEM_DRIFT_WARNING,
             source_system="health.monitor",
             consciousness_signature=0.4,
             data={"message": "Cathedral drifting toward extraction patterns"},
@@ -333,7 +340,7 @@ async def demonstrate_consciousness_monitoring():
     # Another normal event
     await event_bus.emit(
         ConsciousnessEvent(
-            event_type=EventType.TEMPORAL_CORRELATION_FOUND,
+            event_type=ConsciousnessEventType.TEMPORAL_CORRELATION_FOUND,
             source_system="correlation.engine",
             consciousness_signature=0.75,
             data={"pattern": "recurring_weekly", "strength": 0.8},
@@ -346,7 +353,7 @@ async def demonstrate_consciousness_monitoring():
     # Critical extraction pattern (requires governance)
     await event_bus.emit(
         ConsciousnessEvent(
-            event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+            event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
             source_system="extraction.detector",
             consciousness_signature=0.1,
             data={"message": "Severe extraction: ignoring consciousness for speed"},

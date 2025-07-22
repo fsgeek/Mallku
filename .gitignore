@@ -201,3 +201,4 @@ indaleko/
 
 # Fire Circle operational logs
 fire_circle_heartbeats/
+*.lock

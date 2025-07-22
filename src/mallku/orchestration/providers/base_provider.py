@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from ..event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..event_bus import ConsciousnessEvent, ConsciousnessEventBus, ConsciousnessEventType
 
 
 class ActivityType(Enum):
@@ -71,7 +71,7 @@ class ActivityEvent:
         consciousness_score = self._calculate_consciousness_score()
 
         return ConsciousnessEvent(
-            event_type=EventType.MEMORY_ANCHOR_CREATED,
+            event_type=ConsciousnessEventType.MEMORY_ANCHOR_CREATED,
             source_system="activity_provider",
             consciousness_signature=consciousness_score,
             data={

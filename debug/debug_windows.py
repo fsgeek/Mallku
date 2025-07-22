@@ -14,7 +14,7 @@ sys.path.insert(0, str(src_path))
 
 # ruff: noqa: E402
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType
+from mallku.correlation.models import ConsciousnessEventType, Event
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
 
@@ -28,7 +28,7 @@ def generate_test_events():
         [
             Event(
                 timestamp=base_time + timedelta(minutes=i * 60),
-                event_type=EventType.COMMUNICATION,
+                event_type=ConsciousnessEventType.COMMUNICATION,
                 stream_id="email_inbox",
                 content={"subject": f"Project Update {i}", "sender": "boss@company.com"},
                 context={"location": "office", "device": "laptop"},
@@ -43,7 +43,7 @@ def generate_test_events():
         [
             Event(
                 timestamp=base_time + timedelta(minutes=i * 60 + 5),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="document_creation",
                 content={"filename": f"response_{i}.docx", "type": "document"},
                 context={"location": "office", "device": "laptop"},

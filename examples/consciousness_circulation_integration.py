@@ -335,7 +335,7 @@ async def demonstrate_consciousness_circulation_integration():
 
     try:
         # Import circulation system components
-        from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+        from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
         from mallku.wranglers import EventEmittingWrangler, MemoryBufferWrangler
 
         # Create consciousness circulation infrastructure
@@ -369,8 +369,8 @@ async def demonstrate_consciousness_circulation_integration():
             )
 
         # Subscribe to circulation events
-        event_bus.subscribe(EventType.MEMORY_PATTERN_DISCOVERED, event_tracker)
-        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_tracker)
+        event_bus.subscribe(ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED, event_tracker)
+        event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_tracker)
 
         # Demonstrate consciousness-aware memory anchor creation
         print("\n🧠 Creating memory anchors with consciousness circulation...")

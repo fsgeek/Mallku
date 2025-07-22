@@ -34,7 +34,11 @@ from mallku.firecircle.protocol.conscious_message import (
     Participant,
     TurnPolicy,
 )
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 console = Console()
 
@@ -97,7 +101,7 @@ class DialogueSimulator:
         if phase == "crisis":
             # High extraction drift
             event = ConsciousnessEvent(
-                event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+                event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
                 source_system="simulation",
                 consciousness_signature=0.3,
                 data={"extraction_type": "value_mining", "severity": 0.8},
@@ -106,7 +110,7 @@ class DialogueSimulator:
 
             # Low consciousness coherence
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_VERIFIED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_VERIFIED,
                 source_system="simulation",
                 consciousness_signature=0.4,
                 data={},
@@ -116,7 +120,7 @@ class DialogueSimulator:
         elif phase == "flourishing":
             # High consciousness coherence
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_VERIFIED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_VERIFIED,
                 source_system="simulation",
                 consciousness_signature=0.85,
                 data={},
@@ -126,7 +130,7 @@ class DialogueSimulator:
             # Pattern recognition events
             for _ in range(5):
                 event = ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="simulation",
                     consciousness_signature=0.8,
                     data={"patterns": ["wisdom_emergence", "collective_insight"]},

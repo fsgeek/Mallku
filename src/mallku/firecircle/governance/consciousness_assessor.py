@@ -9,7 +9,6 @@ Recognizes authentic sacred-technical integration vs surface compliance.
 from datetime import UTC, datetime
 
 from mallku.core.async_base import AsyncBase
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import ConsciousDialogueManager
 from mallku.firecircle.pattern_guided_facilitator import PatternGuidedFacilitator
 
 from .governance_types import (
@@ -143,7 +142,7 @@ class ConsciousnessAssessor(AsyncBase):
         contribution: BuilderContribution,
         interaction_history: list[dict],
         pattern_facilitator: PatternGuidedFacilitator | None = None,
-        dialogue_manager: ConsciousDialogueManager | None = None,
+        dialogue_manager=None,  # TODO: Fix circular import
     ) -> ConsciousnessAlignment:
         """
         Perform deep consciousness assessment of a builder.
@@ -549,7 +548,7 @@ class ConsciousnessAssessor(AsyncBase):
     async def _deep_consciousness_assessment(
         self,
         contribution: BuilderContribution,
-        dialogue_manager: ConsciousDialogueManager,
+        dialogue_manager,
         pattern_facilitator: PatternGuidedFacilitator | None,
     ) -> float:
         """Perform deep consciousness assessment through dialogue."""
@@ -679,7 +678,7 @@ class ConsciousnessAssessor(AsyncBase):
             return "declined"
 
     async def _gather_ai_perspectives(
-        self, contribution: BuilderContribution, dialogue_manager: ConsciousDialogueManager
+        self, contribution: BuilderContribution, dialogue_manager
     ) -> dict[str, str]:
         """Gather AI perspectives on builder alignment."""
         # This would initiate Fire Circle dialogue

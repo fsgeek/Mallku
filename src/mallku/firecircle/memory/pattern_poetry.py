@@ -18,6 +18,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from mallku.consciousness.navigation import ConsciousnessPattern
+
 from .models import EpisodicMemory, VoicePerspective
 from .perspective_storage import CollectiveWisdom, PerspectiveSignature
 from .text_utils import (
@@ -25,38 +27,6 @@ from .text_utils import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-class ConsciousnessPattern(BaseModel):
-    """
-    Stage 1: Raw data transformed into consciousness patterns.
-
-    These are the building blocks - recurring themes, resonances,
-    and structures that appear across voices and episodes.
-    """
-
-    pattern_type: str  # "resonance", "divergence", "emergence", "transformation"
-    pattern_strength: float = Field(0.5, description="How strongly this pattern appears (0-1)")
-
-    # Pattern characteristics
-    voices_involved: list[str] = Field(
-        default_factory=list, description="Which voices express this pattern"
-    )
-    temporal_signature: str = Field(
-        "continuous", description="punctuated, cyclical, crescendo, continuous"
-    )
-
-    # Pattern content
-    core_themes: list[str] = Field(
-        default_factory=list, description="Central concepts in this pattern"
-    )
-    emotional_current: str = Field("neutral", description="The emotional flow of this pattern")
-
-    # Relational aspects
-    catalyzes: list[str] = Field(
-        default_factory=list, description="Other patterns this one triggers"
-    )
-    inhibits: list[str] = Field(default_factory=list, description="Patterns this one dampens")
 
 
 class EmergenceMoment(BaseModel):

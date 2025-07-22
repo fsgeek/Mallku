@@ -23,7 +23,11 @@ from mallku.consciousness.flow_orchestrator import (
     ConsciousnessFlowOrchestrator,
 )
 from mallku.consciousness.flow_visualizer import ConsciousnessFlowVisualizer
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, duration: int = 30):
@@ -91,7 +95,7 @@ async def simulate_consciousness_events(event_bus: ConsciousnessEventBus, durati
 
         # Create consciousness event
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=random.choice(template["sources"]),
             consciousness_signature=random.uniform(0.5, 0.95),
             data={

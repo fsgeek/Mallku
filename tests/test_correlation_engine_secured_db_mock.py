@@ -24,7 +24,7 @@ from mallku.core.database.secured_interface import (
     SecuredDatabaseInterface,
 )
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType, TemporalCorrelation
+from mallku.correlation.models import ConsciousnessEventType, Event, TemporalCorrelation
 from mallku.models import MemoryAnchor
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
@@ -154,7 +154,7 @@ class TestCorrelationEngineSecuredDBIntegration:
                 Event(
                     event_id=uuid4(),
                     timestamp=base_time + timedelta(minutes=i * 10),
-                    event_type=EventType.STORAGE,
+                    event_type=ConsciousnessEventType.STORAGE,
                     stream_id="filesystem",
                     content={"file": f"document{i}.pdf", "action": "save"},
                     metadata={"source": "editor"},
@@ -166,7 +166,7 @@ class TestCorrelationEngineSecuredDBIntegration:
                 Event(
                     event_id=uuid4(),
                     timestamp=base_time + timedelta(minutes=i * 10, seconds=30),
-                    event_type=EventType.STORAGE,
+                    event_type=ConsciousnessEventType.STORAGE,
                     stream_id="backup_system",
                     content={"file": f"document{i}.pdf", "action": "backup"},
                     metadata={"source": "auto_backup"},
@@ -195,7 +195,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="filesystem",
             content={"file_path": "/test/important.doc"},
             metadata={"size": 1024},
@@ -204,7 +204,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         correlated_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC) + timedelta(seconds=2),
-            event_type=EventType.ACTIVITY,
+            event_type=ConsciousnessEventType.ACTIVITY,
             stream_id="editor",
             content={"action": "open", "file": "/test/important.doc"},
             metadata={"application": "word"},
@@ -331,7 +331,7 @@ class TestCorrelationEngineSecuredDBIntegration:
                 Event(
                     event_id=uuid4(),
                     timestamp=datetime.now(UTC),
-                    event_type=EventType.ACTIVITY,
+                    event_type=ConsciousnessEventType.ACTIVITY,
                     stream_id="test",
                     content={"test": "data"},
                 )
@@ -421,7 +421,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
                     Event(
                         event_id=uuid4(),
                         timestamp=now + timedelta(minutes=i * 5),
-                        event_type=EventType.STORAGE,
+                        event_type=ConsciousnessEventType.STORAGE,
                         stream_id="filesystem",
                         content={"file_path": f"/docs/report_{i}.pdf", "size": 2048},
                         metadata={"modified": (now + timedelta(minutes=i * 5)).isoformat()},
@@ -432,7 +432,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
                     Event(
                         event_id=uuid4(),
                         timestamp=now + timedelta(minutes=i * 5, seconds=3),
-                        event_type=EventType.ACTIVITY,
+                        event_type=ConsciousnessEventType.ACTIVITY,
                         stream_id="pdf_reader",
                         content={"action": "open", "file": f"/docs/report_{i}.pdf"},
                         metadata={"page_count": 10},
@@ -502,7 +502,7 @@ class TestSecurityMetricsTracking:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id=f"stream_{i}",
                 content={"index": i},
             )

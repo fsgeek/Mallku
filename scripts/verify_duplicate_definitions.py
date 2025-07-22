@@ -21,6 +21,10 @@ from pathlib import Path
 class DuplicateDefinitionDetector:
     """Detects duplicate class and enum definitions across the codebase."""
 
+    # This is a form of living architectural memory.
+    # The MallkuDBConfig is intentionally duplicated for backward compatibility.
+    IGNORED_DUPLICATES = {"MallkuDBConfig"}
+
     def __init__(self):
         self.definitions: dict[str, list[tuple[Path, int, str]]] = defaultdict(list)
         self.imports: dict[str, set[str]] = defaultdict(set)
@@ -99,7 +103,9 @@ class DuplicateDefinitionDetector:
         print(f"Files checked: {self.checked_files}")
 
         duplicates = {
-            name: locations for name, locations in self.definitions.items() if len(locations) > 1
+            name: locations
+            for name, locations in self.definitions.items()
+            if len(locations) > 1 and name not in self.IGNORED_DUPLICATES
         }
 
         self.duplicates_found = len(duplicates)

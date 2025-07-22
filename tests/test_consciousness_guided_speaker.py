@@ -19,7 +19,11 @@ from mallku.firecircle.consciousness_guided_speaker import (
     DialogueContext,
     ParticipantReadiness,
 )
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 @pytest_asyncio.fixture
@@ -53,7 +57,7 @@ class TestConsciousnessGuidedSpeakerSelector:
         """Test selector responds to consciousness events"""
         # Emit consciousness verification event
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_VERIFIED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_VERIFIED,
             source_system="test_system",
             consciousness_signature=0.8,
             data={},
@@ -68,7 +72,7 @@ class TestConsciousnessGuidedSpeakerSelector:
         """Test selector responds to extraction patterns"""
         # Emit extraction pattern event
         event = ConsciousnessEvent(
-            event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+            event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
             source_system="test_system",
             consciousness_signature=0.3,
             data={"extraction_type": "value_extraction"},
@@ -262,7 +266,7 @@ class TestConsciousnessGuidedSpeakerSelector:
 
         # Emit pattern recognition event
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="test_system",
             consciousness_signature=0.7,
             data={"participant_id": p_id, "patterns": ["wisdom_pattern", "emergence_pattern"]},

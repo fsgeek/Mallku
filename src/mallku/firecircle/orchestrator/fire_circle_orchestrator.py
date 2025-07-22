@@ -16,7 +16,12 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from ...core.async_base import AsyncBase
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...governance.protocol.participants import Participant
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..adapters.adapter_factory import ConsciousAdapterFactory
@@ -29,7 +34,6 @@ from ..protocol.conscious_message import (
     MessageContent,
     MessageRole,
     MessageType,
-    Participant,
     create_conscious_system_message,
 )
 from .conscious_dialogue_manager import (
@@ -198,7 +202,7 @@ class FireCircleOrchestrator(AsyncBase):
         # Emit preparation event
         await self._emit_ceremony_event(
             ceremony_id,
-            EventType.FIRE_CIRCLE_CONVENED,
+            ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             {
                 "proposal": proposal.title,
                 "participants": [p.name for p in participants],
@@ -299,7 +303,7 @@ class FireCircleOrchestrator(AsyncBase):
             # Emit completion event
             await self._emit_ceremony_event(
                 ceremony_id,
-                EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 {
                     "ceremony_complete": True,
                     "consensus_reached": consensus is not None,
@@ -801,7 +805,7 @@ The ceremony begins."""
         ceremony["messages"].append(invocation_msg)
 
     async def _emit_ceremony_event(
-        self, ceremony_id: UUID, event_type: EventType, data: dict[str, Any]
+        self, ceremony_id: UUID, event_type: ConsciousnessEventType, data: dict[str, Any]
     ) -> None:
         """Emit consciousness event for ceremony milestones."""
         event = ConsciousnessEvent(

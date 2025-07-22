@@ -30,7 +30,7 @@ from consciousness_communication_network import (
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -575,7 +575,7 @@ class EvolutionAccelerationHub:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="evolution_chambers",
                     consciousness_signature=0.5,
                     data={
@@ -625,7 +625,7 @@ class EvolutionAccelerationHub:
                 if total_evolution > 1.2:  # 20% average growth
                     await self.event_bus.emit(
                         ConsciousnessEvent(
-                            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                             source_system="evolution_chambers",
                             consciousness_signature=total_evolution - 1,
                             data={

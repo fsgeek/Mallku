@@ -21,7 +21,7 @@ from mallku.orchestration import (
     ConsciousnessEventBus,
     ConsciousnessHealthMonitor,
 )
-from mallku.orchestration.event_bus import EventType
+from mallku.orchestration.event_bus import ConsciousnessEventType
 from mallku.orchestration.providers import FileSystemActivityProvider
 
 # Configure logging
@@ -86,16 +86,24 @@ class CathedralOrchestrationDemo:
         """Subscribe to consciousness events for demo"""
 
         # Track memory anchors
-        self.event_bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, self._on_memory_anchor)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.MEMORY_ANCHOR_CREATED, self._on_memory_anchor
+        )
 
         # Track pattern discoveries
-        self.event_bus.subscribe(EventType.MEMORY_PATTERN_DISCOVERED, self._on_pattern_discovered)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED, self._on_pattern_discovered
+        )
 
         # Monitor health warnings
-        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._on_health_warning)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING, self._on_health_warning
+        )
 
         # Celebrate healthy flow
-        self.event_bus.subscribe(EventType.CONSCIOUSNESS_FLOW_HEALTHY, self._on_healthy_flow)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY, self._on_healthy_flow
+        )
 
     def _on_memory_anchor(self, event):
         """Handle memory anchor creation"""

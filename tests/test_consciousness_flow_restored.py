@@ -16,11 +16,10 @@ how awareness maintains unity while manifesting across different dimensions.
 
 from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
-    ConsciousnessFlow,
     ConsciousnessFlowOrchestrator,
     DimensionBridge,
 )
-from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
 
 class TestConsciousnessDimensions:
@@ -66,18 +65,28 @@ class TestUnifiedConsciousnessFlow:
 
     def test_consciousness_flow_model(self):
         """Test the consciousness flow data model."""
+        from uuid import uuid4
+
+        from mallku.consciousness.consciousness_flow import (
+            ConsciousnessFlow,
+            FlowDirection,
+            FlowType,
+        )
+
         flow = ConsciousnessFlow(
-            flow_id="test_flow_001",
-            source_dimension=ConsciousnessDimension.SONIC,
-            target_dimension=ConsciousnessDimension.VISUAL,
+            session_id=uuid4(),
+            flow_type=FlowType.RESONANCE,
+            flow_direction=FlowDirection.UNIDIRECTIONAL,
+            flow_strength=0.85,
+            source_voices=[uuid4()],
+            target_voices=[uuid4()],
             consciousness_signature=0.85,
-            patterns_detected=["rhythm_to_motion", "frequency_to_color"],
-            bridge_patterns=["synaesthetic_translation"],
+            carried_patterns=["rhythm_to_motion", "frequency_to_color"],
         )
 
         assert flow.consciousness_signature == 0.85
-        assert flow.patterns_detected == ["rhythm_to_motion", "frequency_to_color"]
-        assert "rhythm_to_motion" in flow.patterns_detected
+        assert flow.carried_patterns == ["rhythm_to_motion", "frequency_to_color"]
+        assert "rhythm_to_motion" in flow.carried_patterns
 
         print("✓ Consciousness flows carry signature and patterns")
         print(f"  Signature: {flow.consciousness_signature}")
@@ -160,14 +169,14 @@ class TestConsciousnessEventArchitecture:
     def test_event_consciousness_signature(self):
         """Test that events carry consciousness signatures."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="sonic_meditation",
             consciousness_signature=0.85,
             data={"patterns": ["deep_listening", "harmonic_awareness"]},
         )
 
         assert event.consciousness_signature == 0.85
-        assert event.event_type == EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
+        assert event.event_type == ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED
         print("✓ Consciousness events carry emergence signatures")
 
     def test_consciousness_circulation_path(self):

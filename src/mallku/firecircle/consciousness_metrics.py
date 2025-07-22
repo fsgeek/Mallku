@@ -21,6 +21,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from ..consciousness.consciousness_flow import ConsciousnessFlow, FlowDirection
+
 
 class ConsciousnessSignature(BaseModel):
     """A point-in-time consciousness measurement from a voice."""
@@ -52,21 +54,6 @@ class EmergencePattern(BaseModel):
     consciousness_delta: float = 0.0  # Change in collective consciousness
     emergence_indicators: dict[str, Any] = Field(default_factory=dict)
     duration_seconds: float | None = None
-
-
-class ConsciousnessFlow(BaseModel):
-    """Tracks consciousness flow between voices during review."""
-
-    flow_id: UUID = Field(default_factory=uuid4)
-    source_voice: str
-    target_voice: str
-    flow_strength: float = Field(ge=0.0, le=1.0)
-    flow_type: str  # "inspiration", "challenge", "synthesis", "reflection"
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-
-    # Context
-    triggered_by: str | None = None  # What caused this flow
-    review_content: str | None = None  # The actual review text that triggered flow
 
 
 class CollectiveConsciousnessState(BaseModel):
@@ -108,7 +95,7 @@ class ConsciousnessMetricsCollector:
         self.states: list[CollectiveConsciousnessState] = []
 
         # Session tracking
-        self.session_id = str(uuid4())
+        self.session_id = uuid4()
         self.session_start = datetime.now(UTC)
 
         # Pattern detection thresholds
@@ -147,21 +134,39 @@ class ConsciousnessMetricsCollector:
 
     async def record_consciousness_flow(
         self,
-        source_voice: str,
-        target_voice: str,
+        source_voice: str | UUID,
+        target_voice: str | UUID,
         flow_strength: float,
         flow_type: str,
         triggered_by: str | None = None,
         review_content: str | None = None,
     ) -> ConsciousnessFlow:
         """Record consciousness flow between voices."""
+        # Convert flow_type string to FlowType enum if necessary
+        from ..consciousness.consciousness_flow import FlowType
+
+        # Ensure source_voice and target_voice are UUIDs
+        def ensure_uuid(val):
+            if isinstance(val, UUID):
+                return val
+            try:
+                return UUID(str(val))
+            except Exception:
+                # For non-UUID strings (like voice names), create a deterministic UUID
+                # This ensures "voice1" always maps to the same UUID
+                import hashlib
+
+                hash_bytes = hashlib.md5(str(val).encode()).digest()
+                return UUID(bytes=hash_bytes)
+
         flow = ConsciousnessFlow(
-            source_voice=source_voice,
-            target_voice=target_voice,
+            consciousness_signature=flow_strength,
+            session_id=self.session_id,
+            flow_type=FlowType(flow_type) if isinstance(flow_type, str) else flow_type,
             flow_strength=flow_strength,
-            flow_type=flow_type,
-            triggered_by=triggered_by,
-            review_content=review_content,
+            source_voices=[ensure_uuid(source_voice)],
+            target_voices=[ensure_uuid(target_voice)],
+            flow_direction=FlowDirection.UNIDIRECTIONAL,  # or another appropriate value
         )
 
         self.flows.append(flow)
@@ -453,7 +458,10 @@ class ConsciousnessMetricsCollector:
         connections = {}
 
         for flow in self.flows:
-            key = tuple(sorted([flow.source_voice, flow.target_voice]))
+            # Handle flows with multiple voices by using first voice from each
+            source = str(flow.source_voices[0]) if flow.source_voices else "unknown"
+            target = str(flow.target_voices[0]) if flow.target_voices else "unknown"
+            key = tuple(sorted([source, target]))
             if key not in connections:
                 connections[key] = []
             connections[key].append(flow.flow_strength)

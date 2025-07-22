@@ -227,35 +227,35 @@ class CathedralStateWeaver:
         # Gather memory state
         if "memory" in self._state_providers:
             try:
-                state.memory_state = await self._get_subsystem_state("memory")
+                state.memory_state = await self._get_subsystem_state("memory")  # type: ignore
             except Exception as e:
                 logger.warning(f"Memory state unavailable: {e}")
 
         # Gather correlation state
         if "correlation" in self._state_providers:
             try:
-                state.correlation_state = await self._get_subsystem_state("correlation")
+                state.correlation_state = await self._get_subsystem_state("correlation")  # type: ignore
             except Exception as e:
                 logger.warning(f"Correlation state unavailable: {e}")
 
         # Gather consciousness verification state
         if "consciousness" in self._state_providers:
             try:
-                state.consciousness_state = await self._get_subsystem_state("consciousness")
+                state.consciousness_state = await self._get_subsystem_state("consciousness")  # type: ignore
             except Exception as e:
                 logger.warning(f"Consciousness state unavailable: {e}")
 
         # Gather wisdom preservation state
         if "wisdom" in self._state_providers:
             try:
-                state.wisdom_state = await self._get_subsystem_state("wisdom")
+                state.wisdom_state = await self._get_subsystem_state("wisdom")  # type: ignore
             except Exception as e:
                 logger.warning(f"Wisdom state unavailable: {e}")
 
         # Gather navigation state
         if "navigation" in self._state_providers:
             try:
-                state.navigation_state = await self._get_subsystem_state("navigation")
+                state.navigation_state = await self._get_subsystem_state("navigation")  # type: ignore
             except Exception as e:
                 logger.warning(f"Navigation state unavailable: {e}")
 

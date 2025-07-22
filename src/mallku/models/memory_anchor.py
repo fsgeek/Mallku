@@ -10,10 +10,12 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from mallku.core.models import ModelConfig
 
 
-class MemoryAnchor(BaseModel):
+class MemoryAnchor(ModelConfig):
     """
     A Memory Anchor represents a synchronized point across multiple activity streams.
 
@@ -49,31 +51,7 @@ class MemoryAnchor(BaseModel):
     # Last update tracking
     last_updated: datetime | None = Field(None, description="When this anchor was last modified")
 
-    class Config:
-        """Model configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
-
-        json_schema_extra = {
-            "example": {
-                "anchor_id": "550e8400-e29b-41d4-a716-446655440000",
-                "timestamp": "2024-01-15T10:30:00Z",
-                "predecessor_id": "550e8400-e29b-41d4-a716-446655440001",
-                "cursors": {
-                    "temporal": "2024-01-15T10:30:00Z",
-                    "spatial": {"latitude": 49.2827, "longitude": -123.1207},
-                    "filesystem": "/Users/alice/Documents/project.md",
-                    "email": "msg-id-12345",
-                    "spotify": "track:4iV5W9uYEdYUVa79Axb7Rh",
-                },
-                "metadata": {
-                    "providers": ["filesystem", "email", "spotify"],
-                    "creation_trigger": "temporal_threshold",
-                    "confidence": 0.85,
-                },
-                "last_updated": "2024-01-15T10:35:00Z",
-            }
-        }
+    model_config = {"json_encoders": {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}}
 
     def add_cursor(self, cursor_type: str, cursor_value: Any) -> None:
         """
@@ -188,5 +166,10 @@ class MemoryAnchor(BaseModel):
 
         if "last_updated" in doc and doc["last_updated"] and isinstance(doc["last_updated"], str):
             doc["last_updated"] = datetime.fromisoformat(doc["last_updated"].replace("Z", "+00:00"))
+
+        # Remove ArangoDB metadata fields
+        doc.pop("_key", None)
+        doc.pop("_id", None)
+        doc.pop("_rev", None)
 
         return cls(**doc)

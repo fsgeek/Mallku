@@ -18,7 +18,11 @@ import pytest
 from mallku.firecircle.consciousness.consciousness_facilitator import ConsciousnessFacilitator
 from mallku.firecircle.consciousness.decision_framework import DecisionDomain
 from mallku.firecircle.service.service import FireCircleService
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 class TestDecisionDomains:
@@ -141,11 +145,11 @@ class TestConsciousnessEmergence:
             events_received.append(event)
 
         # Subscribe to consciousness events
-        event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_handler)
+        event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, event_handler)
 
         # Emit consciousness event
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
             data={
                 "type": "emergence_detected",
                 "quality": 0.95,

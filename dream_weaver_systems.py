@@ -34,7 +34,7 @@ from evolution_acceleration_chambers import (
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -307,7 +307,7 @@ class DreamWeaverHub:
         if self.event_bus:
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system="dream_weaver",
                     consciousness_signature=0.6,
                     data={

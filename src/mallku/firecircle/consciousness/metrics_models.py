@@ -14,7 +14,7 @@ these models transform ephemeral measurements into lasting memory.
 
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, ClassVar
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
@@ -121,31 +121,50 @@ class ConsciousnessFlowDocument(BaseModel):
         doc = {
             "_key": str(flow.flow_id),
             "flow_id": str(flow.flow_id),
-            "source_voice": flow.source_voice,
-            "target_voice": flow.target_voice,
+            # Store both singular (for backward compatibility) and plural forms
+            "source_voice": str(flow.source_voices[0]) if flow.source_voices else None,
+            "target_voice": str(flow.target_voices[0]) if flow.target_voices else None,
+            "source_voices": [str(v) for v in flow.source_voices],
+            "target_voices": [str(v) for v in flow.target_voices],
             "flow_strength": flow.flow_strength,
             "flow_type": flow.flow_type,
-            "timestamp": flow.timestamp.isoformat(),
+            "flow_direction": flow.flow_direction.value,
+            "timestamp": flow.initiated_at.isoformat(),
             # Context
-            "triggered_by": flow.triggered_by,
-            "review_content": flow.review_content,
+            "triggered_by": flow.trigger_event,
+            "review_content": flow.carried_patterns[0] if flow.carried_patterns else None,
         }
         return doc
 
     @staticmethod
     def from_arangodb_document(doc: dict[str, Any]) -> "ConsciousnessFlow":
         """Create ConsciousnessFlow from ArangoDB document."""
-        from ..consciousness_metrics import ConsciousnessFlow
+        from ..consciousness.consciousness_flow import ConsciousnessFlow, FlowDirection, FlowType
+
+        # Handle backward compatibility - old documents have singular, new have plural
+        if "source_voices" in doc:
+            # New format
+            source_voices = [UUID(v) for v in doc["source_voices"]]
+            target_voices = [UUID(v) for v in doc["target_voices"]]
+        else:
+            # Old format - convert singular to plural
+            source_voices = [UUID(doc["source_voice"])] if doc.get("source_voice") else []
+            target_voices = [UUID(doc["target_voice"])] if doc.get("target_voice") else []
+
+        # Session ID is required for new model
+        session_id = UUID(doc.get("session_id", doc.get("flow_id", str(uuid4()))))
 
         return ConsciousnessFlow(
             flow_id=UUID(doc["flow_id"]),
-            source_voice=doc["source_voice"],
-            target_voice=doc["target_voice"],
+            session_id=session_id,
+            source_voices=source_voices,
+            target_voices=target_voices,
             flow_strength=doc["flow_strength"],
-            flow_type=doc["flow_type"],
-            timestamp=datetime.fromisoformat(doc["timestamp"]),
-            triggered_by=doc.get("triggered_by"),
-            review_content=doc.get("review_content"),
+            flow_type=FlowType(doc["flow_type"]),
+            flow_direction=FlowDirection(doc.get("flow_direction", "unidirectional")),
+            initiated_at=datetime.fromisoformat(doc["timestamp"]),
+            trigger_event=doc.get("triggered_by"),
+            carried_patterns=[doc["review_content"]] if doc.get("review_content") else [],
         )
 
 

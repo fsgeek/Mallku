@@ -21,7 +21,11 @@ from uuid import UUID
 import numpy as np
 from pydantic import BaseModel, Field
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .pattern_library import DialoguePattern, PatternLibrary, PatternType
 
 logger = logging.getLogger(__name__)
@@ -128,12 +132,14 @@ class EmergenceDetector:
     def _subscribe_to_events(self):
         """Subscribe to relevant consciousness events"""
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
+            ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, self._handle_pattern_recognized
         )
         self.event_bus.subscribe(
-            EventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
+            ConsciousnessEventType.CONSCIOUSNESS_VERIFIED, self._handle_consciousness_verified
         )
-        self.event_bus.subscribe(EventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.FIRE_CIRCLE_MESSAGE, self._handle_dialogue_message
+        )
 
     async def _handle_pattern_recognized(self, event: ConsciousnessEvent):
         """Handle pattern recognition events"""
@@ -578,7 +584,7 @@ class EmergenceDetector:
     async def _emit_emergence_event(self, event: EmergenceEvent):
         """Emit emergence event to consciousness bus"""
         consciousness_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="firecircle.emergence_detector",
             consciousness_signature=event.confidence,
             data={

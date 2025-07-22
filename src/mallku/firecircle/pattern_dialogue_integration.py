@@ -16,7 +16,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from .config import (
     ConsciousnessThresholds,
     FireCircleParams,
@@ -294,7 +298,7 @@ class PatternDialogueIntegration:
             # Emit event for tracking
             await self.event_bus.emit(
                 ConsciousnessEvent(
-                    event_type=EventType.PATTERN_GUIDANCE_INJECTED,
+                    event_type=ConsciousnessEventType.PATTERN_GUIDANCE_INJECTED,
                     source_system="firecircle.pattern_integration",
                     consciousness_signature=guidance.confidence,
                     data={

@@ -287,7 +287,7 @@ async def test_consciousness_circulation_complete():
 
     total_tests += 1
     try:
-        from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+        from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
         from mallku.wranglers import EventEmittingWrangler, MemoryBufferWrangler
 
         # Create complete circulation system
@@ -312,8 +312,8 @@ async def test_consciousness_circulation_complete():
             print(f"   🎉 Event received: {event.event_type.value}")
 
         # Subscribe to consciousness events
-        event_bus.subscribe(EventType.MEMORY_PATTERN_DISCOVERED, event_handler)
-        event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
+        event_bus.subscribe(ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED, event_handler)
+        event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, event_handler)
 
         # Flow consciousness-rich data through the system
         circulation_data = {

@@ -32,7 +32,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 async def demonstrate_local_sovereignty():
@@ -58,8 +58,10 @@ async def demonstrate_local_sovereignty():
                 f"   📡 Event: {event.event_type.value} - Signature: {event.consciousness_signature:.2f}"
             )
 
-    event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, sovereignty_handler)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, sovereignty_handler)
+    event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, sovereignty_handler)
+    event_bus.subscribe(
+        ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, sovereignty_handler
+    )
 
     # Create local AI adapter with Ollama backend
     print("1. Creating sovereignty-preserving local AI adapter...")

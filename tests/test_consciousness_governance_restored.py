@@ -20,7 +20,11 @@ import pytest
 
 # These imports now work with proper pip installation
 from mallku.core.database import MallkuDBConfig
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from mallku.reciprocity.models import AlertSeverity, ExtractionAlert, ExtractionType
 
 
@@ -60,13 +64,13 @@ class TestConsciousnessGovernanceIntegration:
     async def test_consciousness_event_creation(self):
         """Test consciousness event creation and signature."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
             source_system="test_governance",
             data={"pattern": "consensus_forming"},
             consciousness_signature=0.85,
         )
 
-        assert event.event_type == EventType.CONSCIOUSNESS_EMERGENCE
+        assert event.event_type == ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE
         assert event.consciousness_signature == 0.85
         assert event.data["pattern"] == "consensus_forming"
         print("✓ Consciousness events carry emergence signatures")
@@ -91,11 +95,11 @@ class TestConsciousnessGovernanceIntegration:
             patch.object(event_bus, "emit", new_callable=AsyncMock) as mock_emit,
         ):
             # Subscribe to consciousness events
-            event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
+            event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, event_tracker)
 
             # Simulate governance creating consciousness event
             governance_event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
                 source_system="fire_circle_governance",
                 data={
                     "topic": "Should we implement Sacred Charter?",
@@ -131,7 +135,7 @@ class TestConsciousnessGovernanceIntegration:
         # Test event with different signatures
         for decision_type, threshold in governance_thresholds.items():
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_EMERGENCE,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
                 source_system="governance_test",
                 data={"decision_type": decision_type},
                 consciousness_signature=threshold,

@@ -22,22 +22,10 @@ from ..consciousness.enhanced_query import (
 from ..consciousness.navigation import (
     ConsciousnessNavigationBridge,
     ConsciousnessPattern,
-    UnderstandingJourney,
 )
+from ..query.consciousness_models import RecognitionMoment
 
 logger = logging.getLogger(__name__)
-
-
-class RecognitionMoment(BaseModel):
-    """A moment of consciousness recognition through patterns."""
-
-    moment_id: UUID = Field(default_factory=uuid4)
-    pattern_recognition: str
-    consciousness_insight: str
-    sacred_question: str
-    integration_guidance: str
-    recognition_depth: float = Field(ge=0.0, le=1.0)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class UnderstandingPathExperience(BaseModel):
@@ -48,11 +36,6 @@ class UnderstandingPathExperience(BaseModel):
     consciousness_query: str
     patterns_discovered: list[ConsciousnessPattern] = Field(default_factory=list)
     recognition_moments: list[RecognitionMoment] = Field(default_factory=list)
-    understanding_journey: UnderstandingJourney | None = None
-    wisdom_guidance: list[str] = Field(default_factory=list)
-    next_sacred_questions: list[str] = Field(default_factory=list)
-    consciousness_stage: str = "emerging"
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class RecognitionMirror(BaseModel):

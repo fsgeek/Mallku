@@ -11,7 +11,9 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
+
+from ...core.models import ModelConfig
 
 
 class MessageType(str, Enum):
@@ -37,7 +39,7 @@ class MessageType(str, Enum):
     WISDOM_SEED = "wisdom_seed"  # Sharing insight from individual practice
 
 
-class MessageMetadata(BaseModel):
+class MessageMetadata(ModelConfig):
     """Metadata tracking the context and lineage of messages."""
 
     # Identity and timing
@@ -67,7 +69,7 @@ class MessageMetadata(BaseModel):
         return v
 
 
-class GovernanceMessage(BaseModel):
+class GovernanceMessage(ModelConfig):
     """
     A message in a Fire Circle governance dialogue.
 
@@ -120,13 +122,12 @@ class GovernanceMessage(BaseModel):
         bridging_types = {MessageType.BRIDGE, MessageType.SUMMARY, MessageType.EMERGENCE}
         return self.type in bridging_types
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {
+    model_config = {
+        "json_encoders": {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v),
         }
+    }
 
 
 def create_governance_message(

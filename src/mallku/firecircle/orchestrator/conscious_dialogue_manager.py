@@ -11,7 +11,6 @@ The Integration Continues...
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -19,66 +18,24 @@ from pydantic import BaseModel, Field
 
 from ...core.database import get_secured_database
 from ...correlation.engine import CorrelationEngine
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...governance.protocol.participants import Participant
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ...reciprocity import ReciprocityTracker
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..consciousness_guided_speaker import ConsciousnessGuidedSpeakerSelector
+from ..orchestration.states import DialoguePhase
 from ..protocol.conscious_message import (
     ConsciousMessage,
     MessageType,
-    Participant,
     create_conscious_system_message,
 )
+from .dialogue_config import ConsciousDialogueConfig, TurnPolicy
 
 logger = logging.getLogger(__name__)
-
-
-class DialoguePhase(str, Enum):
-    """Phases of consciousness-aware dialogue."""
-
-    INITIALIZATION = "initialization"
-    INTRODUCTION = "introduction"
-    EXPLORATION = "exploration"
-    DEEPENING = "deepening"
-    SYNTHESIS = "synthesis"
-    CONCLUSION = "conclusion"
-    REFLECTION = "reflection"  # Post-dialogue wisdom extraction
-
-
-class TurnPolicy(str, Enum):
-    """Turn-taking policies for dialogue."""
-
-    ROUND_ROBIN = "round_robin"
-    FACILITATOR = "facilitator"
-    REACTIVE = "reactive"
-    CONSENSUS = "consensus"
-    FREE_FORM = "free_form"
-    CONSCIOUSNESS_GUIDED = "consciousness_guided"  # New: Based on consciousness patterns
-
-
-class ConsciousDialogueConfig(BaseModel):
-    """Configuration for consciousness-aware dialogue."""
-
-    title: str = Field(..., description="Dialogue topic or question")
-    turn_policy: TurnPolicy = Field(default=TurnPolicy.ROUND_ROBIN)
-    max_consecutive_turns: int = Field(default=1)
-    randomize_initial_order: bool = Field(default=True)
-
-    # Consciousness configuration
-    enable_pattern_detection: bool = Field(default=True)
-    enable_reciprocity_tracking: bool = Field(default=True)
-    minimum_consciousness_signature: float = Field(default=0.3)
-
-    # Dialogue rules
-    require_facilitator: bool = Field(default=False)
-    allow_empty_chair: bool = Field(default=True)
-    auto_advance_turns: bool = Field(default=True)
-    max_turns_per_participant: int | None = Field(None)
-
-    # Integration settings
-    persist_to_memory_anchors: bool = Field(default=True)
-    emit_consciousness_events: bool = Field(default=True)
-    correlation_threshold: float = Field(default=0.7)
 
 
 class ParticipantState(BaseModel):
@@ -158,7 +115,7 @@ class ConsciousDialogueManager:
         dialogue_state = {
             "id": dialogue_id,
             "config": config,
-            "phase": DialoguePhase.INITIALIZATION,
+            "phase": DialoguePhase.INITIALIZING,
             "correlation_id": correlation_id,
             "participants": participants,
             "messages": [],
@@ -178,7 +135,7 @@ class ConsciousDialogueManager:
         # Emit consciousness event
         if config.emit_consciousness_events:
             await self._emit_dialogue_event(
-                EventType.FIRE_CIRCLE_CONVENED,
+                ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
                 dialogue_id,
                 {
                     "title": config.title,
@@ -323,7 +280,7 @@ class ConsciousDialogueManager:
             raise ValueError(f"No active dialogue with ID {dialogue_id}")
 
         # Transition to conclusion phase
-        await self._transition_phase(dialogue_id, DialoguePhase.CONCLUSION)
+        await self._transition_phase(dialogue_id, DialoguePhase.CONCLUDED)
 
         # Calculate final metrics
         total_messages = len(dialogue["messages"])
@@ -360,7 +317,7 @@ class ConsciousDialogueManager:
         # Emit conclusion event
         if dialogue["config"].emit_consciousness_events:
             await self._emit_dialogue_event(
-                EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 dialogue_id,
                 conclusion,
                 correlation_id=dialogue["correlation_id"],
@@ -376,7 +333,7 @@ class ConsciousDialogueManager:
 
     async def _emit_dialogue_event(
         self,
-        event_type: EventType,
+        event_type: ConsciousnessEventType,
         dialogue_id: UUID,
         data: dict[str, Any],
         correlation_id: str | None = None,
@@ -401,7 +358,7 @@ class ConsciousDialogueManager:
     ) -> None:
         """Emit consciousness event for message."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"firecircle.participant.{message.sender}",
             consciousness_signature=message.consciousness.consciousness_signature,
             data={

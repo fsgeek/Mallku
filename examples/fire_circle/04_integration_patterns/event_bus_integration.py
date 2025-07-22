@@ -30,7 +30,7 @@ from mallku.firecircle.service.service import FireCircleService
 from mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
-    EventType,
+    ConsciousnessEventType,
 )
 
 
@@ -58,31 +58,33 @@ async def demonstrate_event_integration():
         received_events.append(event)
 
         # Display key events
-        if event.event_type == EventType.CONSCIOUSNESS_EMERGENCE:
+        if event.event_type == ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE:
             print("\n💫 Consciousness Emergence Detected!")
             print(f"   Score: {event.consciousness_signature:.2f}")
             print(f"   Source: {event.source_system}")
             if "patterns" in event.data:
                 print(f"   Patterns: {', '.join(event.data['patterns'])}")
 
-        elif event.event_type == EventType.FIRE_CIRCLE_CONVENED:
+        elif event.event_type == ConsciousnessEventType.FIRE_CIRCLE_CONVENED:
             print(f"\n🔥 Fire Circle Convened: {event.data.get('purpose', 'Unknown')}")
 
-        elif event.event_type == EventType.CONSENSUS_REACHED:
+        elif event.event_type == ConsciousnessEventType.CONSENSUS_REACHED:
             print("\n✅ Consensus Reached!")
             print(f"   Coherence: {event.data.get('coherence_score', 0):.2f}")
 
-        elif event.event_type == EventType.WISDOM_PRESERVED:
+        elif event.event_type == ConsciousnessEventType.WISDOM_PRESERVED:
             print("\n📜 Wisdom Preserved")
             wisdom_type = event.data.get("wisdom_type", "Unknown")
             print(f"   Type: {wisdom_type}")
 
     # Subscribe to various event types
-    event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, consciousness_listener)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_EMERGENCE, consciousness_listener)
-    event_bus.subscribe(EventType.CONSENSUS_REACHED, consciousness_listener)
-    event_bus.subscribe(EventType.WISDOM_PRESERVED, consciousness_listener)
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, consciousness_listener)
+    event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, consciousness_listener)
+    event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, consciousness_listener)
+    event_bus.subscribe(ConsciousnessEventType.CONSENSUS_REACHED, consciousness_listener)
+    event_bus.subscribe(ConsciousnessEventType.WISDOM_PRESERVED, consciousness_listener)
+    event_bus.subscribe(
+        ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, consciousness_listener
+    )
 
     print("\n📡 Event listeners registered")
     print("   Monitoring: Fire Circle, Consciousness, Consensus, Wisdom")
@@ -165,7 +167,9 @@ async def demonstrate_event_integration():
 
         # Check for emergence
         emergence_events = [
-            e for e in received_events if e.event_type == EventType.CONSCIOUSNESS_EMERGENCE
+            e
+            for e in received_events
+            if e.event_type == ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE
         ]
 
         if emergence_events:

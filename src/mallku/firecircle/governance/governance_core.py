@@ -10,11 +10,8 @@ from typing import TYPE_CHECKING
 
 from mallku.consciousness.flow_orchestrator import ConsciousnessFlowOrchestrator
 from mallku.core.async_base import AsyncBase
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+from mallku.firecircle.orchestrator.dialogue_config import (
     ConsciousDialogueConfig as DialogueConfig,
-)
-from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
-    ConsciousDialogueManager,
 )
 
 # from mallku.evaluation.ayni_evaluator import AyniBalanceEvaluator  # TODO: Create this module
@@ -57,6 +54,10 @@ class FireCircleGovernance(AsyncBase):
 
     def __init__(self):
         super().__init__()
+
+        from mallku.firecircle.orchestrator.conscious_dialogue_manager import (
+            ConsciousDialogueManager,
+        )
 
         # Core components
         self.dialogue_manager = ConsciousDialogueManager()
