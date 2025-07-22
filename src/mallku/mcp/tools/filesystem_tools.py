@@ -131,3 +131,39 @@ def read_file(file_path: str, max_lines: int = None) -> dict[str, Any]:
 
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
+
+
+def write_file(file_path: str, content: str, overwrite: bool = False) -> dict[str, Any]:
+    """
+    Writes content to a file, with safeguards against accidental overwrites.
+
+    Args:
+        file_path: The path to the file to write.
+        content: The content to write to the file.
+        overwrite: Whether to overwrite the file if it already exists. Defaults to False.
+
+    Returns:
+        A dictionary containing a confirmation message or an error.
+    """
+    try:
+        p = Path(file_path)
+
+        if p.exists() and not overwrite:
+            return {
+                "error": f"File '{file_path}' already exists. Set overwrite=True to replace it."
+            }
+
+        p.parent.mkdir(parents=True, exist_ok=True)
+
+        with p.open("w", encoding="utf-8") as f:
+            f.write(content)
+
+        return {
+            "status": "success",
+            "file_path": str(p.resolve()),
+            "characters_written": len(content),
+            "message": f"Successfully wrote {len(content)} characters to {p.resolve()}",
+        }
+
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}

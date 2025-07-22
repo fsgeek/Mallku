@@ -7,7 +7,7 @@ with the Mallku environment, orchestrate complex tasks, and manage
 their own lifecycle.
 """
 
-from .filesystem_tools import list_directory, read_file
+from .filesystem_tools import list_directory, read_file, write_file
 from .loom_tools import check_loom_status, invoke_loom, spawn_apprentice_weaver
 
 __all__ = [
@@ -16,4 +16,5 @@ __all__ = [
     "spawn_apprentice_weaver",
     "list_directory",
     "read_file",
+    "write_file",
 ]
