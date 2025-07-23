@@ -30,8 +30,8 @@ class DatabaseSecurityFixer:
         fixes = 0
 
         # Fix get_database imports
-        pattern = r"from\s+\.+core\.database\s+import\s+get_database"
-        replacement = "from ...core.database import get_secured_database"
+        pattern = r"from\s+\.+core\.database\.deprecated\s+import\s+get_database_deprecated"
+        replacement = "from ...core.database import get_database"
         content, count = re.subn(pattern, replacement, content)
         fixes += count
 
@@ -47,9 +47,9 @@ class DatabaseSecurityFixer:
         """Fix database access patterns."""
         fixes = 0
 
-        # Fix get_database() calls
-        pattern = r"get_database\(\)"
-        replacement = "await get_secured_database()"
+        # Fix get_database_deprecated() calls
+        pattern = r"get_database_deprecated\(\)"
+        replacement = "await get_database()"
         content, count = re.subn(pattern, replacement, content)
         fixes += count
 
@@ -60,14 +60,14 @@ class DatabaseSecurityFixer:
         fixes += count
 
         # Mark functions as async if they weren't already
-        if "await get_secured_database()" in content:
+        if "await get_database()" in content:
             # Find function definitions that use database
             lines = content.split("\n")
             new_lines = []
             for i, line in enumerate(lines):
                 if (
                     "def " in line
-                    and "await get_secured_database()" in "\n".join(lines[i : i + 20])
+                    and "await get_database()" in "\n".join(lines[i : i + 20])
                     and not line.strip().startswith("async ")
                 ):
                     line = line.replace("def ", "async def ")
@@ -96,7 +96,7 @@ class DatabaseSecurityFixer:
             )
             lines.insert(
                 import_section_end + 2,
-                "# Direct ArangoDB access is FORBIDDEN - use get_secured_database()",
+                "# Direct ArangoDB access is FORBIDDEN - use get_database()",
             )
             lines.insert(import_section_end + 3, "")
 
@@ -111,7 +111,7 @@ class DatabaseSecurityFixer:
         # Remove dangerous justification comments
         patterns = [
             r"#.*Direct access needed for internal metrics.*",
-            r"#.*We use get_database\(\) instead of get_secured_database\(\).*",
+            r"#.*We use get_database_deprecated\(\) instead of get_database\(\).*",
             r"#.*internal system data, not user data.*",
             r"#.*need AQL access for complex queries.*",
         ]

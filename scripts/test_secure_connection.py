@@ -36,10 +36,10 @@ async def test_connection():
 
     try:
         # Try importing with patched database
-        from mallku.core.database import get_secured_database
+        from mallku.core.database import get_database
 
         print("\n🔄 Attempting connection...")
-        secured_db = get_secured_database()
+        secured_db = get_database()
         await secured_db.initialize()
 
         print("✅ Database connection successful!")

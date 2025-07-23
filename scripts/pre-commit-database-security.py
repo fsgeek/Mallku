@@ -31,8 +31,8 @@ def check_file(filepath: str) -> list[str]:
                 continue
 
             # Check for violations
-            if "get_database()" in line and "get_secured_database" not in line:
-                violations.append(f"{filepath}:{i}: Direct get_database() call")
+            if "get_database_deprecated()" in line and "get_database" not in line:
+                violations.append(f"{filepath}:{i}: Direct get_database_deprecated() call")
 
             if "ArangoClient" in line and "# security-exception" not in line:
                 violations.append(f"{filepath}:{i}: Direct ArangoClient usage")
@@ -40,8 +40,8 @@ def check_file(filepath: str) -> list[str]:
             if "localhost:8529" in line:
                 violations.append(f"{filepath}:{i}: Direct ArangoDB port access")
 
-            if "from" in line and "database import get_database" in line:
-                violations.append(f"{filepath}:{i}: Importing insecure get_database")
+            if "from" in line and "database.deprecated import get_database_deprecated" in line:
+                violations.append(f"{filepath}:{i}: Importing insecure get_database_deprecated")
 
     except Exception as e:
         print(f"Error checking {filepath}: {e}")
@@ -63,7 +63,7 @@ def main(files: list[str]) -> int:
         for violation in all_violations:
             print(f"  ❌ {violation}")
         print("\n📚 All database access MUST use secure patterns:")
-        print("  - get_secured_database() not get_database()")
+        print("  - get_database() not get_database_deprecated()")
         print("  - API gateway (port 8080) not direct ArangoDB (port 8529)")
         print("  - No direct ArangoClient instantiation")
         print("\n💡 See Issue #176 for architectural context")

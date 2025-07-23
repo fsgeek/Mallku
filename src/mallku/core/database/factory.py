@@ -9,7 +9,8 @@ It is the single source of truth for database access in Mallku.
 import logging
 import os
 
-from arango import ArangoClient
+from arango.client import ArangoClient
+from arango.database import StandardDatabase
 
 from .dev_interface import DevDatabaseInterface
 from .secured_arango_interface import SecuredArangoDatabase
@@ -17,7 +18,7 @@ from .secured_arango_interface import SecuredArangoDatabase
 logger = logging.getLogger(__name__)
 
 
-def get_database():
+def get_database() -> SecuredArangoDatabase | StandardDatabase | DevDatabaseInterface:
     """
     Factory function for the database interface.
 

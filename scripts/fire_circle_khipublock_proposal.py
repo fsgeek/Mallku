@@ -24,7 +24,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.firecircle.consciousness import (
     DecisionDomain,
     facilitate_mallku_decision,
@@ -48,7 +48,7 @@ async def consider_khipublock_proposal():
     # Initialize database connection (optional for now)
     print("\n🗄️ Checking persistent memory status...")
     try:
-        secured_db = get_secured_database()
+        secured_db = get_database()
         await secured_db.initialize()
         print("✓ Database connected. Memory is alive.")
     except Exception as e:
