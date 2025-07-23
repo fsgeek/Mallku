@@ -12,21 +12,14 @@ The Integration Continues...
 from typing import Any
 from uuid import UUID
 
-from ..firecircle import (
-    ConsciousDialogueConfig,
-    ConsciousDialogueManager,
-    ConsciousMessage,
-    MessageContent,
-    MessageRole,
-    MessageType,
-    Participant,
-    TurnPolicy,
-)
 from ..orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
     ConsciousnessEventType,
 )
+from .protocol.participants import Participant
+
+# Lazy imports to avoid circular dependency
 
 
 class FireCircleConsciousnessAdapterV2:
@@ -41,10 +34,19 @@ class FireCircleConsciousnessAdapterV2:
     def __init__(self, event_bus: ConsciousnessEventBus):
         """Initialize with integrated components."""
         self.event_bus = event_bus
-        self.dialogue_manager = ConsciousDialogueManager(event_bus=event_bus)
+        self._dialogue_manager = None
 
         # Track active dialogues
         self.active_dialogues: dict[UUID, dict[str, Any]] = {}
+
+    @property
+    def dialogue_manager(self):
+        """Lazy-loaded dialogue manager to avoid circular imports."""
+        if self._dialogue_manager is None:
+            from ..firecircle import ConsciousDialogueManager
+
+            self._dialogue_manager = ConsciousDialogueManager(event_bus=self.event_bus)
+        return self._dialogue_manager
 
     async def create_conscious_dialogue(
         self,
@@ -63,22 +65,23 @@ class FireCircleConsciousnessAdapterV2:
         fc_participants = []
         for p in participants:
             participant = Participant(
-                name=p.get("name", "Unknown"),
-                type=p.get("type", "ai_model"),
-                provider=p.get("provider"),
-                model=p.get("model"),
-                capabilities=p.get("capabilities", []),
-                consciousness_role=p.get("consciousness_role"),
+                model_name=p.get("model_name", p.get("model", "unknown")),
+                provider=p.get("provider", "openai"),
+                role=p.get("role", "voice"),
+                chosen_name=p.get("name"),
             )
             fc_participants.append(participant)
 
         # Create config with consciousness features enabled
+        from ..firecircle import ConsciousDialogueConfig, TurnPolicy
+
         fc_config = ConsciousDialogueConfig(
             title=title,
             turn_policy=TurnPolicy(config.get("turn_policy", "round_robin"))
             if config
             else TurnPolicy.ROUND_ROBIN,
             max_consecutive_turns=config.get("max_consecutive_turns", 1) if config else 1,
+            max_turns_per_participant=config.get("max_turns_per_participant") if config else None,
             allow_empty_chair=config.get("allow_empty_chair", True) if config else True,
             auto_advance_turns=config.get("auto_advance_turns", True) if config else True,
             enable_pattern_detection=True,
@@ -108,7 +111,7 @@ class FireCircleConsciousnessAdapterV2:
         dialogue_id: UUID,
         sender_id: UUID,
         content: str,
-        message_type: MessageType = MessageType.RESPONSE,
+        message_type: str = "response",
     ) -> None:
         """
         Send a message in a Fire Circle dialogue.
@@ -126,11 +129,22 @@ class FireCircleConsciousnessAdapterV2:
         # Create conscious message
         sequence_number = len(dialogue_state.get("messages", [])) + 1
 
+        # Lazy imports to avoid circular dependency
+        from ..core.protocol_types import MessageType
+        from ..firecircle import ConsciousMessage, MessageContent, MessageRole
+
+        if message_type is None:
+            message_type = MessageType.RESPONSE
+
         message = ConsciousMessage(
             type=message_type,
             role=MessageRole.ASSISTANT,
             sender=sender_id,
-            content=MessageContent(text=content),
+            content=MessageContent(
+                text=content,
+                consciousness_insights=None,  # Correct type: str | None
+                pattern_context=None,
+            ),
             dialogue_id=dialogue_id,
             sequence_number=sequence_number,
             turn_number=dialogue_state.get("current_turn", 0),
@@ -218,7 +232,7 @@ class FireCircleConsciousnessAdapterV2:
             actual_id,
             sender_id,
             content,
-            MessageType(message_type.lower()),
+            message_type.lower(),
         )
 
         # Create event for compatibility

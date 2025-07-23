@@ -14,63 +14,16 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-
-from ..query.models import QueryRequest, QueryResponse, QueryType
+from ..query.models import QueryRequest, QueryResponse
 from ..query.service import MemoryAnchorQueryService
 from .navigation import (
     ConsciousnessNavigationBridge,
     ConsciousnessPattern,
     UnderstandingJourney,
 )
+from .query_models import ConsciousnessQueryRequest, ConsciousnessQueryResponse
 
 logger = logging.getLogger(__name__)
-
-
-class ConsciousnessQueryRequest(BaseModel):
-    """Enhanced query request that includes consciousness context."""
-
-    # Base query information
-    query_text: str
-    query_type: QueryType | None = None
-
-    # Consciousness context
-    seeker_context: dict[str, Any] = Field(default_factory=dict)
-    consciousness_intention: str = (
-        "understanding"  # understanding, recognition, integration, awakening
-    )
-    sacred_question: str | None = None  # Deeper question behind the search
-
-    # Navigation preferences
-    journey_style: str = "guided"  # guided, exploratory, contemplative
-    readiness_level: str = "emerging"  # emerging, awakening, established, transformative
-    include_wisdom_guidance: bool = True
-
-    # Technical parameters
-    max_results: int = 20
-    min_confidence: float = 0.3
-    temporal_window: dict[str, datetime] | None = None
-
-
-class ConsciousnessQueryResponse(BaseModel):
-    """Enhanced query response with consciousness guidance."""
-
-    # Base query results
-    base_response: QueryResponse
-
-    # Consciousness enhancements
-    consciousness_patterns: list[ConsciousnessPattern] = Field(default_factory=list)
-    understanding_journey: UnderstandingJourney | None = None
-    wisdom_guidance: dict[str, Any] = Field(default_factory=dict)
-
-    # Recognition opportunities
-    pattern_recognition_opportunities: list[dict[str, Any]] = Field(default_factory=list)
-    integration_suggestions: list[str] = Field(default_factory=list)
-    sacred_questions: list[str] = Field(default_factory=list)
-
-    # Connection to collective wisdom
-    wisdom_lineage_connections: list[dict[str, Any]] = Field(default_factory=list)
-    reciprocity_opportunities: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class EnhancedConsciousnessQueryService:

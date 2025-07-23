@@ -15,7 +15,7 @@ and what is expected.
 
 from typing import Any
 
-from ...governance.protocol.message import MessageType as GovernanceMessageType
+from ...core.protocol_types import MessageType as GovernanceMessageType
 
 
 class MessageTypeCompat:

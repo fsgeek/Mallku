@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ...governance.protocol.message import MessageType
+from ...core.protocol_types import MessageType
 from ...models.memory_anchor import MemoryAnchor
 
 

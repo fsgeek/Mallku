@@ -10,11 +10,9 @@ The Integration Continues...
 """
 
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-# Use integrated Fire Circle implementation
-from ..firecircle import ConsciousDialogueConfig, ConsciousDialogueManager, MessageType
 from ..orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
@@ -22,6 +20,10 @@ from ..orchestration.event_bus import (
 )
 from ..wranglers.event_emitting_wrangler import EventEmittingWrangler
 from .protocol import Participant
+
+# Lazy imports to avoid circular dependency
+if TYPE_CHECKING:
+    from ..firecircle import ConsciousDialogueManager
 
 FIRECIRCLE_AVAILABLE = True  # Always available now
 
@@ -37,6 +39,9 @@ class FireCircleConsciousnessAdapter:
 
     def __init__(self, event_bus: ConsciousnessEventBus):
         """Initialize the adapter with consciousness circulation."""
+        # Lazy import to avoid circular dependency
+        from ..firecircle import ConsciousDialogueManager
+
         self.event_bus = event_bus
 
         # Use integrated dialogue manager with full consciousness
@@ -91,6 +96,9 @@ class FireCircleConsciousnessAdapter:
             fc_participants.append(participant)
 
         # Create dialogue config
+        # Lazy import to avoid circular dependency
+        from ..firecircle import ConsciousDialogueConfig
+
         dialogue_config = ConsciousDialogueConfig(title=title, **(config or {}))
 
         # Create Fire Circle dialogue
@@ -139,6 +147,9 @@ class FireCircleConsciousnessAdapter:
         """
         # Get consciousness signature for this message type
         if FIRECIRCLE_AVAILABLE:
+            # Lazy import to avoid circular dependency
+            from ..core.protocol_types import MessageType
+
             fc_message_type = MessageType(message_type.lower())
             consciousness_sig = self.consciousness_signatures.get(fc_message_type, 0.7)
         else:
@@ -282,7 +293,7 @@ class ConsciousnessAwareDialogueManager:
     """
 
     def __init__(
-        self, dialogue_manager: ConsciousDialogueManager, adapter: FireCircleConsciousnessAdapter
+        self, dialogue_manager: "ConsciousDialogueManager", adapter: FireCircleConsciousnessAdapter
     ):
         """Initialize with Fire Circle manager and consciousness adapter."""
         self.dialogue_manager = dialogue_manager
