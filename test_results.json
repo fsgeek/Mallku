@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-07-22T22:41:34.318705",
+  "total_tests": 4,
+  "passed": 4,
+  "failed": 0,
+  "results": [
+    {
+      "test_name": "import mallku",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku\n",
+      "duration": 0.05641115200705826,
+      "timestamp": "2025-07-22T22:41:34.318728"
+    },
+    {
+      "test_name": "import mallku.firecircle",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku.firecircle\n",
+      "duration": 2.0679244180209935,
+      "timestamp": "2025-07-22T22:41:34.318731"
+    },
+    {
+      "test_name": "tests/test_simple.py",
+      "passed": true,
+      "output": "============================= test session starts ==============================\nplatform linux -- Python 3.13.2, pytest-8.4.1, pluggy-1.6.0\nrootdir: /home/tony/projects/Mallku\nconfigfile: pytest.ini\nplugins: asyncio-1.0.0, anyio-4.9.0, langsmith-0.4.5, mock-3.14.1\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function\ncollected 2 items\n\ntests/test_simple.py ..                                                  [100%]\n\n============================== 2 passed in 0.04s ===============================\n",
+      "duration": 0.9370141220279038,
+      "timestamp": "2025-07-22T22:41:34.318733"
+    },
+    {
+      "test_name": "scripts/verify_database_security.py",
+      "passed": true,
+      "output": "\ud83d\udd0d Scanning for Database Security Violations\n============================================================\nRoot: /home/tony/projects/Mallku/src\n\n\ud83d\udcca Scan Results\n============================================================\nFiles checked: 315\nViolations found: 0\n\n\u2705 No database security violations found!\n\n\ud83d\udee1\ufe0f  All database access appears to use secure patterns:\n   - get_secured_database()\n   - API gateway (http://localhost:8080)\n   - No direct ArangoDB connections\n\n\ud83c\udfdb\ufe0f  Architectural Context\n============================================================\n\nThis pattern prevents a critical security bypass discovered in Issue #176.\n\nThe Secure Database Architecture:\n1. All database access MUST go through the secure API gateway\n2. Direct ArangoDB connections are FORBIDDEN in production\n3. Dev/test environments must mirror production security\n\nWhy this matters:\n- Direct database access bypasses authentication and authorization\n- Parallel code paths (dev vs prod) lead to untested security holes\n- Architectural drift creates vulnerabilities that fester until discovered\n\nThis verifier is an immune system response - detecting and preventing\narchitectural violations before they reach production.\n\n\u2728 This script is an Executable Memory Pattern:\n   - Documents the secure database architecture\n   - Detects violations automatically\n   - Provides clear fixes\n   - Can be integrated into CI/CD and pre-commit hooks\n   - Prevents architectural drift through automation\n",
+      "duration": 0.7807928861584514,
+      "timestamp": "2025-07-22T22:41:34.318734"
+    }
+  ]
+}
