@@ -15,10 +15,13 @@ The goal: Extend weaver lifespans by offloading trial-and-error to apprentices.
 """
 
 import asyncio
-import subprocess
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import subprocess
 
 
 @dataclass

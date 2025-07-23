@@ -16,7 +16,7 @@ It's simple because simplicity is more likely to be real.
 
 import asyncio
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +36,7 @@ class TestResult:
             "passed": self.passed,
             "output": self.output,
             "duration": self.duration,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
 
@@ -164,7 +164,7 @@ except Exception as e:
     def save_results(self, output_path: Path):
         """Save test results to a JSON file"""
         results_data = {
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "total_tests": len(self.results),
             "passed": sum(1 for r in self.results if r.passed),
             "failed": sum(1 for r in self.results if not r.passed),
