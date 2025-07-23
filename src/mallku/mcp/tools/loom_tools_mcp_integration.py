@@ -92,7 +92,7 @@ class ApprenticeSpawner:
                             "CEREMONY_NAME": ceremony_name,
                             "PYTHONPATH": "/app:/workspace",
                         },
-                        "command": ["python3", "/workspace/apprentice_work.py"],
+                        "command": ["uv", "run", "python", "/workspace/apprentice_work.py"],
                         # Remove network reference - use default network
                     }
                 },

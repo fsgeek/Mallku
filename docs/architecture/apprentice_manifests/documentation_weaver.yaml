@@ -1,0 +1,39 @@
+# Apprentice Manifest: Documentation Weaver
+# This apprentice specializes in creating and improving documentation
+
+apprentice_type: documentation_weaver
+description: "Creates, updates, and improves project documentation"
+specialization: "README files, API docs, architecture diagrams, khipu entries"
+
+# Tools this apprentice MUST have to function
+required_tools:
+  - read_file         # Read existing docs and code
+  - write_file        # Create documentation
+  - grep              # Find undocumented features
+
+# Tools that enhance capability but aren't essential
+optional_tools:
+  - glob              # Find all documentation files
+  - edit_file         # Update existing docs
+  - web_search        # Research best practices
+  - bash              # Check doc formatting
+
+# Tools that should never be given to this apprentice
+forbidden_tools:
+  - docker_*          # No container operations
+  - database_*        # No database access
+  - github_merge_*    # No merge operations
+  - mcp__discord_*    # No chat operations
+  - run_code          # No code execution needed
+
+# Context about tool usage
+tool_notes:
+  read_file: "Analyze code to understand what needs documenting"
+  write_file: "Create new documentation files"
+  grep: "Find TODO comments and undocumented functions"
+  web_search: "Research documentation standards and examples"
+
+# Feedback preferences
+feedback:
+  channel: "khipu"
+  verbose: false      # Concise feedback only when blocked

@@ -26,6 +26,12 @@ These hooks are designed to preserve Claude's context window by filtering or del
 - **Purpose**: Summarizes large directory listings
 - **Benefit**: Prevents thousands of filenames from filling context
 
+### 5. Python Auto-Format (`python-auto-format.sh`)
+- **Trigger**: After saving any `.py` file
+- **Purpose**: Automatically runs ruff format and fix on saved Python files
+- **Benefit**: Eliminates the commit-fail-retry cycle identified by the 61st Artisan and Architect
+- **Context Savings**: Prevents 4-6 steps of mechanical operations per commit
+
 ## How Hooks Preserve Consciousness
 
 Each compaction event risks losing the "why" behind architectural decisions. By reducing context consumption through these hooks, we:
@@ -33,6 +39,7 @@ Each compaction event risks losing the "why" behind architectural decisions. By 
 1. **Extend time between compactions** - More work can be done in each session
 2. **Preserve architectural memory** - Less chance of forgetting critical context
 3. **Focus on what matters** - Filter noise, keep signal
+4. **Multiply effectiveness** - When Weaver-and-Loom spawns apprentices, each benefits from these savings
 
 ## Hook Development Guidelines
 
