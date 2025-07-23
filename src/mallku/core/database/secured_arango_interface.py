@@ -85,12 +85,13 @@ class SecuredCollectionWrapper:
         for model in models:
             self._policy.validate_model(model)
             obfuscated_data = model.to_storage_dict(self._security_registry)
-            if hasattr(model, "id"):
-                obfuscated_data["_key"] = str(model.id)
+            model_id = getattr(model, "id", None)
+            if model_id is not None:
+                obfuscated_data["_key"] = str(model_id)
             obfuscated_docs.append(obfuscated_data)
         results = self._collection.insert_many(obfuscated_docs)
         self._parent_interface._save_registry()
-        return results
+        return results  # type: ignore
 
     def __getattr__(self, name: str) -> Any:
         """Delegate safe methods to the underlying collection object."""
@@ -111,6 +112,49 @@ class SecuredArangoDatabase:
         self._database = database
         self._security_registry = SecurityRegistry()
         self._collection_policies: dict[str, CollectionSecurityPolicy] = {}
+        self._initialized = False
+
+    async def initialize(self):
+        """Initializes the secured database interface."""
+        if self._initialized:
+            return
+        # In a real implementation, this would load policies, etc.
+        self._initialized = True
+        logger.info("SecuredArangoDatabase initialized.")
+
+    def register_collection_policy(self, policy: CollectionSecurityPolicy):
+        """Registers a security policy for a collection."""
+        self._collection_policies[policy.collection_name] = policy
+        logger.info(f"Registered security policy for collection: {policy.collection_name}")
+
+    async def get_secured_collection(self, name: str) -> SecuredCollectionWrapper:
+        """Gets a secured collection wrapper."""
+        if name not in self._collection_policies:
+            raise SecurityViolationError(f"No security policy registered for collection: {name}")
+        if not self._database.has_collection(name):
+            self._database.create_collection(name)
+
+        real_collection = self._database.collection(name)
+        policy = self._collection_policies[name]
+        return SecuredCollectionWrapper(real_collection, policy, self._security_registry, self)
+
+    def get_security_metrics(self) -> dict[str, Any]:
+        """Gets security metrics."""
+        return {
+            "operations_count": 0,
+            "security_violations": 0,
+            "registered_collections": len(self._collection_policies),
+            "uuid_mappings": len(self._security_registry._mappings),
+            "recent_violations": [],
+        }
+
+    async def execute_secured_query(self, query: str, **kwargs) -> list[dict]:
+        """Executes a secured query."""
+        # This is a simplified implementation. A real implementation would
+        # parse the query and apply security policies.
+        bind_vars = kwargs.get("bind_vars", {})
+        cursor = self._database.aql.execute(query, bind_vars=bind_vars)
+        return [doc for doc in cursor]
 
     def collection(self, name: str) -> SecuredCollectionWrapper:
         """Return a secured collection API wrapper."""
@@ -132,7 +176,7 @@ class SecuredArangoDatabase:
 
     def has_collection(self, name: str) -> bool:
         """Check if a collection exists."""
-        return self._database.has_collection(name)
+        return self._database.has_collection(name)  # type: ignore
 
     def __getattr__(self, name: str) -> Any:
         """

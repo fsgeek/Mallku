@@ -219,9 +219,9 @@ try:
     for py_file in Path('/workspace/src').rglob('*.py'):
         if 'test' not in str(py_file):
             content = py_file.read_text()
-            if 'get_database()' in content:
+            if 'get_database_deprecated()' in content:
                 direct_access += 1
-            if 'get_secured_database()' in content:
+            if 'get_database()' in content:
                 secured_access += 1
 
     if direct_access > 0:

@@ -112,10 +112,10 @@ else:
 """Test that secure database configuration works."""
 
 import asyncio
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 
 async def test():
-    db = get_secured_database()
+    db = get_database()
     await db.initialize()
     print("✅ Secure database connection successful!")
 

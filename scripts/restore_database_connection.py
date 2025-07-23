@@ -217,12 +217,12 @@ class DatabaseRestorer:
 
         try:
             print("  Importing database module...")
-            from mallku.core.database import get_secured_database
+            from mallku.core.database import get_database
 
             print("  ✓ Import successful")
 
             print("  Getting secured database interface...")
-            secured_db = get_secured_database()
+            secured_db = get_database()
             print("  ✓ Interface created")
 
             print("  Testing database operations...")
