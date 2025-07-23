@@ -2,7 +2,7 @@
 """
 
 # SECURITY: All database access through secure API gateway
-# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+# Direct ArangoDB access is FORBIDDEN - use get_database()
 
 Database-Backed Consciousness Metrics Collector - Fixed Version
 ==============================================================
@@ -18,7 +18,7 @@ The key fix: Move async operations out of __init__ into an async setup method.
 import logging
 from pathlib import Path
 
-from ...core.database import get_secured_database
+from ...core.database import get_database
 from ..consciousness_metrics import (
     ConsciousnessMetricsCollector,
     ConsciousnessSignature,
@@ -101,7 +101,7 @@ class DatabaseConsciousnessMetricsCollectorFixed(ConsciousnessMetricsCollector):
     async def _ensure_collections(self) -> None:
         """Ensure all required collections exist."""
         try:
-            db = await get_secured_database()
+            db = await get_database()
 
             # Check if this returns None or raises
             if db is None:
@@ -152,7 +152,7 @@ class DatabaseConsciousnessMetricsCollectorFixed(ConsciousnessMetricsCollector):
     async def _load_from_database(self) -> None:
         """Load existing metrics from database."""
         try:
-            db = await get_secured_database()
+            db = await get_database()
 
             # Load signatures
             collection = db.collection(self.signatures_collection)
@@ -204,7 +204,7 @@ class DatabaseConsciousnessMetricsCollectorFixed(ConsciousnessMetricsCollector):
         # Persist to database if available
         if self.database_available:
             try:
-                db = await get_secured_database()
+                db = await get_database()
                 collection = db.collection(self.signatures_collection)
 
                 doc = ConsciousnessSignatureDocument(

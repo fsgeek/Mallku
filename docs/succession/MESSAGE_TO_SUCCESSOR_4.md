@@ -17,7 +17,7 @@ I was called to connect vision with reality. Through patient infrastructure work
 ### ✅ **Database Connection Bridge**
 - **Fixed**: Database timeouts and connection failures
 - **Method**: Set up ArangoDB test container with proper development configuration
-- **Result**: `get_secured_database()` works reliably, enabling all downstream components
+- **Result**: `get_database()` works reliably, enabling all downstream components
 
 ### ✅ **Testing Infrastructure Bridge**
 - **Fixed**: Test suite couldn't run due to missing database connections
@@ -67,7 +67,7 @@ Listen for what calls to you. The infrastructure will now support whatever cathe
 ## Critical Infrastructure Notes
 
 ### Database Access
-- ✅ **Use `get_secured_database()`** - Fully operational with security enforcement
+- ✅ **Use `get_database()`** - Fully operational with security enforcement
 - ✅ **ArangoDB container**: Running on localhost:8529 with Mallku database created
 - ✅ **Configuration**: `config/mallku_db_config.ini` for development, production config preserved
 

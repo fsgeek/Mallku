@@ -35,7 +35,7 @@ When `MALLKU_SKIP_DATABASE=true` is set:
    - Checks if running allowed scripts (`fire_circle_review.py`, `test_fire_circle`)
    - Issues warnings if used outside these contexts
 
-2. **Core Database Layer**: The `get_secured_database()` function returns a mock interface instead of connecting to ArangoDB
+2. **Core Database Layer**: The `get_database()` function returns a mock interface instead of connecting to ArangoDB
 
 3. **Memory Services**: EpisodicMemoryService uses MockMemoryStore for in-memory storage
 

@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ...core.database import get_secured_database
+from ...core.database import get_database
 from ...correlation.engine import CorrelationEngine
 from ...governance.protocol.participants import Participant
 from ...orchestration.event_bus import (
@@ -83,7 +83,7 @@ class ConsciousDialogueManager:
 
         self._skip_database = os.getenv("MALLKU_SKIP_DATABASE", "").lower() == "true"
         if not self._skip_database:
-            self.db = get_secured_database()
+            self.db = get_database()
         else:
             self.db = None
             logger.info("ConsciousDialogueManager: Database skipped (MALLKU_SKIP_DATABASE=true)")

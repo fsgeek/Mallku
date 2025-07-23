@@ -21,7 +21,7 @@ _api_client: SecureAPIClient | None = None
 _db_proxy: SecureDatabaseProxy | None = None
 
 
-async def get_secured_database() -> SecureDatabaseProxy:
+async def get_database() -> SecureDatabaseProxy:
     """
     Get secure database proxy that routes all operations through API gateway.
 

@@ -16,7 +16,7 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.reciprocity import InteractionRecord, ReciprocityTracker
 
 
@@ -77,7 +77,7 @@ class TestCathedralExample:
 
         # === Step 4: Demonstrate security effectiveness ===
         # Show that data is actually obfuscated in storage but accessible through proper channels
-        secured_db = get_secured_database()
+        secured_db = get_database()
 
         # This would fail if we tried to access raw database:
         # raw_db = get_database()  # This is monitored and discouraged
@@ -116,7 +116,7 @@ class TestCathedralExample:
 
         # === Principle 1: Security by design ===
         # You literally cannot bypass the security model
-        secured_db = get_secured_database()
+        secured_db = get_database()
         await secured_db.initialize()
 
         # This demonstrates structural enforcement:

@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from ...core.database import get_secured_database
+from ...core.database import get_database
 from ...models.memory_anchor import MemoryAnchor
 from ...services.memory_anchor_service import MemoryAnchorService
 from ..protocol.conscious_message import ConsciousMessage
@@ -47,7 +47,7 @@ class ConsciousMemoryStore:
 
         if not self._skip_database:
             self.memory_service = memory_service or MemoryAnchorService()
-            self.db = get_secured_database()
+            self.db = get_database()
             # Ensure collection exists
             self._ensure_collection()
         else:

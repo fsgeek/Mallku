@@ -12,7 +12,7 @@ The Foundation Verification Suite ensures Mallku's core infrastructure remains s
 # Good: Test that security is architecturally enforced
 def test_direct_database_access_impossible():
     # Verify only secured interface exists
-    db = get_secured_database()
+    db = get_database()
     assert hasattr(db, 'enforce_security')
 
 # Bad: Test implementation details
@@ -34,7 +34,7 @@ def test_security_without_registry():
     SecurityRegistry._instances.clear()
 
     # Security should still work
-    db = get_secured_database()
+    db = get_database()
     assert db.is_secured()
 ```
 
@@ -126,13 +126,13 @@ The tests themselves follow Sacred Error Philosophy:
 # Clear error when foundation is broken
 def test_security_foundation():
     try:
-        db = get_secured_database()
+        db = get_database()
         assert db.is_secured()
     except AssertionError:
         raise AssertionError(
             "Security foundation compromised: "
             "Database access not properly secured. "
-            "Check that get_secured_database() enforces security."
+            "Check that get_database() enforces security."
         )
 ```
 

@@ -15,7 +15,7 @@ from unittest.mock import patch
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.core.security.registry import SecurityRegistry
 from mallku.core.security.secured_model import SecuredModel
 
@@ -41,7 +41,7 @@ class TestArchitecturalSecurity:
 
         with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
             # Only secured access should be available
-            db = get_secured_database()
+            db = get_database()
             assert hasattr(db, "_security_registry")
             assert hasattr(db, "register_collection_policy")
             # Verify it's a SecuredDatabaseInterface
@@ -170,7 +170,7 @@ class TestContainerizationSecurity:
 
         mock_db = Mock()
         with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-            db = get_secured_database()
+            db = get_database()
             assert db is not None
 
         # Should use internal hostnames, not public IPs
@@ -221,7 +221,7 @@ class TestAmnesiaSecurity:
         # Remove all configuration
         with patch.dict(os.environ, {}, clear=True):
             with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-                db = get_secured_database()
+                db = get_database()
 
                 # Should still be secured
                 assert hasattr(db, "_security_registry")

@@ -22,7 +22,7 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.correlation.engine import CorrelationEngine
 from mallku.correlation.models import ConsciousnessEventType, Event
 from mallku.query.models import QueryRequest
@@ -37,7 +37,7 @@ class TestEndToEndDatabaseSecurity:
     @pytest.fixture
     async def secured_database(self):
         """Initialize secured database interface."""
-        db = get_secured_database()
+        db = get_database()
         await db.initialize()
         yield db
 

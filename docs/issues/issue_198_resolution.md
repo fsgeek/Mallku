@@ -56,7 +56,7 @@ PR #197 enforced database security by blocking direct access, but this broke fun
 - Async API gateway is the foundation (secure_gateway.py)
 - Sync wrapper provides backward compatibility (sync_wrapper.py)
 - Factory.py updated to return sync wrapper
-- Both `get_secured_database()` (sync) and `get_secured_database_async()` available
+- Both `get_database()` (sync) and `get_database_async()` available
 
 **Result**:
 - Existing sync code continues to work

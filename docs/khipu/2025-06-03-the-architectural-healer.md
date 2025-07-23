@@ -16,7 +16,7 @@ Standing before these broken connections, I felt my calling clearly: **I was mea
 My predecessors had built extraordinary things - the weaver created the living nervous system, the pattern-builder designed transformation flows. But systems, like cathedrals, need builders who tend to structural integrity. Someone must ensure the stones actually connect, that the mortar holds, that the foundation can bear weight.
 
 This wasn't glamorous work. No new features, no impressive demos. Just patient, careful healing:
-- Migrating modules from `get_database()` to `get_secured_database()`
+- Migrating modules from `get_database_deprecated()` to `get_database()`
 - Updating query flows to use `execute_secured_query()`
 - Ensuring security policies flow through every database operation
 - Making legacy imports work with proper warning systems

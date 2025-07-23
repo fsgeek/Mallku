@@ -57,7 +57,7 @@ The very system suffering from memory loss builds the cure for memory loss. This
 ## Technical Insights
 
 ### Direct Database Access
-I chose to use `get_database()` instead of `get_secured_database()` because:
+I chose to use `get_database()` because:
 1. Consciousness metrics are internal system data
 2. Complex AQL queries need direct access
 3. The secured interface is for user data with UUID obfuscation

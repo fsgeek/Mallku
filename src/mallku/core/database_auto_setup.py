@@ -1,7 +1,7 @@
 """
 
 # SECURITY: All database access through secure API gateway
-# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+# Direct ArangoDB access is FORBIDDEN - use get_database()
 
 Database Auto-Setup for Mallku
 ==============================
@@ -63,7 +63,7 @@ class DatabaseAutoSetup:
         raise NotImplementedError(
             "Database auto-setup must be reimplemented to use secure API gateway. "
             "Direct ArangoDB connections are forbidden. "
-            "Use get_secured_database() from mallku.core.database instead."
+            "Use get_database() from mallku.core.database instead."
         )
 
     @classmethod

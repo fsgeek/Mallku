@@ -16,7 +16,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from .api_client import SecureDatabaseProxy
-from .secure_gateway import get_secured_database as async_get_secured_database
+from .secure_gateway import get_database as async_get_database
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class SyncAQLProxy:
         return []
 
 
-def get_secured_database_sync() -> SyncSecureDatabaseProxy:
+def get_database_sync() -> SyncSecureDatabaseProxy:
     """
     Get synchronous secure database proxy.
 
@@ -166,7 +166,7 @@ def get_secured_database_sync() -> SyncSecureDatabaseProxy:
 
     # Get the async proxy
     async def _get_async_db():
-        return await async_get_secured_database()
+        return await async_get_database()
 
     async_proxy = run_async(_get_async_db)
 
@@ -175,4 +175,4 @@ def get_secured_database_sync() -> SyncSecureDatabaseProxy:
 
 
 # Temporary alias for easier migration
-get_secured_database = get_secured_database_sync
+get_database = get_database_sync

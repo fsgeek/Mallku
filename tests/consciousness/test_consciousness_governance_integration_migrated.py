@@ -28,7 +28,7 @@ The Governance Weaver
 import asyncio
 import logging
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.governance.consciousness_transport import GovernanceParticipant
 from mallku.governance.fire_circle_bridge import (
     ConsciousFireCircleInterface,
@@ -58,7 +58,7 @@ async def simulate_governance_dialogue():
 
     # Initialize database
     # Database now auto-provisions through secured interface
-    secured_db = get_secured_database()
+    secured_db = get_database()
     await secured_db.initialize()
 
     # Create conscious Fire Circle interface
@@ -230,7 +230,7 @@ async def demonstrate_extraction_monitoring():
     await event_bus.start()
 
     # Database now auto-provisions through secured interface
-    secured_db = get_secured_database()
+    secured_db = get_database()
     await secured_db.initialize()
 
     fire_circle = ConsciousFireCircleInterface(secured_db, event_bus)

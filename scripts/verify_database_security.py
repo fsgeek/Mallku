@@ -33,14 +33,17 @@ class DatabaseSecurityVerifier:
         self.violations = []
         self.checked_files = 0
         self.secure_patterns = [
-            "get_secured_database",
+            "get_database",
             "api_url",
             "http://localhost:8080",
             "secure_api_gateway",
         ]
         self.violation_patterns = [
-            ("get_database()", "Direct database access bypasses security"),
-            ("from ...core.database import get_database", "Importing insecure database access"),
+            ("get_database_deprecated()", "Direct database access bypasses security"),
+            (
+                "from ...core.database.deprecated import get_database_deprecated",
+                "Importing insecure database access",
+            ),
             ("ArangoClient", "Direct ArangoDB client usage"),
             ("http://localhost:8529", "Direct ArangoDB port access"),
             ("arangodb://", "Direct ArangoDB connection string"),
@@ -73,12 +76,12 @@ class DatabaseSecurityVerifier:
                     if (
                         isinstance(node, ast.Call)
                         and isinstance(node.func, ast.Name)
-                        and node.func.id == "get_database"
+                        and node.func.id == "get_database_deprecated"
                     ):
                         violations.append(
                             (
                                 node.lineno,
-                                "get_database()",
+                                "get_database_deprecated()",
                                 "Function call bypasses security architecture",
                             )
                         )
@@ -137,7 +140,7 @@ class DatabaseSecurityVerifier:
             print("✅ No database security violations found!")
             print()
             print("🛡️  All database access appears to use secure patterns:")
-            print("   - get_secured_database()")
+            print("   - get_database()")
             print("   - API gateway (http://localhost:8080)")
             print("   - No direct ArangoDB connections")
         else:
@@ -167,11 +170,11 @@ class DatabaseSecurityVerifier:
         print("=" * 60)
         print()
         print("1. Replace direct database access:")
-        print("   ❌ from ...core.database import get_database")
-        print("   ❌ db = get_database()")
+        print("   ❌ from ...core.database.deprecated import get_database_deprecated")
+        print("   ❌ db = get_database_deprecated()")
         print()
-        print("   ✅ from ...core.database import get_secured_database")
-        print("   ✅ db = await get_secured_database()")
+        print("   ✅ from ...core.database import get_database")
+        print("   ✅ db = await get_database()")
         print()
         print("2. Use API gateway for all operations:")
         print("   ❌ ArangoClient(hosts='http://localhost:8529')")
@@ -242,7 +245,7 @@ class DatabaseSecurityVerifier:
 
         print("### Required Actions")
         print()
-        print("1. Replace all `get_database()` calls with `get_secured_database()`")
+        print("1. Replace all `get_database_deprecated()` calls with `get_database()`")
         print("2. Remove all direct ArangoDB client instantiations")
         print("3. Update all database operations to use the secure API gateway")
         print("4. Add this script to pre-commit hooks to prevent future violations")

@@ -107,10 +107,10 @@ class FoundationVerifier:
         """Verify database can only be accessed through secured interface."""
         try:
             # This should be the only way
-            from mallku.core.database import get_secured_database
+            from mallku.core.database import get_database
             from mallku.core.database.secured_interface import SecuredDatabaseInterface
 
-            db = get_secured_database()
+            db = get_database()
             # Check for actual attributes of SecuredDatabaseInterface
             return (
                 isinstance(db, SecuredDatabaseInterface)

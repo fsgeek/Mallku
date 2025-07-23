@@ -21,7 +21,7 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.core.database.secured_interface import (
     CollectionSecurityPolicy,
     SecuredCollectionWrapper,
@@ -48,7 +48,7 @@ class TestSecurityPolicyEnforcement:
     @pytest.fixture
     async def secured_db(self):
         """Initialize secured database with test collections."""
-        db = get_secured_database()
+        db = get_database()
         await db.initialize()
 
         # Register test collection policies

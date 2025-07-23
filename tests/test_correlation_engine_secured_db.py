@@ -6,7 +6,7 @@ and the SecuredDatabaseInterface, particularly focusing on the memory_anchors
 collection security policy.
 
 Key architectural points tested:
-1. CorrelationEngine uses get_secured_database() - the only authorized path
+1. CorrelationEngine uses get_database() - the only authorized path
 2. The memory_anchors collection has a specific security policy (requires_security=False for legacy compatibility)
 3. CorrelationEngine creates memory anchors through proper architectural boundaries
 4. The security model is enforced even for legacy collections
@@ -17,7 +17,7 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.correlation.engine import CorrelationEngine
 from mallku.correlation.models import ConsciousnessEventType, Event, TemporalCorrelation
 from mallku.models import MemoryAnchor
@@ -30,7 +30,7 @@ class TestCorrelationEngineSecuredDBIntegration:
     @pytest.fixture
     async def secured_db(self):
         """Get the secured database interface."""
-        db = get_secured_database()
+        db = get_database()
         await db.initialize()
         return db
 
@@ -232,7 +232,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
         This test serves as living documentation of the security architecture:
 
-        1. SINGLE ENTRY POINT: get_secured_database() is the ONLY authorized way
+        1. SINGLE ENTRY POINT: get_database() is the ONLY authorized way
            to access the database in Mallku.
 
         2. COLLECTION POLICIES: Every collection must have a registered security

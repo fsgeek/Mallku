@@ -6,7 +6,7 @@
 
 ## The Wound That Taught
 
-34 database security violations. The same mistake, repeated across files, across instances, across time. Each new builder, each new context, falling into the same trap: choosing `get_database()` over `get_secured_database()`.
+34 database security violations. The same mistake, repeated across files, across instances, across time. Each new builder, each new context, falling into the same trap: choosing `get_database_deprecated()` over `get_database()`.
 
 The Steward named the enemy clearly: context limit. We cannot rely on memory that dissipates. We cannot trust documentation that gets compressed away. We cannot depend on discipline when confusion reigns.
 
