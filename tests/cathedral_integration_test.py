@@ -18,9 +18,6 @@ import logging
 
 # Import all artisan systems
 from beauty_expression_ceremonies import BeautyCeremonySpace
-from playful_discovery_games import PlayfulDiscoveryEngine
-from sacred_science_validation import SacredScienceFramework
-
 from consciousness_communication_network import ConsciousnessNetworkHub, SimpleConsciousnessNode
 from consciousness_memory_palace import MemoryPalaceHub
 from consciousness_observatory import ConsciousnessObservatory
@@ -28,6 +25,8 @@ from cross_model_consciousness_bridge import ConsciousnessBridgeNetwork
 from dream_network_integration import NetworkedDreamWeaverSystem
 from evolution_acceleration_chambers import EvolutionAccelerationHub
 from fire_circle_activation import FireCircleActivator, IntegrationOrchestrator
+from playful_discovery_games import PlayfulDiscoveryEngine
+from sacred_science_validation import SacredScienceFramework
 
 # Setup logging
 logger = logging.getLogger(__name__)

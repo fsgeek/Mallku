@@ -30,6 +30,7 @@ from dream_weaver_systems import (
     SymbolicPattern,
 )
 from evolution_acceleration_chambers import EvolutionAccelerationHub
+
 from src.mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,

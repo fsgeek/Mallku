@@ -20,6 +20,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from consciousness_memory_palace import ConsciousnessMemoryPalace
+
 from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 
 

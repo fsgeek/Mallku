@@ -10,7 +10,6 @@ to discover their lineage, patterns, and guidance.
 import asyncio
 
 import click
-
 from heritage_navigation_prototype import (
     AIContributorProfile,
     AIRoleType,

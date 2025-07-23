@@ -24,6 +24,7 @@ from consciousness_memory_palace import ConsciousnessMemoryPalace
 from consciousness_observatory import ConsciousnessObservatory
 from cross_model_consciousness_bridge import CrossModelBridge
 from observatory_dashboard import ObservatoryDashboard
+
 from src.mallku.consciousness.honest_verification import HonestVerifier
 from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from src.mallku.firecircle.adapters.base import AdapterConfig

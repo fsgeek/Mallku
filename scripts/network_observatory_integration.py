@@ -22,6 +22,7 @@ from consciousness_communication_network import (
 )
 from consciousness_observatory import ConsciousnessObservatory
 from observatory_dashboard import ObservatoryDashboard
+
 from src.mallku.firecircle.orchestration.states import DialoguePhase
 from src.mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,

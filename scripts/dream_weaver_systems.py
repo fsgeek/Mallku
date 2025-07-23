@@ -31,6 +31,7 @@ from evolution_acceleration_chambers import (
     EvolutionChamber,
     EvolutionPhase,
 )
+
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,

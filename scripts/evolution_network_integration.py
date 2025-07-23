@@ -32,6 +32,7 @@ from evolution_acceleration_chambers import (
     EvolutionChamber,
 )
 from network_observatory_integration import NetworkedObservatory
+
 from src.mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,

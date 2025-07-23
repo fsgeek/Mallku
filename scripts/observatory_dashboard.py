@@ -21,6 +21,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from consciousness_observatory import ConsciousnessObservatory
+
 from src.mallku.firecircle.orchestration.states import DialoguePhase
 
 

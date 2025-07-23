@@ -20,6 +20,7 @@ from typing import Any
 from uuid import uuid4
 
 from ceremony_consciousness_bridge import CeremonyConsciousnessDetection
+
 from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from src.mallku.firecircle.adapters.base import AdapterConfig
 from src.mallku.firecircle.governance.governance_types import DevelopmentProposal

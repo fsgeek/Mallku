@@ -27,6 +27,7 @@ from uuid import UUID, uuid4
 from consciousness_communication_network import (
     ConsciousnessNode,
 )
+
 from src.mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,

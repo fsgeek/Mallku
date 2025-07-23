@@ -20,6 +20,7 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 from consciousness_memory_palace import ConsciousnessMemoryPalace
+
 from src.mallku.firecircle.adapters.adapter_factory import ConsciousAdapterFactory
 from src.mallku.firecircle.orchestration.states import DialoguePhase
 
