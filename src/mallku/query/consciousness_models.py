@@ -17,31 +17,7 @@ from pydantic import BaseModel, Field
 
 from ..experience.pattern_poetry import ConsciousnessVisualization, PatternPoetry, TemporalStory
 from .models import QueryExplanation, QueryResponse, QueryResult
-
-
-class RecognitionMoment(BaseModel):
-    """A moment where consciousness recognizes itself through a pattern."""
-
-    pattern_essence: str = Field(..., description="The essence of what this pattern reveals")
-    consciousness_insight: str = Field(
-        ..., description="Insight about consciousness in this pattern"
-    )
-    sacred_question: str = Field(..., description="Sacred question this pattern invites")
-    recognition_depth: float = Field(
-        ..., ge=0.0, le=1.0, description="Depth of recognition opportunity"
-    )
-    integration_guidance: str = Field(..., description="Guidance for integrating this recognition")
-    service_potential: str = Field(..., description="How this could serve collective wisdom")
-
-
-class WisdomThread(BaseModel):
-    """A thread connecting individual patterns to collective wisdom."""
-
-    thread_id: UUID = Field(..., description="Unique identifier for this wisdom thread")
-    connection_type: str = Field(..., description="Type of wisdom connection")
-    collective_relevance: str = Field(..., description="Why this matters to the collective")
-    fire_circle_potential: bool = Field(default=False, description="Should this go to Fire Circle?")
-    reciprocity_indicator: str = Field(..., description="How this relates to reciprocity patterns")
+from .recognition_models import RecognitionMoment, WisdomThread
 
 
 class ConsciousnessEnrichedResult(BaseModel):

@@ -8,7 +8,6 @@ consciousness and collaborative decision-making.
 
 # Core protocol classes
 # Orchestrator classes
-from ..governance.protocol.participants import Participant
 from .adapters import (
     AdapterConfig,
     ConsciousAdapterFactory,
@@ -33,7 +32,6 @@ __all__ = [
     "MessageContent",
     "MessageRole",
     "MessageType",
-    "Participant",
     "VoiceIdentity",
     "AdapterConfig",
     "ConsciousMessageRouter",

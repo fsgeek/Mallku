@@ -1,3 +1,5 @@
+"""Integration - Core classes"""
+
 from .correlation_adapter import CorrelationToAnchorAdapter
 from .integration_service import EndToEndIntegrationService
 from .pipeline_models import (
@@ -9,11 +11,11 @@ from .pipeline_models import (
 )
 
 __all__ = [
+    "CorrelationToAnchorAdapter",
     "EndToEndIntegrationService",
     "PipelineConfiguration",
     "PipelineEvent",
     "PipelineStage",
-    "PipelineStatus",
     "PipelineStatistics",
-    "CorrelationToAnchorAdapter",
+    "PipelineStatus",
 ]

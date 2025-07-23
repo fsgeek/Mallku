@@ -12,7 +12,7 @@ This is less elegant than a wrapper but it works. Sometimes reality
 requires pragmatism over purity.
 """
 
-from ...governance.protocol.message import MessageType
+from ...core.protocol_types import MessageType
 
 
 def patch_message_type():

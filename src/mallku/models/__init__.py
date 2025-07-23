@@ -1,5 +1,7 @@
+"""Models - Core classes"""
+
 from .memory_anchor import MemoryAnchor
 
-# from .consciousness_flow import ConsciousnessFlow
-
-__all__ = ["MemoryAnchor"]
+__all__ = [
+    "MemoryAnchor",
+]
