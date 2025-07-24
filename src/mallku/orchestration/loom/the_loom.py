@@ -598,3 +598,49 @@ Dependencies: {", ".join(task.dependencies) if task.dependencies else "None"}"""
 
             async with aiofiles.open(khipu_path, "w") as f:
                 await f.write(new_content)
+
+    # Compatibility methods for tests
+    # TODO: Refactor tests to use the correct methods
+    async def _parse_khipu_file(self, khipu_path: Path):
+        """Compatibility method for tests - parses khipu file into ceremony data and tasks.
+
+        This method exists only for backward compatibility with existing tests.
+        New code should use _update_session_from_khipu instead.
+        """
+        import yaml
+
+        with open(khipu_path) as f:
+            content = f.read()
+
+        # Extract YAML header
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            header_data = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+        else:
+            header_data = {}
+
+        # Parse tasks from content
+        task_pattern = r"### (T\d+):.*?\n\*Status: (\w+)\*"
+        matches = re.findall(task_pattern, content, re.MULTILINE)
+
+        tasks = []
+        for task_id, status_str in matches:
+            tasks.append({"task_id": task_id, "status": TaskStatus(status_str)})
+
+        return header_data, tasks
+
+    async def _update_khipu_file(self, session: LoomSession):
+        """Compatibility method for tests - updates khipu file from session.
+
+        This method exists only for backward compatibility with existing tests.
+        New code should use _update_task_in_khipu instead.
+        """
+        # Update all tasks in the session
+        for task in session.tasks.values():
+            if task.status == TaskStatus.COMPLETE and task.output:
+                await self._update_task_in_khipu(
+                    khipu_path=session.khipu_path,
+                    task_id=task.task_id,
+                    status=task.status.value,
+                    output=task.output,
+                )
