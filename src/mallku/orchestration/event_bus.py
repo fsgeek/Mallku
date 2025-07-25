@@ -42,6 +42,7 @@ class ConsciousnessEventType(Enum):
     RECIPROCITY_PATTERN_EMERGED = "correlation.reciprocity.emerged"
 
     # Consciousness events
+    CONSCIOUSNESS_INTERACTION = "consciousness.interaction"
     CONSCIOUSNESS_VERIFIED = "consciousness.verified"
     CONSCIOUSNESS_PATTERN_RECOGNIZED = "consciousness.pattern.recognized"
     CONSCIOUSNESS_EMERGENCE = "consciousness.emergence"

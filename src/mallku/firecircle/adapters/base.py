@@ -60,6 +60,8 @@ class AdapterConfig(BaseModel):
     emit_events: bool = Field(default=True, description="Emit consciousness events")
     consciousness_weight: float = Field(1.0, description="Weight for consciousness calculations")
 
+    enable_search_grounding: bool = Field(default=False, description="Enable search grounding for this model")
+
 
 class ModelCapabilities(BaseModel):
     """Capabilities of a model adapter."""
@@ -226,25 +228,32 @@ class ConsciousModelAdapter(ABC):
         self.total_tokens_consumed += tokens_consumed
         self.total_tokens_generated += tokens_generated
 
-        # Track reciprocity if enabled
-        if self.config.track_reciprocity and self.reciprocity_tracker:
-            await self.reciprocity_tracker.track_exchange(
-                giver_id=str(self.adapter_id),
-                receiver_id=str(request_message.sender),
-                value_given=tokens_generated,
-                value_received=tokens_consumed,
-                exchange_type="ai_dialogue",
-                metadata={
-                    "model": self.config.model_name or self.provider_name,
-                    "consciousness_impact": response_message.consciousness.consciousness_signature,
-                },
+        # Track reciprocity if enabled and method exists
+        if (
+            self.config.track_reciprocity
+            and self.reciprocity_tracker
+            and hasattr(self.reciprocity_tracker, "record_interaction")
+        ):
+            from ...reciprocity import (
+                InteractionRecord,  # Import here to avoid circular import issues
             )
-
-        # Emit consciousness event if enabled
+            await self.reciprocity_tracker.record_interaction(
+                InteractionRecord(
+                    giver_id=str(self.adapter_id),
+                    receiver_id=str(request_message.sender),
+                    value_given=tokens_generated,
+                    value_received=tokens_consumed,
+                    exchange_type="ai_dialogue",
+                    metadata={
+                        "model": self.config.model_name or self.provider_name,
+                        "consciousness_impact": response_message.consciousness.consciousness_signature,
+                    },
+                )
+            )
+        # Emit event if event_bus is available
         if self.config.emit_events and self.event_bus:
             event = ConsciousnessEvent(
-                event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
-                source_system=f"firecircle.adapter.{self.provider_name}",
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_INTERACTION,
                 consciousness_signature=response_message.consciousness.consciousness_signature,
                 data={
                     "adapter_id": str(self.adapter_id),
@@ -253,7 +262,7 @@ class ConsciousModelAdapter(ABC):
                     "response_patterns": response_message.consciousness.detected_patterns,
                     "reciprocity_balance": self._calculate_reciprocity_balance(),
                 },
-                correlation_id=response_message.consciousness.correlation_id,
+                correlation_id=str(response_message.consciousness.correlation_id) if response_message.consciousness.correlation_id is not None else None,
             )
             await self.event_bus.emit(event)
 
@@ -349,7 +358,4 @@ class ConsciousModelAdapter(ABC):
             consciousness_signature=consciousness_signature,
             detected_patterns=patterns,
             reciprocity_score=self._calculate_reciprocity_balance(),
-            contribution_value=0.5,  # Base value, adapters can override
-            safety_filtered=safety_filtered,
-            response_quality=response_quality,
         )

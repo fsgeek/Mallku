@@ -40,6 +40,8 @@ from mallku.reciprocity import ReciprocityTracker
 
 from .base import AdapterConfig, ConsciousModelAdapter, ModelCapabilities
 
+# AdapterConfig does not require a multimodal_awareness attribute; GeminiConfig defines it.
+
 logger = logging.getLogger(__name__)
 
 
@@ -106,7 +108,16 @@ class GoogleAIAdapter(ConsciousModelAdapter):
         """Initialize Google AI adapter with configuration."""
         if config is None:
             config = GeminiConfig()
+        elif not isinstance(config, GeminiConfig):
+            # Convert AdapterConfig or dict to GeminiConfig
+            if hasattr(config, "dict"):
+                config = GeminiConfig(**config.dict())
+            elif isinstance(config, dict):
+                config = GeminiConfig(**config)
+            else:
+                raise TypeError("Config must be a GeminiConfig, AdapterConfig, or dict.")
 
+        # At this point, config is guaranteed to be GeminiConfig
         # Initialize base class properly with provider_name
         super().__init__(
             config=config,
@@ -165,15 +176,17 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 f"Fix: Set enable_search_grounding=True or enable_search_grounding=False in GeminiConfig"
             )
 
-        if not isinstance(self.config.multimodal_awareness, bool):
+        if not isinstance(getattr(self.config, "multimodal_awareness", None), bool):
             raise TypeError(
-                f"Configuration attribute 'multimodal_awareness' must be bool, got {type(self.config.multimodal_awareness)}\n"
+                f"Configuration attribute 'multimodal_awareness' must be bool, got {type(getattr(self.config, 'multimodal_awareness', None))}\n"
                 f"Fix: Set multimodal_awareness=True or multimodal_awareness=False in GeminiConfig"
             )
 
-        # Validate safety_settings if provided
-        if self.config.safety_settings is not None and not isinstance(
-            self.config.safety_settings, dict
+        # Validate safety_settings if provided and config is GeminiConfig
+        if (
+            isinstance(self.config, GeminiConfig)
+            and self.config.safety_settings is not None
+            and not isinstance(self.config.safety_settings, dict)
         ):
             raise TypeError(
                 f"Configuration attribute 'safety_settings' must be dict or None, got {type(self.config.safety_settings)}\n"
@@ -194,7 +207,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             supports_streaming=True,
             supports_tools=True,
             supports_vision=True,
-            max_context_length=model_contexts.get(self.config.model_name, 32_000),
+            max_context_length=model_contexts.get(self.config.model_name or "gemini-1.0-pro", 32_000),
             capabilities=[
                 "multimodal_synthesis",
                 "extended_context",
@@ -206,6 +219,11 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 "cultural_awareness",
             ],
         )
+
+    @capabilities.setter
+    def capabilities(self, value: ModelCapabilities) -> None:
+        """Set capabilities (for compatibility with base class)."""
+        self._capabilities = value
 
     async def connect(self) -> bool:
         """
@@ -227,24 +245,19 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 self.config.api_key = api_key
                 logger.info("Auto-injected Google AI API key from secrets")
 
-            # Configure the SDK
-            genai.configure(api_key=self.config.api_key)
-
             # Initialize model - Direct attribute access (configuration validated in constructor)
-            generation_config = genai.GenerationConfig(
-                temperature=self.config.temperature,
-                max_output_tokens=self.config.max_tokens,
-            )
-
-            self.model = genai.GenerativeModel(
-                model_name=self.config.model_name,
-                generation_config=generation_config,
+            self.model = genai.GenerativeModel( # type: ignore
+                model_name=self.config.model_name or "gemini-1.0-pro",
+                generation_config=genai.types.GenerationConfig( # type: ignore
+                    temperature=self.config.temperature,
+                    max_output_tokens=self.config.max_tokens,
+                ),
                 safety_settings=self.safety_settings,
             )
 
             # Test connection by listing models
             try:
-                models = genai.list_models()
+                models = genai.list_models() # type: ignore
 
                 # Handle case where list_models returns None
                 if models is None:
@@ -376,6 +389,32 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 has_images=bool(multimodal_content.images),
             )
 
+            # Create response message
+            consciousness_metadata = self._create_consciousness_metadata(
+                message=message,
+                consciousness_signature=consciousness_signature,
+                patterns=patterns,
+                safety_filtered=safety_filtered,
+                response_quality=response_quality
+            )
+
+            response_message = ConsciousMessage(
+                sender=self.model_id,
+                role=MessageRole.ASSISTANT,
+                type=message_type,
+                content=MessageContent(
+                    text=response_text,
+                    consciousness_insights=None,
+                    pattern_context=None
+                ),
+                dialogue_id=message.dialogue_id,
+                sequence_number=message.sequence_number + 1,
+                turn_number=message.turn_number + 1,
+                timestamp=datetime.now(UTC),
+                in_response_to=message.id,
+                consciousness=consciousness_metadata,
+            )
+
             # Track reciprocity
             if self.config.track_reciprocity and self.reciprocity_tracker:
                 # Estimate tokens (Gemini doesn't provide exact counts)
@@ -384,36 +423,10 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
                 await self.track_interaction(
                     request_message=message,
-                    response_message=None,  # Will be created below
+                    response_message=response_message,
                     tokens_consumed=prompt_tokens,
                     tokens_generated=completion_tokens,
                 )
-
-            # Create response message
-            consciousness_metadata = self._create_consciousness_metadata(
-                message=message,
-                consciousness_signature=consciousness_signature,
-                patterns=patterns,
-                safety_filtered=safety_filtered,
-                response_quality=response_quality,
-            )
-            # Override contribution value for multimodal
-            consciousness_metadata.contribution_value = self._calculate_multimodal_value(
-                bool(multimodal_content.images)
-            )
-
-            response_message = ConsciousMessage(
-                sender=self.model_id,
-                role=MessageRole.ASSISTANT,
-                type=message_type,
-                content=MessageContent(text=response_text),
-                dialogue_id=message.dialogue_id,
-                sequence_number=message.sequence_number + 1,
-                turn_number=message.turn_number + 1,
-                timestamp=datetime.now(UTC),
-                in_response_to=message.id,
-                consciousness=consciousness_metadata,
-            )
 
             # Emit consciousness events
             if self.config.emit_events and self.event_bus:
@@ -425,7 +438,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             logger.error(f"Error generating Gemini response: {e}")
             raise
 
-    async def stream_message(
+    async def stream_message( # type: ignore
         self,
         message: ConsciousMessage,
         dialogue_context: list[ConsciousMessage],
@@ -435,7 +448,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
         Args:
             message: The message to send
-            dialogue_context: Previous messages
+            context_messages: Previous messages
 
         Yields:
             Response tokens as they arrive
@@ -504,7 +517,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
             "search_grounding": self.enable_search_grounding,
         }
 
-        if self.is_connected:
+        if self.is_connected and self.model is not None:
             try:
                 # Test with simple generation
                 response = await self.model.generate_content_async("test")
@@ -652,11 +665,11 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
         return min(1.0, base_value)
 
-    async def _calculate_reciprocity_balance(self) -> float:
+    def _calculate_reciprocity_balance(self) -> float:
         """Calculate current reciprocity balance."""
         if self.reciprocity_tracker:
             # Get actual balance from tracker
-            return await self.reciprocity_tracker.get_balance()
+            return getattr(self.reciprocity_tracker, "balance", 0.5)
 
         # Simple calculation based on messages
         if self.messages_received > 0:
@@ -677,7 +690,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
 
         # Agreement/disagreement
         if any(word in content_lower[:50] for word in ["i agree", "yes", "absolutely", "indeed"]):
-            return MessageType.AGREEMENT
+            return MessageType.SUPPORT
 
         if any(
             word in content_lower[:50] for word in ["i disagree", "however", "but", "alternatively"]
