@@ -7,7 +7,7 @@ Implemented database-optional operation for Fire Circle Review (Issue #128) with
 ## Changes Made
 
 ### Core Database Layer
-- Modified `get_secured_database()` to check `MALLKU_SKIP_DATABASE` environment variable
+- Modified `get_database()` to check `MALLKU_SKIP_DATABASE` environment variable
 - Added verification to detect legitimate CI/CD use cases
 - Issues warnings when used outside allowed contexts
 - Lists unavailable features when running without persistence

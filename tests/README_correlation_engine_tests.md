@@ -8,7 +8,7 @@ This directory contains tests that demonstrate the architectural boundaries betw
 Full integration test requiring a real database connection. Tests the complete flow from correlation detection to memory anchor storage through the secured database interface.
 
 **Key Points Tested:**
-- CorrelationEngine uses `get_secured_database()` - the only authorized database access path
+- CorrelationEngine uses `get_database()` - the only authorized database access path
 - Memory anchors are created through the secured interface
 - Query service respects secured database boundaries
 - Security metrics are properly tracked
@@ -36,7 +36,7 @@ Focused architectural test that documents and verifies the design decisions with
 
 The SecuredDatabaseInterface enforces security by design:
 
-1. **Single Entry Point**: `get_secured_database()` is the ONLY authorized way to access the database
+1. **Single Entry Point**: `get_database()` is the ONLY authorized way to access the database
 2. **Collection Policies**: Every collection must have a registered security policy
 3. **Secured Models**: Most collections require data to be wrapped in SecuredModel instances
 4. **Audit Trail**: All operations are tracked for security monitoring
@@ -62,7 +62,7 @@ This is intentional - memory_anchors predates the security layer and uses the le
 CorrelationEngine.process_event_stream()
     ↓ (detects patterns)
 CorrelationEngine._create_memory_anchor()
-    ↓ (calls get_secured_database())
+    ↓ (calls get_database())
 SecuredDatabaseInterface.get_secured_collection("memory_anchors")
     ↓ (returns wrapper with legacy policy)
 collection.insert(anchor_document)
@@ -74,7 +74,7 @@ Database Storage
 
 ```
 MemoryAnchorQueryService.execute_query()
-    ↓ (uses get_secured_database())
+    ↓ (uses get_database())
 SecuredDatabaseInterface.execute_secured_query()
     ↓ (enforces collection boundaries)
 Results with proper access control

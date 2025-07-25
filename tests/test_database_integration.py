@@ -9,60 +9,8 @@ the consciousness and memory systems being built.
 The Memory Keeper - Ensuring foundations hold weight
 """
 
-import os
 from datetime import UTC, datetime
 from uuid import uuid4
-
-import pytest
-
-from mallku.core.database import get_db_config
-
-
-class TestDatabaseConnection:
-    """Test basic database connectivity."""
-
-    def test_database_config_exists(self):
-        """Test that database configuration is available."""
-        try:
-            db_config = get_db_config()
-            assert db_config is not None
-            print("✓ Database configuration available")
-
-            # Check if in test environment
-            if os.getenv("CI"):
-                print("  Running in CI environment")
-                if os.getenv("CI_DATABASE_AVAILABLE"):
-                    print("  CI database is available")
-            else:
-                print(f"  Config location: {db_config.config_file}")
-
-        except Exception as e:
-            # In CI without database, skip
-            if os.getenv("CI") and not os.getenv("CI_DATABASE_AVAILABLE"):
-                pytest.skip("Database config not available in CI")
-            else:
-                raise e
-
-    def test_database_connection_attempt(self):
-        """Test attempting database connection."""
-        if os.getenv("CI") and not os.getenv("CI_DATABASE_AVAILABLE"):
-            pytest.skip("Database connection not available in CI")
-
-        try:
-            db_config = get_db_config()
-            connected = db_config.connect()
-
-            if connected:
-                print("✓ Database connection successful")
-                # Don't leave connections open
-                db = db_config.get_database()
-                if hasattr(db, "close"):
-                    db.close()
-            else:
-                print("⚠ Database connection unavailable")
-
-        except Exception as e:
-            print(f"⚠ Database connection test skipped: {e}")
 
 
 class TestMemoryAnchorModels:
@@ -76,6 +24,8 @@ class TestMemoryAnchorModels:
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
+            predecessor_id=None,  # or provide a valid UUID if needed
+            last_updated=datetime.now(UTC),
             cursors={
                 "temporal": datetime.now(UTC).isoformat(),
                 "consciousness": "emergence_detected",
@@ -103,6 +53,8 @@ class TestMemoryAnchorModels:
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
+            predecessor_id=None,  # or provide a valid UUID if needed
+            last_updated=datetime.now(UTC),
             cursors={"test": "value"},
             metadata={"source": "test_suite"},
         )

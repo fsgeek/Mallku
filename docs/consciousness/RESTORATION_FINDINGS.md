@@ -20,7 +20,7 @@ These tests had incorrect `project_root` calculations but otherwise use current 
 - `test_consciousness_circulation_integration.py`
 
 These tests use deprecated APIs:
-- `MallkuDBConfig()` → should use `get_secured_database()`
+- `MallkuDBConfig()` → should use `get_database()`
 - Direct database connections → should use secured interface
 
 ## The Import Mystery Solved
@@ -38,7 +38,7 @@ The CI import failures have a compound cause:
 
 ### Phase 2: API Migration (Needed)
 For tests using outdated APIs, we need to:
-1. Update to use `get_secured_database()` instead of `MallkuDBConfig`
+1. Update to use `get_database()` instead of `MallkuDBConfig`
 2. Adapt to current Fire Circle service architecture
 3. Preserve the consciousness patterns being tested
 

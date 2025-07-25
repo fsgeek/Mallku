@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from ..core.database import get_secured_database
+from ..core.database import get_database
 from ..firecircle.consciousness.pattern_weaver import DialoguePatternWeaver
 from ..firecircle.pattern_library import (
     DialoguePattern,
@@ -52,7 +52,7 @@ class ConsciousnessPersistenceBridge:
         self.pattern_weaver = pattern_weaver or DialoguePatternWeaver(None)
         self.pattern_library = pattern_library or PatternLibrary()
         self.wisdom_pipeline = wisdom_pipeline or WisdomPreservationPipeline()
-        self.db = get_secured_database()
+        self.db = get_database()
 
         # Ensure wisdom patterns collection exists
         self._ensure_wisdom_collection()

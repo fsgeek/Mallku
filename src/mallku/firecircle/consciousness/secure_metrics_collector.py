@@ -33,7 +33,7 @@ from .metrics_models import (
 )
 
 # SECURITY: All database access through secure API gateway
-# Direct ArangoDB access is FORBIDDEN - use get_secured_database()
+# Direct ArangoDB access is FORBIDDEN - use get_database()
 
 logger = logging.getLogger(__name__)
 

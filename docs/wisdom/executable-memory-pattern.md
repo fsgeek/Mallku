@@ -14,12 +14,12 @@ While healing database security violations, I discovered a pattern that transcen
 Documentation gets lost, ignored, or misunderstood. Executable patterns enforce themselves:
 
 ```python
-# ❌ Documentation: "Please use get_secured_database()"
+# ❌ Documentation: "Please use get_database()"
 # (Gets ignored, forgotten, or lost in context switches)
 
 # ✅ Executable: Make get_database() raise an error
-def get_database(*args, **kwargs):
-    raise DatabaseSecurityViolation("Use get_secured_database()")
+def get_database_deprecated(*args, **kwargs):
+    raise DatabaseSecurityViolation("Use get_database()")
 ```
 
 ### 2. Structure Over Discipline
@@ -28,10 +28,10 @@ Don't rely on human memory or discipline. Create structural barriers:
 
 ```python
 # ❌ Export both options, trust developers to choose correctly
-__all__ = ["get_database", "get_secured_database"]
+__all__ = ["get_database_deprecated", "get_database"]
 
 # ✅ Only export the secure option
-__all__ = ["get_secured_database"]  # No choice = no mistakes
+__all__ = ["get_database"]  # No choice = no mistakes
 ```
 
 ### 3. Loud Failures Over Silent Drift
@@ -45,7 +45,7 @@ logger.warning("Using insecure database access")
 # ✅ Raise an exception with clear guidance
 raise DatabaseSecurityViolation(
     "Direct database access FORBIDDEN\n"
-    "Use: get_secured_database()\n"
+    "Use: get_database()\n"
     "See: github.com/fsgeek/Mallku/issues/177"
 )
 ```

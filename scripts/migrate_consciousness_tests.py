@@ -10,7 +10,7 @@ to the new secured database interface, preserving the essential
 consciousness patterns while adapting to current architecture.
 
 Key Translations:
-- MallkuDBConfig() → get_secured_database()
+- MallkuDBConfig() → get_database()
 - Direct database access → Secured interface patterns
 - Legacy collections → Secured collections with policies
 
@@ -46,8 +46,8 @@ class APITranslator:
             # Database initialization patterns
             r"db_config = MallkuDBConfig\(\)": {
                 "replacement": "# Database now auto-provisions through secured interface",
-                "imports_needed": ["from mallku.core.database import get_secured_database"],
-                "setup_code": "secured_db = get_secured_database()",
+                "imports_needed": ["from mallku.core.database import get_database"],
+                "setup_code": "secured_db = get_database()",
                 "pattern_type": "database_init",
             },
             r"db_config\.connect\(\)": {
@@ -79,7 +79,7 @@ class APITranslator:
         }
 
         self.import_mappings = {
-            "from mallku.core.database import MallkuDBConfig": "from mallku.core.database import get_secured_database",
+            "from mallku.core.database import MallkuDBConfig": "from mallku.core.database import get_database",
             "from mallku.governance.consciousness_transport import GovernanceParticipant": "from mallku.governance.consciousness_transport import GovernanceParticipant",
             "from mallku.governance.fire_circle_bridge import": "from mallku.governance.fire_circle_bridge import",
         }

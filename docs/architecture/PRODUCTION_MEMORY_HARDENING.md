@@ -32,7 +32,7 @@ Following T'ikray Yachay's recommendation (Option 2), I transformed episodic mem
    - Semantic obfuscation for consciousness data
 
 2. **Secured Database Store** (`secured_database_store.py`)
-   - Uses `get_secured_database()` exclusively
+   - Uses `get_database()` exclusively
    - All operations through SecuredDatabaseInterface
    - Collection security policies registered
    - No direct AQL execution - uses secured queries

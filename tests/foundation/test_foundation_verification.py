@@ -17,7 +17,7 @@ import pytest
 
 # Core components to verify
 from mallku.core.async_base import AsyncBase
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.core.secrets import SecretsManager
 from mallku.core.security.registry import SecurityRegistry
 from mallku.core.security.secured_model import SecuredModel
@@ -39,7 +39,7 @@ class TestSecurityFoundations:
         mock_db.is_secured = Mock(return_value=True)
 
         with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-            db = get_secured_database()
+            db = get_database()
             assert db is not None
             # SecuredDatabaseInterface has _security_registry instead of enforce_security
             assert hasattr(db, "_security_registry")
@@ -259,7 +259,7 @@ class TestReciprocityFoundations:
         from mallku.reciprocity.tracker import SecureReciprocityTracker
 
         # Mock database to avoid connection issues
-        with patch("mallku.reciprocity.tracker.get_secured_database"):
+        with patch("mallku.reciprocity.tracker.get_database"):
             tracker = SecureReciprocityTracker()
 
             # Should detect patterns, not make judgments
@@ -285,7 +285,7 @@ class TestFoundationIntegration:
     async def test_full_stack_initialization(self):
         """Test that all core components can initialize together."""
         # Initialize core infrastructure
-        db = get_secured_database()
+        db = get_database()
         secrets = SecretsManager()
 
         # Create async component

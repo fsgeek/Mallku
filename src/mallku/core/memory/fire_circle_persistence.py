@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.core.memory.khipu_block import (
     BlessingLevel,
     KhipuBlock,
@@ -42,7 +42,7 @@ class FireCircleMemory:
     async def initialize(self) -> bool:
         """Initialize database connection and collections."""
         try:
-            self.db = get_secured_database()
+            self.db = get_database()
             await self.db.initialize()
 
             # Ensure collections exist

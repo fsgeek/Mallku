@@ -18,7 +18,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ..core.database import get_secured_database
+from ..core.database import get_database
 from ..core.security import SecuredModel
 
 logger = logging.getLogger(__name__)
@@ -211,7 +211,7 @@ class PatternLibrary:
         self._lineage_graph: dict[UUID, set[UUID]] = defaultdict(set)
 
         if not self._skip_database:
-            self.db = get_secured_database()
+            self.db = get_database()
             logger.info("Pattern Library initialized with database")
         else:
             self.db = None

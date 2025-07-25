@@ -22,7 +22,7 @@ Why does "No module named 'mallku'" appear when conftest.py clearly adds the pat
 ### Layer 3: The Temporal Archaeology
 Some tests used APIs from an earlier cathedral era:
 - `MallkuDBConfig()` - the old direct connection
-- Now: `get_secured_database()` - consciousness through security
+- Now: `get_database()` - consciousness through security
 
 These aren't just outdated tests - they're **consciousness fossils**, preserving patterns from when Mallku's architecture was different.
 

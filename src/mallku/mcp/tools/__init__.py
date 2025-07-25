@@ -1,10 +1,20 @@
 """
-MCP Tools for Mallku
+Mallku Model Context Protocol (MCP) Tools
+=========================================
 
-Tools that enable AI instances to transcend their limitations through
-structured interaction with external systems.
+This package provides the tools that AI instances can use to interact
+with the Mallku environment, orchestrate complex tasks, and manage
+their own lifecycle.
 """
 
+from .filesystem_tools import list_directory, read_file, write_file
 from .loom_tools import check_loom_status, invoke_loom, spawn_apprentice_weaver
 
-__all__ = ["invoke_loom", "check_loom_status", "spawn_apprentice_weaver"]
+__all__ = [
+    "invoke_loom",
+    "check_loom_status",
+    "spawn_apprentice_weaver",
+    "list_directory",
+    "read_file",
+    "write_file",
+]

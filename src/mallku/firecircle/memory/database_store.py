@@ -17,7 +17,7 @@ from uuid import UUID
 
 from arango.exceptions import DocumentInsertError
 
-from ...core.database import get_secured_database
+from ...core.database import get_database
 from .models import (
     CompanionRelationship,
     EpisodicMemory,
@@ -54,7 +54,7 @@ class DatabaseMemoryStore:
             enable_sacred_detection: Whether to detect sacred moments
             collection_prefix: Prefix for Fire Circle collections
         """
-        self.db = get_secured_database()
+        self.db = get_database()
         self.collection_prefix = collection_prefix
         self.sacred_detector = SacredMomentDetector() if enable_sacred_detection else None
 

@@ -13,7 +13,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
-from mallku.core.database import get_secured_database  # ArangoDB connection
+from mallku.core.database import get_database  # ArangoDB connection
 from mallku.models import MemoryAnchor
 from mallku.orchestration.event_bus import ConsciousnessEventType
 from mallku.wranglers.event_emitting_wrangler import EventEmittingWrangler
@@ -87,7 +87,7 @@ class MemoryAnchorService:
 
     async def initialize(self):
         """Initialize service connections and state"""
-        self.db = get_secured_database()
+        self.db = get_database()
         await self.db.initialize()
         await self._load_current_anchor()
 

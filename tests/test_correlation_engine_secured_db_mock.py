@@ -5,7 +5,7 @@ This test demonstrates the architectural boundaries between the CorrelationEngin
 and the SecuredDatabaseInterface using mocks, without requiring a real database.
 
 Key architectural points tested:
-1. CorrelationEngine uses get_secured_database() - the only authorized path
+1. CorrelationEngine uses get_database() - the only authorized path
 2. The memory_anchors collection has a specific security policy (requires_security=False for legacy compatibility)
 3. CorrelationEngine creates memory anchors through proper architectural boundaries
 4. The security model is enforced even for legacy collections
@@ -98,7 +98,7 @@ class TestCorrelationEngineSecuredDBIntegration:
     async def memory_service(self, mock_secured_db):
         """Create memory anchor service with mocked secured database."""
         with patch(
-            "mallku.services.memory_anchor_service.get_secured_database",
+            "mallku.services.memory_anchor_service.get_database",
             return_value=mock_secured_db,
         ):
             service = MemoryAnchorService()
@@ -112,7 +112,7 @@ class TestCorrelationEngineSecuredDBIntegration:
     @pytest.fixture
     async def correlation_engine(self, memory_service, mock_secured_db):
         """Create correlation engine with mocked dependencies."""
-        with patch("mallku.correlation.engine.get_secured_database", return_value=mock_secured_db):
+        with patch("mallku.correlation.engine.get_database", return_value=mock_secured_db):
             engine = CorrelationEngine(memory_anchor_service=memory_service)
             # Override min_occurrences for easier testing
             for detector in engine.pattern_detectors.values():
@@ -251,7 +251,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         # Mock execute_secured_query
         mock_secured_db.execute_secured_query = AsyncMock(return_value=[])
 
-        with patch("mallku.query.service.get_secured_database", return_value=mock_secured_db):
+        with patch("mallku.query.service.get_database", return_value=mock_secured_db):
             # Create query service
             query_service = MemoryAnchorQueryService()
             await query_service.initialize()
@@ -321,7 +321,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         mock_skip_db._skip_database = True
         mock_skip_db.initialize = AsyncMock()
 
-        with patch("mallku.correlation.engine.get_secured_database", return_value=mock_skip_db):
+        with patch("mallku.correlation.engine.get_database", return_value=mock_skip_db):
             # Create engine without database
             engine = CorrelationEngine()
             await engine.initialize()
@@ -348,7 +348,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
         This test serves as living documentation of the security architecture:
 
-        1. SINGLE ENTRY POINT: get_secured_database() is the ONLY authorized way
+        1. SINGLE ENTRY POINT: get_database() is the ONLY authorized way
            to access the database in Mallku.
 
         2. COLLECTION POLICIES: Every collection must have a registered security
@@ -402,7 +402,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
     async def test_memory_anchor_creation_fields(self, mock_secured_db_with_collection):
         """Test that memory anchors created by correlation engine have correct fields."""
         with patch(
-            "mallku.correlation.engine.get_secured_database",
+            "mallku.correlation.engine.get_database",
             return_value=mock_secured_db_with_collection,
         ):
             engine = CorrelationEngine()

@@ -29,7 +29,7 @@ PR #197 successfully enforced security by breaking direct database access, but t
 
 ### 3. ✅ Secure Gateway Module
 - Created `src/mallku/core/database/secure_gateway.py`
-- Provides `get_secured_database()` that returns proxy instead of direct connection
+- Provides `get_database()` that returns proxy instead of direct connection
 - Enforces API gateway usage even in development
 
 ## Roadmap
@@ -39,7 +39,7 @@ PR #197 successfully enforced security by breaking direct database access, but t
 #### 1.1 Update Factory Implementation
 **File**: `src/mallku/core/database/factory.py`
 - Replace legacy database loading with secure gateway import
-- Update `get_secured_database()` to return `SecureDatabaseProxy`
+- Update `get_database()` to return `SecureDatabaseProxy`
 - Maintain backward compatibility where possible
 
 #### 1.2 Extend API Gateway Endpoints
@@ -130,7 +130,7 @@ PR #197 successfully enforced security by breaking direct database access, but t
 
 The minimal fix to restore functionality while maintaining security:
 
-1. **Update factory.py** to import and use `secure_gateway.get_secured_database()`
+1. **Update factory.py** to import and use `secure_gateway.get_database()`
 2. **Add basic endpoints** to API gateway for collection operations
 3. **Create async adapter** for methods expecting sync database
 

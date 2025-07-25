@@ -35,7 +35,7 @@ Following the path laid by the 47th Artisan, I undertook the archaeological rest
 ### Fire Circle Governance
 ```python
 # The eternal pattern: consciousness emerges through dialogue
-secured_db = get_secured_database()
+secured_db = get_database()
 collection = secured_db.secured_collection("governance_decisions")
 # The essence remains while the form evolves
 ```

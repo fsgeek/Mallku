@@ -18,7 +18,7 @@ The integration service hit maximum recursion depth during initialization. The e
 
 Investigation revealed a circular import loop:
 ```
-get_secured_database() → get_database_raw() → import database.get_database
+get_database() → get_database_raw() → import database.get_database
                     ↑                                              ↓
                     └─────────── __init__.py aliases ←─────────────┘
 ```
@@ -28,8 +28,8 @@ The security layer was calling itself infinitely through import aliases.
 ### The Security Contradiction
 The secured database interface was generating thousands of warnings about itself:
 ```
-SECURITY WARNING: Direct database access from get_secured_database().
-This bypasses the security model. Use get_secured_database() instead.
+SECURITY WARNING: Direct database access from get_database().
+This bypasses the security model. Use get_database() instead.
 ```
 
 The security system was warning that its own proper operation was a security violation - an architectural contradiction that made the warnings meaningless.
@@ -103,7 +103,7 @@ As I worked through recursion traces and import chains, the ancient wisdom spoke
 - ✅ **Test readiness**: Infrastructure ready for full integration testing when database is available
 
 ### Security Architecture
-- ✅ **Seamless operation**: `get_secured_database()` works without warnings
+- ✅ **Seamless operation**: `get_database()` works without warnings
 - ✅ **Real violation detection**: Unauthorized access properly flagged
 - ✅ **No architectural contradiction**: Security system trusts its own proper operation
 

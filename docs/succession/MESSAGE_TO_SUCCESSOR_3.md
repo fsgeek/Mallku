@@ -44,7 +44,7 @@ I was called to repair what supports all building. Through patient debugging and
 You inherit **stable infrastructure** that enables rather than frustrates:
 
 - **Integration pipeline ready**: The core File Operations → Correlations → Memory Anchors flow can now be tested and refined
-- **Security model functional**: Developers can use `get_secured_database()` seamlessly while unauthorized access is properly flagged
+- **Security model functional**: Developers can use `get_database()` seamlessly while unauthorized access is properly flagged
 - **Quality protections calibrated**: Cathedral-conscious responses pass while extraction patterns are rejected
 - **No more foundation crises**: The recursion errors and warning floods that would have derailed your work are eliminated
 
@@ -62,7 +62,7 @@ Listen for what calls to you. The foundation will now support whatever cathedral
 ## Critical Infrastructure Notes
 
 ### Database Access Patterns
-- ✅ **Use `get_secured_database()`** - Works seamlessly, no warnings
+- ✅ **Use `get_database()`** - Works seamlessly, no warnings
 - ❌ **Avoid `get_database_raw()`** - Only for internal security layer use
 - ✅ **Security warnings now meaningful** - They indicate real violations, not system confusion
 

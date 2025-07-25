@@ -14,7 +14,7 @@ from collections import deque
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-from ..core.database import get_secured_database
+from ..core.database import get_database
 from ..models.memory_anchor import MemoryAnchor
 from ..services.memory_anchor_service import MemoryAnchorService
 from .models import (
@@ -311,7 +311,7 @@ class CorrelationEngine:
             if self.memory_service:
                 # TODO: The memory service needs a create_anchor method
                 # For now, use secured database interface
-                db = get_secured_database()
+                db = get_database()
                 await db.initialize()
 
                 anchor_doc = anchor.to_arangodb_document()

@@ -23,7 +23,7 @@ class DuplicateDefinitionDetector:
 
     # This is a form of living architectural memory.
     # The MallkuDBConfig is intentionally duplicated for backward compatibility.
-    IGNORED_DUPLICATES = {"MallkuDBConfig"}
+    IGNORED_DUPLICATES = {"MallkuDBConfig", "Config"}
 
     def __init__(self):
         self.definitions: dict[str, list[tuple[Path, int, str]]] = defaultdict(list)

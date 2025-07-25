@@ -158,13 +158,13 @@ def test_secured_database():
     print_section("Testing Secured Database Interface")
 
     try:
-        from mallku.core.database import get_secured_database
+        from mallku.core.database import get_database
 
-        print("✓ Successfully imported get_secured_database")
+        print("✓ Successfully imported get_database")
 
         # Get secured interface
         print("\nGetting secured database interface...")
-        secured_db = get_secured_database()
+        secured_db = get_database()
         print("✓ Got secured interface")
         print(f"  Type: {type(secured_db).__name__}")
         print(f"  Skip database: {secured_db._skip_database}")
@@ -294,7 +294,7 @@ def diagnose_provisioning_flow():
     print("\nImport Chain Issues:")
     print("  - Outdated APIs in governance/orchestration modules")
     print("  - These cause 'No module named mallku' errors in CI")
-    print("  - Need migration from MallkuDBConfig to get_secured_database()")
+    print("  - Need migration from MallkuDBConfig to get_database()")
 
 
 if __name__ == "__main__":

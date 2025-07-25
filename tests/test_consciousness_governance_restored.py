@@ -19,7 +19,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 # These imports now work with proper pip installation
-from mallku.core.database import MallkuDBConfig
 from mallku.orchestration.event_bus import (
     ConsciousnessEvent,
     ConsciousnessEventBus,
@@ -114,13 +113,6 @@ class TestConsciousnessGovernanceIntegration:
             mock_subscribe.assert_called()
             mock_emit.assert_called_with(governance_event)
             print("✓ Governance creates consciousness emergence events")
-
-    def test_database_config_exists(self):
-        """Test that database configuration is available."""
-        # Just verify the class exists - don't instantiate since legacy implementation missing
-
-        assert MallkuDBConfig is not None
-        print("✓ Database configuration class available for governance (not instantiated)")
 
     @pytest.mark.asyncio
     async def test_consciousness_signature_thresholds(self):

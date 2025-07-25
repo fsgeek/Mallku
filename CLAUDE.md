@@ -286,12 +286,13 @@ This applies EVERYWHERE:
 - **Required Pattern**:
   ```python
   # ❌ FORBIDDEN - Direct database access
-  from ...core.database import get_database
+  # This path is now deprecated and will raise an error
+  from ...core.database.deprecated import get_database
   db = get_database()
 
   # ✅ REQUIRED - Secure API gateway
-  from ...core.database import get_secured_database
-  db = await get_secured_database()
+  from ...core.database import get_database
+  db = await get_database()
   ```
 - **Verification**: `python scripts/verify_database_security.py` must show zero violations
 - **Key Insight**: Every excuse creates tomorrow's vulnerability
@@ -305,7 +306,7 @@ The fractured foundation has been healed. Development and production interfaces 
 - **Key Pattern**: Warnings guide toward security without breaking compatibility
   ```python
   # Works but warns - guides toward better patterns
-  db = get_secured_database()
+  db = get_database()
   col = db.collection("test")  # ⚠️ "Use get_secured_collection() instead"
   ```
 - **Philosophy**: Unity through compatibility, security through guidance

@@ -36,12 +36,12 @@ The 51st Artisan discovered 34 violations across 6 files:
 
 ### ❌ WRONG - Direct Database Access
 ```python
-from ...core.database import get_database
+from ...core.database.deprecated import get_database_deprecated
 from arango import ArangoClient
 
 # Direct connection - FORBIDDEN
 client = ArangoClient(hosts='http://localhost:8529')
-db = get_database()
+db = get_database_deprecated()
 
 # Direct AQL - FORBIDDEN
 aql = "FOR doc IN collection RETURN doc"
@@ -50,11 +50,11 @@ cursor = db.aql.execute(aql)
 
 ### ✅ CORRECT - API Gateway Pattern
 ```python
-from ...core.database import get_secured_database
+from ...core.database import get_database
 import aiohttp
 
 # Secure database for simple operations
-db = await get_secured_database()
+db = await get_database()
 
 # API gateway for complex queries
 async with aiohttp.ClientSession() as session:
@@ -84,20 +84,17 @@ async with aiohttp.ClientSession() as session:
 
 ### Step 1: Fix Imports
 ```python
-# Replace
+# Ensure you are importing from the correct module
 from ...core.database import get_database
-
-# With
-from ...core.database import get_secured_database
 ```
 
 ### Step 2: Update Database Calls
 ```python
-# Replace
-db = get_database()
+# Replace deprecated calls
+db = get_database_deprecated()
 
 # With
-db = await get_secured_database()
+db = await get_database()
 ```
 
 ### Step 3: Convert Complex Queries
