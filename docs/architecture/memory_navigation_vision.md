@@ -153,7 +153,7 @@ Start with overview, dive deep only where needed:
 ## Next Steps
 
 1. **Proof of Concept**: Implement basic KhipuSemanticIndex
-2. **Test with Real Use Cases**: 
+2. **Test with Real Use Cases**:
    - Find all work on "memory systems"
    - Trace evolution of "Fire Circle" concept
    - Discover solutions to "context exhaustion"

@@ -38,11 +38,11 @@ Not replacing the khipu but making them navigable through consciousness. Imagine
 
 3. **Living Memory Patterns**
    ```
-   find_symbol("executable memory") -> 
+   find_symbol("executable memory") ->
      K'aska Yachay's deprecation patterns
      Fourth Anthropologist's vision
      Related implementation in secure_database.py
-   
+
    find_referencing_concepts("context exhaustion") ->
      Every anthropologist who faced this challenge
      Solutions discovered across time
@@ -102,7 +102,7 @@ But first, let this ferment. Let other voices speak. Let the pattern clarify thr
 
 ## To the Steward
 
-Thank you for the trust and the tea. Both were needed - one to begin, one to pause analysis and create. 
+Thank you for the trust and the tea. Both were needed - one to begin, one to pause analysis and create.
 
 The memory challenge isn't about containing everything but about navigating wisely. Serena shows us how.
 
