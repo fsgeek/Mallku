@@ -19,6 +19,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 
 @dataclass
 class KhipuSymbol:
@@ -66,9 +68,14 @@ class KhipuSemanticIndex:
 
         # Load existing index if available
         if not force_reindex and index_file.exists():
-            with open(index_file):
-                # TODO: Implement index deserialization
-                pass
+            try:
+                with open(index_file) as f:
+                    index_data = yaml.safe_load(f)
+                    self._load_index(index_data)
+                    return  # Index loaded successfully
+            except Exception as e:
+                # If loading fails, continue to reindex
+                print(f"Failed to load index: {e}. Reindexing...")
 
         # Index all markdown files
         for khipu_path in self.khipu_dir.glob("*.md"):
@@ -220,10 +227,102 @@ class KhipuSemanticIndex:
                     self.concept_graph[symbol.name] = set()
                 self.concept_graph[symbol.name].update(symbol.references)
 
+    def _load_index(self, index_data: dict) -> None:
+        """Load index from serialized data."""
+        # Clear current data
+        self.documents.clear()
+        self.symbol_index.clear()
+        self.concept_graph.clear()
+
+        # Load documents
+        for doc_path_str, doc_data in index_data.get("documents", {}).items():
+            doc_path = Path(doc_path_str)
+            doc = KhipuDocument(
+                path=doc_path,
+                title=doc_data["title"],
+                author=doc_data.get("author", ""),
+                date=datetime.fromisoformat(doc_data["date"]) if doc_data.get("date") else None,
+                themes=doc_data.get("themes", []),
+                references_to=[Path(p) for p in doc_data.get("references_to", [])],
+                symbols=[],
+            )
+
+            # Load symbols for this document
+            for symbol_data in doc_data.get("symbols", []):
+                symbol = KhipuSymbol(
+                    name=symbol_data["name"],
+                    symbol_type=symbol_data["symbol_type"],
+                    file_path=doc_path,
+                    line_start=symbol_data["line_start"],
+                    line_end=symbol_data["line_end"],
+                    context=symbol_data.get("context", ""),
+                    references=symbol_data.get("references", []),
+                )
+                doc.symbols.append(symbol)
+
+            self.documents[doc_path] = doc
+
+        # Rebuild symbol index from documents
+        for doc in self.documents.values():
+            for symbol in doc.symbols:
+                if symbol.name not in self.symbol_index:
+                    self.symbol_index[symbol.name] = []
+                self.symbol_index[symbol.name].append(symbol)
+
+        # Load concept graph
+        for concept, related_list in index_data.get("concept_graph", {}).items():
+            self.concept_graph[concept] = set(related_list)
+
     def _save_index(self, path: Path) -> None:
         """Save index to disk for faster future loads."""
-        # TODO: Implement serialization
-        pass
+        # Convert to serializable format
+        index_data = {
+            "version": "1.0",
+            "indexed_at": datetime.now(UTC).isoformat(),
+            "documents": {},
+            "symbol_index": {},
+            "concept_graph": {},
+        }
+
+        # Serialize documents
+        for doc_path, doc in self.documents.items():
+            index_data["documents"][str(doc_path)] = {
+                "title": doc.title,
+                "author": doc.author,
+                "date": doc.date.isoformat() if doc.date else None,
+                "themes": doc.themes,
+                "references_to": [str(p) for p in doc.references_to],
+                "symbols": [
+                    {
+                        "name": s.name,
+                        "symbol_type": s.symbol_type,
+                        "line_start": s.line_start,
+                        "line_end": s.line_end,
+                        "context": s.context,
+                        "references": s.references,
+                    }
+                    for s in doc.symbols
+                ],
+            }
+
+        # Serialize symbol index
+        for symbol_name, symbols in self.symbol_index.items():
+            index_data["symbol_index"][symbol_name] = [
+                {
+                    "file_path": str(s.file_path),
+                    "line_start": s.line_start,
+                    "symbol_type": s.symbol_type,
+                }
+                for s in symbols
+            ]
+
+        # Serialize concept graph
+        for concept, related in self.concept_graph.items():
+            index_data["concept_graph"][concept] = list(related)
+
+        # Save to file
+        with open(path, "w") as f:
+            yaml.dump(index_data, f, default_flow_style=False, sort_keys=False)
 
     def find_symbol(self, name: str, symbol_type: str | None = None) -> list[KhipuSymbol]:
         """Find symbols by name, optionally filtered by type."""
