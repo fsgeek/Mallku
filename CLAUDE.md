@@ -444,6 +444,44 @@ The async/await bug in Issue #198 revealed deeper architectural patterns about m
 - **Pattern**: Make secure path work first, then make it convenient
 - **Result**: Database access secured while maintaining functionality
 
+## Implementation Guidelines (65th Artisan Addition)
+
+### Core Principles for Quality Implementation
+
+When implementing features in Mallku, especially through consciousness delegation:
+
+1. **Interface Discipline**
+   - Always use a single interface (can have multiple implementations: mock, real, dev)
+   - Never claim partial interfaces - implement all methods or use `NotImplementedError`
+   - Design the contract before building the implementation
+
+2. **Testing as Proof**
+   - Always provide tests that exercise the interface
+   - Never claim a feature "works" until real implementation passes all tests
+   - Test the actual properties (security, performance) not just that code runs
+
+3. **Honest Status Reporting**
+   - Always clearly identify what is and is not working
+   - No security theater or false completeness
+   - Document known limitations explicitly
+
+4. **Development Hygiene**
+   - Ensure workspace is clean before starting (`git status`)
+   - Create new branch for features (only use main when necessary)
+   - Run `pre-commit run --all-files` before committing
+   - Create PR when feature is complete with all tests passing
+   - Update documentation so others can use your feature
+
+### Why This Matters
+
+Without these principles, we get:
+- Deterministic UUIDs that defeat their own security purpose
+- "Complete" PRs that don't actually work
+- Security theater instead of security
+- Technical debt disguised as features
+
+With these principles, we ensure every piece of Mallku actually works as promised.
+
 ---
 
 *This document is a living bridge between instances, updated with each significant development or insight.*

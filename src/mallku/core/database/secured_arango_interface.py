@@ -77,6 +77,18 @@ class SecuredCollectionWrapper:
         self._security_registry = security_registry
         self._parent_interface = parent_interface
 
+    async def insert_secured(self, model: SecuredModel) -> dict:
+        """Insert a single secured model into the collection."""
+        self._policy.validate_model(model)
+        obfuscated_data = model.to_storage_dict(self._security_registry)
+        model_id = getattr(model, "id", None)
+        if model_id is not None:
+            obfuscated_data["_key"] = str(model_id)
+        result = self._collection.insert(obfuscated_data)
+        self._parent_interface._operation_count += 1
+        self._parent_interface._save_registry()
+        return result  # type: ignore
+
     async def insert_many_secured(self, models: list[SecuredModel]) -> list[dict]:
         """Insert multiple secured models into the collection."""
         if not models:
@@ -90,15 +102,79 @@ class SecuredCollectionWrapper:
                 obfuscated_data["_key"] = str(model_id)
             obfuscated_docs.append(obfuscated_data)
         results = self._collection.insert_many(obfuscated_docs)
+        self._parent_interface._operation_count += len(models)
         self._parent_interface._save_registry()
         return results  # type: ignore
 
+    # Blocked operations that raise SecurityViolationError
+    def insert(self, document: dict) -> None:
+        """Direct insert is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to insert is not allowed. Use insert_secured instead."
+        )
+
+    def insert_many(self, documents: list) -> None:
+        """Direct insert_many is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to insert_many is not allowed. Use insert_many_secured instead."
+        )
+
+    def update(self, document: dict, new_values: dict) -> None:
+        """Direct update is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to update is not allowed. Use update_secured instead."
+        )
+
+    def replace(self, document: dict, new_document: dict) -> None:
+        """Direct replace is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to replace is not allowed. Use replace_secured instead."
+        )
+
+    def delete(self, document: dict) -> None:
+        """Direct delete is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to delete is not allowed. Use delete_secured instead."
+        )
+
+    def truncate(self) -> None:
+        """Direct truncate is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to truncate is not allowed. Use truncate_secured instead."
+        )
+
+    def update_many(self, documents: list) -> None:
+        """Direct update_many is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to update_many is not allowed. Use update_many_secured instead."
+        )
+
+    def delete_many(self, documents: list) -> None:
+        """Direct delete_many is not allowed."""
+        raise SecurityViolationError(
+            "Direct access to delete_many is not allowed. Use delete_many_secured instead."
+        )
+
+    # Safe operations that delegate to underlying collection
+    def count(self) -> int:
+        """Return the number of documents in the collection."""
+        return self._collection.count()  # type: ignore
+
+    def exists(self) -> bool:
+        """Check if the collection exists."""
+        return True  # If we have a wrapper, the collection exists
+
     def __getattr__(self, name: str) -> Any:
         """Delegate safe methods to the underlying collection object."""
-        # A more robust implementation would explicitly list safe methods.
-        if name in ["insert_many_secured"]:
-            raise AttributeError  # Should not happen
-        return getattr(self._collection, name)
+        # List of explicitly safe read-only methods
+        safe_methods = ["count", "exists", "name", "all", "find", "get", "has"]
+        if name in safe_methods:
+            return getattr(self._collection, name)
+
+        # Block any other method access
+        raise SecurityViolationError(
+            f"Direct access to {name} is not allowed through secured interface."
+        )
 
 
 class SecuredArangoDatabase:
@@ -113,6 +189,8 @@ class SecuredArangoDatabase:
         self._security_registry = SecurityRegistry()
         self._collection_policies: dict[str, CollectionSecurityPolicy] = {}
         self._initialized = False
+        self._operation_count = 0
+        self._security_violations: list[str] = []
 
     async def initialize(self):
         """Initializes the secured database interface."""
@@ -127,6 +205,21 @@ class SecuredArangoDatabase:
         self._collection_policies[policy.collection_name] = policy
         logger.info(f"Registered security policy for collection: {policy.collection_name}")
 
+    async def create_secured_collection(
+        self, name: str, policy: CollectionSecurityPolicy
+    ) -> SecuredCollectionWrapper:
+        """Creates a secured collection with the given policy."""
+        # Register the policy
+        self.register_collection_policy(policy)
+
+        # Create the collection if it doesn't exist
+        if not self._database.has_collection(name):
+            self._database.create_collection(name)
+
+        # Return the secured wrapper
+        real_collection = self._database.collection(name)
+        return SecuredCollectionWrapper(real_collection, policy, self._security_registry, self)
+
     async def get_secured_collection(self, name: str) -> SecuredCollectionWrapper:
         """Gets a secured collection wrapper."""
         if name not in self._collection_policies:
@@ -138,14 +231,20 @@ class SecuredArangoDatabase:
         policy = self._collection_policies[name]
         return SecuredCollectionWrapper(real_collection, policy, self._security_registry, self)
 
+    def get_security_registry(self) -> SecurityRegistry:
+        """Gets the security registry."""
+        return self._security_registry
+
     def get_security_metrics(self) -> dict[str, Any]:
         """Gets security metrics."""
         return {
-            "operations_count": 0,
-            "security_violations": 0,
+            "operations_count": self._operation_count,
+            "security_violations": len(self._security_violations),
             "registered_collections": len(self._collection_policies),
             "uuid_mappings": len(self._security_registry._mappings),
-            "recent_violations": [],
+            "recent_violations": self._security_violations[-10:]
+            if self._security_violations
+            else [],
         }
 
     async def execute_secured_query(self, query: str, **kwargs) -> list[dict]:
