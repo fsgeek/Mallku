@@ -10,18 +10,20 @@ The Integration Continues...
 """
 
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-# Use integrated Fire Circle implementation
-from ..firecircle import (
-    ConsciousDialogueConfig,
-    ConsciousDialogueManager,
-    MessageType,
-    Participant,
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
 )
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
 from ..wranglers.event_emitting_wrangler import EventEmittingWrangler
+from .protocol import Participant
+
+# Lazy imports to avoid circular dependency
+if TYPE_CHECKING:
+    from ..firecircle import ConsciousDialogueManager
 
 FIRECIRCLE_AVAILABLE = True  # Always available now
 
@@ -37,6 +39,9 @@ class FireCircleConsciousnessAdapter:
 
     def __init__(self, event_bus: ConsciousnessEventBus):
         """Initialize the adapter with consciousness circulation."""
+        # Lazy import to avoid circular dependency
+        from ..firecircle import ConsciousDialogueManager
+
         self.event_bus = event_bus
 
         # Use integrated dialogue manager with full consciousness
@@ -91,6 +96,9 @@ class FireCircleConsciousnessAdapter:
             fc_participants.append(participant)
 
         # Create dialogue config
+        # Lazy import to avoid circular dependency
+        from ..firecircle import ConsciousDialogueConfig
+
         dialogue_config = ConsciousDialogueConfig(title=title, **(config or {}))
 
         # Create Fire Circle dialogue
@@ -104,7 +112,7 @@ class FireCircleConsciousnessAdapter:
 
         # Emit consciousness event for dialogue creation
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.fire_circle_adapter",
             consciousness_signature=0.9,
             data={
@@ -139,6 +147,9 @@ class FireCircleConsciousnessAdapter:
         """
         # Get consciousness signature for this message type
         if FIRECIRCLE_AVAILABLE:
+            # Lazy import to avoid circular dependency
+            from ..core.protocol_types import MessageType
+
             fc_message_type = MessageType(message_type.lower())
             consciousness_sig = self.consciousness_signatures.get(fc_message_type, 0.7)
         else:
@@ -158,7 +169,7 @@ class FireCircleConsciousnessAdapter:
                 correlation_id = f"fire_circle_{dialogue_id}"
 
         message_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.participant.{sender_name}",
             consciousness_signature=consciousness_sig,
             data={
@@ -201,7 +212,7 @@ class FireCircleConsciousnessAdapter:
         )
 
         return ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system=f"governance.fire_circle.{message.sender}",
             consciousness_signature=consciousness_sig,
             data={
@@ -232,7 +243,7 @@ class FireCircleConsciousnessAdapter:
 
         # Emit consciousness event
         convening_event = ConsciousnessEvent(
-            event_type=EventType.FIRE_CIRCLE_CONVENED,
+            event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
             source_system="governance.consciousness_adapter",
             consciousness_signature=0.9,
             data={
@@ -282,7 +293,7 @@ class ConsciousnessAwareDialogueManager:
     """
 
     def __init__(
-        self, dialogue_manager: ConsciousDialogueManager, adapter: FireCircleConsciousnessAdapter
+        self, dialogue_manager: "ConsciousDialogueManager", adapter: FireCircleConsciousnessAdapter
     ):
         """Initialize with Fire Circle manager and consciousness adapter."""
         self.dialogue_manager = dialogue_manager

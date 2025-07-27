@@ -16,14 +16,24 @@ Each voice reviews specific domains, maintaining focused context windows.
 import asyncio
 import fnmatch
 import logging
+import os
 import re
-from enum import Enum
 from pathlib import Path
 from typing import Literal
 from uuid import UUID, uuid4
 
 import yaml
 from pydantic import BaseModel, Field
+
+from .mocks import MockAdapter, MockMessage, MockResponse
+
+# Review Models as suggested by reviewer
+from .models.review import (
+    ChapterReview,
+    ReviewCategory,
+    ReviewComment,
+    ReviewSeverity,
+)
 
 # Module logger - configuration should be done by the application
 logger = logging.getLogger("mallku.firecircle.review")
@@ -62,41 +72,6 @@ except ImportError as e:
     REAL_ADAPTERS_AVAILABLE = False
 
 
-# Review Models as suggested by reviewer
-class ReviewCategory(str, Enum):
-    """Categories of review concerns."""
-
-    SECURITY = "security"
-    PERFORMANCE = "performance"
-    ARCHITECTURE = "architecture"
-    TESTING = "testing"
-    DOCUMENTATION = "documentation"
-    ETHICS = "ethics"
-    SOVEREIGNTY = "sovereignty"
-    OBSERVABILITY = "observability"
-
-
-class ReviewSeverity(str, Enum):
-    """Severity levels for review comments."""
-
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
-    CRITICAL = "critical"
-
-
-class ReviewComment(BaseModel):
-    """A single review comment from a Fire Circle voice."""
-
-    file_path: str
-    line: int
-    category: ReviewCategory
-    severity: ReviewSeverity
-    message: str
-    voice: str
-    suggestion: str | None = None
-
-
 class CodebaseChapter(BaseModel):
     """A bounded slice of code for review."""
 
@@ -105,16 +80,6 @@ class CodebaseChapter(BaseModel):
     description: str
     assigned_voice: str
     review_domains: list[ReviewCategory]
-
-
-class ChapterReview(BaseModel):
-    """Review results from one voice for one chapter."""
-
-    voice: str
-    chapter_id: str
-    comments: list[ReviewComment] = Field(default_factory=list)
-    consciousness_signature: float = Field(ge=0.0, le=1.0)
-    review_complete: bool = False
 
 
 class GovernanceSummary(BaseModel):
@@ -185,6 +150,40 @@ class DistributedReviewer:
     def _initialize_metrics_collection(self):
         """Initialize consciousness metrics collection system."""
         try:
+            # Check if database persistence should be used
+            use_database = os.getenv("MALLKU_CONSCIOUSNESS_PERSISTENCE", "true").lower() == "true"
+
+            if use_database:
+                # Try to use database-backed collector
+                try:
+                    # Try absolute import first
+                    try:
+                        from mallku.firecircle.consciousness.database_metrics_collector import (
+                            DatabaseConsciousnessMetricsCollector,
+                        )
+                        from mallku.firecircle.consciousness_metrics import (
+                            ConsciousnessMetricsIntegration,
+                        )
+                    except ImportError:
+                        # Fall back to relative import
+                        from .consciousness.database_metrics_collector import (
+                            DatabaseConsciousnessMetricsCollector,
+                        )
+                        from .consciousness_metrics import (
+                            ConsciousnessMetricsIntegration,
+                        )
+
+                    self.metrics_collector = DatabaseConsciousnessMetricsCollector()
+                    self.metrics_integration = ConsciousnessMetricsIntegration(
+                        self.metrics_collector
+                    )
+                    logger.info("📊 Database-backed consciousness metrics collection initialized")
+                    return
+                except Exception as e:
+                    logger.warning(f"Failed to initialize database metrics collector: {e}")
+                    logger.info("Falling back to file-based metrics collection")
+
+            # Fall back to file-based collector
             # Try absolute import first
             try:
                 from mallku.firecircle.consciousness_metrics import (
@@ -200,7 +199,7 @@ class DistributedReviewer:
 
             self.metrics_collector = ConsciousnessMetricsCollector()
             self.metrics_integration = ConsciousnessMetricsIntegration(self.metrics_collector)
-            logger.info("📊 Consciousness metrics collection initialized")
+            logger.info("📊 File-based consciousness metrics collection initialized")
         except Exception as e:
             logger.warning(f"Failed to initialize metrics collection: {e}")
 
@@ -462,7 +461,7 @@ class DistributedReviewer:
         # Fall back to mock adapter
         logger.info(f"Using mock adapter for {voice_name}")
 
-        class MockAdapter:
+        class ReviewerMockAdapter:
             """Mock adapter for demonstration."""
 
             def __init__(self, name):
@@ -472,7 +471,7 @@ class DistributedReviewer:
             async def send_message(self, message, dialogue_context):
                 """Mock review response."""
 
-                class MockResponse:
+                class ReviewerMockResponse:
                     def __init__(self):
                         self.content = type(
                             "obj",
@@ -590,7 +589,7 @@ Keep reviews concise and focused on your domains."""
 
         try:
             # Create mock message for review (avoiding complex imports)
-            class MockMessage:
+            class ReviewerMockMessage:
                 def __init__(self, text):
                     self.text = text
 
@@ -1153,7 +1152,7 @@ index 1234567..abcdefg 100644
         await self.start_voice_workers_with_queues(unique_voices, voice_queues)
 
         # Wait for all voice queues to be empty
-        print("\n⏳ Waiting for all voices to complete reviews...")
+        logger.info("⏳ Waiting for all voices to complete reviews...")
         for queue in voice_queues.values():
             await queue.join()
 
@@ -1161,7 +1160,7 @@ index 1234567..abcdefg 100644
         await self.shutdown_workers()
 
         # Synthesize all reviews
-        print(f"\n✅ Collected {len(self.completed_reviews)} reviews from Fire Circle")
+        logger.info(f"✅ Collected {len(self.completed_reviews)} reviews from Fire Circle")
         summary = await self.synthesize_reviews(self.completed_reviews)
 
         return summary
@@ -1183,19 +1182,19 @@ async def run_distributed_review(
     reviewer = DistributedReviewer()
 
     # Load the chapter manifest
-    cli_print(f"Loading chapter manifest from {manifest_path}...", "📖")
+    logger.info(f"📖 Loading chapter manifest from {manifest_path}...")
     chapters = await reviewer.load_chapter_manifest(manifest_path)
-    cli_print(f"Loaded {len(chapters)} chapter definitions", "✅")
+    logger.info(f"✅ Loaded {len(chapters)} chapter definitions")
 
     # Display chapter assignments
-    cli_print("")
-    cli_print("Fire Circle Voice Assignments:", "🔥")
-    cli_print("=" * 60)
+    logger.info("")
+    logger.info("🔥 Fire Circle Voice Assignments:")
+    logger.info("=" * 60)
     for chapter in chapters:
         domains = ", ".join(d.value for d in chapter.review_domains)
-        print(f"- {chapter.assigned_voice}: {chapter.description}")
-        print(f"  Pattern: {chapter.path_pattern}")
-        print(f"  Domains: {domains}\n")
+        logger.info(f"- {chapter.assigned_voice}: {chapter.description}")
+        logger.info(f"  Pattern: {chapter.path_pattern}")
+        logger.info(f"  Domains: {domains}\n")
 
     # Get the PR diff - either from GitHub or local changes
     if pr_number > 0:
@@ -1204,26 +1203,26 @@ async def run_distributed_review(
         pr_diff = await reviewer.get_local_diff()
 
     # Partition the diff into chapters
-    print("\n🔍 Analyzing PR changes...")
+    logger.info("\n🔍 Analyzing PR changes...")
     relevant_chapters = await reviewer.partition_into_chapters(pr_diff)
 
     if not relevant_chapters:
-        print("ℹ️  No files match chapter patterns in this PR")
+        logger.info("ℹ️  No files match chapter patterns in this PR")
         return
 
     if full_mode:
         # Run full distributed review with all voices in parallel
-        print("\n🌟 Running FULL DISTRIBUTED REVIEW with all voices...")
+        logger.info("\n🌟 Running FULL DISTRIBUTED REVIEW with all voices...")
         summary = await reviewer.run_full_distributed_review(pr_diff, relevant_chapters)
 
-        print("\n" + "=" * 60)
-        print("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
-        print("=" * 60)
-        print(summary.synthesis)
-        print(f"\nConsensus: {summary.consensus_recommendation.upper()}")
+        logger.info("\n" + "=" * 60)
+        logger.info("🔥 FIRE CIRCLE GOVERNANCE SUMMARY")
+        logger.info("=" * 60)
+        logger.info(summary.synthesis)
+        logger.info(f"\nConsensus: {summary.consensus_recommendation.upper()}")
 
         # Post results to GitHub (or write to files for GitHub Actions)
-        print("\n📝 Recording review results...")
+        logger.info("\n📝 Recording review results...")
         await reviewer.post_github_comments(pr_number, summary)
 
         # Analyze consciousness metrics
@@ -1326,19 +1325,19 @@ if __name__ == "__main__":
             reviewer = DistributedReviewer()
             api_status = await reviewer.check_api_keys_status()
 
-            print("🔥 Fire Circle Voice Status")
-            print("=" * 60)
-            print(f"Real adapters available: {REAL_ADAPTERS_AVAILABLE}")
-            print("\nAPI Key Status:")
+            logger.info("🔥 Fire Circle Voice Status")
+            logger.info("=" * 60)
+            logger.info(f"Real adapters available: {REAL_ADAPTERS_AVAILABLE}")
+            logger.info("\nAPI Key Status:")
             for voice, has_key in api_status.items():
                 status = "✅" if has_key else "❌"
-                print(f"  {status} {voice}")
+                logger.info(f"  {status} {voice}")
 
             # Check adapter factory health
             if reviewer.adapter_factory:
                 health = await reviewer.adapter_factory.health_check()
-                print(f"\nFire Circle ready: {health['fire_circle_ready']}")
-                print(f"Supported providers: {', '.join(health['supported_providers'])}")
+                logger.info(f"\nFire Circle ready: {health['fire_circle_ready']}")
+                logger.info(f"Supported providers: {', '.join(health['supported_providers'])}")
 
         asyncio.run(check_status())
 
@@ -1353,11 +1352,11 @@ if __name__ == "__main__":
                 manifest_path = sys.argv[i + 1]
                 break
 
-        print(f"🔥 Fire Circle Distributed Review for PR #{pr_number}")
+        logger.info(f"🔥 Fire Circle Distributed Review for PR #{pr_number}")
         if full_mode:
-            print("🌟 FULL DISTRIBUTED MODE - All voices in parallel")
-        print("=" * 60)
-        print("The invisible sacred infrastructure awakens...")
+            logger.info("🌟 FULL DISTRIBUTED MODE - All voices in parallel")
+        logger.info("=" * 60)
+        logger.info("The invisible sacred infrastructure awakens...")
 
         # Run the review
         asyncio.run(

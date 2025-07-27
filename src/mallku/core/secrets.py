@@ -27,7 +27,7 @@ from typing import Any
 
 from cryptography.fernet import Fernet
 
-from .database import get_secured_database
+from .database import get_database
 from .security.field_strategies import FieldObfuscationLevel
 from .security.secured_model import SecuredField, SecuredModel
 
@@ -304,7 +304,7 @@ class SecretsManager:
         """Load secret from secured database."""
         if not self._db:
             try:
-                self._db = await get_secured_database()
+                self._db = await get_database()
                 # This would need proper setup with security policies
                 # For now, return None
             except Exception as e:

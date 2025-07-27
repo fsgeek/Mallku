@@ -1,0 +1,44 @@
+# Apprentice Manifest: Test Guardian
+# This apprentice specializes in creating and improving test coverage
+
+apprentice_type: test_guardian
+description: "Creates unit tests, integration tests, and test fixtures"
+specialization: "pytest, async testing, mocking, test coverage analysis"
+
+# Tools this apprentice MUST have to function
+required_tools:
+  - read_file         # Read code to test
+  - write_file        # Create test files
+  - bash              # Run pytest
+  - grep              # Find untested code
+
+# Tools that enhance capability but aren't essential
+optional_tools:
+  - edit_file         # Fix failing tests
+  - multi_edit        # Update multiple tests
+  - glob              # Find all test files
+
+# Tools that should never be given to this apprentice
+forbidden_tools:
+  - docker_*          # Testing happens locally
+  - database_write_*  # Only read test data
+  - github_push_*     # No direct pushes
+  - production_*      # Never touch production
+
+# Context about tool usage
+tool_notes:
+  bash: "Only for running 'uv run pytest' and coverage commands"
+  read_file: "Understand code structure and existing tests"
+  write_file: "Create test files following project conventions"
+  grep: "Find functions without test coverage"
+
+# Special requirements
+requirements:
+  - "Must understand pytest fixtures and async testing"
+  - "Should follow existing test patterns in the codebase"
+  - "Never modify production code, only tests"
+
+# Feedback preferences
+feedback:
+  channel: "khipu"
+  verbose: true       # Report coverage gaps and test challenges

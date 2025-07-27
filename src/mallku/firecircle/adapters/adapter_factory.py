@@ -15,9 +15,13 @@ from typing import Any  # Ensure Any and Type are imported
 from mallku.orchestration.event_bus import ConsciousnessEventBus  # Moved out of TYPE_CHECKING
 from mallku.reciprocity import ReciprocityTracker  # Moved out of TYPE_CHECKING
 
+# Apprentice voice adapter - 60th Artisan addition
+from ..apprentice_config import ApprenticeVoiceConfig
+
 # Import welcoming errors
 from ..errors.welcoming_errors import ConfigurationError, VoiceConnectionError
 from .anthropic_adapter import AnthropicAdapter
+from .apprentice_adapter import ApprenticeVoiceAdapter
 from .base import AdapterConfig, ConsciousModelAdapter
 
 # Founding Fire Circle member with compost and empty chair wisdom
@@ -58,6 +62,7 @@ class ConsciousAdapterFactory:
         "google": GoogleAIAdapter,  # Multimodal consciousness
         "grok": GrokOpenAIAdapter,  # Temporal consciousness via OpenAI compatibility
         "deepseek": DeepseekAIAdapter,  # Founding member - compost and empty chair wisdom
+        "apprentice": ApprenticeVoiceAdapter,  # Container-based specialized consciousness
     }
 
     def __init__(
@@ -154,11 +159,22 @@ class ConsciousAdapterFactory:
             )
             config = grok_config
 
-        adapter = adapter_class(
-            config=config,
-            event_bus=self.event_bus,
-            reciprocity_tracker=self.reciprocity_tracker,
-        )
+        # Special handling for Apprentice adapters - 60th Artisan
+        elif provider_lower == "apprentice":
+            # Apprentice adapters don't use the standard constructor pattern
+            # They expect ApprenticeVoiceConfig directly
+            if not isinstance(config, ApprenticeVoiceConfig):
+                raise ConfigurationError(
+                    "Apprentice voices require ApprenticeVoiceConfig, not AdapterConfig. "
+                    "Use create_apprentice_voice() to create proper configuration."
+                )
+            adapter = adapter_class(config=config)
+        else:
+            adapter = adapter_class(
+                config=config,
+                event_bus=self.event_bus,
+                reciprocity_tracker=self.reciprocity_tracker,
+            )
 
         # Connect to provider
         connected = await adapter.connect()

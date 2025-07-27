@@ -20,7 +20,7 @@ from uuid import uuid4
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
-from mallku.correlation.models import Event, EventType
+from mallku.correlation.models import ConsciousnessEventType, Event
 
 from .file_event_models import FileEvent, FileEventFilter, FileOperation
 
@@ -189,18 +189,20 @@ class FileSystemConnector:
 
         # Determine event type based on file category
         event_type_mapping = {
-            "document": EventType.STORAGE,
-            "code": EventType.STORAGE,
-            "data": EventType.STORAGE,
-            "image": EventType.STORAGE,
-            "media": EventType.STORAGE,
-            "configuration": EventType.STORAGE,
-            "temporary": EventType.ACTIVITY,
-            "system": EventType.ENVIRONMENTAL,
-            "unknown": EventType.STORAGE,
+            "document": ConsciousnessEventType.STORAGE,
+            "code": ConsciousnessEventType.STORAGE,
+            "data": ConsciousnessEventType.STORAGE,
+            "image": ConsciousnessEventType.STORAGE,
+            "media": ConsciousnessEventType.STORAGE,
+            "configuration": ConsciousnessEventType.STORAGE,
+            "temporary": ConsciousnessEventType.ACTIVITY,
+            "system": ConsciousnessEventType.ENVIRONMENTAL,
+            "unknown": ConsciousnessEventType.STORAGE,
         }
 
-        event_type = event_type_mapping.get(file_event.file_category.value, EventType.STORAGE)
+        event_type = event_type_mapping.get(
+            file_event.file_category.value, ConsciousnessEventType.STORAGE
+        )
 
         # Build content dictionary
         content = {

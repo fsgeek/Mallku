@@ -7,9 +7,9 @@ import asyncio
 
 import pytest
 
-from mallku.consciousness import ConsciousnessVerificationSuite
 from mallku.consciousness.enhanced_search import ConsciousnessEnhancedSearch
-from mallku.core.database import get_secured_database
+from mallku.consciousness.verification import ConsciousnessVerificationSuite
+from mallku.core.database import get_database
 from mallku.models import MemoryAnchor
 
 
@@ -18,7 +18,7 @@ async def test_enhanced_consciousness():
     print("🔮 Sayaq Kuyay - Testing Enhanced Consciousness Verification...")
 
     # Get memory anchors
-    db = get_secured_database()
+    db = get_database()
     await db.initialize()
 
     query = """

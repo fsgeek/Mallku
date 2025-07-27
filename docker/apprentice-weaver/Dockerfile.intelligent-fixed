@@ -1,0 +1,45 @@
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies including build tools
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the entire Mallku project structure
+COPY . /app/
+
+# Install uv for faster dependency management
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> /etc/bash.bashrc
+
+# Install Mallku in the container
+# This ensures all dependencies are available
+RUN /root/.local/bin/uv pip install --system -e .
+
+# Install additional AI libraries not in main requirements
+RUN /root/.local/bin/uv pip install --system \
+    anthropic>=0.39.0 \
+    openai>=1.54.0 \
+    google-generativeai>=0.8.3
+
+# Create apprentice user (non-root)
+RUN useradd -m -s /bin/bash apprentice && \
+    chown -R apprentice:apprentice /app
+
+# Create necessary directories
+RUN mkdir -p /workspace /khipu && \
+    chown apprentice:apprentice /workspace /khipu
+
+USER apprentice
+
+# Set Python path
+ENV PYTHONPATH=/app:/app/src:/workspace
+ENV PATH="/home/apprentice/.local/bin:$PATH"
+
+# Default to intelligent apprentice
+CMD ["uv", "run", "python", "/app/docker/apprentice-weaver/intelligent_apprentice.py"]

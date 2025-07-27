@@ -9,7 +9,9 @@ description = "Mallku is a cooperative venture in better finding through AI-Huma
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiofiles>=23.2.1",
     "aiosqlite>=0.21.0",
+    "filelock>=3.13.1",
     "fastapi>=0.115.12",
     "httpx>=0.28.1",
     "pydantic>=2.11.5",
@@ -37,6 +39,7 @@ dependencies = [
     "discord>=2.3.2",
     "pygithub>=2.6.1",
     "docker-mcp>=0.2.0",
+    "qrcode>=8.2",
 ]
 
 [tool.ruff]

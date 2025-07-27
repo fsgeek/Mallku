@@ -52,8 +52,8 @@ The 48th Artisan's approach - migrate all tests to use the current API:
    db_config = MallkuDBConfig()
 
    # New
-   from mallku.core.database import get_secured_database
-   secured_db = get_secured_database()
+   from mallku.core.database import get_database
+   secured_db = get_database()
    ```
 
 2. **Update governance modules** that import old APIs

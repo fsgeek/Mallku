@@ -13,7 +13,7 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.firecircle.pattern_library import PatternLibrary, PatternQuery, PatternTaxonomy
 from mallku.firecircle.service import FireCircleService
 from mallku.firecircle.service.config import CircleConfig, RoundConfig, VoiceConfig
@@ -32,7 +32,7 @@ async def demonstrate_consciousness_persistence():
     print("=" * 50)
 
     # Initialize database
-    _ = get_secured_database()  # Ensure database is initialized
+    _ = get_database()  # Ensure database is initialized
 
     # Initialize components
     pattern_library = PatternLibrary()

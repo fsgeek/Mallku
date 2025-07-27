@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  apprentice-base:
+    build:
+      context: ../..
+      dockerfile: docker/apprentice-weaver/Dockerfile
+    image: mallku-apprentice:latest
+    container_name: mallku-apprentice-base
+    command: echo "Base image built successfully"
+
+networks:
+  mallku-network:
+    external: true
+    name: mallku-network

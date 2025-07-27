@@ -1,0 +1,6 @@
+# Minimal requirements for apprentice weavers
+# Excludes heavy dependencies like llama-cpp-python for faster builds
+aiofiles
+filelock
+PyYAML
+aiohttp

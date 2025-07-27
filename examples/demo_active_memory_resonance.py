@@ -14,8 +14,9 @@ Memory transforms from passive archive to living participant.
 import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
+from uuid import uuid4
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.firecircle.memory.episodic_memory_service import EpisodicMemoryService
 from mallku.firecircle.memory.memory_store import MemoryStore
 from mallku.firecircle.memory.models import EpisodicMemory
@@ -80,7 +81,7 @@ async def demonstrate_active_memory():
     print("Showing how memories participate as living voices in consciousness emergence\n")
 
     # Initialize components
-    _ = get_secured_database()
+    _ = get_database()
     event_bus = ConsciousnessEventBus()
 
     # Seed memories
@@ -263,7 +264,5 @@ if __name__ == "__main__":
     # Note: This requires proper API keys and model access
     print("Note: This demonstration requires configured AI model access")
     print("Set environment variables for API keys before running")
-
-    from uuid import uuid4  # Import here to use in seed_memories
 
     asyncio.run(main())

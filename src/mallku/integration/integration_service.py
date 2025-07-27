@@ -115,7 +115,10 @@ class EndToEndIntegrationService:
             )
 
             # Connect file connector to our event processing
-            self.file_connector.add_event_callback(self._handle_activity_event)
+            def activity_event_callback(event: Event) -> None:
+                asyncio.create_task(self._handle_activity_event(event))
+
+            self.file_connector.add_event_callback(activity_event_callback)
             await self.file_connector.initialize()
 
             # Start processing tasks
@@ -237,7 +240,12 @@ class EndToEndIntegrationService:
         """Handle incoming activity events from file system connector."""
 
         # Create pipeline event to track processing
-        pipeline_event = PipelineEvent(source_event_id=event.event_id, activity_event=event.dict())
+        pipeline_event = PipelineEvent(
+            source_event_id=event.event_id,
+            activity_event=event.dict(),
+            completed_at=None,
+            error_message=None,
+        )
 
         self.pipeline_events[str(event.event_id)] = pipeline_event
         self.active_events.append(pipeline_event)
@@ -304,14 +312,18 @@ class EndToEndIntegrationService:
             # Stage 1: Correlation Detection
             pipeline_event.advance_stage(PipelineStage.CORRELATION_DETECTION)
 
+            if self.correlation_engine is None:
+                raise RuntimeError("Correlation engine is not initialized.")
             correlations = await self.correlation_engine.process_event_stream([event])
-            pipeline_event.detected_correlations = [corr.dict() for corr in correlations]
+            pipeline_event.detected_correlations = [corr.model_dump() for corr in correlations]
 
             correlation_time = (datetime.now(UTC) - start_time).total_seconds() * 1000
             pipeline_event.advance_stage(PipelineStage.ANCHOR_CREATION, correlation_time)
 
             # Stage 2: Memory Anchor Creation
             created_anchors = []
+            if self.correlation_adapter is None:
+                raise RuntimeError("Correlation adapter is not initialized.")
             for correlation in correlations:
                 if correlation.confidence_score >= self.config.anchor_creation_threshold:
                     anchor = await self.correlation_adapter.process_correlation(correlation)

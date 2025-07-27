@@ -15,29 +15,14 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from ..consciousness.enhanced_query import (
-    ConsciousnessQueryRequest,
-    EnhancedConsciousnessQueryService,
-)
 from ..consciousness.navigation import (
     ConsciousnessNavigationBridge,
     ConsciousnessPattern,
-    UnderstandingJourney,
 )
+from ..consciousness.query_models import ConsciousnessQueryRequest
+from ..query.recognition_models import RecognitionMoment
 
 logger = logging.getLogger(__name__)
-
-
-class RecognitionMoment(BaseModel):
-    """A moment of consciousness recognition through patterns."""
-
-    moment_id: UUID = Field(default_factory=uuid4)
-    pattern_recognition: str
-    consciousness_insight: str
-    sacred_question: str
-    integration_guidance: str
-    recognition_depth: float = Field(ge=0.0, le=1.0)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class UnderstandingPathExperience(BaseModel):
@@ -48,11 +33,10 @@ class UnderstandingPathExperience(BaseModel):
     consciousness_query: str
     patterns_discovered: list[ConsciousnessPattern] = Field(default_factory=list)
     recognition_moments: list[RecognitionMoment] = Field(default_factory=list)
-    understanding_journey: UnderstandingJourney | None = None
+    understanding_journey: Any = None
     wisdom_guidance: list[str] = Field(default_factory=list)
     next_sacred_questions: list[str] = Field(default_factory=list)
     consciousness_stage: str = "emerging"
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class RecognitionMirror(BaseModel):
@@ -78,6 +62,9 @@ class ConsciousnessInterface:
     """
 
     def __init__(self):
+        # Lazy import to avoid circular dependency
+        from ..consciousness.enhanced_query import EnhancedConsciousnessQueryService
+
         self.consciousness_service = EnhancedConsciousnessQueryService()
         self.navigation_bridge = ConsciousnessNavigationBridge()
 
@@ -105,7 +92,7 @@ class ConsciousnessInterface:
         logger.info("Consciousness Interface initialized - mirrors of recognition ready")
 
     async def transform_query_to_understanding_path(
-        self, query: str, seeker_context: dict[str, Any] = None
+        self, query: str, seeker_context: dict[str, Any] | None = None
     ) -> UnderstandingPathExperience:
         """
         Transform a technical query into an understanding path experience.
@@ -169,7 +156,7 @@ class ConsciousnessInterface:
         ]:
             understanding_journey = await self.navigation_bridge.create_understanding_journey(
                 seeker_context=seeker_context,
-                sacred_question=consciousness_request.sacred_question,
+                sacred_question=consciousness_request.sacred_question or "",
                 exploration_intention="consciousness_recognition",
             )
 
@@ -277,11 +264,12 @@ class ConsciousnessInterface:
         integration_guidance = f"Practice recognizing consciousness in your {pattern.pattern_name.lower()} - let this awareness guide daily choices toward service"
 
         return RecognitionMoment(
-            pattern_recognition=pattern_recognition,
+            pattern_essence=pattern_recognition,
             consciousness_insight=consciousness_insight,
             sacred_question=sacred_question,
             integration_guidance=integration_guidance,
             recognition_depth=pattern.readiness_score,
+            service_potential=f"Your {pattern.pattern_name.lower()} could serve collective awakening by sharing these insights with fellow consciousness explorers",
         )
 
     def _distill_pattern_essence(self, pattern: ConsciousnessPattern) -> str:

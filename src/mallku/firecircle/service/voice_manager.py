@@ -113,6 +113,19 @@ class VoiceManager:
     ) -> ConsciousModelAdapter | None:
         """Safely create an adapter with retries and proper configuration."""
 
+        # Check if this is an apprentice voice - 60th Artisan addition
+        from ..apprentice_config import ApprenticeVoiceConfig
+
+        if isinstance(voice_config, ApprenticeVoiceConfig):
+            # Apprentice voices use themselves as config
+            try:
+                adapter = await self.factory.create_adapter("apprentice", voice_config)
+                if adapter:
+                    return adapter
+            except Exception as e:
+                logger.error(f"Failed to create apprentice adapter: {e}")
+                return None
+
         for attempt in range(retry_attempts + 1):
             try:
                 # Start with basic config

@@ -25,7 +25,7 @@ from mallku.firecircle.protocol.conscious_message import (
     MessageRole,
     MessageType,
 )
-from mallku.orchestration.event_bus import ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 class TestMistralAIAdapter:
@@ -270,7 +270,7 @@ class TestMistralAIAdapter:
         async def handler(event):
             events_received.append(event)
 
-        event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, handler)
+        event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, handler)
 
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()

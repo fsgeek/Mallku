@@ -18,47 +18,13 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 try:
-    from mallku.core.database import get_database, get_db_config
+    from mallku.core.database import get_database
     from mallku.models import MemoryAnchor
 
     print("✓ Successfully imported Mallku database modules")
 except ImportError as e:
     print(f"✗ Failed to import modules: {e}")
     sys.exit(1)
-
-
-def test_database_connection():
-    """Test basic database connection."""
-    print("\n1. Testing database connection...")
-
-    try:
-        db_config = get_db_config()
-        print(f"   Config file: {db_config.config_file}")
-
-        connected = db_config.connect()
-        if connected:
-            print("   ✓ Database connection successful")
-            return True
-        else:
-            print("   ✗ Database connection failed")
-            return False
-    except Exception as e:
-        print(f"   ✗ Database connection error: {e}")
-        return False
-
-
-def test_collection_creation():
-    """Test collection creation."""
-    print("\n2. Testing collection creation...")
-
-    try:
-        db_config = get_db_config()
-        db_config.ensure_collections()
-        print("   ✓ Collections created successfully")
-        return True
-    except Exception as e:
-        print(f"   ✗ Collection creation failed: {e}")
-        return False
 
 
 def test_memory_anchor_model():
@@ -70,6 +36,8 @@ def test_memory_anchor_model():
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
+            predecessor_id=None,
+            last_updated=datetime.now(UTC),
             cursors={"temporal": datetime.now(UTC).isoformat(), "test_cursor": "test_value"},
             metadata={"providers": ["test_provider"], "creation_trigger": "manual_test"},
         )
@@ -98,11 +66,11 @@ def test_database_operations():
     try:
         db = get_database()
         collection = db.collection("memory_anchors")
-
-        # Create test anchor
         anchor = MemoryAnchor(
             anchor_id=uuid4(),
             timestamp=datetime.now(UTC),
+            predecessor_id=None,
+            last_updated=datetime.now(UTC),
             cursors={"test": "value"},
             metadata={"test": True},
         )
@@ -138,8 +106,6 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     tests = [
-        test_database_connection,
-        test_collection_creation,
         test_memory_anchor_model,
         test_database_operations,
     ]

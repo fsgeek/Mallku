@@ -28,7 +28,7 @@ db = db_config.get_database()
 
 **New Pattern (Secured Interface)**:
 ```python
-secured_db = get_secured_database()
+secured_db = get_database()
 await secured_db.initialize()
 # Direct DB access no longer needed - everything through secured interface
 ```

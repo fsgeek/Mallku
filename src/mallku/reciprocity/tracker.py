@@ -12,7 +12,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID, uuid4
 
-from ..core.database import CollectionSecurityPolicy, get_secured_database
+from ..core.database import CollectionSecurityPolicy, get_database
 from ..core.security.registry import SecurityRegistry
 from ..streams.reciprocity.secured_reciprocity_models import ReciprocityActivityData
 from .extraction_detector import ExtractionDetector
@@ -44,7 +44,7 @@ class SecureReciprocityTracker:
     def __init__(self, db_config: dict[str, Any] | None = None):
         """Initialize the secure reciprocity tracker."""
         # Use secured database interface - enforces security by design
-        self.secured_db = get_secured_database()
+        self.secured_db = get_database()
 
         # Maintain compatibility with legacy code expecting 'db' attribute
         # But this will be removed in future versions

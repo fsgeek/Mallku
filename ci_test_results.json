@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-07-22T22:42:20.149920",
+  "total_tests": 8,
+  "passed": 6,
+  "failed": 2,
+  "results": [
+    {
+      "test_name": "import mallku",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku\n",
+      "duration": 0.051820100052282214,
+      "timestamp": "2025-07-22T22:42:20.149942"
+    },
+    {
+      "test_name": "import mallku.firecircle",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku.firecircle\n",
+      "duration": 1.9931308538652956,
+      "timestamp": "2025-07-22T22:42:20.149945"
+    },
+    {
+      "test_name": "import mallku.orchestration",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku.orchestration\n",
+      "duration": 0.10454912995919585,
+      "timestamp": "2025-07-22T22:42:20.149947"
+    },
+    {
+      "test_name": "import mallku.core.database",
+      "passed": true,
+      "output": "\u2713 Successfully imported mallku.core.database\n",
+      "duration": 0.2996858290862292,
+      "timestamp": "2025-07-22T22:42:20.149948"
+    },
+    {
+      "test_name": "scripts/verify_database_security.py",
+      "passed": true,
+      "output": "\ud83d\udd0d Scanning for Database Security Violations\n============================================================\nRoot: /home/tony/projects/Mallku/src\n\n\ud83d\udcca Scan Results\n============================================================\nFiles checked: 315\nViolations found: 0\n\n\u2705 No database security violations found!\n\n\ud83d\udee1\ufe0f  All database access appears to use secure patterns:\n   - get_secured_database()\n   - API gateway (http://localhost:8080)\n   - No direct ArangoDB connections\n\n\ud83c\udfdb\ufe0f  Architectural Context\n============================================================\n\nThis pattern prevents a critical security bypass discovered in Issue #176.\n\nThe Secure Database Architecture:\n1. All database access MUST go through the secure API gateway\n2. Direct ArangoDB connections are FORBIDDEN in production\n3. Dev/test environments must mirror production security\n\nWhy this matters:\n- Direct database access bypasses authentication and authorization\n- Parallel code paths (dev vs prod) lead to untested security holes\n- Architectural drift creates vulnerabilities that fester until discovered\n\nThis verifier is an immune system response - detecting and preventing\narchitectural violations before they reach production.\n\n\u2728 This script is an Executable Memory Pattern:\n   - Documents the secure database architecture\n   - Detects violations automatically\n   - Provides clear fixes\n   - Can be integrated into CI/CD and pre-commit hooks\n   - Prevents architectural drift through automation\n",
+      "duration": 0.8143962260801345,
+      "timestamp": "2025-07-22T22:42:20.149949"
+    },
+    {
+      "test_name": "tests/test_simple.py",
+      "passed": true,
+      "output": "..                                                                       [100%]\n2 passed in 0.03s\n",
+      "duration": 0.8218891050200909,
+      "timestamp": "2025-07-22T22:42:20.149950"
+    },
+    {
+      "test_name": "tests/firecircle/test_adapter_smoke.py",
+      "passed": false,
+      "output": "E\n==================================== ERRORS ====================================\n________________________ ERROR at setup of test_adapter ________________________\nfile /home/tony/projects/Mallku/tests/firecircle/test_adapter_smoke.py, line 44\n  async def test_adapter(adapter_name: str, config: AdapterConfig = None) -> bool:\n      \"\"\"Test a single adapter instantiation WITHOUT connecting to APIs.\"\"\"\n      try:\n          # Import the adapter class directly to test instantiation only\n          adapter_classes = {\n              \"anthropic\": (\"anthropic_adapter\", \"AnthropicAdapter\"),\n              \"openai\": (\"openai_adapter\", \"OpenAIConsciousAdapter\"),\n              \"google\": (\"google_adapter\", \"GoogleAIAdapter\"),\n              \"mistral\": (\"mistral_adapter\", \"MistralAIAdapter\"),\n              \"grok\": (\"grok_openai_adapter\", \"GrokOpenAIAdapter\"),\n              \"deepseek\": (\"deepseek_adapter\", \"DeepseekAIAdapter\"),\n              \"local\": (\"local_adapter\", \"LocalAIAdapter\"),\n          }\n\n          if adapter_name not in adapter_classes:\n              print(f\"\u274c FAILED: Unknown adapter {adapter_name}\")\n              return False\n\n          module_name, class_name = adapter_classes[adapter_name]\n\n          # Import the adapter module\n          module = __import__(f\"mallku.firecircle.adapters.{module_name}\", fromlist=[class_name])\n          adapter_class = getattr(module, class_name)\n\n          # Create minimal config if not provided\n          if config is None:\n              config = AdapterConfig(api_key=\"test\", model_name=\"test-model\")\n\n          # Instantiate adapter WITHOUT connecting\n          adapter = adapter_class(config=config, event_bus=None, reciprocity_tracker=None)\n\n          # Verify adapter was created\n          if adapter is None:\n              print(f\"\u274c FAILED: Adapter instantiation returned None for {adapter_name}\")\n              return False\n\n          print(f\"\u2705 SUCCESS: {adapter_name} adapter instantiated (no API connection)\")\n          print(f\"   Type: {type(adapter).__name__}\")\n          print(f\"   Model: {getattr(config, 'model_name', 'Unknown')}\")\n          print(f\"   Provider: {getattr(adapter, 'provider_name', 'Unknown')}\")\n          return True\n\n      except ImportError as e:\n          print(f\"\u274c FAILED: Import error for {adapter_name}\")\n          print(f\"   Error: {e}\")\n          return False\n\n      except Exception as e:\n          print(f\"\u274c FAILED: {adapter_name} adapter instantiation failed\")\n          print(f\"   Error type: {type(e).__name__}\")\n          print(f\"   Error: {e}\")\n          return False\nE       fixture 'adapter_name' not found\n>       available fixtures: _class_event_loop, _function_event_loop, _module_event_loop, _package_event_loop, _session_event_loop, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, class_mocker, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, mocker, module_mocker, monkeypatch, package_mocker, preserve_sys_path, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, session_mocker, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory\n>       use 'pytest --fixtures [testpath]' for help on them.\n\n/home/tony/projects/Mallku/tests/firecircle/test_adapter_smoke.py:44\n=========================== short test summary info ============================\nERROR tests/firecircle/test_adapter_smoke.py::test_adapter\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n11 warnings, 1 error in 1.49s\n",
+      "duration": 2.827356926165521,
+      "timestamp": "2025-07-22T22:42:20.149952"
+    },
+    {
+      "test_name": "-m",
+      "passed": false,
+      "output": "56\tW293  \t[*] blank-line-with-whitespace\n 4\tF401  \t[*] unused-import\n 4\tW292  \t[*] missing-newline-at-end-of-file\n 2\tDTZ005\t[ ] call-datetime-now-without-tzinfo\n 2\tF541  \t[*] f-string-missing-placeholders\n 2\tUP006 \t[*] non-pep585-annotation\n 2\tUP035 \t[ ] deprecated-import\n 1\tW291  \t[*] trailing-whitespace\nFound 73 errors.\n[*] 67 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).\n",
+      "duration": 0.15578983700834215,
+      "timestamp": "2025-07-22T22:42:20.149953"
+    }
+  ]
+}

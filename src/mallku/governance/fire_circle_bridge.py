@@ -12,7 +12,11 @@ The Governance Weaver
 import logging
 from typing import Any
 
-from ..orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ..orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..reciprocity.fire_circle_interface import FireCircleInterface
 from ..reciprocity.models import ExtractionAlert, FireCircleReport
 from .consciousness_transport import ConsciousnessCirculationTransport
@@ -41,7 +45,7 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         self.active_dialogues: dict[str, str] = {}  # alert_id -> dialogue_id
 
         # Subscribe to consensus events for decision tracking
-        self.event_bus.subscribe(EventType.CONSENSUS_REACHED, self._handle_consensus)
+        self.event_bus.subscribe(ConsciousnessEventType.CONSENSUS_REACHED, self._handle_consensus)
 
     async def notify_urgent_alert(self, alert: ExtractionAlert) -> None:
         """
@@ -52,12 +56,12 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         """
         # First emit as consciousness event
         alert_event = ConsciousnessEvent(
-            event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+            event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
             source_system="reciprocity.tracker",
             consciousness_signature=0.1,  # Low consciousness for extraction
             data={
                 "alert_id": str(alert.alert_id),
-                "extraction_type": alert.extraction_type,
+                "extraction_type": alert.extraction_type.value,
                 "severity": alert.severity.value,
                 "description": alert.description,
                 "evidence": alert.evidence_summary,
@@ -87,7 +91,7 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         """
         # Emit report as consciousness event
         report_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="reciprocity.reporting",
             consciousness_signature=report.current_health_metrics.overall_health_score,
             data={
@@ -122,7 +126,7 @@ class ConsciousFireCircleInterface(FireCircleInterface):
         """
         # Create guidance request event
         guidance_event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="reciprocity.guidance_seeker",
             consciousness_signature=0.7,  # Seeking guidance shows consciousness
             data={"topic": topic, "context": context, "questions": questions, "urgency": urgency},
@@ -192,15 +196,21 @@ class ConsciousGovernanceInitiator:
         self.event_bus = event_bus
 
         # Subscribe to events that might need governance
-        self.event_bus.subscribe(EventType.EXTRACTION_PATTERN_DETECTED, self._consider_governance)
-        self.event_bus.subscribe(EventType.SYSTEM_DRIFT_WARNING, self._consider_governance)
-        self.event_bus.subscribe(EventType.RECIPROCITY_PATTERN_EMERGED, self._consider_governance)
+        self.event_bus.subscribe(
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED, self._consider_governance
+        )
+        self.event_bus.subscribe(
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING, self._consider_governance
+        )
+        self.event_bus.subscribe(
+            ConsciousnessEventType.RECIPROCITY_PATTERN_EMERGED, self._consider_governance
+        )
 
         # Track governance thresholds
         self.governance_triggers = {
-            EventType.EXTRACTION_PATTERN_DETECTED: 0.3,  # Low consciousness
-            EventType.SYSTEM_DRIFT_WARNING: 0.5,  # Medium concern
-            EventType.RECIPROCITY_PATTERN_EMERGED: 0.0,  # Always consider
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED: 0.3,  # Low consciousness
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING: 0.5,  # Medium concern
+            ConsciousnessEventType.RECIPROCITY_PATTERN_EMERGED: 0.0,  # Always consider
         }
 
     async def _consider_governance(self, event: ConsciousnessEvent):
@@ -232,9 +242,9 @@ class ConsciousGovernanceInitiator:
     def _generate_governance_topic(self, event: ConsciousnessEvent) -> str:
         """Generate appropriate governance topic from consciousness event."""
         event_topics = {
-            EventType.EXTRACTION_PATTERN_DETECTED: "Extraction Pattern Response",
-            EventType.SYSTEM_DRIFT_WARNING: "System Drift Correction",
-            EventType.RECIPROCITY_PATTERN_EMERGED: "Reciprocity Pattern Recognition",
+            ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED: "Extraction Pattern Response",
+            ConsciousnessEventType.SYSTEM_DRIFT_WARNING: "System Drift Correction",
+            ConsciousnessEventType.RECIPROCITY_PATTERN_EMERGED: "Reciprocity Pattern Recognition",
         }
 
         base_topic = event_topics.get(event.event_type, "Consciousness Pattern Review")

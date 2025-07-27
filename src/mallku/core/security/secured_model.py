@@ -9,9 +9,9 @@ import builtins
 import json
 from typing import Any, get_type_hints
 
-from pydantic import BaseModel
 from pydantic import Field as PydanticField
 
+from ...core.models import ModelConfig
 from .field_strategies import FieldIndexStrategy, FieldObfuscationLevel, FieldSecurityConfig
 from .registry import SecurityRegistry
 
@@ -54,7 +54,7 @@ def SecuredField(
     return PydanticField(default, **kwargs)
 
 
-class SecuredModel(BaseModel):
+class SecuredModel(ModelConfig):
     """
     Base model for Mallku with integrated security features.
 
@@ -67,12 +67,6 @@ class SecuredModel(BaseModel):
 
     _registry: SecurityRegistry | None = None
     _development_mode: bool = False
-
-    class Config:
-        # Allow extra fields for metadata
-        extra = "allow"
-        # Use enum values in serialization
-        use_enum_values = True
 
     @classmethod
     def set_registry(cls, registry: SecurityRegistry) -> None:
@@ -111,7 +105,11 @@ class SecuredModel(BaseModel):
             field_info = self.__fields__.get(field_name)
             security_config = None
 
-            if field_info and hasattr(field_info, "json_schema_extra"):
+            if (
+                field_info
+                and hasattr(field_info, "json_schema_extra")
+                and field_info.json_schema_extra
+            ):
                 config_dict = field_info.json_schema_extra.get("security_config")
                 if config_dict:
                     security_config = FieldSecurityConfig(**config_dict)

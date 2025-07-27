@@ -2,10 +2,10 @@
 ## Discovered by Foundation Verification Suite
 
 ### Issue Summary
-The foundation verification tests revealed that database access control needs strengthening. While `get_secured_database()` exists as the intended sole access point, the architectural enforcement could be stronger.
+The foundation verification tests revealed that database access control needs strengthening. While `get_database()` exists as the intended sole access point, the architectural enforcement could be stronger.
 
 ### Current State
-- ✅ `get_secured_database()` provides a secured interface
+- ✅ `get_database()` provides a secured interface
 - ✅ Security registry and UUID obfuscation work correctly
 - ❌ Direct database access is not architecturally impossible
 - ❌ Container isolation not fully enforced in development
@@ -22,10 +22,10 @@ Database access should be physically impossible except through the secured inter
 #### 1. Module Structure Reform
 ```python
 # mallku/core/database/__init__.py
-from .secured_interface import get_secured_database
+from .secured_interface import get_database
 # Explicitly do NOT export raw database classes
 
-__all__ = ['get_secured_database']  # Only export secured access
+__all__ = ['get_database']  # Only export secured access
 ```
 
 #### 2. Container Configuration
@@ -47,7 +47,7 @@ services:
 #### 3. Development Environment Enforcement
 ```python
 # mallku/core/database/factory.py
-def get_secured_database():
+def get_database():
     if not _is_properly_isolated():
         raise SecurityError(
             "Database access attempted outside secured context. "

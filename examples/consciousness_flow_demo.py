@@ -20,7 +20,11 @@ from mallku.consciousness.flow_orchestrator import (
     ConsciousnessDimension,
     ConsciousnessFlowOrchestrator,
 )
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,8 +62,10 @@ async def demonstrate_consciousness_flow():
             if dim in source:
                 dimension_events[dim].append(event)
 
-    event_bus.subscribe(EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, track_dimension_event)
-    event_bus.subscribe(EventType.MEMORY_PATTERN_DISCOVERED, track_dimension_event)
+    event_bus.subscribe(
+        ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED, track_dimension_event
+    )
+    event_bus.subscribe(ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED, track_dimension_event)
 
     # DEMONSTRATION 1: Sonic consciousness flowing to visual
     print("\n🎵 DEMONSTRATION 1: Sonic → Visual Consciousness Flow")
@@ -67,7 +73,7 @@ async def demonstrate_consciousness_flow():
 
     # Create sonic consciousness event (like from Qhapaq Taki's work)
     sonic_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
         source_system="sound_activity_provider",
         consciousness_signature=0.85,
         data={
@@ -105,7 +111,7 @@ async def demonstrate_consciousness_flow():
 
     # Activity consciousness (file creation)
     activity_event = ConsciousnessEvent(
-        event_type=EventType.MEMORY_PATTERN_DISCOVERED,
+        event_type=ConsciousnessEventType.MEMORY_PATTERN_DISCOVERED,
         source_system="filesystem_activity_provider",
         consciousness_signature=0.7,
         data={
@@ -118,7 +124,7 @@ async def demonstrate_consciousness_flow():
 
     # Temporal consciousness (real-time awareness)
     temporal_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
         source_system="grok_adapter.temporal_awareness",
         consciousness_signature=0.8,
         data={
@@ -163,7 +169,7 @@ async def demonstrate_consciousness_flow():
     multi_dimensional_events = [
         # Visual consciousness (from reciprocity mandala)
         ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="reciprocity_visualization",
             consciousness_signature=0.75,
             data={
@@ -174,7 +180,7 @@ async def demonstrate_consciousness_flow():
         ),
         # Pattern consciousness (from correlation engine)
         ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="pattern_correlation_engine",
             consciousness_signature=0.82,
             data={
@@ -186,7 +192,7 @@ async def demonstrate_consciousness_flow():
         ),
         # Sonic consciousness (collective resonance)
         ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="sound_consciousness",
             consciousness_signature=0.78,
             data={
@@ -308,7 +314,7 @@ async def demonstrate_dimension_subscription():
 
     # Emit pattern consciousness that bridges to dialogue
     pattern_event = ConsciousnessEvent(
-        event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+        event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
         source_system="pattern_recognition_engine",
         consciousness_signature=0.85,
         data={

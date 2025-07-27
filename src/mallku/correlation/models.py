@@ -12,15 +12,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-
-class EventType(str, Enum):
-    """Types of events that can be correlated."""
-
-    ACTIVITY = "activity"
-    STORAGE = "storage"
-    ENVIRONMENTAL = "environmental"
-    COMMUNICATION = "communication"
-    LOCATION = "location"
+from mallku.core.models import ModelConfig
+from mallku.orchestration.event_bus import ConsciousnessEventType
 
 
 class TemporalPrecision(str, Enum):
@@ -33,7 +26,7 @@ class TemporalPrecision(str, Enum):
     CYCLICAL = "cyclical"  # days
 
 
-class Event(BaseModel):
+class Event(ModelConfig):
     """
     Represents a single event in an activity stream.
 
@@ -44,7 +37,7 @@ class Event(BaseModel):
 
     event_id: UUID = Field(default_factory=uuid4)
     timestamp: datetime = Field(..., description="When this event occurred")
-    event_type: EventType = Field(..., description="Category of event")
+    event_type: ConsciousnessEventType = Field(..., description="Category of event")
     stream_id: str = Field(..., description="Source stream identifier")
 
     # Event content and context
@@ -58,10 +51,7 @@ class Event(BaseModel):
         default_factory=list, description="Tags that help identify correlation opportunities"
     )
 
-    class Config:
-        """Model configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
+    model_config = {"json_encoders": {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}}
 
 
 class TemporalCorrelation(BaseModel):
@@ -166,7 +156,7 @@ class CorrelationWindow(BaseModel):
             return True
         return False
 
-    def get_events_by_type(self, event_type: EventType) -> list[Event]:
+    def get_events_by_type(self, event_type: ConsciousnessEventType) -> list[Event]:
         """Get all events of a specific type within this window."""
         return [event for event in self.events if event.event_type == event_type]
 

@@ -22,7 +22,11 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from ...orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..service.service import FireCircleResult, FireCircleService
 from .ceremony_orchestrator import CeremonyOrchestrator
 from .config import MemorySystemConfig
@@ -265,7 +269,7 @@ class EpisodicMemoryService:
     async def _emit_sacred_moment_event(self, memory: EpisodicMemory) -> None:
         """Emit event for sacred moment detection."""
         event = ConsciousnessEvent(
-            event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
             source_system="episodic_memory",
             consciousness_signature=memory.consciousness_indicators.overall_emergence_score,
             data={

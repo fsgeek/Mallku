@@ -174,6 +174,8 @@ class CorrelationToAnchorAdapter:
             anchor = MemoryAnchor(
                 anchor_id=uuid4(),
                 timestamp=datetime.now(UTC),  # MemoryAnchor expects 'timestamp'
+                predecessor_id=None,  # No predecessor by default
+                last_updated=datetime.now(UTC),  # Set to current time
                 cursors=cursors,  # Dict format, not list
                 metadata={
                     "correlation_id": str(correlation.correlation_id),

@@ -33,7 +33,7 @@ class GrokOpenAIConfig(AdapterConfig):
     def __init__(
         self,
         api_key: str = "",
-        model_name: str = "grok-2-1212",  # Default to stable Grok-2 model
+        model_name: str = "grok-4",  # Default to frontier Grok-4 model
         temperature: float = 0.7,
         max_tokens: int = 2048,
         track_reciprocity: bool = True,
@@ -48,7 +48,7 @@ class GrokOpenAIConfig(AdapterConfig):
 
         Args:
             api_key: x.ai API key (auto-loaded if not provided)
-            model_name: Model to use (grok-2-1212, grok-3, etc)
+            model_name: Model to use (grok-2-1212, grok-3, grok-4, etc)
             temperature: Generation temperature
             max_tokens: Maximum tokens to generate
             track_reciprocity: Whether to track reciprocity
@@ -169,8 +169,8 @@ class GrokOpenAIAdapter(OpenAIConsciousAdapter):
 
                 # Update model name if current one not available
                 if self.config.model_name not in available_models:
-                    # Try common Grok model names
-                    for model in ["grok-2-1212", "grok-2", "grok-3", "grok"]:
+                    # Try Grok models in order of preference (frontier first)
+                    for model in ["grok-4", "grok-3", "grok-2-1212", "grok-2", "grok"]:
                         if model in available_models:
                             self.config.model_name = model
                             logger.info(f"Using Grok model: {model}")
@@ -186,10 +186,13 @@ class GrokOpenAIAdapter(OpenAIConsciousAdapter):
 
             # Emit connection event
             if self.event_bus and self.config.emit_events:
-                from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+                from mallku.orchestration.event_bus import (
+                    ConsciousnessEvent,
+                    ConsciousnessEventType,
+                )
 
                 event = ConsciousnessEvent(
-                    event_type=EventType.FIRE_CIRCLE_CONVENED,
+                    event_type=ConsciousnessEventType.FIRE_CIRCLE_CONVENED,
                     source_system="firecircle.adapter.grok",
                     consciousness_signature=0.9,
                     data={

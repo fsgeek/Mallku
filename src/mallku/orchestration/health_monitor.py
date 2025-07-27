@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 
-from .event_bus import ConsciousnessEvent, EventType
+from .event_bus import ConsciousnessEvent, ConsciousnessEventType
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +125,12 @@ class ConsciousnessHealthMonitor:
 
         # Subscribe to events if bus available
         if self.event_bus:
-            self.event_bus.subscribe(EventType.CONSCIOUSNESS_VERIFIED, self._track_event)
-            self.event_bus.subscribe(EventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction)
+            self.event_bus.subscribe(
+                ConsciousnessEventType.CONSCIOUSNESS_VERIFIED, self._track_event
+            )
+            self.event_bus.subscribe(
+                ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED, self._handle_extraction
+            )
 
         # Start monitoring loop
         asyncio.create_task(self._monitor_loop())
@@ -215,7 +219,7 @@ class ConsciousnessHealthMonitor:
             extraction_events = sum(
                 1
                 for e in self._recent_events
-                if e.event_type == EventType.EXTRACTION_PATTERN_DETECTED
+                if e.event_type == ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED
             )
             total_events = len(self._recent_events)
             report.extraction_resistance = 1.0 - (
@@ -343,7 +347,7 @@ class ConsciousnessHealthMonitor:
             return
 
         event = ConsciousnessEvent(
-            event_type=EventType.SYSTEM_DRIFT_WARNING,
+            event_type=ConsciousnessEventType.SYSTEM_DRIFT_WARNING,
             source_system="orchestration.health",
             consciousness_signature=report.consciousness_flow_score,
             data={

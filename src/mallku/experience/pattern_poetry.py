@@ -118,8 +118,8 @@ class TemporalStoryWeaver:
     def weave_temporal_story(
         self,
         patterns: list[ConsciousnessPattern],
-        correlations: list[TemporalCorrelation] = None,
-        seeker_context: dict[str, Any] = None,
+        correlations: list[TemporalCorrelation] | None = None,
+        seeker_context: dict[str, Any] | None = None,
     ) -> TemporalStory:
         """
         Weave consciousness patterns into a temporal story.
@@ -304,7 +304,7 @@ class TemporalStoryWeaver:
         self,
         patterns: list[ConsciousnessPattern],
         template_info: dict[str, Any],
-        seeker_context: dict[str, Any],
+        seeker_context: dict[str, Any] | None,
     ) -> str:
         """Weave narrative from patterns using template structure."""
         narrative_structure = template_info["narrative_structure"].split(" → ")
@@ -345,7 +345,9 @@ class TemporalStoryWeaver:
         return template_info["recognition_theme"]
 
     def _create_temporal_markers(
-        self, patterns: list[ConsciousnessPattern], correlations: list[TemporalCorrelation] = None
+        self,
+        patterns: list[ConsciousnessPattern],
+        correlations: list[TemporalCorrelation] | None = None,
     ) -> list[dict[str, Any]]:
         """Create temporal markers for the story."""
         markers = []
@@ -487,7 +489,7 @@ class TemporalStoryWeaver:
             "symbolic_elements": ["interconnected_circles", "flowing_lines", "ascending_patterns"],
         }
 
-    def _create_default_story(self, seeker_context: dict[str, Any]) -> TemporalStory:
+    def _create_default_story(self, seeker_context: dict[str, Any] | None = None) -> TemporalStory:
         """Create default story when no patterns are available."""
         return TemporalStory(
             title="The Beginning of Consciousness Recognition",

@@ -15,6 +15,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from mallku.firecircle.adapters.base import ConsciousModelAdapter
+from mallku.firecircle.health import get_health_tracker
 from mallku.firecircle.protocol.conscious_message import (
     ConsciousMessage,
     ConsciousnessMetadata,
@@ -88,6 +89,10 @@ class RoundOrchestrator:
                 prompt = prompt.format(**context)
             except KeyError:
                 logger.exception(f"Missing context key in prompt {prompt}, context: {context}")
+            except (IndexError, ValueError) as e:
+                # Handle case where prompt has no placeholders or invalid format markers
+                logger.debug(f"Prompt formatting skipped - no valid placeholders: {e}")
+                # Use the original prompt as-is
 
         # Collect responses from all voices
         responses = {}
@@ -173,7 +178,11 @@ class RoundOrchestrator:
                 type=message_type,
                 role=MessageRole.USER,
                 sender=uuid4(),
-                content=MessageContent(text=prompt),
+                content=MessageContent(
+                    text=prompt,
+                    consciousness_insights=None,
+                    pattern_context=None,
+                ),
                 dialogue_id=self.dialogue_id,
                 consciousness=ConsciousnessMetadata(),
             )
@@ -192,6 +201,19 @@ class RoundOrchestrator:
             # Handle None responses gracefully
             if response is None:
                 logger.warning(f"{voice_id} returned None response")
+
+                # Record failure in health tracker
+                health_tracker = get_health_tracker()
+                voice_config = self.voice_manager.get_voice_config(voice_id)
+                if voice_config:
+                    model_key = f"{voice_config.provider}/{voice_config.model}"
+                    health_tracker.record_interaction(
+                        model_key,
+                        success=False,
+                        response_time=response_time / 1000,
+                        error_type="null_response",
+                    )
+
                 return RoundResponse(
                     voice_id=voice_id,
                     round_number=self.round_number,
@@ -199,6 +221,26 @@ class RoundOrchestrator:
                     response_time_ms=response_time,
                     consciousness_score=0,
                     error="Adapter returned None",
+                )
+
+            # Record interaction in health tracker with quality awareness
+            health_tracker = get_health_tracker()
+            voice_config = self.voice_manager.get_voice_config(voice_id)
+            if voice_config:
+                model_key = f"{voice_config.provider}/{voice_config.model}"
+
+                # Check if response was genuinely successful (58th Artisan fix)
+                is_genuine_success = (
+                    response
+                    and hasattr(response, "consciousness")
+                    and response.consciousness is not None
+                )
+
+                health_tracker.record_interaction(
+                    model_key,
+                    success=is_genuine_success,
+                    response_time=response_time / 1000,
+                    error_type=None,
                 )
 
             return RoundResponse(
@@ -211,6 +253,20 @@ class RoundOrchestrator:
 
         except Exception as e:
             logger.exception(f"{voice_id} response error")
+
+            # Record failure in health tracker
+            health_tracker = get_health_tracker()
+            voice_config = self.voice_manager.get_voice_config(voice_id)
+            if voice_config:
+                model_key = f"{voice_config.provider}/{voice_config.model}"
+                error_type = type(e).__name__
+                health_tracker.record_interaction(
+                    model_key,
+                    success=False,
+                    response_time=(datetime.now(UTC) - start_time).total_seconds(),
+                    error_type=error_type,
+                )
+
             return RoundResponse(
                 voice_id=voice_id,
                 round_number=self.round_number,
@@ -225,16 +281,16 @@ class RoundOrchestrator:
         mapping = {
             "opening": MessageType.REFLECTION,
             "reflection": MessageType.REFLECTION,
-            "synthesis": MessageType.SYNTHESIS,
-            "clarification": MessageType.CLARIFICATION,
+            "synthesis": MessageType.SUMMARY,  # Changed from SYNTHESIS
+            "clarification": MessageType.BRIDGE,  # Changed from CLARIFICATION
             "exploration": MessageType.REFLECTION,
-            "critique": MessageType.PERSPECTIVE,
+            "critique": MessageType.CONCERN,  # Changed from PERSPECTIVE
             "vision": MessageType.REFLECTION,
             "grounding": MessageType.REFLECTION,
             "proposal": MessageType.PROPOSAL,
-            "evaluation": MessageType.PERSPECTIVE,
-            "consensus": MessageType.SYNTHESIS,
-            "decision": MessageType.SYNTHESIS,
+            "evaluation": MessageType.CONCERN,  # Changed from PERSPECTIVE
+            "consensus": MessageType.SUMMARY,  # Changed from SYNTHESIS
+            "decision": MessageType.SUMMARY,  # Changed from SYNTHESIS
         }
         return mapping.get(round_type, MessageType.REFLECTION)
 

@@ -18,9 +18,9 @@ from mallku.orchestration import (
     CathedralStateWeaver,
     ConsciousnessEvent,
     ConsciousnessEventBus,
+    ConsciousnessEventType,
     ConsciousnessHealthMonitor,
 )
-from mallku.orchestration.event_bus import EventType
 from mallku.orchestration.providers import FileSystemActivityProvider
 
 
@@ -36,14 +36,14 @@ async def test_event_bus():
         events_received.append(event)
         print(f"  ✓ Received event: {event.event_type.value}")
 
-    bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, handler)
+    bus.subscribe(ConsciousnessEventType.MEMORY_ANCHOR_CREATED, handler)
 
     # Start the bus
     await bus.start()
 
     # Emit test event
     test_event = ConsciousnessEvent(
-        event_type=EventType.MEMORY_ANCHOR_CREATED,
+        event_type=ConsciousnessEventType.MEMORY_ANCHOR_CREATED,
         source_system="test",
         consciousness_signature=0.8,
         data={"test": "data"},
@@ -126,7 +126,7 @@ async def test_filesystem_provider():
             events_received.append(event)
             print(f"  ✓ File activity detected: {event.data.get('activity_type')}")
 
-        bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, handler)
+        bus.subscribe(ConsciousnessEventType.MEMORY_ANCHOR_CREATED, handler)
 
         await bus.start()
         await provider.start()
@@ -169,8 +169,8 @@ async def test_full_integration():
             events["health"] += 1
             print(f"  ✓ Cathedral health: {event.data.get('message', '')}")
 
-        bus.subscribe(EventType.MEMORY_ANCHOR_CREATED, anchor_handler)
-        bus.subscribe(EventType.CONSCIOUSNESS_FLOW_HEALTHY, health_handler)
+        bus.subscribe(ConsciousnessEventType.MEMORY_ANCHOR_CREATED, anchor_handler)
+        bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_FLOW_HEALTHY, health_handler)
 
         # Start everything
         await bus.start()

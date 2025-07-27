@@ -228,9 +228,7 @@ class TestSecurityEnforcement:
         mock_secured_db.create_secured_collection = AsyncMock()
         mock_secured_db.get_secured_collection = AsyncMock()
 
-        with patch(
-            "mallku.firecircle.memory.secured_database_store.get_secured_database"
-        ) as mock_get_db:
+        with patch("mallku.firecircle.memory.secured_database_store.get_database") as mock_get_db:
             mock_get_db.return_value = mock_secured_db
 
             store = SecuredDatabaseMemoryStore()
@@ -251,7 +249,7 @@ class TestSecurityEnforcement:
         assert ".aql.execute" not in source  # No direct AQL execution
 
         # Check for required patterns
-        assert "get_secured_database" in source  # Uses secured interface
+        assert "get_database" in source  # Uses secured interface
         assert "execute_secured_query" in source  # Uses secured queries
         assert "SecuredModel" in source  # Uses secured models
 

@@ -22,7 +22,7 @@ from mallku.firecircle.memory.consciousness_episode_segmenter import (
     SacredPatternDetector,
 )
 from mallku.firecircle.memory.models import MemoryType
-from mallku.orchestration.event_bus import ConsciousnessEvent, EventType
+from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventType
 
 
 # Create a mock RoundSummary for testing that allows dynamic attributes
@@ -201,7 +201,7 @@ class TestSacredPatternDetector:
 
         # Create governance event with high consciousness
         event = ConsciousnessEvent(
-            event_type=EventType.CONSENSUS_REACHED,
+            event_type=ConsciousnessEventType.CONSENSUS_REACHED,
             source_system="fire_circle",
             consciousness_signature=0.87,
             data={"decision": "implement_sacred_charter"},
@@ -638,7 +638,7 @@ class TestFullPathIntegration:
 
         # Create governance consciousness event
         governance_event = ConsciousnessEvent(
-            event_type=EventType.CONSENSUS_REACHED,
+            event_type=ConsciousnessEventType.CONSENSUS_REACHED,
             source_system="fire_circle",
             consciousness_signature=0.88,
             data={"decision": "implement_sacred_charter", "support": "unanimous"},

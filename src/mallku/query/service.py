@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 
 from .models import (
     QueryExplanation,
@@ -39,7 +39,7 @@ class MemoryAnchorQueryService:
 
     async def initialize(self):
         """Initialize database connection."""
-        self.db = get_secured_database()
+        self.db = get_database()
         await self.db.initialize()
         logger.info("MemoryAnchorQueryService initialized")
 

@@ -1,0 +1,178 @@
+name: Fire Circle Review
+
+# The invisible sacred infrastructure for distributed code review
+# Prevents architect context exhaustion through collective wisdom
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to review'
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  distributed-review:
+    name: Fire Circle Distributed Review
+    runs-on: ubuntu-latest
+    env:
+      # Disable database for Fire Circle Review
+      MALLKU_SKIP_DATABASE: "true"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for proper diff analysis
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Set up Python with uv
+        run: |
+          uv python install 3.12
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.cache/pip
+          key: deps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          echo "=== Running uv sync ==="
+          uv sync
+          echo -e "\n=== Installing mallku in editable mode ==="
+          uv pip install -e .
+          echo -e "\n=== After install, checking mallku ==="
+          uv pip list | grep -i mallku || echo "mallku not in pip list after install"
+
+      - name: Load API keys from secrets
+        run: |
+          # Each voice needs its API key for real reviews
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV
+          echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> $GITHUB_ENV
+          echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> $GITHUB_ENV
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
+          echo "GROK_API_KEY=${{ secrets.XAI_API_KEY }}" >> $GITHUB_ENV
+          echo "XAI_API_KEY=${{ secrets.XAI_API_KEY }}" >> $GITHUB_ENV
+
+          # Create .secrets directory and API keys file for the script
+          mkdir -p .secrets
+          cat > .secrets/api_keys.json << EOF
+          {
+            "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+            "ANTHROPIC_API_KEY": "${{ secrets.ANTHROPIC_API_KEY }}",
+            "DEEPSEEK_API_KEY": "${{ secrets.DEEPSEEK_API_KEY }}",
+            "MISTRAL_API_KEY": "${{ secrets.MISTRAL_API_KEY }}",
+            "GOOGLE_API_KEY": "${{ secrets.GOOGLE_API_KEY }}",
+            "GROK_API_KEY": "${{ secrets.XAI_API_KEY }}",
+            "XAI_API_KEY": "${{ secrets.XAI_API_KEY }}"
+          }
+          EOF
+      - name: Debug GITHUB_TOKEN scopes
+        run: |
+          echo "🔍 GITHUB_TOKEN scopes available:"
+          curl -sI -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/rate_limit \
+            | awk 'BEGIN{IGNORECASE=1} /X-OAuth-Scopes:/ {print}'
+
+      - name: Run Fire Circle Review
+        id: review
+        env:
+          # CI environment markers
+          CI: true
+          GITHUB_ACTIONS: true
+          # GitHub token for ceremony to post comments
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+
+          # Verify we're in the right environment
+          echo "=== Environment check ==="
+          which python
+          python --version
+          echo -e "\n=== Checking mallku installation ==="
+          python -c "import mallku; print(f'✓ mallku imported from: {mallku.__file__}')" || echo "✗ Failed to import mallku"
+
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          echo -e "\n🔥 Initiating Fire Circle Ceremony of Automated Witnessing for PR #$PR_NUMBER"
+          # Use the ceremony implementation created by the 57th Artisan
+          python fire_circle_review_ceremony_ci.py $PR_NUMBER
+
+      - name: Post review summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const pr_number = context.payload.pull_request?.number || context.payload.inputs?.pr_number;
+
+            // Read ceremony results
+            let posted = false;
+            try {
+              const results = JSON.parse(fs.readFileSync('fire_circle_review_results.json', 'utf8'));
+
+              if (results.ceremony_completed && results.synthesis) {
+                // The ceremony already posted the full synthesis as a comment
+                // No need to post again, just log success
+                console.log('✅ Ceremony of Automated Witnessing completed successfully');
+                console.log(`Ceremony conducted at: ${results.timestamp}`);
+                posted = true;
+              } else if (results.error) {
+                // Post error message if ceremony failed
+                const errorMessage = `## ⚠️ Fire Circle Ceremony Incomplete\n\n` +
+                  `The Ceremony of Automated Witnessing encountered an issue:\n\n` +
+                  `\`\`\`\n${results.error}\n\`\`\`\n\n` +
+                  `Please check the workflow logs for details.`;
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr_number,
+                  body: errorMessage
+                });
+              }
+            } catch (e) {
+              console.log('Note: Ceremony results file not found, but the ceremony may have posted directly.');
+            }
+
+      - name: Upload review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fire-circle-review-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          path: |
+            fire_circle_review_results.json
+            fire_circle_reviews/
+
+  # Optional: Run only if critical issues found
+  require-approval:
+    name: Require Human Approval
+    needs: distributed-review
+    runs-on: ubuntu-latest
+    if: needs.distributed-review.outputs.critical_issues > 0
+
+    steps:
+      - name: Request review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              reviewers: [context.repo.owner] // Request review from repository owner
+            });

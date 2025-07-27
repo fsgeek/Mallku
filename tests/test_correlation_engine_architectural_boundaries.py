@@ -4,7 +4,7 @@ Test: Architectural Boundaries - CorrelationEngine and SecuredDatabaseInterface
 This test demonstrates the key architectural boundaries without requiring
 a full database connection. It focuses on verifying that:
 
-1. CorrelationEngine uses get_secured_database() correctly
+1. CorrelationEngine uses get_database() correctly
 2. The memory_anchors collection has the proper security policy
 3. Components respect the secured database interface
 """
@@ -21,7 +21,12 @@ from mallku.core.database.secured_interface import (
     SecuredDatabaseInterface,
 )
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType, TemporalCorrelation, TemporalPrecision
+from mallku.correlation.models import (
+    ConsciousnessEventType,
+    Event,
+    TemporalCorrelation,
+    TemporalPrecision,
+)
 from mallku.models import MemoryAnchor
 from mallku.query.service import MemoryAnchorQueryService
 
@@ -74,7 +79,7 @@ class TestArchitecturalBoundaries:
         mock_memory_service = MagicMock()
         mock_memory_service.initialize = AsyncMock()
 
-        with patch("mallku.correlation.engine.get_secured_database", return_value=mock_secured_db):
+        with patch("mallku.correlation.engine.get_database", return_value=mock_secured_db):
             with patch(
                 "mallku.correlation.engine.MemoryAnchorService", return_value=mock_memory_service
             ):
@@ -119,7 +124,7 @@ class TestArchitecturalBoundaries:
         mock_secured_db = MagicMock(spec=SecuredDatabaseInterface)
         mock_secured_db.initialize = AsyncMock()
 
-        with patch("mallku.query.service.get_secured_database", return_value=mock_secured_db):
+        with patch("mallku.query.service.get_database", return_value=mock_secured_db):
             # Create query service
             service = MemoryAnchorQueryService()
 
@@ -139,7 +144,7 @@ class TestArchitecturalBoundaries:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="filesystem",
             content={"file": "test.pdf"},
         )
@@ -244,7 +249,7 @@ class TestArchitecturalBoundaries:
 
         2. CorrelationEngine._create_memory_anchor(correlation)
            - Converts TemporalCorrelation to MemoryAnchor
-           - Calls get_secured_database() to get SecuredDatabaseInterface
+           - Calls get_database() to get SecuredDatabaseInterface
 
         3. SecuredDatabaseInterface.get_secured_collection("memory_anchors")
            - Returns SecuredCollectionWrapper with memory_anchors policy
@@ -259,7 +264,7 @@ class TestArchitecturalBoundaries:
            - Operates on memory_anchors collection with proper boundaries
 
         KEY POINTS:
-        - All database access goes through get_secured_database()
+        - All database access goes through get_database()
         - memory_anchors has special policy for backward compatibility
         - Even with requires_security=False, still uses secured interface
         - No component bypasses the architectural boundary

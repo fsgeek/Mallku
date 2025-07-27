@@ -27,7 +27,11 @@ from rich.tree import Tree
 
 from mallku.consciousness.flow_monitor import ConsciousnessFlowMonitor
 from mallku.consciousness.flow_orchestrator import ConsciousnessFlowOrchestrator
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 
 class PatternEmergenceVisualizer:
@@ -214,7 +218,7 @@ async def simulate_pattern_rich_events(
 
             # Initial emergence
             event = ConsciousnessEvent(
-                event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                 source_system=f"{initial_dimension}_consciousness",
                 consciousness_signature=0.6 + (cycle * 0.02),
                 data={
@@ -235,7 +239,7 @@ async def simulate_pattern_rich_events(
                 ]
 
                 spread_event = ConsciousnessEvent(
-                    event_type=EventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
+                    event_type=ConsciousnessEventType.CONSCIOUSNESS_PATTERN_RECOGNIZED,
                     source_system=f"{spread_dimension}_recognition",
                     consciousness_signature=0.7 + (cycle * 0.015),
                     data={

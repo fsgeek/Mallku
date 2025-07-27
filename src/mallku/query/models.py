@@ -61,7 +61,7 @@ class TemporalQuery(BaseModel):
     )
 
 
-class PatternQuery(BaseModel):
+class BehaviorPatternQuery(BaseModel):
     """Pattern-based query for recurring behaviors."""
 
     pattern_type: str = Field(..., description="Type of pattern to search for")

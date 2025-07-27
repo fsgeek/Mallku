@@ -15,7 +15,11 @@ from mallku.governance.firecircle_consciousness_adapter import (
     FIRECIRCLE_AVAILABLE,
     FireCircleConsciousnessAdapter,
 )
-from mallku.orchestration.event_bus import ConsciousnessEvent, ConsciousnessEventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -48,7 +52,7 @@ async def test_fire_circle_consciousness_flow():
         )
 
     # Subscribe to all event types
-    for event_type in EventType:
+    for event_type in ConsciousnessEventType:
         event_bus.subscribe(event_type, event_tracker)
 
     logger.info("\n1. Creating Fire Circle dialogue through consciousness adapter...")
@@ -181,7 +185,7 @@ async def test_fire_circle_consciousness_flow():
     # Verify integration success
     integration_successful = (
         fire_circle_events > 0
-        and EventType.FIRE_CIRCLE_CONVENED.value in event_counts
+        and ConsciousnessEventType.FIRE_CIRCLE_CONVENED.value in event_counts
         and len(correlated_events) >= 5  # At least convening + 4 messages
     )
 
@@ -214,17 +218,17 @@ async def demonstrate_consciousness_triggering_fire_circle():
     convenings = []
 
     async def track_convening(event: ConsciousnessEvent):
-        if event.event_type == EventType.FIRE_CIRCLE_CONVENED:
+        if event.event_type == ConsciousnessEventType.FIRE_CIRCLE_CONVENED:
             convenings.append(event)
             logger.info(f"🔥 Fire Circle convened: {event.data.get('title')}")
 
-    event_bus.subscribe(EventType.FIRE_CIRCLE_CONVENED, track_convening)
+    event_bus.subscribe(ConsciousnessEventType.FIRE_CIRCLE_CONVENED, track_convening)
 
     logger.info("\n1. Emitting extraction pattern that needs governance...")
 
     # Create extraction event
     extraction_event = ConsciousnessEvent(
-        event_type=EventType.EXTRACTION_PATTERN_DETECTED,
+        event_type=ConsciousnessEventType.EXTRACTION_PATTERN_DETECTED,
         source_system="integration.monitor",
         consciousness_signature=0.2,
         data={

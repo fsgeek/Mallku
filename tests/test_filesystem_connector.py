@@ -19,7 +19,7 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 # ruff: noqa: E402
-from mallku.correlation.models import Event, EventType
+from mallku.correlation.models import ConsciousnessEventType, Event
 from mallku.streams.filesystem import FileEventFilter, FileSystemConnector
 
 
@@ -173,7 +173,10 @@ class FileSystemConnectorTests:
 
             # Verify event details
             for event in creation_events:
-                assert event.event_type in [EventType.STORAGE, EventType.ACTIVITY]
+                assert event.event_type in [
+                    ConsciousnessEventType.STORAGE,
+                    ConsciousnessEventType.ACTIVITY,
+                ]
                 assert event.stream_id == "test_filesystem"
                 assert "file_path" in event.content
                 assert "file_name" in event.content

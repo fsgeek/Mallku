@@ -31,10 +31,6 @@ from .models import (
 class SecuredVoicePerspective(SecuredModel, VoicePerspective):
     """Voice perspective with security awareness."""
 
-    class Config:
-        # Inherit config from both parents
-        pass
-
     def get_obfuscation_fields(self) -> dict[str, str]:
         """Define field obfuscation strategies."""
         return {
@@ -67,10 +63,6 @@ class SecuredEpisodicMemory(SecuredModel, EpisodicMemory):
     # Override nested models with secured versions
     consciousness_indicators: SecuredConsciousnessIndicator
     voice_perspectives: list[SecuredVoicePerspective] = []
-
-    class Config:
-        # Inherit from parent configs
-        pass
 
     def get_obfuscation_fields(self) -> dict[str, str]:
         """Define field obfuscation strategies for episodic memory."""

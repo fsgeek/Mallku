@@ -6,7 +6,7 @@ and the SecuredDatabaseInterface, particularly focusing on the memory_anchors
 collection security policy.
 
 Key architectural points tested:
-1. CorrelationEngine uses get_secured_database() - the only authorized path
+1. CorrelationEngine uses get_database() - the only authorized path
 2. The memory_anchors collection has a specific security policy (requires_security=False for legacy compatibility)
 3. CorrelationEngine creates memory anchors through proper architectural boundaries
 4. The security model is enforced even for legacy collections
@@ -17,9 +17,9 @@ from uuid import uuid4
 
 import pytest
 
-from mallku.core.database import get_secured_database
+from mallku.core.database import get_database
 from mallku.correlation.engine import CorrelationEngine
-from mallku.correlation.models import Event, EventType, TemporalCorrelation
+from mallku.correlation.models import ConsciousnessEventType, Event, TemporalCorrelation
 from mallku.models import MemoryAnchor
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
@@ -30,7 +30,7 @@ class TestCorrelationEngineSecuredDBIntegration:
     @pytest.fixture
     async def secured_db(self):
         """Get the secured database interface."""
-        db = get_secured_database()
+        db = get_database()
         await db.initialize()
         return db
 
@@ -74,7 +74,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="test_stream_1",
                 content={"file": "document1.pdf"},
                 metadata={"source": "filesystem"},
@@ -82,7 +82,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC) + timedelta(seconds=5),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="test_stream_2",
                 content={"action": "edit"},
                 metadata={"application": "editor"},
@@ -114,7 +114,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="filesystem",
             content={"file_path": "/test/important.doc"},
             metadata={"size": 1024},
@@ -123,7 +123,7 @@ class TestCorrelationEngineSecuredDBIntegration:
         correlated_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC) + timedelta(seconds=2),
-            event_type=EventType.ACTIVITY,
+            event_type=ConsciousnessEventType.ACTIVITY,
             stream_id="editor",
             content={"action": "open", "file": "/test/important.doc"},
             metadata={"application": "word"},
@@ -215,7 +215,7 @@ class TestCorrelationEngineSecuredDBIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="test",
                 content={"test": "data"},
             )
@@ -232,7 +232,7 @@ class TestCorrelationEngineSecuredDBIntegration:
 
         This test serves as living documentation of the security architecture:
 
-        1. SINGLE ENTRY POINT: get_secured_database() is the ONLY authorized way
+        1. SINGLE ENTRY POINT: get_database() is the ONLY authorized way
            to access the database in Mallku.
 
         2. COLLECTION POLICIES: Every collection must have a registered security
@@ -265,7 +265,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=now,
-                event_type=EventType.STORAGE,
+                event_type=ConsciousnessEventType.STORAGE,
                 stream_id="filesystem",
                 content={"file_path": "/docs/report.pdf", "size": 2048},
                 metadata={"modified": now.isoformat()},
@@ -273,7 +273,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
             Event(
                 event_id=uuid4(),
                 timestamp=now + timedelta(seconds=3),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id="pdf_reader",
                 content={"action": "open", "file": "/docs/report.pdf"},
                 metadata={"page_count": 10},
@@ -322,7 +322,7 @@ class TestCorrelationEngineMemoryAnchorIntegration:
         primary_event = Event(
             event_id=uuid4(),
             timestamp=datetime.now(UTC),
-            event_type=EventType.STORAGE,
+            event_type=ConsciousnessEventType.STORAGE,
             stream_id="storage_provider",
             content={"file": "data.csv"},
         )
@@ -364,7 +364,7 @@ class TestSecurityMetricsTracking:
             Event(
                 event_id=uuid4(),
                 timestamp=datetime.now(UTC),
-                event_type=EventType.ACTIVITY,
+                event_type=ConsciousnessEventType.ACTIVITY,
                 stream_id=f"stream_{i}",
                 content={"index": i},
             )

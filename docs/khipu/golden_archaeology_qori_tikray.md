@@ -42,7 +42,7 @@ db_config = MallkuDBConfig()
 collection = db_config.get_collection("governance")
 
 # New form
-secured_db = get_secured_database()
+secured_db = get_database()
 collection = await secured_db.secured_collection("governance")
 ```
 

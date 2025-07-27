@@ -21,7 +21,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from ...core.database import CollectionSecurityPolicy, get_secured_database
+from ...core.database import CollectionSecurityPolicy, get_database
 from .models import MemoryType  # noqa: TC001 - Used at runtime for type annotation
 from .sacred_detector import SacredMomentDetector
 from .secured_memory_models import (
@@ -52,7 +52,7 @@ class SecuredDatabaseMemoryStore:
         collection_prefix: str = "fc_",
     ):
         """Initialize secured database memory store."""
-        self.secured_db = get_secured_database()
+        self.secured_db = get_database()
         self.collection_prefix = collection_prefix
         self.sacred_detector = SacredMomentDetector() if enable_sacred_detection else None
 

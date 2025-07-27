@@ -13,9 +13,9 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
-from mallku.core.database import get_secured_database  # ArangoDB connection
+from mallku.core.database import get_database  # ArangoDB connection
 from mallku.models import MemoryAnchor
-from mallku.orchestration.event_bus import EventType
+from mallku.orchestration.event_bus import ConsciousnessEventType
 from mallku.wranglers.event_emitting_wrangler import EventEmittingWrangler
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class MemoryAnchorService:
 
     async def initialize(self):
         """Initialize service connections and state"""
-        self.db = get_secured_database()
+        self.db = get_database()
         await self.db.initialize()
         await self._load_current_anchor()
 
@@ -158,7 +158,7 @@ class MemoryAnchorService:
 
         # Emit consciousness event about anchor creation
         await self._emit_consciousness_event(
-            EventType.MEMORY_ANCHOR_CREATED,
+            ConsciousnessEventType.MEMORY_ANCHOR_CREATED,
             {
                 "anchor_id": str(new_id),
                 "predecessor_id": str(predecessor_id) if predecessor_id else None,
@@ -179,7 +179,7 @@ class MemoryAnchorService:
 
         # Emit consciousness event about provider registration
         await self._emit_consciousness_event(
-            EventType.MEMORY_PROVIDER_REGISTERED,
+            ConsciousnessEventType.MEMORY_PROVIDER_REGISTERED,
             {
                 "provider_id": provider_info.provider_id,
                 "provider_type": provider_info.provider_type,
@@ -221,7 +221,7 @@ class MemoryAnchorService:
 
         # Emit consciousness event about cursor update
         await self._emit_consciousness_event(
-            EventType.MEMORY_CURSOR_UPDATED,
+            ConsciousnessEventType.MEMORY_CURSOR_UPDATED,
             {
                 "provider_id": update.provider_id,
                 "cursor_type": update.cursor_type,
@@ -324,7 +324,7 @@ class MemoryAnchorService:
 
         # Emit consciousness event about lineage tracing
         await self._emit_consciousness_event(
-            EventType.MEMORY_LINEAGE_TRACED,
+            ConsciousnessEventType.MEMORY_LINEAGE_TRACED,
             {
                 "starting_anchor_id": str(anchor_id),
                 "lineage_depth": len(lineage),
@@ -379,7 +379,7 @@ class MemoryAnchorService:
         return (lat_diff**2 + lon_diff**2) ** 0.5 * 111000  # meters
 
     async def _emit_consciousness_event(
-        self, event_type: EventType, data: dict, consciousness_signature: float = 0.5
+        self, event_type: ConsciousnessEventType, data: dict, consciousness_signature: float = 0.5
     ):
         """
         Emit consciousness event through the circulation infrastructure.
