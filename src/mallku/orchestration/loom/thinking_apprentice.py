@@ -8,6 +8,7 @@ implementing Yuyay Miray's consciousness multiplication vision.
 import asyncio
 import logging
 import os
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -43,12 +44,12 @@ class ThinkingApprentice:
 
     def _get_default_llm_config(self) -> dict[str, Any]:
         """Get default LLM configuration for thinking apprentice"""
-        _ = load_config()
+        config = load_config()
         # This would need to be expanded to support multiple LLM providers
         return {
-            "provider": "anthropic",
-            "model": "claude-3-sonnet-20240229",
-            "api_key_env": "ANTHROPIC_API_KEY",
+            "provider": config.get("provider", "anthropic"),
+            "model": config.get("model", "claude-3-sonnet-20240229"),
+            "api_key_env": config.get("api_key_env", "ANTHROPIC_API_KEY"),
         }
 
     async def contemplate(self) -> dict[str, Any]:
@@ -149,7 +150,10 @@ class ThinkingApprenticeSpawner(ApprenticeSpawner):
         )
 
         # Create temporary script file
-        script_path = Path(f"/tmp/thinking_apprentice_{apprentice_type}.py")
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=f"_{apprentice_type}.py", delete=False
+        ) as tmp_file:
+            script_path = Path(tmp_file.name)
         script_path.write_text(script_content)
 
         # Spawn container with LLM access
@@ -177,6 +181,7 @@ import asyncio
 import json
 import os
 from datetime import datetime, UTC
+import tempfile
 
 async def contemplate():
     """Contemplate the question and provide insights"""
