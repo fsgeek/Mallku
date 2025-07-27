@@ -14,8 +14,12 @@ from .secured_arango_interface import (
     SecurityViolationError,
 )
 
+# Backward compatibility alias
+SecuredDatabaseInterface = SecuredArangoDatabase
+
 __all__ = [
     "SecuredArangoDatabase",
+    "SecuredDatabaseInterface",  # Backward compatibility
     "SecuredCollectionWrapper",
     "CollectionSecurityPolicy",
     "SecurityViolationError",
