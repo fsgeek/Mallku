@@ -7,5 +7,6 @@ that collaborate through shared memory and message passing.
 """
 
 from .lightweight_apprentice import ProcessApprentice
+from .shared_memory_commons import SharedMemoryCommons
 
-__all__ = ["ProcessApprentice"]
+__all__ = ["ProcessApprentice", "SharedMemoryCommons"]
