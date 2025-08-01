@@ -205,3 +205,4 @@ fire_circle_heartbeats/
 
 # Claude
 .claude/
+.mcp.json
