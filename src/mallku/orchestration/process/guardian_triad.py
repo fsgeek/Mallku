@@ -12,7 +12,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 
-from .lightweight_apprentice import ProcessApprentice
+from .lightweight_chasqui import ProcessChasqui
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class GuardianTriad:
     """
 
     def __init__(self):
-        self.guardians: list[ProcessApprentice] = []
+        self.guardians: list[ProcessChasqui] = []
         self.initialize_triad()
 
     def initialize_triad(self):
@@ -84,7 +84,7 @@ class GuardianTriad:
         ]
 
         for orientation in guardian_orientations:
-            guardian = ProcessApprentice(apprentice_id=orientation["id"], role="guardian")
+            guardian = ProcessChasqui(apprentice_id=orientation["id"], role="guardian")
             # Store orientation for decision-making
             guardian.orientation = orientation
             self.guardians.append(guardian)
@@ -115,7 +115,7 @@ class GuardianTriad:
         return consensus
 
     async def _guardian_evaluation(
-        self, guardian: ProcessApprentice, message: dict, context: dict
+        self, guardian: ProcessChasqui, message: dict, context: dict
     ) -> VettingResult:
         """Individual Guardian evaluation"""
 
