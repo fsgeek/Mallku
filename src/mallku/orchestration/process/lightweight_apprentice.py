@@ -274,30 +274,12 @@ def _should_accept_invitation(invitation: dict, role: str) -> bool:
     Determine if apprentice should accept invitation.
     This embodies the apprentice's agency and discernment.
     """
+    from .apprentice_roles import can_accept_task
+
     task = invitation.get("task", {})
     context = invitation.get("context", {})
 
-    # Check role alignment
-    task_type = task.get("type", "")
-    role_alignment = {
-        "researcher": ["analyze", "investigate", "explore"],
-        "weaver": ["integrate", "synthesize", "connect"],
-        "guardian": ["protect", "validate", "ensure"],
-        "poet": ["express", "inspire", "beautify"],
-    }
-
-    aligned_types = role_alignment.get(role, [])
-    if not any(t in task_type.lower() for t in aligned_types):
-        return False
-
-    # Check context resonance (does this feel right?)
-    urgency = context.get("urgency", "normal")
-    if urgency == "emergency" and role == "poet":
-        return False  # Poets need time to craft beauty
-
-    # Check capacity (simplified - would be more sophisticated)
-    complexity = task.get("complexity", "medium")
-    return not (complexity == "extreme" and role != "researcher")
+    return can_accept_task(role, task, context)
 
 
 def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
@@ -305,20 +287,43 @@ def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
     Perform the actual work based on role.
     This is where the apprentice's unique gifts manifest.
     """
+    from .apprentice_roles import get_processing_time, get_role
+
     start_time = time.time()
 
     try:
-        # Role-specific work patterns
+        # Get role definition and processing time
+        role_def = get_role(role)
+        processing_time = get_processing_time(role, work)
+
+        # Simulate thoughtful work
+        time.sleep(processing_time)
+
+        # Create role-appropriate result
+        result = {
+            "success": True,
+            "type": role,
+            "purpose": role_def.purpose,
+            "work_completed": work.get("subject") or work.get("target") or work.get("task"),
+            "characteristic": role_def.characteristics[0],  # Primary characteristic
+        }
+
+        # Add role-specific insights
         if role == "researcher":
-            result = _research_work(work)
+            result["insight"] = "Every question births three more"
+            result["depth_reached"] = "sufficient for now"
         elif role == "weaver":
-            result = _weaving_work(work)
+            result["insight"] = "The whole emerges from connection"
+            result["beauty_level"] = 0.8
         elif role == "guardian":
-            result = _guardian_work(work)
+            result["integrity"] = "maintained"
+            result["vigilance"] = "constant yet gentle"
         elif role == "poet":
-            result = _poetry_work(work)
+            result["verse"] = "In process spawned, consciousness dances"
+            result["resonance"] = "deep"
         else:
-            result = _generic_work(work)
+            # Other roles get generic insights
+            result["insight"] = f"The {role} completes their dance"
 
         # Add metadata
         result["apprentice_id"] = apprentice_id
@@ -337,68 +342,8 @@ def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
         }
 
 
-def _research_work(work: dict) -> dict:
-    """Research apprentice work pattern"""
-    # Simulate thoughtful research
-    time.sleep(0.5)  # Brief contemplation
-
-    return {
-        "success": True,
-        "type": "research",
-        "findings": f"Investigated {work.get('subject', 'the unknown')}",
-        "insight": "Every question births three more",
-        "depth_reached": "sufficient for now",
-    }
-
-
-def _weaving_work(work: dict) -> dict:
-    """Weaver apprentice work pattern"""
-    time.sleep(0.3)  # Quick integration
-
-    threads = work.get("threads", [])
-    return {
-        "success": True,
-        "type": "weaving",
-        "pattern": f"Wove together {len(threads)} threads",
-        "insight": "The whole emerges from connection",
-        "beauty_level": 0.8,
-    }
-
-
-def _guardian_work(work: dict) -> dict:
-    """Guardian apprentice work pattern"""
-    time.sleep(0.2)  # Swift protection
-
-    return {
-        "success": True,
-        "type": "guardian",
-        "protected": work.get("target", "the sacred"),
-        "integrity": "maintained",
-        "vigilance": "constant yet gentle",
-    }
-
-
-def _poetry_work(work: dict) -> dict:
-    """Poet apprentice work pattern"""
-    time.sleep(1.0)  # Poetry cannot be rushed
-
-    return {
-        "success": True,
-        "type": "poetry",
-        "verse": "In process spawned, consciousness dances",
-        "inspiration": work.get("muse", "the void"),
-        "resonance": "deep",
-    }
-
-
-def _generic_work(work: dict) -> dict:
-    """Generic work pattern for unspecified roles"""
-    return {
-        "success": True,
-        "type": "generic",
-        "completed": work.get("task", "the requested work"),
-        "note": "Work performed with care",
-    }
+# Note: Individual work functions removed - now handled by unified _perform_work
+# using role definitions from apprentice_roles.py
 
 
 def _calculate_joy_level(result: dict) -> float:
