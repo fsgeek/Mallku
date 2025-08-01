@@ -187,20 +187,29 @@ class ProcessApprentice:
 
             return psutil.virtual_memory().available / (1024 * 1024)
         except ImportError:
-            # Assume sufficient memory if we can't check
-            return 1000
+            # Conservative fallback if psutil not available
+            logger.warning("psutil not available, using conservative memory default of 256MB")
+            return 256  # Conservative default to prevent resource exhaustion
 
     def _release_process(self):
         """Gently release the process"""
         if self.process and self.process.is_alive():
             # First try gentle termination
             self.process.terminate()
+
+            # Add small delay to prevent race condition between terminate and is_alive check
+            time.sleep(0.1)
+
+            # Wait for graceful termination
             self.process.join(timeout=2.0)
 
             # If still alive, we must be more firm (but still respectful)
             if self.process.is_alive():
+                logger.warning(
+                    f"Process {self.process.pid} didn't terminate gracefully, forcing kill"
+                )
                 self.process.kill()
-                self.process.join()
+                self.process.join(timeout=0.5)
 
         self.process = None
 
