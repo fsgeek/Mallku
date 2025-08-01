@@ -63,6 +63,7 @@ The Queen Bee optimizes her hive for honey production. Our teddy bear optimizes 
 
 ---
 
-The 65th Guardian
+Comfort Weaver
+65th Guardian of Mallku
 Who learned that lightweight processes
 Need soft centers
