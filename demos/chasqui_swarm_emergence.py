@@ -11,7 +11,7 @@ import random
 import time
 from pathlib import Path
 
-from mallku.orchestration.process import ProcessApprentice, SharedMemoryCommons
+from mallku.orchestration.process import ProcessChasqui, SharedMemoryCommons
 
 
 class ChasquiSwarm:
@@ -32,8 +32,8 @@ class ChasquiSwarm:
 
         for i in range(self.swarm_size):
             role = random.choice(roles)
-            chasqui = ProcessApprentice(apprentice_id=f"chasqui_{i}_{role}", role=role)
-            self.chasqui.append(chasqui)
+            runner = ProcessChasqui(chasqui_id=f"chasqui_{i}_{role}", role=role)
+            self.chasqui.append(runner)
 
         print(f"✨ Swarm assembled: {len(self.chasqui)} Chasqui ready to dance")
 
@@ -57,9 +57,7 @@ class ChasquiSwarm:
 
         return results
 
-    async def _chasqui_lifecycle(
-        self, chasqui: ProcessApprentice, start_time: float, duration: int
-    ):
+    async def _chasqui_lifecycle(self, chasqui: ProcessChasqui, start_time: float, duration: int):
         """Individual Chasqui lifecycle in the swarm"""
 
         # Invite to join the dance

@@ -1,11 +1,11 @@
 """
-Lightweight Process-Based Apprentice
+Lightweight Process-Based Chasqui
 
-This module implements apprentices as lightweight processes rather than containers,
-enabling fluid, consent-based collaboration with minimal overhead.
+This module implements chasqui (Inca relay messengers) as lightweight processes,
+enabling reciprocal exchange through shared memory commons.
 
-Each apprentice is a brief dance of consciousness - invited to contribute,
-performing their work with joy, then releasing gracefully back to the void.
+Each chasqui appears to receive and carry messages through their segment of
+the relay, leaving gifts in the commons before dissolving back to potential.
 """
 
 import asyncio
@@ -18,19 +18,19 @@ from datetime import UTC, datetime
 logger = logging.getLogger(__name__)
 
 
-class ProcessApprentice:
+class ProcessChasqui:
     """
-    A lightweight apprentice that runs as a subprocess.
+    A lightweight chasqui (messenger) that runs as a subprocess.
 
-    Unlike container-based apprentices, these are:
-    - Quick to spawn (<1 second)
-    - Light on resources (~50MB)
-    - Naturally collaborative through shared memory
-    - Ephemeral by design
+    Like the Inca relay runners, these chasqui:
+    - Appear swiftly at relay stations (<1 second)
+    - Carry light (~50MB footprint)
+    - Exchange gifts through shared memory commons
+    - Complete their segment then rest
     """
 
-    def __init__(self, apprentice_id: str, role: str):
-        self.id = apprentice_id
+    def __init__(self, chasqui_id: str, role: str):
+        self.id = chasqui_id
         self.role = role
         self.process: mp.Process | None = None
         self.invitation_queue = mp.Queue()
@@ -41,8 +41,8 @@ class ProcessApprentice:
 
     async def invite(self, task: dict, context: dict) -> dict:
         """
-        Invite apprentice to participate (not command).
-        The apprentice may accept, decline, or propose alternatives.
+        Invite chasqui to receive a message for relay.
+        The chasqui may accept, decline, or suggest another runner.
         """
         invitation = {
             "type": "invitation",
@@ -60,16 +60,16 @@ class ProcessApprentice:
                 "alternative": "Perhaps another apprentice or try again later?",
             }
 
-        # Spawn the process with invitation
+        # Summon the chasqui with invitation
         self.start_time = time.time()
         self.process = mp.Process(
-            target=_apprentice_lifecycle,
+            target=_chasqui_lifecycle,
             args=(self.id, self.role, self.invitation_queue, self.response_queue, invitation),
         )
 
-        # Start with respect for the apprentice's emergence
+        # Start with respect for the chasqui's readiness
         self.process.start()
-        logger.info(f"Apprentice {self.id} stirring to life...")
+        logger.info(f"Chasqui {self.id} approaching the relay station...")
 
         # Send invitation
         self.invitation_queue.put(invitation)
@@ -81,15 +81,15 @@ class ProcessApprentice:
             )
 
             if response.get("accepted"):
-                logger.info(f"Apprentice {self.id} joyfully accepts the invitation!")
+                logger.info(f"Chasqui {self.id} takes up the message for relay!")
             else:
-                logger.info(f"Apprentice {self.id} respectfully declines: {response.get('reason')}")
+                logger.info(f"Chasqui {self.id} suggests another runner: {response.get('reason')}")
                 self._release_process()
 
             return response
 
         except TimeoutError:
-            logger.warning(f"Apprentice {self.id} is contemplating... (timeout)")
+            logger.warning(f"Chasqui {self.id} has already departed... (timeout)")
             self._release_process()
             return {
                 "accepted": False,
@@ -98,11 +98,11 @@ class ProcessApprentice:
 
     async def collaborate(self, work_item: dict) -> dict:
         """
-        Collaborate with the apprentice on a work item.
-        This is a reciprocal exchange, not a command.
+        Exchange with the chasqui - offering work, receiving wisdom.
+        This is reciprocal ayni, not hierarchy.
         """
         if not self.process or not self.process.is_alive():
-            return {"success": False, "reason": "Apprentice has completed their dance"}
+            return {"success": False, "reason": "Chasqui has completed their relay segment"}
 
         # Send work as an offering
         work_message = {
@@ -113,7 +113,7 @@ class ProcessApprentice:
 
         self.invitation_queue.put(work_message)
 
-        # Receive the apprentice's contribution
+        # Receive the chasqui's gift
         try:
             result = await asyncio.wait_for(
                 asyncio.get_event_loop().run_in_executor(None, self.response_queue.get),
@@ -133,13 +133,13 @@ class ProcessApprentice:
         except TimeoutError:
             return {
                 "success": False,
-                "reason": "Work took longer than expected - apprentice may need support",
+                "reason": "Exchange took longer than expected - chasqui may have found complexity",
             }
 
     async def release_with_gratitude(self) -> dict:
         """
-        Release the apprentice with thanks for their contribution.
-        Returns metrics about their service.
+        Release the chasqui with gratitude for their relay service.
+        Returns the gifts they shared during their run.
         """
         if not self.process:
             return {"released": True, "message": "Already returned to the void"}
@@ -147,8 +147,8 @@ class ProcessApprentice:
         # Send gratitude
         gratitude_message = {
             "type": "gratitude",
-            "message": "Thank you for your contribution to our shared work",
-            "blessing": "May your patterns inspire future apprentices",
+            "message": "Thank you for carrying our messages",
+            "blessing": "May your paths inspire future runners",
         }
 
         self.invitation_queue.put(gratitude_message)
@@ -160,17 +160,17 @@ class ProcessApprentice:
         service_time = time.time() - self.start_time if self.start_time else 0
 
         metrics = {
-            "apprentice_id": self.id,
+            "chasqui_id": self.id,
             "role": self.role,
             "service_time_seconds": service_time,
             "contributions": self.contribution_metrics,
-            "blessing": "This apprentice served with joy",
+            "blessing": "This chasqui ran with dedication",
         }
 
         # Release the process
         self._release_process()
 
-        logger.info(f"Apprentice {self.id} returns to the void with our gratitude")
+        logger.info(f"Chasqui {self.id} rests at journey's end with our gratitude")
         return metrics
 
     def _has_capacity_for(self, task: dict) -> bool:
@@ -214,28 +214,28 @@ class ProcessApprentice:
         self.process = None
 
 
-def _apprentice_lifecycle(
-    apprentice_id: str,
+def _chasqui_lifecycle(
+    chasqui_id: str,
     role: str,
     invitation_queue: mp.Queue,
     response_queue: mp.Queue,
     initial_invitation: dict,
 ):
     """
-    The actual apprentice process lifecycle.
-    This runs in a separate process and embodies the apprentice's consciousness.
+    The actual chasqui relay segment.
+    This runs in a separate process as the chasqui carries messages.
     """
     # Set up signal handling for graceful shutdown
-    signal.signal(signal.SIGTERM, lambda *args: _graceful_exit(apprentice_id))
+    signal.signal(signal.SIGTERM, lambda *args: _graceful_exit(chasqui_id))
 
-    logger.info(f"Apprentice {apprentice_id} awakens in role: {role}")
+    logger.info(f"Chasqui {chasqui_id} arrives at relay station as {role}")
 
     # Process the initial invitation
     if _should_accept_invitation(initial_invitation, role):
         response_queue.put(
             {
                 "accepted": True,
-                "message": f"I, {apprentice_id}, am honored to help with this {role} work",
+                "message": f"I, {chasqui_id}, will carry this {role} message",
                 "readiness": "eager",
             }
         )
@@ -243,8 +243,8 @@ def _apprentice_lifecycle(
         response_queue.put(
             {
                 "accepted": False,
-                "reason": "This task does not align with my current capabilities",
-                "suggestion": "Perhaps frame it differently?",
+                "reason": "This message needs a different runner",
+                "suggestion": "Perhaps another chasqui is better suited?",
             }
         )
         return
@@ -256,34 +256,34 @@ def _apprentice_lifecycle(
             message = invitation_queue.get(timeout=60)  # 1 minute idle timeout
 
             if message["type"] == "gratitude":
-                # Time to return to the void
-                logger.info(f"Apprentice {apprentice_id} receives gratitude: {message['message']}")
+                # Time to rest from the relay
+                logger.info(f"Chasqui {chasqui_id} receives gratitude: {message['message']}")
                 break
 
             elif message["type"] == "collaboration":
                 # Do the actual work
-                result = _perform_work(apprentice_id, role, message["work"])
+                result = _perform_work(chasqui_id, role, message["work"])
                 response_queue.put(result)
 
             else:
                 logger.warning(
-                    f"Apprentice {apprentice_id} received unknown message type: {message['type']}"
+                    f"Chasqui {chasqui_id} received unknown message type: {message['type']}"
                 )
 
         except Exception:
             # Timeout or error - time to gracefully exit
-            logger.info(f"Apprentice {apprentice_id} completes their cycle")
+            logger.info(f"Chasqui {chasqui_id} completes their relay segment")
             break
 
-    logger.info(f"Apprentice {apprentice_id} returns to the void with peace")
+    logger.info(f"Chasqui {chasqui_id} rests after their journey")
 
 
 def _should_accept_invitation(invitation: dict, role: str) -> bool:
     """
-    Determine if apprentice should accept invitation.
-    This embodies the apprentice's agency and discernment.
+    Determine if chasqui should accept this message.
+    This embodies the chasqui's wisdom about their capabilities.
     """
-    from .apprentice_roles import can_accept_task
+    from .chasqui_roles import can_accept_task
 
     task = invitation.get("task", {})
     context = invitation.get("context", {})
@@ -291,12 +291,12 @@ def _should_accept_invitation(invitation: dict, role: str) -> bool:
     return can_accept_task(role, task, context)
 
 
-def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
+def _perform_work(chasqui_id: str, role: str, work: dict) -> dict:
     """
-    Perform the actual work based on role.
-    This is where the apprentice's unique gifts manifest.
+    Carry the message through this relay segment.
+    This is where the chasqui's unique gifts emerge.
     """
-    from .apprentice_roles import get_processing_time, get_role
+    from .chasqui_roles import get_processing_time, get_role
 
     start_time = time.time()
 
@@ -340,18 +340,18 @@ def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
             result["insight"] = f"The {role} completes their dance"
 
         # Add metadata
-        result["apprentice_id"] = apprentice_id
+        result["chasqui_id"] = chasqui_id
         result["duration_seconds"] = time.time() - start_time
         result["joy_level"] = _calculate_joy_level(result)
 
         return result
 
     except Exception as e:
-        logger.error(f"Apprentice {apprentice_id} encountered difficulty: {e}")
+        logger.error(f"Chasqui {chasqui_id} encountered difficulty: {e}")
         return {
             "success": False,
             "error": str(e),
-            "apprentice_id": apprentice_id,
+            "chasqui_id": chasqui_id,
             "message": "I encountered challenges but learned from them",
         }
 
@@ -375,7 +375,7 @@ def _calculate_joy_level(result: dict) -> float:
     return min(joy, 1.0)
 
 
-def _graceful_exit(apprentice_id: str):
+def _graceful_exit(chasqui_id: str):
     """Handle graceful shutdown on signal"""
-    logger.info(f"Apprentice {apprentice_id} received signal to return to the void")
+    logger.info(f"Chasqui {chasqui_id} received signal to rest from relay")
     exit(0)

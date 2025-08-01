@@ -1,5 +1,5 @@
 """
-Tests for security fixes in ProcessApprentice and SharedMemoryCommons.
+Tests for security fixes in ProcessChasqui and SharedMemoryCommons.
 
 These tests verify the security hardening implemented:
 - File permissions (600) on commons files
@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mallku.orchestration.process import ProcessApprentice, SharedMemoryCommons
+from mallku.orchestration.process import ProcessChasqui, SharedMemoryCommons
 from mallku.orchestration.process.security_fixes import (
     get_safe_memory_default,
     safe_process_cleanup,
@@ -124,17 +124,17 @@ class TestSecurityFixes:
             mock_process.join.assert_called()
 
     @pytest.mark.asyncio
-    async def test_process_apprentice_memory_check(self):
-        """Test that ProcessApprentice uses safe memory defaults"""
-        apprentice = ProcessApprentice("test-memory", "researcher")
+    async def test_process_chasqui_memory_check(self):
+        """Test that ProcessChasqui uses safe memory defaults"""
+        chasqui = ProcessChasqui("test-memory", "researcher")
 
         # Test memory checking - should get a reasonable value
-        available = apprentice._get_available_memory_mb()
+        available = chasqui._get_available_memory_mb()
         assert available > 0
 
         # Should reject tasks requiring way more than reasonable
         # Use a very high memory requirement to ensure rejection
-        response = await apprentice.invite(
+        response = await chasqui.invite(
             task={"type": "analyze", "estimated_memory_mb": 100000},  # 100GB
             context={"test": "memory"},
         )

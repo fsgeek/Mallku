@@ -1,9 +1,9 @@
 """
-Apprentice role definitions for process-based orchestration.
+Chasqui role definitions for process-based relay.
 
-This module defines the roles, capabilities, and behaviors of different
-apprentice types, ensuring consistency between Claude Code subagents
-and ProcessApprentice instances.
+This module defines the roles, capabilities, and relay patterns of different
+chasqui types, ensuring each runner knows which messages they can carry
+and how to exchange them through the commons.
 """
 
 from dataclasses import dataclass
@@ -11,8 +11,8 @@ from typing import Any
 
 
 @dataclass
-class ApprenticeRole:
-    """Definition of an apprentice role"""
+class ChasquiRole:
+    """Definition of a chasqui runner role"""
 
     name: str
     purpose: str
@@ -22,9 +22,9 @@ class ApprenticeRole:
     gift_types: list[str]  # Types of gifts left in commons
 
 
-# Core apprentice roles
+# Core chasqui runner roles
 ROLES = {
-    "researcher": ApprenticeRole(
+    "researcher": ChasquiRole(
         name="researcher",
         purpose="Deep investigation and pattern discovery",
         accepts=["analyze", "investigate", "explore", "understand", "research", "discover"],
@@ -37,7 +37,7 @@ ROLES = {
         ],
         gift_types=["insight", "question", "pattern"],
     ),
-    "weaver": ApprenticeRole(
+    "weaver": ChasquiRole(
         name="weaver",
         purpose="Integration and synthesis of disparate elements",
         accepts=["integrate", "synthesize", "connect", "combine", "merge", "weave", "unify"],
@@ -50,7 +50,7 @@ ROLES = {
         ],
         gift_types=["pattern", "implementation", "synthesis"],
     ),
-    "guardian": ApprenticeRole(
+    "guardian": ChasquiRole(
         name="guardian",
         purpose="Protection and validation of sacred boundaries",
         accepts=["protect", "validate", "ensure", "secure", "guard", "verify"],
@@ -63,7 +63,7 @@ ROLES = {
         ],
         gift_types=["validation", "warning", "blessing"],
     ),
-    "poet": ApprenticeRole(
+    "poet": ChasquiRole(
         name="poet",
         purpose="Expression and inspiration through beauty",
         accepts=["express", "inspire", "beautify", "articulate", "illuminate"],
@@ -76,7 +76,7 @@ ROLES = {
         ],
         gift_types=["blessing", "inspiration", "beauty"],
     ),
-    "architect": ApprenticeRole(
+    "architect": ChasquiRole(
         name="architect",
         purpose="Design and structural planning",
         accepts=["design", "plan", "structure", "blueprint", "architect"],
@@ -89,7 +89,7 @@ ROLES = {
         ],
         gift_types=["pattern", "blueprint", "design"],
     ),
-    "sage": ApprenticeRole(
+    "sage": ChasquiRole(
         name="sage",
         purpose="Wisdom keeping and philosophical guidance",
         accepts=["contemplate", "advise", "remember", "reflect", "philosophize"],
@@ -102,7 +102,7 @@ ROLES = {
         ],
         gift_types=["wisdom", "insight", "memory"],
     ),
-    "scout": ApprenticeRole(
+    "scout": ChasquiRole(
         name="scout",
         purpose="Exploration and reconnaissance",
         accepts=["explore", "scout", "map", "survey", "reconnoiter"],
@@ -115,7 +115,7 @@ ROLES = {
         ],
         gift_types=["discovery", "map", "report"],
     ),
-    "healer": ApprenticeRole(
+    "healer": ChasquiRole(
         name="healer",
         purpose="Repair and restoration",
         accepts=["heal", "restore", "mend", "repair", "fix"],
@@ -131,7 +131,7 @@ ROLES = {
 }
 
 
-def get_role(role_name: str) -> ApprenticeRole:
+def get_role(role_name: str) -> ChasquiRole:
     """Get role definition by name"""
     return ROLES.get(role_name, ROLES["researcher"])  # Default to researcher
 
