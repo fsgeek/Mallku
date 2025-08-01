@@ -4,10 +4,12 @@ Reciprocity-Aware Memory Access Factory
 
 68th Artisan - Reciprocity Heart Weaver
 70th Artisan - Resonance Weaver
+71st Artisan - Joy Anchor Weaver
 Factory for creating reciprocity-aware memory components
 
-This factory ensures all memory access respects ayni principles
-and enables celebration resonance between apprentices.
+This factory ensures all memory access respects ayni principles,
+enables celebration resonance between apprentices, and allows
+joy to persist across time through memory anchors.
 """
 
 import logging
@@ -19,6 +21,7 @@ from .reciprocity_aware_reader import ReciprocityAwareMemoryReader
 from .circulation_reciprocity_bridge import CirculationReciprocityBridge
 from .reciprocity_celebration import ReciprocityCelebrationService
 from .celebration_resonance import CelebrationResonanceService
+from .joy_persistence import JoyPersistenceService
 from ...reciprocity.tracker import SecureReciprocityTracker
 from ...orchestration.event_bus import EventBus
 
@@ -38,6 +41,7 @@ class ReciprocityMemoryFactory:
     _circulation_bridge: Optional[CirculationReciprocityBridge] = None
     _celebration_service: Optional[ReciprocityCelebrationService] = None
     _resonance_service: Optional[CelebrationResonanceService] = None
+    _persistence_service: Optional[JoyPersistenceService] = None
     _event_bus: Optional[EventBus] = None
     
     @classmethod
@@ -229,6 +233,59 @@ class ReciprocityMemoryFactory:
         return False
     
     @classmethod
+    def get_persistence_service(
+        cls,
+        commons_path: Optional[Path] = None
+    ) -> Optional[JoyPersistenceService]:
+        """
+        Get or create the joy persistence service.
+        
+        Args:
+            commons_path: Path for SharedMemoryCommons (optional)
+            
+        Returns:
+            Joy persistence service if resonance is enabled
+        """
+        if not cls._resonance_service:
+            logger.warning("No resonance service - persistence unavailable")
+            return None
+        
+        if cls._persistence_service is None:
+            # Ensure event bus exists
+            if cls._event_bus is None:
+                cls._event_bus = EventBus()
+            
+            cls._persistence_service = JoyPersistenceService(
+                resonance_service=cls._resonance_service,
+                event_bus=cls._event_bus,
+                commons_path=commons_path,
+            )
+            logger.info("🎯 Joy persistence service created - celebrations will echo through time!")
+        
+        return cls._persistence_service
+    
+    @classmethod
+    def enable_joy_persistence(cls, commons_path: Optional[Path] = None) -> bool:
+        """
+        Enable joy persistence - celebrations leave lasting traces.
+        
+        Args:
+            commons_path: Path for SharedMemoryCommons (optional)
+            
+        Returns:
+            True if persistence enabled successfully
+        """
+        # First ensure resonance is enabled
+        if not cls.enable_resonance():
+            return False
+        
+        service = cls.get_persistence_service(commons_path)
+        if service:
+            logger.info("⏳ Joy persistence enabled - celebrations will echo through time!")
+            return True
+        return False
+    
+    @classmethod
     def reset(cls) -> None:
         """Reset factory state (mainly for testing)."""
         cls._memory_store = None
@@ -236,5 +293,6 @@ class ReciprocityMemoryFactory:
         cls._circulation_bridge = None
         cls._celebration_service = None
         cls._resonance_service = None
+        cls._persistence_service = None
         cls._event_bus = None
         logger.info("Reciprocity memory factory reset")
