@@ -324,6 +324,11 @@ def _perform_work(apprentice_id: str, role: str, work: dict) -> dict:
         elif role == "weaver":
             result["insight"] = "The whole emerges from connection"
             result["beauty_level"] = 0.8
+            result["type"] = "weaving"  # Override type for weaver work
+            # Handle thread weaving if threads are provided
+            if "threads" in work:
+                thread_count = len(work["threads"])
+                result["pattern"] = f"Woven pattern from {thread_count} threads"
         elif role == "guardian":
             result["integrity"] = "maintained"
             result["vigilance"] = "constant yet gentle"
