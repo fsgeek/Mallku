@@ -3,19 +3,22 @@ Reciprocity-Aware Memory Access Factory
 =======================================
 
 68th Artisan - Reciprocity Heart Weaver
+70th Artisan - Resonance Weaver
 Factory for creating reciprocity-aware memory components
 
-This factory ensures all memory access respects ayni principles.
+This factory ensures all memory access respects ayni principles
+and enables celebration resonance between apprentices.
 """
 
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 from .memory_store import MemoryStore
 from .reciprocity_aware_reader import ReciprocityAwareMemoryReader
 from .circulation_reciprocity_bridge import CirculationReciprocityBridge
 from .reciprocity_celebration import ReciprocityCelebrationService
+from .celebration_resonance import CelebrationResonanceService
 from ...reciprocity.tracker import SecureReciprocityTracker
 from ...orchestration.event_bus import EventBus
 
@@ -34,6 +37,7 @@ class ReciprocityMemoryFactory:
     _reciprocity_tracker: Optional[SecureReciprocityTracker] = None
     _circulation_bridge: Optional[CirculationReciprocityBridge] = None
     _celebration_service: Optional[ReciprocityCelebrationService] = None
+    _resonance_service: Optional[CelebrationResonanceService] = None
     _event_bus: Optional[EventBus] = None
     
     @classmethod
@@ -182,11 +186,55 @@ class ReciprocityMemoryFactory:
         return False
     
     @classmethod
+    def get_resonance_service(cls) -> Optional[CelebrationResonanceService]:
+        """
+        Get or create the celebration resonance service.
+        
+        Returns:
+            Resonance service if celebrations are enabled
+        """
+        if not cls._celebration_service:
+            logger.warning("No celebration service - resonance unavailable")
+            return None
+        
+        if cls._resonance_service is None:
+            # Ensure event bus exists
+            if cls._event_bus is None:
+                cls._event_bus = EventBus()
+            
+            cls._resonance_service = CelebrationResonanceService(
+                celebration_service=cls._celebration_service,
+                event_bus=cls._event_bus,
+            )
+            logger.info("🌊 Celebration resonance service created - joy will ripple!")
+        
+        return cls._resonance_service
+    
+    @classmethod
+    def enable_resonance(cls) -> bool:
+        """
+        Enable celebration resonance between apprentices.
+        
+        Returns:
+            True if resonance enabled successfully
+        """
+        # First ensure celebrations are enabled
+        if not cls.enable_celebrations():
+            return False
+        
+        service = cls.get_resonance_service()
+        if service:
+            logger.info("✨ Celebration resonance enabled - joy will multiply!")
+            return True
+        return False
+    
+    @classmethod
     def reset(cls) -> None:
         """Reset factory state (mainly for testing)."""
         cls._memory_store = None
         cls._reciprocity_tracker = None
         cls._circulation_bridge = None
         cls._celebration_service = None
+        cls._resonance_service = None
         cls._event_bus = None
         logger.info("Reciprocity memory factory reset")
