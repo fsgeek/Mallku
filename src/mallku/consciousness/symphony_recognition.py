@@ -258,6 +258,9 @@ class SymphonyRecognizer:
             if moment.builds_on:
                 # Resonance amplified by source's celebration
                 for source_ref in moment.builds_on:
+                    # Handle both string and list references
+                    if isinstance(source_ref, list):
+                        source_ref = source_ref[0] if source_ref else ""
                     source = next((m for m in moments if source_ref in m.contribution), None)
                     if source:
                         amplification = 0.2  # 20% boost
