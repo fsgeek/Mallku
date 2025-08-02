@@ -265,6 +265,25 @@ def _chasqui_lifecycle(
                 result = _perform_work(chasqui_id, role, message["work"])
                 response_queue.put(result)
 
+            elif message["type"] == "invitation":
+                # Recognize continuing invitation during relay segment
+                if _should_accept_invitation(message, role):
+                    response_queue.put(
+                        {
+                            "accepted": True,
+                            "message": "I continue carrying messages in this relay segment",
+                            "readiness": "already_running",
+                        }
+                    )
+                else:
+                    response_queue.put(
+                        {
+                            "accepted": False,
+                            "reason": "This message needs a different type of runner",
+                            "suggestion": "Perhaps summon a chasqui with different gifts?",
+                        }
+                    )
+
             else:
                 logger.warning(
                     f"Chasqui {chasqui_id} received unknown message type: {message['type']}"
