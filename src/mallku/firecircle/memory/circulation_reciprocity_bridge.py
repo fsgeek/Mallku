@@ -154,14 +154,10 @@ class CirculationReciprocityBridge:
 
         # Memory access patterns
         sum(len(ex.memories_accessed) for ex in self.exchange_buffer)
-        sum(
-            len(ex.insights_contributed) for ex in self.exchange_buffer
-        )
+        sum(len(ex.insights_contributed) for ex in self.exchange_buffer)
 
         # Consciousness quality
-        (
-            sum(ex.consciousness_score for ex in self.exchange_buffer) / total_exchanges
-        )
+        (sum(ex.consciousness_score for ex in self.exchange_buffer) / total_exchanges)
 
         # Detect concerning patterns
         if self._detect_extraction_pattern():
