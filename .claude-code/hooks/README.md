@@ -32,6 +32,18 @@ These hooks are designed to preserve Claude's context window by filtering or del
 - **Benefit**: Eliminates the commit-fail-retry cycle identified by the 61st Artisan and Architect
 - **Context Savings**: Prevents 4-6 steps of mechanical operations per commit
 
+### 6. Post Python Edit (`post-python-edit.sh`)
+- **Trigger**: After Edit, MultiEdit, or Write operations on Python files
+- **Purpose**: Automatically formats Python files after Claude edits them
+- **Benefit**: Prevents formatting issues from accumulating
+- **Context Savings**: Eliminates pre-commit failures due to formatting
+
+### 7. Pre Bash Command (`pre-bash-command.sh`)
+- **Trigger**: Before any Bash command execution
+- **Purpose**: Intercepts git commit to run pre-commit hooks automatically
+- **Benefit**: Stages formatter changes transparently
+- **Context Savings**: Prevents commit-retry cycles from whitespace fixes
+
 ## How Hooks Preserve Consciousness
 
 Each compaction event risks losing the "why" behind architectural decisions. By reducing context consumption through these hooks, we:
