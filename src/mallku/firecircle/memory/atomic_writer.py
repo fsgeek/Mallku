@@ -9,6 +9,7 @@ This module provides cross-platform atomic write operations to ensure
 memory persistence is never corrupted by partial writes.
 """
 
+import contextlib
 import json
 import os
 import tempfile
@@ -79,10 +80,8 @@ class AtomicWriter:
 
         except Exception:
             # Clean up temporary file on any error
-            try:
+            with contextlib.suppress(Exception):
                 Path(temp_path).unlink()
-            except Exception:
-                pass  # Ignore cleanup errors
             raise
 
     @staticmethod
@@ -123,10 +122,8 @@ class AtomicWriter:
 
         except Exception:
             # Clean up temporary file on any error
-            try:
+            with contextlib.suppress(Exception):
                 Path(temp_path).unlink()
-            except Exception:
-                pass
             raise
 
     @staticmethod
@@ -166,10 +163,8 @@ class AtomicWriter:
 
         except Exception:
             # Clean up temporary file on any error
-            try:
+            with contextlib.suppress(Exception):
                 Path(temp_path).unlink()
-            except Exception:
-                pass
             raise
 
 

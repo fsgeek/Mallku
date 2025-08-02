@@ -11,17 +11,19 @@ the reciprocal nature of knowledge exchange.
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ..firecircle.memory.reciprocity_aware_reader import (
-    MemoryExchange,
-)
 from ..reciprocity.models import ContributionType
 from .process_apprentice import (
     ApprenticeInvitation,
     ApprenticeResponse,
     ProcessApprentice,
 )
+
+if TYPE_CHECKING:
+    from ..firecircle.memory.reciprocity_aware_reader import (
+        MemoryExchange,
+    )
 
 logger = logging.getLogger(__name__)
 

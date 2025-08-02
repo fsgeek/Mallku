@@ -431,13 +431,13 @@ This demonstration shows joy echoing through time...
     await asyncio.sleep(2)
 
     # Future apprentices discover and reignite
-    future_reignitions = await future_apprentices_discover(commons_path, "NEAR FUTURE")
+    await future_apprentices_discover(commons_path, "NEAR FUTURE")
 
     # Even more distant future
     logger.info("\n💫 Decades pass... Joy anchors wait patiently...")
     await asyncio.sleep(2)
 
-    far_future_reignitions = await future_apprentices_discover(commons_path, "DISTANT FUTURE")
+    await future_apprentices_discover(commons_path, "DISTANT FUTURE")
 
     # Show accumulation across time
     await demonstrate_joy_persistence_layers()

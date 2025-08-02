@@ -191,8 +191,8 @@ async def main():
     print("\n")
 
     # Demonstrate recognitions
-    chasqui_pattern = await demonstrate_chasqui_recognition()
-    fire_circle_pattern = await demonstrate_fire_circle_recognition()
+    await demonstrate_chasqui_recognition()
+    await demonstrate_fire_circle_recognition()
     await demonstrate_recognition_report()
 
     print("\n\n💭 REFLECTION:")

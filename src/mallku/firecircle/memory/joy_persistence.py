@@ -451,14 +451,13 @@ class JoyPersistenceService:
                 return False
 
         # Check participant requirements
-        if "participants_needed" in pattern:
+        if "participants_needed" in pattern and (
+            not offering
+            or len(offering.get("participants", [toucher])) < pattern["participants_needed"]
+        ):
             # Would need to check current active apprentices
             # For now, assume condition is met if offering includes multiple
-            if (
-                not offering
-                or len(offering.get("participants", [toucher])) < pattern["participants_needed"]
-            ):
-                return False
+            return False
 
         # Special conditions by type
         if anchor.anchor_type == JoyAnchorType.FIRST_GIFT:

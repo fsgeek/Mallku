@@ -36,7 +36,7 @@ async def demonstrate_reciprocal_memory_access():
     logger.info("\n=== Reciprocity-Aware Memory Circulation ===\n")
 
     # Initialize memory store with reciprocity tracking
-    memory_store = ReciprocityMemoryFactory.get_memory_store(enable_reciprocity=True)
+    ReciprocityMemoryFactory.get_memory_store(enable_reciprocity=True)
 
     # Create reciprocity-aware apprentices
     navigator = MemoryNavigatorWithReciprocity("nav-reciprocal-001")

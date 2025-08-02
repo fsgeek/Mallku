@@ -150,16 +150,16 @@ class CirculationReciprocityBridge:
 
         # Calculate pattern metrics
         total_exchanges = len(self.exchange_buffer)
-        completed_reciprocity = sum(1 for ex in self.exchange_buffer if ex.reciprocity_complete)
+        sum(1 for ex in self.exchange_buffer if ex.reciprocity_complete)
 
         # Memory access patterns
-        total_memories_accessed = sum(len(ex.memories_accessed) for ex in self.exchange_buffer)
-        total_insights_contributed = sum(
+        sum(len(ex.memories_accessed) for ex in self.exchange_buffer)
+        sum(
             len(ex.insights_contributed) for ex in self.exchange_buffer
         )
 
         # Consciousness quality
-        avg_consciousness = (
+        (
             sum(ex.consciousness_score for ex in self.exchange_buffer) / total_exchanges
         )
 
@@ -213,7 +213,7 @@ class CirculationReciprocityBridge:
         if not self.reciprocity_tracker:
             return
 
-        pattern = ReciprocityPattern(
+        ReciprocityPattern(
             pattern_type="memory_extraction_concern",
             pattern_description=(
                 "High rate of memory access without reciprocal contribution detected "
@@ -242,7 +242,7 @@ class CirculationReciprocityBridge:
         if not self.reciprocity_tracker:
             return
 
-        pattern = ReciprocityPattern(
+        ReciprocityPattern(
             pattern_type="consciousness_emergence_in_circulation",
             pattern_description=(
                 "Increasing consciousness quality detected in memory circulation - "

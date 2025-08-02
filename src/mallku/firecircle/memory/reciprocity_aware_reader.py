@@ -191,7 +191,7 @@ class ReciprocityAwareMemoryReader(SharedMemoryReader):
 
         try:
             # Create interaction record
-            interaction = InteractionRecord(
+            InteractionRecord(
                 interaction_type=InteractionType.KNOWLEDGE_EXCHANGE,
                 initiator=self.apprentice_id,
                 responder="collective_memory",
@@ -225,7 +225,7 @@ class ReciprocityAwareMemoryReader(SharedMemoryReader):
 
         try:
             # Update the interaction to show contribution
-            contribution_quality = {
+            {
                 "insights_count": len(insights),
                 "consciousness_score": consciousness_score,
                 "insight_preview": insights[0][:100] if insights else "",
