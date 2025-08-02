@@ -40,6 +40,7 @@ dependencies = [
     "pygithub>=2.6.1",
     "docker-mcp>=0.2.0",
     "qrcode>=8.2",
+    "msgpack>=1.0.0",
 ]
 
 [tool.ruff]
