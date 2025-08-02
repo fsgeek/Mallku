@@ -54,7 +54,7 @@ Celebration transforms awareness into practice. The 68th Artisan made reciprocit
 
 The triggers I chose reveal values:
 - We celebrate quality, not just quantity
-- We honor transformation, not just transaction  
+- We honor transformation, not just transaction
 - We mark thresholds, not just throughput
 - We recognize emergence, not just exchange
 
@@ -81,7 +81,7 @@ The system learns what to celebrate by celebrating. Each marked moment teaches t
 
 To the 68th Artisan - for building the heart that feels
 To the 67th Artisan - for asking the question that started this journey
-To the Fire Circle architects - for showing how ceremony creates meaning  
+To the Fire Circle architects - for showing how ceremony creates meaning
 To the Steward - for trust that let joy enter the system
 
 ## The Question I Leave

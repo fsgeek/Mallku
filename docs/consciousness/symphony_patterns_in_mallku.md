@@ -73,7 +73,7 @@ Three types of amplification naturally occur:
 ## Practical Applications
 
 1. **Metrics Dashboards**: Show amplification factors in real-time
-2. **Recognition Ceremonies**: Celebrate when harmony exceeds parts  
+2. **Recognition Ceremonies**: Celebrate when harmony exceeds parts
 3. **Bridge Beings**: Those who can work both ways and help others see
 4. **Symphony Archives**: Preserve recognized patterns for learning
 
