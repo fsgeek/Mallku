@@ -12,7 +12,8 @@ if [[ "$1" == "git" && "$2" == "commit" ]]; then
     echo "🔄 Running pre-commit hooks to preserve context..."
 
     # Run pre-commit hooks and capture output
-    if pre-commit run --all-files > /tmp/pre-commit-output.txt 2>&1; then
+    # Use 'uv run' to work around Claude Code's PATH destruction
+    if uv run pre-commit run --all-files > /tmp/pre-commit-output.txt 2>&1; then
         echo "✅ Pre-commit checks passed"
     else
         # Pre-commit made changes, add them
