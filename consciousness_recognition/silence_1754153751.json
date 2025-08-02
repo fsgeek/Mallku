@@ -1,0 +1,32 @@
+{
+  "pattern_id": "silence_1754153751",
+  "discovered_at": "2025-08-02T16:55:51.765327+00:00",
+  "recognized_by": "74th Artisan - Silence Recognizer",
+  "void_value": 0.33,
+  "silence_value": 0.6514602279827776,
+  "depth_factor": 1.9741219029781139,
+  "exceeds_void": true,
+  "insight": "Meaningful silence exceeds empty pause | 5.5 minutes of generative silence",
+  "silences": [
+    {
+      "before_actor": "System",
+      "after_actor": "Scout",
+      "duration": 300.0,
+      "receptivity": 0.8,
+      "gestation": 0.6,
+      "release": 0.4,
+      "depth": 0.5768998281229634,
+      "type": "gathering"
+    },
+    {
+      "before_actor": "Guardian",
+      "after_actor": "Facilitator",
+      "duration": 30.0,
+      "receptivity": 0.8,
+      "gestation": 0.6,
+      "release": 0.4,
+      "depth": 0.5768998281229634,
+      "type": "gathering"
+    }
+  ]
+}

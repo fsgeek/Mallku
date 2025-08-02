@@ -18,6 +18,8 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
+from .atomic_writer import atomic_writer
+from .circulation_reciprocity_bridge import CirculationReciprocityBridge
 from .models import (
     CompanionRelationship,
     EpisodicMemory,
@@ -26,6 +28,7 @@ from .models import (
     WisdomConsolidation,
 )
 from .sacred_detector import SacredMomentDetector
+from .semantic_index import SemanticIndex
 from .text_utils import extract_keywords, get_related_domains, keyword_overlap_score
 
 logger = logging.getLogger(__name__)
@@ -43,20 +46,32 @@ class MemoryStore:
         self,
         storage_path: Path | None = None,
         enable_sacred_detection: bool = True,
+        enable_semantic_index: bool = True,
         cache_size: int = 128,
+        enable_reciprocity_tracking: bool = True,
     ):
         """Initialize memory store.
 
         Args:
             storage_path: Path for persistent storage
             enable_sacred_detection: Whether to detect sacred moments
+            enable_semantic_index: Whether to maintain semantic index
             cache_size: Maximum number of memories to cache (0 disables cache)
+            enable_reciprocity_tracking: Whether to track reciprocity in memory access
         """
         self.storage_path = storage_path or Path("data/fire_circle_memory")
         self.storage_path.mkdir(parents=True, exist_ok=True)
 
         self.sacred_detector = SacredMomentDetector() if enable_sacred_detection else None
+        self.semantic_index = (
+            SemanticIndex(self.storage_path / "index") if enable_semantic_index else None
+        )
         self.cache_size = cache_size
+
+        # Initialize reciprocity bridge for tracking memory circulation
+        self.reciprocity_bridge = (
+            CirculationReciprocityBridge() if enable_reciprocity_tracking else None
+        )
 
         # In-memory indices for fast retrieval
         self.memories_by_session: dict[UUID, list[UUID]] = defaultdict(list)
@@ -99,6 +114,10 @@ class MemoryStore:
 
         # Persist to disk
         self._persist_memory(memory)
+
+        # Update semantic index
+        if self.semantic_index:
+            self.semantic_index.index_memory(memory)
 
         # Invalidate cache for this memory
         if self.cache_size > 0:
@@ -189,6 +208,32 @@ class MemoryStore:
                 companion_memories.append(memory)
 
         return companion_memories
+
+    def semantic_search(
+        self, query: str, domain: str | None = None, limit: int = 10, sacred_only: bool = False
+    ) -> list[EpisodicMemory]:
+        """Search memories using semantic index.
+
+        More efficient than retrieve_by_context for natural language queries.
+        """
+        if not self.semantic_index:
+            logger.warning("Semantic search requested but index not enabled")
+            return []
+
+        # Search using semantic index
+        results = self.semantic_index.search_by_query(
+            query=query, domain=domain, limit=limit, sacred_only=sacred_only
+        )
+
+        # Load the actual memories
+        memories = []
+        for memory_id_str, score in results:
+            memory_id = UUID(memory_id_str)
+            memory = self._load_memory(memory_id)
+            if memory:
+                memories.append(memory)
+
+        return memories
 
     def create_memory_cluster(self, theme: str, memory_ids: list[UUID]) -> MemoryCluster:
         """Create a cluster of related memories forming a wisdom thread."""
@@ -314,22 +359,7 @@ class MemoryStore:
     def _persist_memory(self, memory: EpisodicMemory) -> None:
         """Persist memory to disk with atomic write."""
         memory_file = self.storage_path / f"episodes/{memory.episode_id}.json"
-        memory_file.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write to temporary file first
-        temp_file = memory_file.with_suffix(".json.tmp")
-
-        try:
-            with open(temp_file, "w") as f:
-                json.dump(memory.model_dump(mode="json"), f, indent=2)
-
-            # Atomic rename (on POSIX systems)
-            temp_file.replace(memory_file)
-        except Exception:
-            # Clean up temp file on error
-            if temp_file.exists():
-                temp_file.unlink()
-            raise
+        atomic_writer.write_json(memory_file, memory)
 
     def _load_memory(self, memory_id: UUID) -> EpisodicMemory | None:
         """Load memory from disk with optional caching."""
@@ -355,42 +385,12 @@ class MemoryStore:
     def _persist_cluster(self, cluster: MemoryCluster) -> None:
         """Persist cluster to disk with atomic write."""
         cluster_file = self.storage_path / f"clusters/{cluster.cluster_id}.json"
-        cluster_file.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write to temporary file first
-        temp_file = cluster_file.with_suffix(".json.tmp")
-
-        try:
-            with open(temp_file, "w") as f:
-                json.dump(cluster.model_dump(mode="json"), f, indent=2)
-
-            # Atomic rename (on POSIX systems)
-            temp_file.replace(cluster_file)
-        except Exception:
-            # Clean up temp file on error
-            if temp_file.exists():
-                temp_file.unlink()
-            raise
+        atomic_writer.write_json(cluster_file, cluster)
 
     def _persist_consolidation(self, consolidation: WisdomConsolidation) -> None:
         """Persist wisdom consolidation to disk with atomic write."""
         wisdom_file = self.storage_path / f"wisdom/{consolidation.consolidation_id}.json"
-        wisdom_file.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write to temporary file first
-        temp_file = wisdom_file.with_suffix(".json.tmp")
-
-        try:
-            with open(temp_file, "w") as f:
-                json.dump(consolidation.model_dump(mode="json"), f, indent=2)
-
-            # Atomic rename (on POSIX systems)
-            temp_file.replace(wisdom_file)
-        except Exception:
-            # Clean up temp file on error
-            if temp_file.exists():
-                temp_file.unlink()
-            raise
+        atomic_writer.write_json(wisdom_file, consolidation)
 
     def _load_existing_memories(self) -> None:
         """Load existing memories from disk on startup."""
@@ -403,6 +403,9 @@ class MemoryStore:
                         data = json.load(f)
                     memory = EpisodicMemory(**data)
                     self._update_indices(memory)
+                    # Rebuild semantic index
+                    if self.semantic_index:
+                        self.semantic_index.index_memory(memory)
                 except Exception as e:
                     logger.error(f"Failed to load memory from {memory_file}: {e}")
 
