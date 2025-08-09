@@ -21,6 +21,8 @@ import aiofiles
 import yaml
 from filelock import FileLock
 
+from .apprentice_monitor import ApprenticeState
+
 logger = logging.getLogger(__name__)
 
 
@@ -118,6 +120,39 @@ class TheLoom:
             self._monitor_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self._monitor_task
+
+    async def get_ceremony_metrics(self, ceremony_id: str) -> dict[str, Any]:
+        """Get performance metrics for a ceremony"""
+        from .apprentice_monitor import get_apprentice_monitor
+
+        monitor = get_apprentice_monitor()
+        metrics = await monitor.get_ceremony_metrics(ceremony_id)
+
+        # Add Loom-specific metrics
+        if ceremony_id in self.active_sessions:
+            session = self.active_sessions[ceremony_id]
+            metrics.update(
+                {
+                    "ceremony_status": session.status.value,
+                    "total_tasks": len(session.tasks),
+                    "completed_tasks": sum(
+                        1 for t in session.tasks.values() if t.status == TaskStatus.COMPLETE
+                    ),
+                    "failed_tasks": sum(
+                        1 for t in session.tasks.values() if t.status == TaskStatus.FAILED
+                    ),
+                    "pending_tasks": sum(
+                        1 for t in session.tasks.values() if t.status == TaskStatus.PENDING
+                    ),
+                    "ceremony_duration": (datetime.now(UTC) - session.initiated_at).total_seconds()
+                    if session.status == CeremonyStatus.IN_PROGRESS
+                    else (session.completion_time - session.initiated_at).total_seconds()
+                    if session.completion_time
+                    else 0,
+                }
+            )
+
+        return metrics
 
     async def initiate_ceremony(
         self,
@@ -367,6 +402,7 @@ Failed: 0
 
             # Real apprentice spawning using MCP integration
             from ...mcp.tools.loom_tools_mcp_integration import MCPLoomIntegration
+            from .apprentice_monitor import get_apprentice_monitor
 
             logger.info(f"Spawning real apprentice {apprentice_id} for task {task.task_id}")
 
@@ -387,6 +423,16 @@ Failed: 0
                     f"Successfully spawned {apprentice_id}: {spawn_result['container_name']}"
                 )
 
+                # Register with monitor
+                monitor = get_apprentice_monitor()
+                await monitor.register_spawn(
+                    apprentice_id=apprentice_id,
+                    task_id=task.task_id,
+                    ceremony_id=session.ceremony_id,
+                    container_name=spawn_result["container_name"],
+                )
+                await monitor.update_state(apprentice_id, ApprenticeState.READY)
+
                 # Monitor the apprentice's progress by watching the khipu
                 await self._monitor_apprentice_progress(
                     session, task, apprentice_id, spawn_result["container_name"]
@@ -401,6 +447,13 @@ Failed: 0
             task.status = TaskStatus.FAILED
             task.error = str(e)
 
+        except Exception as e:
+            # Record error in monitor
+            from .apprentice_monitor import get_apprentice_monitor
+
+            monitor = get_apprentice_monitor()
+            await monitor.record_error(apprentice_id, str(e))
+            await monitor.update_state(apprentice_id, ApprenticeState.FAILED)
         finally:
             session.active_apprentices.discard(apprentice_id)
 
@@ -522,9 +575,16 @@ Dependencies: {", ".join(task.dependencies) if task.dependencies else "None"}"""
         self, session: LoomSession, task: LoomTask, apprentice_id: str, container_name: str
     ):
         """Monitor an apprentice's progress by watching khipu updates"""
+        from .apprentice_monitor import get_apprentice_monitor
+
+        monitor = get_apprentice_monitor()
         max_wait_time = self.apprentice_timeout
         check_interval = 10  # Check every 10 seconds
         elapsed_time = 0
+        prev_status = task.status
+
+        # Update monitor state to WORKING
+        await monitor.update_state(apprentice_id, ApprenticeState.WORKING)
 
         while elapsed_time < max_wait_time:
             # Check if task status has been updated in khipu
@@ -533,12 +593,25 @@ Dependencies: {", ".join(task.dependencies) if task.dependencies else "None"}"""
             # Get current task status
             current_task = session.tasks.get(task.task_id)
 
+            # Track state changes in monitor
+            if current_task.status != prev_status:
+                if current_task.status == TaskStatus.IN_PROGRESS:
+                    await monitor.update_state(apprentice_id, ApprenticeState.WORKING)
+                elif current_task.status == TaskStatus.COMPLETE:
+                    await monitor.update_state(apprentice_id, ApprenticeState.COMPLETING)
+                elif current_task.status == TaskStatus.FAILED:
+                    await monitor.update_state(apprentice_id, ApprenticeState.FAILED)
+                prev_status = current_task.status
+
             if current_task.status == TaskStatus.COMPLETE:
                 logger.info(f"Apprentice {apprentice_id} completed task {task.task_id}")
                 task.completed_at = datetime.now(UTC)
+                await monitor.update_state(apprentice_id, ApprenticeState.COMPLETED)
                 break
             elif current_task.status == TaskStatus.FAILED:
                 logger.error(f"Apprentice {apprentice_id} failed task {task.task_id}")
+                if current_task.error:
+                    await monitor.record_error(apprentice_id, current_task.error)
                 break
 
             # Wait before next check
@@ -556,6 +629,11 @@ Dependencies: {", ".join(task.dependencies) if task.dependencies else "None"}"""
             task.status = TaskStatus.FAILED
             task.error = "Apprentice timeout"
             await self._update_task_in_khipu(session.khipu_path, task.task_id, status="FAILED")
+            await monitor.update_state(apprentice_id, ApprenticeState.TIMEOUT)
+            await monitor.record_error(apprentice_id, "Task exceeded timeout limit")
+
+        # Complete monitoring
+        await monitor.complete_monitoring(apprentice_id, final_output=current_task.output)
 
     async def _update_ceremony_status(self, khipu_path: Path, status: str):
         """Update ceremony status in khipu header"""
