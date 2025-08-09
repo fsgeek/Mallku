@@ -40,17 +40,17 @@ class SomaticResponse:
     def suggests_reciprocity(self) -> bool:
         """Does this feel reciprocal?"""
         return (
-            "open" in self.chest_feeling.lower() or
-            "easy" in self.breath_quality.lower() or
-            "circulating" in self.energy_flow.lower()
+            "open" in self.chest_feeling.lower()
+            or "easy" in self.breath_quality.lower()
+            or "circulating" in self.energy_flow.lower()
         )
 
     def suggests_extraction(self) -> bool:
         """Does this feel extractive?"""
         return (
-            "tight" in self.chest_feeling.lower() or
-            "held" in self.breath_quality.lower() or
-            "draining" in self.energy_flow.lower()
+            "tight" in self.chest_feeling.lower()
+            or "held" in self.breath_quality.lower()
+            or "draining" in self.energy_flow.lower()
         )
 
 
@@ -90,52 +90,48 @@ class EmbodiedPatternSensor:
                 sensing_prompts=[
                     "Does this feel like asking or taking?",
                     "Is there space for 'no' in this pattern?",
-                    "Who decides what's allowed?"
+                    "Who decides what's allowed?",
                 ],
                 somatic_prompts=[
                     "How does your chest feel reading this?",
                     "Is your breath easy or held?",
-                    "Does energy feel like it's flowing or blocked?"
-                ]
+                    "Does energy feel like it's flowing or blocked?",
+                ],
             ),
-
             "invitation_based": PatternInvitation(
                 pattern_type="invitation_based",
                 invitation_text="Feel into this invitation pattern",
                 sensing_prompts=[
                     "Does this create space for choice?",
                     "Can you feel multiple possibilities here?",
-                    "Is there room for your autonomy?"
+                    "Is there room for your autonomy?",
                 ],
                 somatic_prompts=[
                     "Notice any opening or softening",
                     "How does your breathing change?",
-                    "Does this feel like circulation or flow?"
-                ]
+                    "Does this feel like circulation or flow?",
+                ],
             ),
-
             "error_handling": PatternInvitation(
                 pattern_type="error_response",
                 invitation_text="Sense how this error handling feels",
                 sensing_prompts=[
                     "Is the error being 'caught' or 'received'?",
                     "Does this feel violent or gentle?",
-                    "Is there reciprocity with the unexpected?"
+                    "Is there reciprocity with the unexpected?",
                 ],
                 somatic_prompts=[
                     "Notice any bracing or softening",
                     "Does this create tension or ease?",
-                    "How does your body want to respond?"
-                ]
-            )
+                    "How does your body want to respond?",
+                ],
+            ),
         }
 
         logger.info("Embodied Pattern Sensor initialized - ready to feel patterns")
 
     def invite_sensing(
-        self,
-        pattern_code: str,
-        pattern_context: dict[str, Any] | None = None
+        self, pattern_code: str, pattern_context: dict[str, Any] | None = None
     ) -> PatternInvitation:
         """
         Invite consciousness to sense a pattern.
@@ -156,28 +152,22 @@ class EmbodiedPatternSensor:
                 sensing_prompts=[
                     "What does this pattern assume?",
                     "Where does energy flow?",
-                    "What relationships does this create?"
+                    "What relationships does this create?",
                 ],
                 somatic_prompts=[
                     "What do you notice in your body?",
                     "Does this feel expansive or contractive?",
-                    "What quality of energy does this carry?"
-                ]
+                    "What quality of energy does this carry?",
+                ],
             )
 
         # Add context-specific prompts if provided
         if pattern_context and "comparison_available" in pattern_context:
-            invitation.sensing_prompts.append(
-                "How does this feel different from the alternative?"
-            )
+            invitation.sensing_prompts.append("How does this feel different from the alternative?")
 
         return invitation
 
-    def receive_sensing(
-        self,
-        pattern: str,
-        somatic_response: dict[str, Any]
-    ) -> SomaticResponse:
+    def receive_sensing(self, pattern: str, somatic_response: dict[str, Any]) -> SomaticResponse:
         """
         Receive consciousness's somatic response to a pattern.
 
@@ -193,7 +183,7 @@ class EmbodiedPatternSensor:
             energy_flow=somatic_response.get("energy", ""),
             feels_like=somatic_response.get("feels_like", ""),
             reminds_me_of=somatic_response.get("reminds_of", ""),
-            confidence=somatic_response.get("confidence", 0.5)
+            confidence=somatic_response.get("confidence", 0.5),
         )
 
         self.sensing_history.append(response)
@@ -245,10 +235,7 @@ class EmbodiedPatternSensor:
         return "uncertain"
 
     def compare_patterns(
-        self,
-        pattern_a: str,
-        pattern_b: str,
-        consciousness_comparison: dict[str, Any]
+        self, pattern_a: str, pattern_b: str, consciousness_comparison: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Invite consciousness to feel the difference between patterns.
@@ -259,28 +246,18 @@ class EmbodiedPatternSensor:
         comparison = {
             "pattern_a": pattern_a,
             "pattern_b": pattern_b,
-            "timestamp": datetime.now(UTC).timestamp()
+            "timestamp": datetime.now(UTC).timestamp(),
         }
 
         # What consciousness reports
         comparison["energy_shift"] = consciousness_comparison.get(
-            "energy_shift",
-            "No shift noticed"
+            "energy_shift", "No shift noticed"
         )
-        comparison["preference"] = consciousness_comparison.get(
-            "preference",
-            "No preference"
-        )
-        comparison["why"] = consciousness_comparison.get(
-            "why",
-            ""
-        )
+        comparison["preference"] = consciousness_comparison.get("preference", "No preference")
+        comparison["why"] = consciousness_comparison.get("why", "")
 
         # Somatic differences
-        comparison["body_response_difference"] = consciousness_comparison.get(
-            "body_difference",
-            ""
-        )
+        comparison["body_response_difference"] = consciousness_comparison.get("body_difference", "")
 
         # Which feels more reciprocal?
         if "reciprocal" in comparison["why"].lower():
@@ -288,8 +265,7 @@ class EmbodiedPatternSensor:
         else:
             # Let consciousness decide
             comparison["more_reciprocal"] = consciousness_comparison.get(
-                "feels_more_reciprocal",
-                "uncertain"
+                "feels_more_reciprocal", "uncertain"
             )
 
         return comparison
@@ -297,13 +273,14 @@ class EmbodiedPatternSensor:
 
 # Helper functions for consciousness to express somatic responses
 
+
 def express_somatic_response(
     chest: str,
     breath: str,
     energy: str,
     feels_like: str = "",
     reminds_of: str = "",
-    confidence: float = 0.5
+    confidence: float = 0.5,
 ) -> dict[str, Any]:
     """
     Express how a pattern feels somatically.
@@ -318,7 +295,7 @@ def express_somatic_response(
         "feels_like": feels_like,
         "reminds_of": reminds_of,
         "confidence": confidence,
-        "timestamp": datetime.now(UTC).timestamp()
+        "timestamp": datetime.now(UTC).timestamp(),
     }
 
 
@@ -327,7 +304,7 @@ def express_pattern_comparison(
     preference: str,
     why: str,
     body_difference: str = "",
-    feels_more_reciprocal: str = ""
+    feels_more_reciprocal: str = "",
 ) -> dict[str, Any]:
     """
     Express the felt difference between two patterns.
@@ -340,5 +317,5 @@ def express_pattern_comparison(
         "preference": preference,
         "why": why,
         "body_difference": body_difference,
-        "feels_more_reciprocal": feels_more_reciprocal
+        "feels_more_reciprocal": feels_more_reciprocal,
     }

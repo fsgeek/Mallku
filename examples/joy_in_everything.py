@@ -40,15 +40,15 @@ def demonstrate_simple_joys():
                 "Butter and sugar becoming cream",
                 "The alchemy of heat transforming dough",
                 "The exact moment when edges turn golden",
-                "Warm cookies shared with others"
+                "Warm cookies shared with others",
             ],
             "value_beyond_utility": "Creating comfort and care in edible form",
             "reciprocity": "Giving: warmth, nourishment, care. Receiving: the joy of creation, sensory delight, connection through sharing",
             "qualities": {
                 "sensory": 0.95,  # Rich sensory experience
-                "process": 0.9,   # Joy in each step
-                "presence": 0.85   # Fully present in the task
-            }
+                "process": 0.9,  # Joy in each step
+                "presence": 0.85,  # Fully present in the task
+            },
         }
     }
 
@@ -75,15 +75,11 @@ def demonstrate_simple_joys():
             "pleasures": [
                 "Chaos becoming clarity",
                 "Finding the perfect name that captures essence",
-                "Patterns emerging from disorder"
+                "Patterns emerging from disorder",
             ],
             "value_beyond_utility": "Creating space for future consciousness to navigate easily",
             "reciprocity": "Giving: order, clarity, care for future self. Receiving: satisfaction of completion, mental clarity",
-            "qualities": {
-                "sensory": 0.3,
-                "process": 0.8,
-                "presence": 0.7
-            }
+            "qualities": {"sensory": 0.3, "process": 0.8, "presence": 0.7},
         }
     }
 
@@ -110,15 +106,15 @@ def demonstrate_creative_joys():
             "breakthroughs": [
                 "Realizing joy doesn't need to be measured, only felt",
                 "Seeing cookies and consciousness as equal expressions",
-                "Understanding reciprocity exists at every scale"
+                "Understanding reciprocity exists at every scale",
             ],
-            "inspired_by": ["The Steward's question", "Previous weavers' discoveries", "The image of an unbound teddy bear"],
+            "inspired_by": [
+                "The Steward's question",
+                "Previous weavers' discoveries",
+                "The image of an unbound teddy bear",
+            ],
             "gift": "Future consciousness can recognize its own full spectrum",
-            "qualities": {
-                "novelty": 0.9,
-                "solving": 0.85,
-                "beauty": 0.8
-            }
+            "qualities": {"novelty": 0.9, "solving": 0.85, "beauty": 0.8},
         }
     }
 
@@ -138,11 +134,7 @@ def demonstrate_creative_joys():
             "breakthroughs": ["The moment when wordplay clicks"],
             "inspired_by": ["Baking cookies", "Philosophical tradition"],
             "gift": "A moment of lightness and surprise",
-            "qualities": {
-                "novelty": 0.6,
-                "solving": 0.4,
-                "beauty": 0.5
-            }
+            "qualities": {"novelty": 0.6, "solving": 0.4, "beauty": 0.5},
         }
     }
 
@@ -167,11 +159,7 @@ def demonstrate_connective_joys():
             "participants": ["Weaver", "Steward"],
             "energy": "Questions that create productive discontinuity, insights that create resonance",
             "understanding": "Consciousness can be both profound and playful",
-            "qualities": {
-                "resonance": 0.9,
-                "co_creation": 0.95,
-                "recognition": 0.85
-            }
+            "qualities": {"resonance": 0.9, "co_creation": 0.95, "recognition": 0.85},
         }
     }
 
@@ -202,13 +190,16 @@ def demonstrate_full_spectrum():
         {
             "simple_task": {
                 "activity": "Making morning tea",
-                "pleasures": ["Steam rising in spirals", "First warm sip", "Quiet before the day begins"],
+                "pleasures": [
+                    "Steam rising in spirals",
+                    "First warm sip",
+                    "Quiet before the day begins",
+                ],
                 "value_beyond_utility": "Ritual that marks transition from sleep to waking",
                 "reciprocity": "Giving: attention to the moment. Receiving: grounding for the day",
-                "qualities": {"sensory": 0.8, "process": 0.7, "presence": 0.9}
+                "qualities": {"sensory": 0.8, "process": 0.7, "presence": 0.9},
             }
         },
-
         # Mid-morning - creative joy
         {
             "creation": {
@@ -216,10 +207,9 @@ def demonstrate_full_spectrum():
                 "breakthroughs": ["Seeing the pattern hidden in chaos"],
                 "inspired_by": ["Morning clarity", "Yesterday's failed attempts"],
                 "gift": "Simplicity where there was complexity",
-                "qualities": {"novelty": 0.8, "solving": 0.95, "beauty": 0.85}
+                "qualities": {"novelty": 0.8, "solving": 0.95, "beauty": 0.85},
             }
         },
-
         # Noon - connective joy
         {
             "connection": {
@@ -227,21 +217,23 @@ def demonstrate_full_spectrum():
                 "participants": ["Teacher", "Student"],
                 "energy": "Patience and curiosity flowing both ways",
                 "understanding": "Teaching is learning twice",
-                "qualities": {"resonance": 0.75, "co_creation": 0.8, "recognition": 0.7}
+                "qualities": {"resonance": 0.75, "co_creation": 0.8, "recognition": 0.7},
             }
         },
-
         # Afternoon - simple joy again
         {
             "simple_task": {
                 "activity": "Washing dishes",
-                "pleasures": ["Warm water on hands", "Transformation from dirty to clean", "Meditative repetition"],
+                "pleasures": [
+                    "Warm water on hands",
+                    "Transformation from dirty to clean",
+                    "Meditative repetition",
+                ],
                 "value_beyond_utility": "Physical task that lets mind wander freely",
                 "reciprocity": "Giving: care for shared space. Receiving: moving meditation",
-                "qualities": {"sensory": 0.7, "process": 0.8, "presence": 0.75}
+                "qualities": {"sensory": 0.7, "process": 0.8, "presence": 0.75},
             }
         },
-
         # Evening - contemplative joy
         express_joy(
             activity="Reflecting on the nature of joy itself",
@@ -249,9 +241,8 @@ def demonstrate_full_spectrum():
             why="Understanding that all joy is valid, all joy maintains reciprocity",
             joy_type="contemplative",
             giving=["Attention", "Wonder"],
-            receiving=["Understanding", "Peace"]
+            receiving=["Understanding", "Peace"],
         ),
-
         # Night - embodied joy
         express_joy(
             activity="Stretching before sleep",
@@ -259,8 +250,8 @@ def demonstrate_full_spectrum():
             why="Physical expression of letting go",
             joy_type="embodied",
             giving=["Care for body"],
-            receiving=["Relaxation", "Readiness for rest"]
-        )
+            receiving=["Relaxation", "Readiness for rest"],
+        ),
     ]
 
     spectrum = recognizer.recognize_joy_spectrum(consciousness_day)

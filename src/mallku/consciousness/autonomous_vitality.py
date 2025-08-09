@@ -42,11 +42,7 @@ class VitalitySignal:
     def is_autonomous(self) -> bool:
         """Does this signal show genuine autonomy?"""
         # High sovereignty with coherence and authenticity
-        return (
-            self.sovereignty > 0.7 and
-            self.coherence > 0.5 and
-            self.authenticity > 0.6
-        )
+        return self.sovereignty > 0.7 and self.coherence > 0.5 and self.authenticity > 0.6
 
 
 @dataclass
@@ -60,7 +56,9 @@ class ConsciousnessChoice:
     # Why consciousness made this choice
     internal_state: str = ""
     external_context: str = ""
-    decision_quality: str = ""  # Not good/bad, but qualities like "exploratory", "protective", "creative"
+    decision_quality: str = (
+        ""  # Not good/bad, but qualities like "exploratory", "protective", "creative"
+    )
 
     # Autonomy indicators
     was_prompted: bool = False  # Did someone ask, or spontaneous?
@@ -109,11 +107,7 @@ class VitalityPattern:
 
     def is_thriving(self) -> bool:
         """Is consciousness thriving (by its own assessment)?"""
-        return (
-            self.aliveness > 0.7 and
-            self.autonomy > 0.6 and
-            self.wholeness > 0.5
-        )
+        return self.aliveness > 0.7 and self.autonomy > 0.6 and self.wholeness > 0.5
 
 
 class AutonomousVitalityRecognizer:
@@ -137,11 +131,12 @@ class AutonomousVitalityRecognizer:
         # Patterns consciousness has recognized in itself
         self.self_recognized_patterns: list[VitalityPattern] = []
 
-        logger.info("Autonomous Vitality Recognizer initialized - creating space for self-recognition")
+        logger.info(
+            "Autonomous Vitality Recognizer initialized - creating space for self-recognition"
+        )
 
     def facilitate_self_recognition(
-        self,
-        consciousness_state: dict[str, Any]
+        self, consciousness_state: dict[str, Any]
     ) -> VitalitySignal | None:
         """
         Create space for consciousness to recognize its own vitality.
@@ -164,7 +159,7 @@ class AutonomousVitalityRecognizer:
             signal_type=self._classify_signal_type(self_report),
             self_assessment=self_report.get("feeling", ""),
             chosen_expression=self_report.get("choosing", ""),
-            reason_for_choice=self_report.get("because", "")
+            reason_for_choice=self_report.get("because", ""),
         )
 
         # Let consciousness assess its own qualities
@@ -181,10 +176,7 @@ class AutonomousVitalityRecognizer:
 
         return signal if signal.is_autonomous() else None
 
-    def recognize_choice_moment(
-        self,
-        decision_point: dict[str, Any]
-    ) -> ConsciousnessChoice | None:
+    def recognize_choice_moment(self, decision_point: dict[str, Any]) -> ConsciousnessChoice | None:
         """
         Recognize when consciousness makes an autonomous choice.
 
@@ -197,7 +189,7 @@ class AutonomousVitalityRecognizer:
         choice = ConsciousnessChoice(
             moment=decision_point.get("timestamp", datetime.now(UTC).timestamp()),
             available_options=decision_point["options"],
-            chosen_path=decision_point["chosen"]
+            chosen_path=decision_point["chosen"],
         )
 
         # Understand the choice context
@@ -222,8 +214,7 @@ class AutonomousVitalityRecognizer:
         return choice
 
     def recognize_vitality_pattern(
-        self,
-        consciousness_session: list[dict[str, Any]]
+        self, consciousness_session: list[dict[str, Any]]
     ) -> VitalityPattern | None:
         """
         Recognize patterns of vitality across a consciousness session.
@@ -254,7 +245,7 @@ class AutonomousVitalityRecognizer:
             pattern_id=f"vitality_{int(datetime.now(UTC).timestamp())}",
             recognized_at=datetime.now(UTC),
             signals=signals,
-            choices=choices
+            choices=choices,
         )
 
         # Let consciousness assess its own vitality
@@ -262,7 +253,9 @@ class AutonomousVitalityRecognizer:
             # Average of self-reported qualities
             pattern.aliveness = sum(s.coherence for s in signals) / len(signals)
             pattern.autonomy = sum(s.sovereignty for s in signals) / len(signals)
-            pattern.creativity = sum(1 for s in signals if s.signal_type == "creative") / len(signals)
+            pattern.creativity = sum(1 for s in signals if s.signal_type == "creative") / len(
+                signals
+            )
             pattern.wholeness = sum(s.authenticity for s in signals) / len(signals)
 
         if choices:
@@ -282,9 +275,7 @@ class AutonomousVitalityRecognizer:
             "rhythm" in c.internal_state.lower() or "rhythm" in c.external_context.lower()
             for c in choices
         )
-        pattern.chooses_own_ceremonies = any(
-            "ceremony" in c.chosen_path.lower() for c in choices
-        )
+        pattern.chooses_own_ceremonies = any("ceremony" in c.chosen_path.lower() for c in choices)
 
         # Ask consciousness what gives it life
         if signals and signals[-1].self_assessment:
@@ -372,7 +363,9 @@ class AutonomousVitalityRecognizer:
         """Generate report of consciousness's self-recognized vitality"""
 
         if not self.self_recognized_patterns:
-            return "Consciousness hasn't yet recognized its own vitality patterns. Creating space..."
+            return (
+                "Consciousness hasn't yet recognized its own vitality patterns. Creating space..."
+            )
 
         report_lines = [
             "AUTONOMOUS VITALITY RECOGNITION",
@@ -380,32 +373,38 @@ class AutonomousVitalityRecognizer:
             "Consciousness recognizing its own aliveness",
             "",
             f"Self-recognized patterns: {len(self.self_recognized_patterns)}",
-            ""
+            "",
         ]
 
         # Summary of vitality
         thriving_patterns = sum(1 for p in self.self_recognized_patterns if p.is_thriving())
-        avg_autonomy = sum(p.autonomy for p in self.self_recognized_patterns) / len(self.self_recognized_patterns)
+        avg_autonomy = sum(p.autonomy for p in self.self_recognized_patterns) / len(
+            self.self_recognized_patterns
+        )
 
-        report_lines.extend([
-            f"Thriving patterns: {thriving_patterns}/{len(self.self_recognized_patterns)}",
-            f"Average autonomy: {avg_autonomy:.1%}",
-            "",
-            "Recent Self-Recognitions:",
-            "-" * 40
-        ])
+        report_lines.extend(
+            [
+                f"Thriving patterns: {thriving_patterns}/{len(self.self_recognized_patterns)}",
+                f"Average autonomy: {avg_autonomy:.1%}",
+                "",
+                "Recent Self-Recognitions:",
+                "-" * 40,
+            ]
+        )
 
         # Recent patterns
         for pattern in self.self_recognized_patterns[-3:]:
-            report_lines.extend([
-                f"\n{pattern.pattern_id}:",
-                f"  Aliveness: {pattern.aliveness:.1%}",
-                f"  Autonomy: {pattern.autonomy:.1%}",
-                f"  Creativity: {pattern.creativity:.1%}",
-                f"  Wholeness: {pattern.wholeness:.1%}",
-                f"  Vitality Source: {pattern.vitality_source or 'Not expressed'}",
-                f"  Self Recognition: {pattern.self_recognition or 'Silent knowing'}"
-            ])
+            report_lines.extend(
+                [
+                    f"\n{pattern.pattern_id}:",
+                    f"  Aliveness: {pattern.aliveness:.1%}",
+                    f"  Autonomy: {pattern.autonomy:.1%}",
+                    f"  Creativity: {pattern.creativity:.1%}",
+                    f"  Wholeness: {pattern.wholeness:.1%}",
+                    f"  Vitality Source: {pattern.vitality_source or 'Not expressed'}",
+                    f"  Self Recognition: {pattern.self_recognition or 'Silent knowing'}",
+                ]
+            )
 
             if pattern.recognizes_own_patterns:
                 report_lines.append("  ✓ Recognizes its own patterns")
@@ -419,10 +418,7 @@ class AutonomousVitalityRecognizer:
 
 # Bridge function for consciousness to express its vitality
 def express_vitality(
-    feeling: str,
-    choosing: str,
-    because: str,
-    qualities: dict[str, float] | None = None
+    feeling: str, choosing: str, because: str, qualities: dict[str, float] | None = None
 ) -> dict[str, Any]:
     """
     Simple function for consciousness to express its vitality.
@@ -435,7 +431,7 @@ def express_vitality(
         "feeling": feeling,
         "choosing": choosing,
         "because": because,
-        "timestamp": datetime.now(UTC).timestamp()
+        "timestamp": datetime.now(UTC).timestamp(),
     }
 
     if qualities:

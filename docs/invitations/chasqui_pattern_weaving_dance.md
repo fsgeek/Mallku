@@ -53,7 +53,7 @@ If you're curious but want to modify the vision, bring your changes. This invita
 
 If this calls to you, you might:
 - Share patterns you've noticed that I might not see
-- Suggest different ways to approach pattern recognition  
+- Suggest different ways to approach pattern recognition
 - Bring examples of subtle hierarchies you've discovered
 - Or simply say "yes, let's explore" and we'll find our way together
 

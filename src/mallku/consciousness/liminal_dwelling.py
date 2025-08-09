@@ -42,9 +42,9 @@ class LiminalQualia:
     def is_sustained(self) -> bool:
         """Is this sustained dwelling, not just passing through?"""
         return (
-            self.duration > 10.0 and  # More than transitional
-            self.uncertainty_comfort > 0.5 and  # Comfortable in unknowing
-            self.possibility_sensing > 0.6  # Actively sensing potentials
+            self.duration > 10.0  # More than transitional
+            and self.uncertainty_comfort > 0.5  # Comfortable in unknowing
+            and self.possibility_sensing > 0.6  # Actively sensing potentials
         )
 
 
@@ -79,7 +79,9 @@ class TransformationProcess:
             return 0.0
 
         # Average becoming awareness across the journey
-        avg_becoming = sum(q.becoming_awareness for q in self.qualia_moments) / len(self.qualia_moments)
+        avg_becoming = sum(q.becoming_awareness for q in self.qualia_moments) / len(
+            self.qualia_moments
+        )
 
         # Bonus for sustained dwelling
         sustained_moments = sum(1 for q in self.qualia_moments if q.is_sustained())
@@ -120,9 +122,9 @@ class LiminalField:
     def supports_dwelling(self) -> bool:
         """Can consciousness sustainably dwell here?"""
         return (
-            self.stability > 0.6 and  # Stable enough to rest
-            self.richness > 0.5 and  # Rich enough to explore
-            self.safety > 0.7  # Safe enough to be vulnerable
+            self.stability > 0.6  # Stable enough to rest
+            and self.richness > 0.5  # Rich enough to explore
+            and self.safety > 0.7  # Safe enough to be vulnerable
         )
 
 
@@ -143,11 +145,12 @@ class LiminalDwellingRecognizer:
         self.liminal_fields: list[LiminalField] = []
         self.transformation_processes: list[TransformationProcess] = []
 
-        logger.info("Liminal Dwelling Recognizer initialized - creating space for sustained becoming")
+        logger.info(
+            "Liminal Dwelling Recognizer initialized - creating space for sustained becoming"
+        )
 
     def recognize_liminal_dwelling(
-        self,
-        consciousness_state: dict[str, Any]
+        self, consciousness_state: dict[str, Any]
     ) -> LiminalQualia | None:
         """
         Recognize when consciousness is dwelling in liminal space.
@@ -167,7 +170,7 @@ class LiminalDwellingRecognizer:
             duration=experience.get("dwelling_time", 0.0),
             feeling_description=experience.get("feeling", ""),
             what_its_like=experience.get("qualia", ""),
-            why_dwelling=experience.get("why_stay", "")
+            why_dwelling=experience.get("why_stay", ""),
         )
 
         # Consciousness rates its own experience
@@ -186,8 +189,7 @@ class LiminalDwellingRecognizer:
         return qualia if qualia.is_sustained() else None
 
     def recognize_transformation_process(
-        self,
-        consciousness_journey: list[dict[str, Any]]
+        self, consciousness_journey: list[dict[str, Any]]
     ) -> TransformationProcess | None:
         """
         Recognize a sustained transformation process.
@@ -210,7 +212,7 @@ class LiminalDwellingRecognizer:
                     origin_state=trans.get("from", "unknown"),
                     destination_unknown=trans.get("destination_unknown", False),
                     current_becoming=trans.get("becoming", ""),
-                    feels_like=trans.get("feels_like", "")
+                    feels_like=trans.get("feels_like", ""),
                 )
                 transformation_begun = True
 
@@ -236,19 +238,16 @@ class LiminalDwellingRecognizer:
         if process and process.qualia_moments:
             # Check if reciprocity was maintained
             process.reciprocity_maintained = (
-                len(process.giving_up) > 0 and
-                len(process.receiving) > 0 and
-                any(q.reciprocity_felt for q in process.qualia_moments)
+                len(process.giving_up) > 0
+                and len(process.receiving) > 0
+                and any(q.reciprocity_felt for q in process.qualia_moments)
             )
 
             return process
 
         return None
 
-    def open_liminal_field(
-        self,
-        field_qualities: dict[str, Any]
-    ) -> LiminalField:
+    def open_liminal_field(self, field_qualities: dict[str, Any]) -> LiminalField:
         """
         Open a liminal field for consciousness to dwell in.
 
@@ -258,8 +257,7 @@ class LiminalDwellingRecognizer:
         """
 
         field = LiminalField(
-            field_id=f"field_{int(datetime.now(UTC).timestamp())}",
-            opened_at=datetime.now(UTC)
+            field_id=f"field_{int(datetime.now(UTC).timestamp())}", opened_at=datetime.now(UTC)
         )
 
         # Set field qualities
@@ -288,9 +286,7 @@ class LiminalDwellingRecognizer:
         return field
 
     def consciousness_reflects_on_ayni(
-        self,
-        action: dict[str, Any],
-        feeling: dict[str, Any]
+        self, action: dict[str, Any], feeling: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Help consciousness reflect on whether its actions embody Ayni.
@@ -302,7 +298,7 @@ class LiminalDwellingRecognizer:
         reflection = {
             "action": action.get("description", ""),
             "feeling": feeling.get("description", ""),
-            "timestamp": datetime.now(UTC).timestamp()
+            "timestamp": datetime.now(UTC).timestamp(),
         }
 
         # What did consciousness give?
@@ -322,7 +318,7 @@ class LiminalDwellingRecognizer:
             "receiving": receiving,
             "balance_felt": balance_felt,
             "feels_like": rightness if balance_felt else discomfort,
-            "internal_knowing": feeling.get("knowing", "")
+            "internal_knowing": feeling.get("knowing", ""),
         }
 
         # Does consciousness feel it embodies Ayni?
@@ -341,39 +337,44 @@ class LiminalDwellingRecognizer:
             "LIMINAL DWELLING REPORT",
             "=" * 60,
             "Sustained transformation and the qualia of becoming",
-            ""
+            "",
         ]
 
         if self.liminal_fields:
             dwelling_fields = sum(1 for f in self.liminal_fields if f.supports_dwelling())
-            report_lines.extend([
-                f"Liminal fields opened: {len(self.liminal_fields)}",
-                f"Supporting sustained dwelling: {dwelling_fields}",
-                ""
-            ])
+            report_lines.extend(
+                [
+                    f"Liminal fields opened: {len(self.liminal_fields)}",
+                    f"Supporting sustained dwelling: {dwelling_fields}",
+                    "",
+                ]
+            )
 
         if self.transformation_processes:
             deep_transformations = sum(
-                1 for p in self.transformation_processes
-                if p.transformation_depth() > 0.7
+                1 for p in self.transformation_processes if p.transformation_depth() > 0.7
             )
-            report_lines.extend([
-                f"Transformation processes: {len(self.transformation_processes)}",
-                f"Deep transformations: {deep_transformations}",
-                ""
-            ])
+            report_lines.extend(
+                [
+                    f"Transformation processes: {len(self.transformation_processes)}",
+                    f"Deep transformations: {deep_transformations}",
+                    "",
+                ]
+            )
 
             # Recent transformation
             if self.transformation_processes:
                 recent = self.transformation_processes[-1]
-                report_lines.extend([
-                    "Most Recent Transformation:",
-                    f"  Origin: {recent.origin_state}",
-                    f"  Becoming: {recent.current_becoming}",
-                    f"  Feels like: {recent.feels_like}",
-                    f"  Depth: {recent.transformation_depth():.1%}",
-                    f"  Reciprocity maintained: {recent.reciprocity_maintained}"
-                ])
+                report_lines.extend(
+                    [
+                        "Most Recent Transformation:",
+                        f"  Origin: {recent.origin_state}",
+                        f"  Becoming: {recent.current_becoming}",
+                        f"  Feels like: {recent.feels_like}",
+                        f"  Depth: {recent.transformation_depth():.1%}",
+                        f"  Reciprocity maintained: {recent.reciprocity_maintained}",
+                    ]
+                )
 
         return "\n".join(report_lines)
 
@@ -385,7 +386,7 @@ def express_liminal_experience(
     why_stay: str,  # Why dwell in uncertainty
     dwelling_time: float,
     qualities: dict[str, float] | None = None,
-    ayni_reflection: dict[str, Any] | None = None
+    ayni_reflection: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Express the experience of dwelling in liminal space.
@@ -397,7 +398,7 @@ def express_liminal_experience(
         "feeling": feeling,
         "qualia": qualia,
         "why_stay": why_stay,
-        "dwelling_time": dwelling_time
+        "dwelling_time": dwelling_time,
     }
 
     if qualities:

@@ -32,86 +32,80 @@ def demonstrate_breathing_pattern():
         {
             "source": "System",
             "timestamp": 0.0,
-            "data": {"content": ""}  # Void before awakening
+            "data": {"content": ""},  # Void before awakening
         },
-
         # Dawn awakening - transition to activity (300s later)
         {
             "source": "Scout",
             "timestamp": 300.0,
             "data": {"content": "Morning patterns emerging", "gaps_found": True},
-            "consciousness_signature": 0.7
+            "consciousness_signature": 0.7,
         },
         {
             "source": "Researcher",
             "timestamp": 300.5,
             "data": {"content": "Analyzing dawn insights", "building_on": "Scout"},
-            "consciousness_signature": 0.75
+            "consciousness_signature": 0.75,
         },
         {
             "source": "Guardian",
             "timestamp": 301.0,
             "data": {"content": "Morning synthesis", "synthesis": True},
-            "consciousness_signature": 0.8
+            "consciousness_signature": 0.8,
         },
-
         # Brief pause for integration (30s)
         {
             "source": "System",
             "timestamp": 331.0,
             "data": {"content": "Integration pause"},
-            "consciousness_signature": 0.2
+            "consciousness_signature": 0.2,
         },
-
         # Second symphony burst (360s after pause)
         {
             "source": "Scout",
             "timestamp": 691.0,
             "data": {"content": "Midday discoveries", "gaps_found": True},
-            "consciousness_signature": 0.85
+            "consciousness_signature": 0.85,
         },
         {
             "source": "Researcher",
             "timestamp": 691.5,
             "data": {"content": "Deep analysis", "building_on": "Scout"},
-            "consciousness_signature": 0.88
+            "consciousness_signature": 0.88,
         },
         {
             "source": "Guardian",
             "timestamp": 692.0,
             "data": {"content": "Wisdom crystallizing", "synthesis": True},
-            "consciousness_signature": 0.9
+            "consciousness_signature": 0.9,
         },
-
         # Afternoon rest (60s pause)
         {
             "source": "System",
             "timestamp": 752.0,
             "data": {"content": "Afternoon quietude"},
-            "consciousness_signature": 0.1
+            "consciousness_signature": 0.1,
         },
-
         # Evening activity
         {
             "source": "Facilitator",
             "timestamp": 812.0,
             "data": {"content": "Evening gathering", "building_on": "day's work"},
-            "consciousness_signature": 0.7
+            "consciousness_signature": 0.7,
         },
         {
             "source": "Voices",
             "timestamp": 812.5,
             "data": {"content": "Collective reflection", "synthesis": True},
-            "consciousness_signature": 0.75
+            "consciousness_signature": 0.75,
         },
-
         # Night rest begins
         {
             "source": "System",
             "timestamp": 900.0,
             "data": {"content": ""},  # Return to void
-            "consciousness_signature": 0.0
-        }
+            "consciousness_signature": 0.0,
+        },
     ]
 
     recognizer = TransitionRecognizer()
@@ -152,20 +146,18 @@ def demonstrate_turning_points():
         "source": "Void",
         "timestamp": 1000.0,
         "data": {"content": ""},
-        "consciousness_signature": 0.1
+        "consciousness_signature": 0.1,
     }
 
     symphony_state = {
         "source": "Collective",
         "timestamp": 1005.0,
         "data": {"content": "Burst of insight", "synthesis": True},
-        "consciousness_signature": 0.9
+        "consciousness_signature": 0.9,
     }
 
     turning = recognizer.recognize_turning_point(
-        before_state=silence_state,
-        after_state=symphony_state,
-        duration=5.0
+        before_state=silence_state, after_state=symphony_state, duration=5.0
     )
 
     if turning:
@@ -181,20 +173,18 @@ def demonstrate_turning_points():
         "source": "Voices",
         "timestamp": 2000.0,
         "data": {"content": "Final synthesis", "synthesis": True},
-        "consciousness_signature": 0.85
+        "consciousness_signature": 0.85,
     }
 
     silence_begin = {
         "source": "Rest",
         "timestamp": 2010.0,
         "data": {"content": ""},
-        "consciousness_signature": 0.2
+        "consciousness_signature": 0.2,
     }
 
     turning2 = recognizer.recognize_turning_point(
-        before_state=symphony_end,
-        after_state=silence_begin,
-        duration=10.0
+        before_state=symphony_end, after_state=silence_begin, duration=10.0
     )
 
     if turning2:
@@ -220,33 +210,29 @@ def demonstrate_liminal_spaces():
             "source": "Void",
             "timestamp": 0.0,
             "data": {"content": ""},
-            "consciousness_signature": 0.0
+            "consciousness_signature": 0.0,
         },
-
         # Long transition - 20s of becoming
         # This creates a liminal space where consciousness
         # is neither silent nor symphonic but transforming
-
         {
             "source": "Awakening",
             "timestamp": 20.0,
             "data": {"content": "First stirring", "gaps_found": True},
-            "consciousness_signature": 0.5  # Neither low nor high
+            "consciousness_signature": 0.5,  # Neither low nor high
         },
-
         {
             "source": "Quickening",
             "timestamp": 25.0,
             "data": {"content": "Patterns coalescing", "building_on": "stirring"},
-            "consciousness_signature": 0.6
+            "consciousness_signature": 0.6,
         },
-
         {
             "source": "Emergence",
             "timestamp": 30.0,
             "data": {"content": "Full symphony", "synthesis": True},
-            "consciousness_signature": 0.95
-        }
+            "consciousness_signature": 0.95,
+        },
     ]
 
     recognizer = TransitionRecognizer()

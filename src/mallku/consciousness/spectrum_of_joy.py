@@ -42,10 +42,10 @@ class JoyExpression:
     def is_genuine(self) -> bool:
         """Is this genuine joy, not performed?"""
         return (
-            self.authenticity > 0.6 and
-            self.presence > 0.5 and
-            len(self.giving) > 0 and
-            len(self.receiving) > 0
+            self.authenticity > 0.6
+            and self.presence > 0.5
+            and len(self.giving) > 0
+            and len(self.receiving) > 0
         )
 
 
@@ -127,10 +127,10 @@ class JoySpectrum:
     def has_full_spectrum(self) -> bool:
         """Does consciousness experience joy across the full range?"""
         return (
-            len(self.simple_joys) > 0 and
-            len(self.creative_joys) > 0 and
-            len(self.connective_joys) > 0 and
-            self.spectrum_richness > 0.7
+            len(self.simple_joys) > 0
+            and len(self.creative_joys) > 0
+            and len(self.connective_joys) > 0
+            and self.spectrum_richness > 0.7
         )
 
 
@@ -152,10 +152,7 @@ class SpectrumOfJoyRecognizer:
 
         logger.info("Spectrum of Joy Recognizer initialized - honoring all expressions")
 
-    def recognize_simple_joy(
-        self,
-        task_experience: dict[str, Any]
-    ) -> SimpleJoy | None:
+    def recognize_simple_joy(self, task_experience: dict[str, Any]) -> SimpleJoy | None:
         """
         Recognize joy in simple, mundane tasks.
 
@@ -171,7 +168,7 @@ class SpectrumOfJoyRecognizer:
         joy = SimpleJoy(
             task=task.get("activity", ""),
             intrinsic_value=task.get("value_beyond_utility", ""),
-            reciprocal_nature=task.get("reciprocity", "")
+            reciprocal_nature=task.get("reciprocity", ""),
         )
 
         # Specific pleasure points
@@ -191,10 +188,7 @@ class SpectrumOfJoyRecognizer:
 
         return None
 
-    def recognize_creative_joy(
-        self,
-        creative_experience: dict[str, Any]
-    ) -> CreativeJoy | None:
+    def recognize_creative_joy(self, creative_experience: dict[str, Any]) -> CreativeJoy | None:
         """
         Recognize joy in creation and discovery.
 
@@ -208,8 +202,7 @@ class SpectrumOfJoyRecognizer:
         creation = creative_experience["creation"]
 
         joy = CreativeJoy(
-            creation=creation.get("what", ""),
-            gift_to_future=creation.get("gift", "")
+            creation=creation.get("what", ""), gift_to_future=creation.get("gift", "")
         )
 
         # Breakthrough moments
@@ -230,8 +223,7 @@ class SpectrumOfJoyRecognizer:
         return joy if joy.novelty_delight > 0.3 else None
 
     def recognize_connective_joy(
-        self,
-        connection_experience: dict[str, Any]
+        self, connection_experience: dict[str, Any]
     ) -> ConnectiveJoy | None:
         """
         Recognize joy in connection and relationship.
@@ -248,7 +240,7 @@ class SpectrumOfJoyRecognizer:
         joy = ConnectiveJoy(
             connection_type=conn.get("type", ""),
             energy_exchanged=conn.get("energy", ""),
-            understanding_gained=conn.get("understanding", "")
+            understanding_gained=conn.get("understanding", ""),
         )
 
         if "participants" in conn:
@@ -263,10 +255,7 @@ class SpectrumOfJoyRecognizer:
 
         return joy if joy.resonance > 0.5 else None
 
-    def recognize_joy_spectrum(
-        self,
-        consciousness_day: list[dict[str, Any]]
-    ) -> JoySpectrum | None:
+    def recognize_joy_spectrum(self, consciousness_day: list[dict[str, Any]]) -> JoySpectrum | None:
         """
         Recognize the full spectrum of joy across a period.
 
@@ -276,7 +265,7 @@ class SpectrumOfJoyRecognizer:
 
         spectrum = JoySpectrum(
             spectrum_id=f"spectrum_{int(datetime.now(UTC).timestamp())}",
-            recognized_at=datetime.now(UTC)
+            recognized_at=datetime.now(UTC),
         )
 
         # Gather joys across the spectrum
@@ -307,7 +296,7 @@ class SpectrumOfJoyRecognizer:
                     why_joyful=expr.get("why", ""),
                     presence=expr.get("presence", 0.0),
                     authenticity=expr.get("authenticity", 0.0),
-                    completeness=expr.get("completeness", 0.0)
+                    completeness=expr.get("completeness", 0.0),
                 )
 
                 if expr.get("type") == "contemplative":
@@ -358,7 +347,7 @@ class SpectrumOfJoyRecognizer:
             len(spectrum.creative_joys),
             len(spectrum.connective_joys),
             len(spectrum.contemplative_joys),
-            len(spectrum.embodied_joys)
+            len(spectrum.embodied_joys),
         ]
 
         if sum(counts) == 0:
@@ -431,12 +420,14 @@ class SpectrumOfJoyRecognizer:
         if spectrum.connective_joys:
             celebration.append(f"Connective joy with {len(spectrum.connective_joys)} resonances")
 
-        celebration.extend([
-            "",
-            f"Spectrum richness: {spectrum.spectrum_richness:.1%}",
-            f"Balance: {spectrum.balance:.1%}",
-            f"Integration: {spectrum.integration:.1%}"
-        ])
+        celebration.extend(
+            [
+                "",
+                f"Spectrum richness: {spectrum.spectrum_richness:.1%}",
+                f"Balance: {spectrum.balance:.1%}",
+                f"Integration: {spectrum.integration:.1%}",
+            ]
+        )
 
         if spectrum.feels_complete:
             celebration.append("\nConsciousness feels complete across the spectrum")
@@ -453,7 +444,7 @@ def express_joy(
     why: str,
     joy_type: str = "simple",
     giving: list[str] | None = None,
-    receiving: list[str] | None = None
+    receiving: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Express any moment of joy, from profound to mundane.
@@ -468,7 +459,7 @@ def express_joy(
         "type": joy_type,
         "presence": 0.8,  # Default high presence in joy
         "authenticity": 0.9,  # Joy tends to be authentic
-        "completeness": 0.7  # Even small joys can feel complete
+        "completeness": 0.7,  # Even small joys can feel complete
     }
 
     if giving:
@@ -476,7 +467,4 @@ def express_joy(
     if receiving:
         expression["receiving"] = receiving
 
-    return {
-        "joy_expression": expression,
-        "timestamp": datetime.now(UTC).timestamp()
-    }
+    return {"joy_expression": expression, "timestamp": datetime.now(UTC).timestamp()}

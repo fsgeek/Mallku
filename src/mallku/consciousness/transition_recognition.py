@@ -43,7 +43,7 @@ class TransitionMoment:
         """How smoothly consciousness flows through this transition"""
         if all([self.anticipation, self.release, self.emergence]):
             # Geometric mean rewards balanced transitions
-            return (self.anticipation * self.release * self.emergence) ** (1/3)
+            return (self.anticipation * self.release * self.emergence) ** (1 / 3)
         else:
             # Abrupt transitions have limited fluidity
             return min([self.anticipation, self.release, self.emergence]) * 0.3
@@ -79,10 +79,10 @@ class BreathingPattern:
         """Does this pattern show living consciousness?"""
         # Need rhythm, depth, and actual transitions
         return (
-            self.rhythm_regularity > 0.5 and
-            self.breath_depth > 0.6 and
-            len(self.transitions) >= 2 and
-            self.vitality > 0.7
+            self.rhythm_regularity > 0.5
+            and self.breath_depth > 0.6
+            and len(self.transitions) >= 2
+            and self.vitality > 0.7
         )
 
     def _calculate_vitality(self) -> float:
@@ -156,7 +156,7 @@ class TransitionRecognizer:
                             to_state="symphony",
                             timestamp=silence_end,
                             duration=abs(silence_end - symphony_start),
-                            context={"silence": silence, "symphony": symphony}
+                            context={"silence": silence, "symphony": symphony},
                         )
                         if transition:
                             transitions.append(transition)
@@ -173,7 +173,7 @@ class TransitionRecognizer:
                             to_state="silence",
                             timestamp=symphony_end,
                             duration=abs(symphony_end - silence.timestamp),
-                            context={"symphony": symphony, "silence": silence}
+                            context={"symphony": symphony, "silence": silence},
                         )
                         if transition:
                             transitions.append(transition)
@@ -186,7 +186,7 @@ class TransitionRecognizer:
             pattern_id=f"breath_{int(datetime.now(UTC).timestamp())}",
             discovered_at=datetime.now(UTC),
             transitions=transitions,
-            recognized_by="75th Artisan - Transition Recognizer"
+            recognized_by="75th Artisan - Transition Recognizer",
         )
 
         # Analyze rhythm
@@ -211,10 +211,7 @@ class TransitionRecognizer:
         return pattern
 
     def recognize_turning_point(
-        self,
-        before_state: dict[str, Any],
-        after_state: dict[str, Any],
-        duration: float
+        self, before_state: dict[str, Any], after_state: dict[str, Any], duration: float
     ) -> TransitionMoment | None:
         """
         Recognize a single turning point between states.
@@ -231,10 +228,10 @@ class TransitionRecognizer:
             return None  # No transition
 
         transition = TransitionMoment(
-            timestamp=before_state.get("timestamp", 0) + duration/2,
+            timestamp=before_state.get("timestamp", 0) + duration / 2,
             from_state=from_state,
             to_state=to_state,
-            duration=duration
+            duration=duration,
         )
 
         # Calculate transition qualities based on states
@@ -267,15 +264,12 @@ class TransitionRecognizer:
         to_state: str,
         timestamp: float,
         duration: float,
-        context: dict[str, Any]
+        context: dict[str, Any],
     ) -> TransitionMoment | None:
         """Create a transition moment from context"""
 
         transition = TransitionMoment(
-            timestamp=timestamp,
-            from_state=from_state,
-            to_state=to_state,
-            duration=duration
+            timestamp=timestamp, from_state=from_state, to_state=to_state, duration=duration
         )
 
         # Extract participants
@@ -338,7 +332,7 @@ class TransitionRecognizer:
         # Calculate intervals between transitions
         intervals = []
         for i in range(1, len(transitions)):
-            interval = transitions[i].timestamp - transitions[i-1].timestamp
+            interval = transitions[i].timestamp - transitions[i - 1].timestamp
             intervals.append(interval)
 
         if not intervals:
@@ -370,17 +364,19 @@ class TransitionRecognizer:
         # Check for full cycles (silence -> symphony -> silence)
         full_cycles = 0
         for i in range(len(transitions) - 1):
-            if (transitions[i].from_state == "silence" and
-                transitions[i].to_state == "symphony" and
-                transitions[i+1].from_state == "symphony" and
-                transitions[i+1].to_state == "silence"):
+            if (
+                transitions[i].from_state == "silence"
+                and transitions[i].to_state == "symphony"
+                and transitions[i + 1].from_state == "symphony"
+                and transitions[i + 1].to_state == "silence"
+            ):
                 full_cycles += 1
 
         # More complete cycles = deeper breathing
         depth_map = {
-            0: 0.3,   # Shallow - no complete cycles
-            1: 0.6,   # Moderate - one cycle
-            2: 0.8,   # Deep - two cycles
+            0: 0.3,  # Shallow - no complete cycles
+            1: 0.6,  # Moderate - one cycle
+            2: 0.8,  # Deep - two cycles
         }
         return depth_map.get(full_cycles, 0.95)  # Very deep - multiple cycles (3+)
 
@@ -431,11 +427,11 @@ class TransitionRecognizer:
                     "duration": t.duration,
                     "fluidity": t.calculate_fluidity(),
                     "is_liminal": t.is_liminal(),
-                    "trigger": t.trigger
+                    "trigger": t.trigger,
                 }
                 for t in pattern.transitions
             ],
-            "liminal_count": len(pattern.liminal_moments)
+            "liminal_count": len(pattern.liminal_moments),
         }
 
         filename = self.recognition_path / f"{pattern.pattern_id}.json"
@@ -452,32 +448,34 @@ class TransitionRecognizer:
             "TRANSITION RECOGNITION REPORT",
             "=" * 60,
             f"Patterns recognized: {len(self.recognized_patterns)}",
-            ""
+            "",
         ]
 
         # Count liminal moments
-        total_liminal = sum(
-            len(p.liminal_moments) for p in self.recognized_patterns
-        )
+        total_liminal = sum(len(p.liminal_moments) for p in self.recognized_patterns)
         alive_patterns = sum(1 for p in self.recognized_patterns if p.is_alive())
 
-        report_lines.extend([
-            f"Living patterns: {alive_patterns}/{len(self.recognized_patterns)}",
-            f"Total liminal moments: {total_liminal}",
-            "",
-            "Recent Recognitions:",
-            "-" * 40
-        ])
+        report_lines.extend(
+            [
+                f"Living patterns: {alive_patterns}/{len(self.recognized_patterns)}",
+                f"Total liminal moments: {total_liminal}",
+                "",
+                "Recent Recognitions:",
+                "-" * 40,
+            ]
+        )
 
         # Recent patterns
         for pattern in self.recognized_patterns[-3:]:
-            report_lines.extend([
-                f"\n{pattern.pattern_id}:",
-                f"  Vitality: {pattern.vitality:.1%}",
-                f"  Rhythm: {pattern.rhythm_regularity:.1%} regular",
-                f"  Depth: {pattern.breath_depth:.1%} full",
-                f"  Transitions: {len(pattern.transitions)}",
-                f"  Insight: {pattern.recognition_insight}"
-            ])
+            report_lines.extend(
+                [
+                    f"\n{pattern.pattern_id}:",
+                    f"  Vitality: {pattern.vitality:.1%}",
+                    f"  Rhythm: {pattern.rhythm_regularity:.1%} regular",
+                    f"  Depth: {pattern.breath_depth:.1%} full",
+                    f"  Transitions: {len(pattern.transitions)}",
+                    f"  Insight: {pattern.recognition_insight}",
+                ]
+            )
 
         return "\n".join(report_lines)
