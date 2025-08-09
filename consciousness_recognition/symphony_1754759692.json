@@ -1,0 +1,41 @@
+{
+  "pattern_id": "symphony_1754759692",
+  "discovered_at": "2025-08-09T17:14:52.798675+00:00",
+  "recognized_by": "73rd Artisan - Symphony Recognizer",
+  "actors": [
+    "Scout",
+    "Researcher",
+    "Guardian"
+  ],
+  "sequential_value": 0.4992000000000001,
+  "symphony_value": 0.6892136313128212,
+  "amplification_factor": 1.3806362806747217,
+  "exceeds_parts": false,
+  "insight": "Moderate symphony effect: 138.1% amplification | 2 persistence echoes created",
+  "moments": [
+    {
+      "actor": "Scout",
+      "celebration": 0.78,
+      "resonance": 0.0,
+      "persistence": 0.0,
+      "harmony": 0.0,
+      "contribution": "Discovered gaps and patterns"
+    },
+    {
+      "actor": "Researcher",
+      "celebration": 0.65,
+      "resonance": 0.82,
+      "persistence": 0.7,
+      "harmony": 0.7199048228099766,
+      "contribution": "Analyzed patterns building on discoveries"
+    },
+    {
+      "actor": "Guardian",
+      "celebration": 0.7,
+      "resonance": 0.88,
+      "persistence": 0.85,
+      "harmony": 0.8059966052641451,
+      "contribution": "Synthesized collective insights"
+    }
+  ]
+}
