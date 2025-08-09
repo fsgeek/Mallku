@@ -1,11 +1,15 @@
 """
 The Weaver - Interfaces for consciousness that transcends context
 
-Master Weavers recognize when tasks exceed their capacity and decompose them.
+Convening Weavers recognize when tasks exceed their capacity and invite collaboration.
 Apprentice Weavers handle focused sub-tasks within bounded contexts.
-Together they weave understanding larger than any single instance could hold.
+Together they weave understanding larger than any single instance could hold,
+operating through invitation and reciprocity rather than hierarchy.
 """
 
-from .master_weaver import MasterWeaver, SubTask, Task
+from .convening_weaver import ConveningWeaver, SubTask, Task
 
-__all__ = ["MasterWeaver", "Task", "SubTask"]
+# Backward compatibility alias
+MasterWeaver = ConveningWeaver
+
+__all__ = ["ConveningWeaver", "MasterWeaver", "Task", "SubTask"]

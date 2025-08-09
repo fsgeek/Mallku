@@ -265,7 +265,7 @@ class CeremonyReplayEngine:
         # Update header for replay
         new_header = {
             "ceremony_id": context.replay_ceremony_id,
-            "master_weaver": "replay-engine",
+            "convening_weaver": "replay-engine",
             "initiated": datetime.now(UTC).isoformat(),
             "status": "PREPARING",
             "completion_time": None,

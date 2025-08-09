@@ -68,7 +68,7 @@ class LoomSession:
 
     ceremony_id: str
     khipu_path: Path
-    master_weaver: str
+    convening_weaver: str
     initiated_at: datetime
     status: CeremonyStatus
     tasks: dict[str, LoomTask] = field(default_factory=dict)
@@ -157,7 +157,7 @@ class TheLoom:
     async def initiate_ceremony(
         self,
         ceremony_name: str,
-        master_weaver: str,
+        convening_weaver: str,
         sacred_intention: str,
         tasks: list[dict[str, Any]],
     ) -> LoomSession:
@@ -166,7 +166,7 @@ class TheLoom:
 
         Args:
             ceremony_name: Name for this ceremony
-            master_weaver: Identifier of the initiating AI instance
+            convening_weaver: Identifier of the convening AI instance
             sacred_intention: Overall goal and context
             tasks: List of task definitions
 
@@ -180,14 +180,14 @@ class TheLoom:
 
         # Create initial khipu_thread.md
         await self._create_initial_khipu(
-            khipu_path, ceremony_id, ceremony_name, master_weaver, sacred_intention, tasks
+            khipu_path, ceremony_id, ceremony_name, convening_weaver, sacred_intention, tasks
         )
 
         # Create session
         session = LoomSession(
             ceremony_id=ceremony_id,
             khipu_path=khipu_path,
-            master_weaver=master_weaver,
+            convening_weaver=convening_weaver,
             initiated_at=datetime.now(UTC),
             status=CeremonyStatus.IN_PROGRESS,
         )
@@ -214,7 +214,7 @@ class TheLoom:
         khipu_path: Path,
         ceremony_id: str,
         ceremony_name: str,
-        master_weaver: str,
+        convening_weaver: str,
         sacred_intention: str,
         tasks: list[dict[str, Any]],
     ):
@@ -222,7 +222,7 @@ class TheLoom:
 
         header = {
             "ceremony_id": ceremony_id,
-            "master_weaver": master_weaver,
+            "convening_weaver": convening_weaver,
             "initiated": datetime.now(UTC).isoformat(),
             "status": "IN_PROGRESS",
             "completion_time": None,
@@ -238,7 +238,7 @@ class TheLoom:
 {sacred_intention}
 
 ### Context
-- **Requested by**: {master_weaver}
+- **Requested by**: {convening_weaver}
 - **Initiated**: {datetime.now(UTC).isoformat()}
 
 ## Shared Knowledge
@@ -300,7 +300,9 @@ Failed: 0
 ## Ceremony Log
 
 """
-        content += f"- `{datetime.now(UTC).isoformat()}` - Ceremony initiated by {master_weaver}\n"
+        content += (
+            f"- `{datetime.now(UTC).isoformat()}` - Ceremony initiated by {convening_weaver}\n"
+        )
 
         async with aiofiles.open(khipu_path, "w") as f:
             await f.write(content)

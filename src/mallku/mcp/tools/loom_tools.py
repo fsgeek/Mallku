@@ -36,7 +36,7 @@ async def invoke_loom(
     ceremony_name: str,
     sacred_intention: str,
     tasks: list[dict[str, Any]],
-    master_weaver: str | None = None,
+    convening_weaver: str | None = None,
 ) -> dict[str, Any]:
     """
     Invoke the Loom for large task orchestration
@@ -54,7 +54,7 @@ async def invoke_loom(
             - description: Detailed description of what needs to be done
             - priority: HIGH, MEDIUM, or LOW (optional, defaults to MEDIUM)
             - dependencies: List of task IDs this depends on (optional)
-        master_weaver: Identifier of invoking instance (auto-detected if not provided)
+        convening_weaver: Identifier of invoking instance (auto-detected if not provided)
 
     Returns:
         Dict containing:
@@ -84,9 +84,9 @@ async def invoke_loom(
         )
     """
     try:
-        # Auto-detect master weaver if not provided
-        if master_weaver is None:
-            master_weaver = f"ai-instance-{uuid.uuid4().hex[:8]}"
+        # Auto-detect convening weaver if not provided
+        if convening_weaver is None:
+            convening_weaver = f"ai-instance-{uuid.uuid4().hex[:8]}"
 
         # Validate tasks
         task_ids = set()
@@ -108,7 +108,7 @@ async def invoke_loom(
         # Initiate the ceremony
         session = await loom.initiate_ceremony(
             ceremony_name=ceremony_name,
-            master_weaver=master_weaver,
+            convening_weaver=convening_weaver,
             sacred_intention=sacred_intention,
             tasks=tasks,
         )

@@ -72,7 +72,7 @@ class CeremonyHeader:
     """Represents the YAML header of a khipu thread"""
 
     ceremony_id: str
-    master_weaver: str
+    convening_weaver: str
     initiated: datetime
     status: CeremonyStatus
     completion_time: datetime | None = None
@@ -164,7 +164,7 @@ class FullKhipuParser(MinimalKhipuParser):
         header_dict = self.parse_yaml_header(content)
 
         # Required fields
-        required = ["ceremony_id", "master_weaver", "initiated", "status"]
+        required = ["ceremony_id", "convening_weaver", "initiated", "status"]
         for field in required:
             if field not in header_dict:
                 raise KhipuParseError(f"Missing required field: {field}")
@@ -182,7 +182,9 @@ class FullKhipuParser(MinimalKhipuParser):
 
         return CeremonyHeader(
             ceremony_id=header_dict["ceremony_id"],
-            master_weaver=header_dict["master_weaver"],
+            convening_weaver=header_dict.get(
+                "convening_weaver", header_dict.get("master_weaver", "")
+            ),
             initiated=initiated,
             status=CeremonyStatus(header_dict["status"]),
             completion_time=completion_time,
@@ -475,7 +477,7 @@ if __name__ == "__main__":
     # Example: Reading ceremony context
     example_content = """---
 ceremony_id: bug-2025-08-09
-master_weaver: Purpose-Keeper
+convening_weaver: Purpose-Keeper
 initiated: 2025-08-09T12:00:00Z
 status: IN_PROGRESS
 template: Bug Healing Ceremony
