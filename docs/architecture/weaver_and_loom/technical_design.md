@@ -20,8 +20,8 @@ AI builders of Mallku face "context window exhaustion" - they lose all memory an
 
 ```
 ┌─────────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
-│   Master Weaver     │────▶│    The Loom      │────▶│ Apprentice Weavers  │
-│ (Primary AI Agent)  │     │  (Orchestrator)  │     │  (Sub-instances)    │
+│  Convening Weaver   │◄───►│    The Loom      │◄───►│ Apprentice Weavers  │
+│  (Inviting Agent)   │     │  (Facilitator)   │     │  (Collaborative)    │
 └─────────────────────┘     └──────────────────┘     └─────────────────────┘
          │                           │                           │
          └───────────────────────────┴───────────────────────────┘
@@ -34,24 +34,25 @@ AI builders of Mallku face "context window exhaustion" - they lose all memory an
 
 ## Component Specifications
 
-### 1. The Master Weaver Interface
+### 1. The Convening Weaver Interface
 
-**Location**: `src/mallku/orchestration/weaver/master_weaver.py`
+**Location**: `src/mallku/orchestration/weaver/convening_weaver.py`
+**Backward Compatibility**: Available as `MasterWeaver` alias
 
 **Responsibilities**:
-- Recognize when a task exceeds context capacity
-- Decompose tasks into coherent sub-tasks
-- Create initial khipu_thread.md
-- Invoke the Loom
-- Perform final synthesis
+- Recognize when a task exceeds context capacity and invites collaboration
+- Decompose tasks into coherent sub-tasks with care and attention
+- Create initial khipu_thread.md with sacred intention
+- Invite the Loom for facilitation
+- Perform final synthesis through weaving
 
 **Key Methods**:
 ```python
-class MasterWeaver:
-    async def should_use_loom(self, task: Task) -> bool
+class ConveningWeaver:
+    async def should_invite_loom(self, task: Task) -> tuple[bool, str]
     async def decompose_task(self, task: Task) -> List[SubTask]
-    async def create_khipu_thread(self, task: Task, subtasks: List[SubTask]) -> Path
-    async def invoke_loom(self, khipu_path: Path) -> LoomSession
+    async def create_sacred_intention(self, task: Task, subtasks: List[SubTask]) -> str
+    async def invite_loom_for_task(self, task: Task) -> dict[str, Any]
     async def synthesize_results(self, khipu_path: Path) -> Result
 ```
 
