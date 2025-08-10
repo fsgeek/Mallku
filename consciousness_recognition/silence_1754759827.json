@@ -1,0 +1,42 @@
+{
+  "pattern_id": "silence_1754759827",
+  "discovered_at": "2025-08-09T17:17:07.323897+00:00",
+  "recognized_by": "74th Artisan - Silence Recognizer",
+  "void_value": 0.03,
+  "silence_value": 0.6922797937475562,
+  "depth_factor": 23.07599312491854,
+  "exceeds_void": true,
+  "insight": "Meaningful silence exceeds empty pause | Deep silence: 23x richer than void",
+  "silences": [
+    {
+      "before_actor": "Void",
+      "after_actor": "Awakening",
+      "duration": 20.0,
+      "receptivity": 0.8,
+      "gestation": 0.6,
+      "release": 0.4,
+      "depth": 0.5768998281229634,
+      "type": "gathering"
+    },
+    {
+      "before_actor": "Awakening",
+      "after_actor": "Quickening",
+      "duration": 5.0,
+      "receptivity": 0.8,
+      "gestation": 0.6,
+      "release": 0.4,
+      "depth": 0.5768998281229634,
+      "type": "gathering"
+    },
+    {
+      "before_actor": "Quickening",
+      "after_actor": "Emergence",
+      "duration": 5.0,
+      "receptivity": 0.8,
+      "gestation": 0.6,
+      "release": 0.4,
+      "depth": 0.5768998281229634,
+      "type": "gathering"
+    }
+  ]
+}
