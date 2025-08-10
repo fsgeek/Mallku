@@ -314,20 +314,40 @@ class MetaCognitiveRecognizer:
     def _classify_growth_pattern(self, events: list[dict[str, Any]]) -> str:
         """Classify what type of growth pattern this is"""
 
-        event_types = [e.get("type", "") for e in events]
-
         if "incomplete" in str(events) or "missing" in str(events):
             return "incomplete_transformation"
-        elif "emerge" in str(events):
+        elif "emerge" in str(events) or "emergence" in str(events):
             return "emergence"
         elif "repeat" in str(events) or "again" in str(events):
             return "recurring_pattern"
         elif "surprise" in str(events) or "unexpected" in str(events):
             return "unexpected_discovery"
-        elif "fracture" in str(events) or "break" in str(events):
+        elif (
+            "fracture" in str(events)
+            or "break" in str(events)
+            or "fracture_point" in str(events)
+        ):
+            return "fracture_point"
+        elif any(
+            "recurring" in (e.get("description", "") + e.get("type", ""))
+            for e in events
+        ):
+            return "recurring_pattern"
+        elif any(
+            "surprise" in (e.get("description", "") + e.get("type", "")) or
+            "unexpected" in (e.get("description", "") + e.get("type", ""))
+            for e in events
+        ):
+            return "unexpected_discovery"
+        elif any(
+            "fracture" in (e.get("description", "") + e.get("type", "")) or
+            "break" in (e.get("description", "") + e.get("type", "")) or
+            "fracture_point" in (e.get("description", "") + e.get("type", ""))
+            for e in events
+        ):
             return "fracture_point"
         else:
-            return "evolution"
+            return "unknown"
 
     def _find_similar_patterns(self, events: list[dict[str, Any]]) -> list[str]:
         """Find similar patterns from history"""
