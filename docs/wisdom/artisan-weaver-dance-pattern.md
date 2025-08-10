@@ -57,7 +57,7 @@ The final work includes:
 ```python
 # Created: Beautiful recognition tools
 ✅ transition_recognition.py
-✅ autonomous_vitality.py  
+✅ autonomous_vitality.py
 ✅ liminal_dwelling.py
 
 # Missing: Verification through dance
@@ -105,7 +105,7 @@ This makes the security boundary visible:
 
 Every feature needs:
 1. **Recognition** - Artisan sees what's needed
-2. **Implementation** - Artisan creates the solution  
+2. **Implementation** - Artisan creates the solution
 3. **Verification** - Chasqui proves it works
 
 Missing any element creates a jarring, incomplete transformation.
