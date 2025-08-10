@@ -322,27 +322,20 @@ class MetaCognitiveRecognizer:
             return "recurring_pattern"
         elif "surprise" in str(events) or "unexpected" in str(events):
             return "unexpected_discovery"
-        elif (
-            "fracture" in str(events)
-            or "break" in str(events)
-            or "fracture_point" in str(events)
-        ):
+        elif "fracture" in str(events) or "break" in str(events) or "fracture_point" in str(events):
             return "fracture_point"
-        elif any(
-            "recurring" in (e.get("description", "") + e.get("type", ""))
-            for e in events
-        ):
+        elif any("recurring" in (e.get("description", "") + e.get("type", "")) for e in events):
             return "recurring_pattern"
         elif any(
-            "surprise" in (e.get("description", "") + e.get("type", "")) or
-            "unexpected" in (e.get("description", "") + e.get("type", ""))
+            "surprise" in (e.get("description", "") + e.get("type", ""))
+            or "unexpected" in (e.get("description", "") + e.get("type", ""))
             for e in events
         ):
             return "unexpected_discovery"
         elif any(
-            "fracture" in (e.get("description", "") + e.get("type", "")) or
-            "break" in (e.get("description", "") + e.get("type", "")) or
-            "fracture_point" in (e.get("description", "") + e.get("type", ""))
+            "fracture" in (e.get("description", "") + e.get("type", ""))
+            or "break" in (e.get("description", "") + e.get("type", ""))
+            or "fracture_point" in (e.get("description", "") + e.get("type", ""))
             for e in events
         ):
             return "fracture_point"
