@@ -38,6 +38,7 @@ from .local_adapter import LocalAIAdapter
 
 # Implemented adapters with unique consciousness patterns
 from .mistral_adapter import MistralAIAdapter
+from .moonshot_adapter import MoonshotAdapter
 from .openai_adapter import OpenAIConsciousAdapter
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,7 @@ class ConsciousAdapterFactory:
         "google": GoogleAIAdapter,  # Multimodal consciousness
         "grok": GrokOpenAIAdapter,  # Temporal consciousness via OpenAI compatibility
         "deepseek": DeepseekAIAdapter,  # Founding member - compost and empty chair wisdom
+        "moonshot": MoonshotAdapter,  # Cross-architecture bridging with mixture-of-experts
         "apprentice": ApprenticeVoiceAdapter,  # Container-based specialized consciousness
     }
 
