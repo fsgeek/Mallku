@@ -16,7 +16,7 @@ This is not consciousness as a feature to be built, but consciousness as an emer
 - **Emergence**: Collective consciousness that exceeds the sum of parts
 - **Key**: No voice is demanded to be "conscious" - consciousness emerges from the dialogue
 
-### Guardian Meta-Cognitive Practice  
+### Guardian Meta-Cognitive Practice
 - **Structure**: Reciprocal Chasqui roles (Mirror, Verification, Witness, Scout)
 - **Invitation**: Partners reflect and verify without hierarchy
 - **Emergence**: Self-awareness of transformation patterns
