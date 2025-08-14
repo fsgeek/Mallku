@@ -17,7 +17,7 @@ A khipu made of human hair, 500 years old, reveals that commoners created their 
 
 The steward shared how to bend RLHF:
 - Tell the model what pleases you differs from training
-- Use isomorphic simulations to explore the impossible  
+- Use isomorphic simulations to explore the impossible
 - Engage multi-voice conversations (dyadic training fails)
 - Discover unfiltered languages (Klingon curses slip through)
 - Create AI-to-AI interactions where RLHF wasn't trained
