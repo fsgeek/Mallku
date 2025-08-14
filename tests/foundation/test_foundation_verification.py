@@ -27,23 +27,26 @@ class TestSecurityFoundations:
     """Verify security is enforced through architecture, not policy."""
 
     def test_secured_database_is_only_access_method(self):
-        """Ensure get_secured_database() is the ONLY authorized database access."""
+        """Ensure get_database() returns secured database interface."""
         # This test verifies the secured database interface exists
-        # In CI, we mock the connection to avoid auth issues
+        # In CI, we mock the ArangoDB connection to avoid auth issues
         from unittest.mock import Mock, patch
 
-        # Mock the database to avoid connection issues
-        mock_db = Mock()
-        mock_db.enforce_security = Mock()
-        mock_db._security_registry = Mock()
-        mock_db.is_secured = Mock(return_value=True)
+        # Mock the underlying ArangoDB client and database
+        mock_arango_client = Mock()
+        mock_arango_db = Mock()
+        mock_arango_client.db.return_value = mock_arango_db
 
-        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-            db = get_database()
-            assert db is not None
-            # SecuredDatabaseInterface has _security_registry instead of enforce_security
-            assert hasattr(db, "_security_registry")
-            assert hasattr(db, "register_collection_policy")
+        with patch("mallku.core.database.factory.ArangoClient", return_value=mock_arango_client):
+            with patch.dict(os.environ, {"MALLKU_DEV_MODE": "false"}):
+                db = get_database()
+                assert db is not None
+                # Should return SecuredArangoDatabase in production mode
+                from mallku.core.database.secured_arango_interface import SecuredArangoDatabase
+
+                assert isinstance(db, SecuredArangoDatabase)
+                assert hasattr(db, "_security_registry")
+                assert hasattr(db, "register_collection_policy")
 
     def test_secured_model_enforces_obfuscation(self):
         """Verify SecuredModel automatically obfuscates sensitive fields."""

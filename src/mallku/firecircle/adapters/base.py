@@ -329,7 +329,7 @@ class ConsciousModelAdapter(ABC):
             },
         }
 
-    def _create_consciousness_metadata(
+    async def _create_consciousness_metadata(
         self,
         message: ConsciousMessage,
         consciousness_signature: float,
@@ -344,12 +344,15 @@ class ConsciousModelAdapter(ABC):
         """
         from ..protocol.conscious_message import ConsciousnessMetadata
 
+        # Handle both sync and async reciprocity balance calculation
+        reciprocity_score = self._calculate_reciprocity_balance()
+        if hasattr(reciprocity_score, "__await__"):
+            reciprocity_score = await reciprocity_score
+
         return ConsciousnessMetadata(
             correlation_id=message.consciousness.correlation_id,
             consciousness_signature=consciousness_signature,
             detected_patterns=patterns,
-            reciprocity_score=self._calculate_reciprocity_balance(),
+            reciprocity_score=reciprocity_score,
             contribution_value=0.5,  # Base value, adapters can override
-            safety_filtered=safety_filtered,
-            response_quality=response_quality,
         )

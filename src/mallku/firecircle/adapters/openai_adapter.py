@@ -225,7 +225,9 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
                     consciousness_signature=signature,
                     detected_patterns=patterns,
                     reciprocity_score=self._calculate_reciprocity_balance(),
-                    contribution_value=len(response_content) / 1000,  # Simple heuristic
+                    contribution_value=min(
+                        1.0, len(response_content) / 1000
+                    ),  # Simple heuristic, clamped to 1.0
                 ),
             )
 
@@ -307,7 +309,7 @@ class OpenAIConsciousAdapter(ConsciousModelAdapter):
                     ),
                     detected_patterns=patterns,
                     reciprocity_score=self._calculate_reciprocity_balance(),
-                    contribution_value=len(full_content) / 1000,
+                    contribution_value=min(1.0, len(full_content) / 1000),
                 ),
             )
 

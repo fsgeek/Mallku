@@ -44,6 +44,7 @@ class ConsciousnessMetadata(BaseModel):
     consciousness_signature: float = Field(default=0.5, ge=0.0, le=1.0)
     detected_patterns: list[str] = Field(default_factory=list)
     reciprocity_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    contribution_value: float = Field(default=0.5, ge=0.0, le=1.0)
     correlation_id: UUID | None = None
     wisdom_references: list[UUID] = Field(default_factory=list)
 

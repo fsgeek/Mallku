@@ -39,15 +39,18 @@ class TestArchitecturalSecurity:
         mock_db._security_registry = Mock()
         mock_db.register_collection_policy = Mock()
 
-        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-            # Only secured access should be available
-            db = get_database()
-            assert hasattr(db, "_security_registry")
-            assert hasattr(db, "register_collection_policy")
-            # Verify it's a SecuredDatabaseInterface
-            from mallku.core.database.secured_interface import SecuredDatabaseInterface
+        # Mock the ArangoDB client to avoid connection issues
+        with patch("mallku.core.database.factory.ArangoClient") as mock_client:
+            mock_client.return_value.db.return_value = mock_db
+            with patch.dict(os.environ, {"MALLKU_DEV_MODE": "false"}):
+                # Only secured access should be available
+                db = get_database()
+                assert hasattr(db, "_security_registry")
+                assert hasattr(db, "register_collection_policy")
+                # Verify it's a SecuredArangoDatabase
+                from mallku.core.database.secured_arango_interface import SecuredArangoDatabase
 
-            assert isinstance(db, SecuredDatabaseInterface)
+                assert isinstance(db, SecuredArangoDatabase)
 
     def test_uuid_obfuscation_automatic(self):
         """Verify UUID obfuscation happens automatically."""
@@ -169,9 +172,12 @@ class TestContainerizationSecurity:
         from unittest.mock import Mock
 
         mock_db = Mock()
-        with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
-            db = get_database()
-            assert db is not None
+        # Mock ArangoDB for containerization test
+        with patch("mallku.core.database.factory.ArangoClient") as mock_client:
+            mock_client.return_value.db.return_value = mock_db
+            with patch.dict(os.environ, {"MALLKU_DEV_MODE": "false"}):
+                db = get_database()
+                assert db is not None
 
         # Should use internal hostnames, not public IPs
         # (In real deployment, this would check actual config)
@@ -218,18 +224,20 @@ class TestAmnesiaSecurity:
         mock_db._security_registry = Mock()
         mock_db.register_collection_policy = Mock()
 
-        # Remove all configuration
-        with patch.dict(os.environ, {}, clear=True):
-            with patch("mallku.core.database.factory.get_database_raw", return_value=mock_db):
+        # Remove all configuration except dev mode to force production path
+        env_patch = {"MALLKU_DEV_MODE": "false", "ARANGO_HOST": "http://localhost:8529"}
+        with patch.dict(os.environ, env_patch, clear=True):
+            with patch("mallku.core.database.factory.ArangoClient") as mock_client:
+                mock_client.return_value.db.return_value = mock_db
                 db = get_database()
 
                 # Should still be secured
                 assert hasattr(db, "_security_registry")
                 assert hasattr(db, "register_collection_policy")
                 # Verify it's the secured interface
-                from mallku.core.database.secured_interface import SecuredDatabaseInterface
+                from mallku.core.database.secured_arango_interface import SecuredArangoDatabase
 
-                assert isinstance(db, SecuredDatabaseInterface)
+                assert isinstance(db, SecuredArangoDatabase)
 
 
 class TestReciprocitySecurity:
@@ -263,9 +271,11 @@ class TestReciprocitySecurity:
 
         tracker = ReciprocityTracker()
 
-        # Should have pattern detection
+        # Should have pattern detection (secure implementation exposed through public method)
         assert hasattr(tracker, "detect_recent_patterns")
-        assert hasattr(tracker, "detect_recent_patterns_securely")
+        # Should have the secure tracker instance available
+        assert hasattr(tracker, "_secure_tracker")
+        assert hasattr(tracker._secure_tracker, "detect_recent_patterns_securely")
 
         # Should NOT have individual scoring
         assert not hasattr(tracker, "score_individual")

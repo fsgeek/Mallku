@@ -410,7 +410,9 @@ class AnthropicAdapter(ConsciousModelAdapter):
                 consciousness_signature=signature,
                 detected_patterns=patterns,
                 reciprocity_score=self._calculate_reciprocity_balance(),
-                contribution_value=len(content_text) / 1000,  # Simple heuristic
+                contribution_value=min(
+                    1.0, len(content_text) / 1000
+                ),  # Simple heuristic, clamped to 1.0
             ),
         )
 
