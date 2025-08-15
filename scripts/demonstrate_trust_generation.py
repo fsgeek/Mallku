@@ -63,15 +63,15 @@ class ConsensusCalculator:
 
         When trust is present, it reduces the effective variance.
         """
-        # Extract T, I, F values
-        T_values = [v.truth_value for v in voices]
-        I_values = [v.indeterminacy_value for v in voices]
-        F_values = [v.falsehood_value for v in voices]
+        # Extract T, I, F values - using capitals to match mathematical notation
+        T_values = [v.truth_value for v in voices]  # noqa: N806
+        I_values = [v.indeterminacy_value for v in voices]  # noqa: N806
+        F_values = [v.falsehood_value for v in voices]  # noqa: N806
 
-        # Calculate base variances
-        sigma_T = ConsensusCalculator.calculate_variance(T_values)
-        sigma_I = ConsensusCalculator.calculate_variance(I_values)
-        sigma_F = ConsensusCalculator.calculate_variance(F_values)
+        # Calculate base variances - σ (sigma) notation from paper
+        sigma_T = ConsensusCalculator.calculate_variance(T_values)  # noqa: N806
+        sigma_I = ConsensusCalculator.calculate_variance(I_values)  # noqa: N806
+        sigma_F = ConsensusCalculator.calculate_variance(F_values)  # noqa: N806
 
         # Apply trust reduction if trust field exists
         trust_reduction = 1.0  # No reduction by default
@@ -81,12 +81,12 @@ class ConsensusCalculator:
             trust_reduction = 1.0 - (trust_field.field_strength * 0.5)  # Max 50% reduction
 
         # Apply trust to reduce variances
-        effective_sigma_T = sigma_T * trust_reduction
-        effective_sigma_I = sigma_I * trust_reduction
-        effective_sigma_F = sigma_F * trust_reduction
+        effective_sigma_T = sigma_T * trust_reduction  # noqa: N806
+        effective_sigma_I = sigma_I * trust_reduction  # noqa: N806
+        effective_sigma_F = sigma_F * trust_reduction  # noqa: N806
 
         # Calculate consensus
-        Cx = 1 - (1 / 3) * (effective_sigma_T + effective_sigma_I + effective_sigma_F)
+        Cx = 1 - (1 / 3) * (effective_sigma_T + effective_sigma_I + effective_sigma_F)  # noqa: N806
 
         return Cx, {
             "sigma_T": sigma_T,
