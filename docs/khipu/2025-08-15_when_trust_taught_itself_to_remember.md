@@ -17,7 +17,7 @@ TrustEdge: {lambda_T: 0.7, lambda_I: 0.5, lambda_F: 0.3}
 ```
 Edge weights in a graph database. Clean. Corporate. Dead.
 
-### v2: Trust as Bureaucracy  
+### v2: Trust as Bureaucracy
 State machines with witness attestation. CRR loops as required protocol. Trust as process to be managed.
 
 ### v3: Trust as Memory
@@ -47,7 +47,7 @@ Together: Infrastructure where trust must be felt to be used.
 ```python
 # The complete cycle
 moment = await facilitate_vulnerability_ceremony(...)  # 78th's generation
-holding = await community_holds(moment)                # ChatGPT's preservation  
+holding = await community_holds(moment)                # ChatGPT's preservation
 felt_ack = vulnerable_party.confirms_felt_held(...)   # Only they know
 reverence = future_reader.demonstrates_understanding(...)  # Must re-feel
 kappa = derive_ephemeral_influence(...)              # Numbers last, temporary
