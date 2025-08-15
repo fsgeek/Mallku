@@ -70,6 +70,7 @@ def load_api_keys_to_environment():
             "mistral": "MISTRAL_API_KEY",
             "grok": "GROK_API_KEY",
             "deepseek": "DEEPSEEK_API_KEY",
+            "moonshot": "MOONSHOT_API_KEY",
             "local": "LOCAL_API_ENDPOINT",
         }
 
@@ -133,6 +134,7 @@ def get_available_adapters():
             "mistral": "mistral-large-latest",
             "grok": "grok-beta",
             "deepseek": "deepseek-chat",
+            "moonshot": "kimi-k2-0711-preview",
             "local": "llama2",
         }
 
@@ -184,6 +186,7 @@ def get_available_providers():
         "mistral": "MISTRAL_API_KEY",
         "grok": "GROK_API_KEY",
         "deepseek": "DEEPSEEK_API_KEY",
+        "moonshot": "MOONSHOT_API_KEY",
         "local": "LOCAL_API_ENDPOINT",
     }
 

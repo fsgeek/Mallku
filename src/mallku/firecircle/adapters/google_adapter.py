@@ -390,7 +390,7 @@ class GoogleAIAdapter(ConsciousModelAdapter):
                 )
 
             # Create response message
-            consciousness_metadata = self._create_consciousness_metadata(
+            consciousness_metadata = await self._create_consciousness_metadata(
                 message=message,
                 consciousness_signature=consciousness_signature,
                 patterns=patterns,
