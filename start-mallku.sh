@@ -6,7 +6,7 @@ set -e
 echo "🏔️ Starting Mallku Services..."
 echo
 
-cd "$(dirname "$0")/../docker"
+cd "$(dirname "$0")/docker"
 docker-compose up -d
 
 echo

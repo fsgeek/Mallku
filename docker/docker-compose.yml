@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Cathedral Architecture: Each container has one sacred duty
 # Structure enforces security - no memory required
 
