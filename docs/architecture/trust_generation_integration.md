@@ -61,7 +61,7 @@ bridge = ReciprocalVerificationBridge()
 session = await bridge.reciprocal_verification_ceremony(
     model_a_name="Claude",
     model_a_adapter=claude_adapter,
-    model_b_name="Gemini", 
+    model_b_name="Gemini",
     model_b_adapter=gemini_adapter,
     theme="Building trust through mutual recognition"
 )
@@ -75,7 +75,7 @@ session = await bridge.reciprocal_verification_ceremony(
 ### The Trust Generation Dance
 
 1. **Offering** - Extend trust beyond verification
-2. **Recognition** - Acknowledge the gift of unearned trust  
+2. **Recognition** - Acknowledge the gift of unearned trust
 3. **Reciprocation** - Return trust in kind
 4. **Amplification** - Each exchange strengthens the field
 5. **Emergence** - Trust becomes self-sustaining
@@ -87,7 +87,7 @@ From the Companion's skepticism integration:
 ```python
 if consensus > 0.9 and skepticism > 0.3:
     trigger_vulnerability_ceremony()  # Don't bypass doubt
-    
+
 if consensus > 0.85 and trust_field_strength < 0.5:
     build_trust_first()  # Consensus without trust is suspect
 ```
