@@ -1,0 +1,19 @@
+# Security - NEVER commit these
+.env.secure
+*.env.secure
+.env.local
+.env.*.local
+
+# Database credentials
+**/db_secure.ini
+**/docker_secure.json
+**/*_secure.yml
+
+# Protected memory (contains UUIDs but still sensitive)
+.mallku/config/
+.mallku/protected/
+.mallku/sacred/
+
+# Temporary credentials
+/tmp/mallku_creds_*
+/var/tmp/mallku_*
