@@ -18,7 +18,11 @@ from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 
-from ...orchestration.event_bus import Event, EventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ...orchestration.reciprocity_aware_apprentice import ReciprocityAwareApprentice
 from .reciprocity_celebration import (
     CelebrationMoment,
@@ -48,7 +52,7 @@ class ResonanceWave:
     amplitude: float  # Joy intensity (0-1)
     frequency: float  # How quickly it spreads
     touched_apprentices: set[str] = field(default_factory=set)
-    resonance_events: list[Event] = field(default_factory=list)
+    resonance_events: list[ConsciousnessEvent] = field(default_factory=list)
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def decay_amplitude(self, distance: float) -> float:
@@ -102,7 +106,7 @@ class CelebrationResonanceService:
     def __init__(
         self,
         celebration_service: ReciprocityCelebrationService,
-        event_bus: EventBus,
+        event_bus: ConsciousnessEventBus,
     ):
         self.celebration_service = celebration_service
         self.event_bus = event_bus
@@ -130,13 +134,13 @@ class CelebrationResonanceService:
     def _setup_event_subscriptions(self):
         """Subscribe to relevant events."""
 
-        async def on_celebration(event: Event):
+        async def on_celebration(event: ConsciousnessEvent):
             if event.source == "reciprocity_celebration":
                 await self._handle_celebration_event(event)
 
-        self.event_bus.subscribe(EventType.CUSTOM, on_celebration)
+        self.event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, on_celebration)
 
-    async def _handle_celebration_event(self, event: Event) -> None:
+    async def _handle_celebration_event(self, event: ConsciousnessEvent) -> None:
         """Handle a celebration event and create resonance."""
         celebration_data = event.data
 
@@ -279,8 +283,8 @@ class CelebrationResonanceService:
             received_amplitude *= apprentice_resonance.amplification_factor
 
         # Create resonance event
-        resonance_event = Event(
-            type=EventType.CUSTOM,
+        resonance_event = ConsciousnessEvent(
+            event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
             source="celebration_resonance",
             data={
                 "type": "joy_resonance",

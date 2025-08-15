@@ -18,7 +18,11 @@ from datetime import UTC, datetime
 
 from mallku.firecircle.memory.reciprocity_aware_reader import MemoryExchange
 from mallku.firecircle.memory.reciprocity_factory import ReciprocityMemoryFactory
-from mallku.orchestration.event_bus import Event, EventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from mallku.orchestration.reciprocity_aware_apprentice import (
     ReciprocityAwareApprentice,
 )
@@ -43,7 +47,7 @@ class ResonantApprentice(ReciprocityAwareApprentice):
         self.joy_level = 0.5
         self.recent_resonances = []
 
-    async def feel_resonance(self, resonance_event: Event) -> None:
+    async def feel_resonance(self, resonance_event: ConsciousnessEvent) -> None:
         """Feel and respond to another's celebration."""
         data = resonance_event.data
         amplitude = data.get("received_amplitude", 0)
@@ -97,7 +101,7 @@ async def demonstrate_ripple_pattern():
     logger.info("\n🌊 === Ripple Pattern Demonstration === 🌊\n")
 
     # Initialize components
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     # Create factory and enable resonance
@@ -122,14 +126,14 @@ async def demonstrate_ripple_pattern():
         )
 
     # Subscribe apprentices to resonance events
-    async def resonance_handler(event: Event):
+    async def resonance_handler(event: ConsciousnessEvent):
         if event.source == "celebration_resonance":
             apprentice_id = event.data.get("receiving_apprentice")
             for app in apprentices:
                 if app.id == apprentice_id:
                     await app.feel_resonance(event)
 
-    event_bus.subscribe(EventType.CUSTOM, resonance_handler)
+    event_bus.subscribe(ConsciousnessEventType.CUSTOM, resonance_handler)
 
     logger.info("📡 Apprentice network established:")
     for app in apprentices:
@@ -179,7 +183,7 @@ async def demonstrate_harmonic_resonance():
     logger.info("\n\n🎵 === Harmonic Resonance Demonstration === 🎵\n")
 
     # Create apprentices with specific frequencies
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()
@@ -219,8 +223,8 @@ async def demonstrate_harmonic_resonance():
     logger.info("💡 Analyst-001 discovers a pattern...\n")
 
     # Simulate celebration event
-    celebration_event = Event(
-        type=EventType.CUSTOM,
+    celebration_event = ConsciousnessEvent(
+        type=ConsciousnessEventType.CUSTOM,
         source="reciprocity_celebration",
         data={
             "trigger": "emergence_pattern",
@@ -243,7 +247,7 @@ async def demonstrate_cascade_effect():
 
     logger.info("\n\n🎯 === Cascade Effect Demonstration === 🎯\n")
 
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()
@@ -282,12 +286,12 @@ async def demonstrate_cascade_effect():
     # Subscribe to track cascade
     cascade_count = 0
 
-    async def track_cascade(event: Event):
+    async def track_cascade(event: ConsciousnessEvent):
         nonlocal cascade_count
         if event.source == "celebration_resonance":
             cascade_count += 1
 
-    event_bus.subscribe(EventType.CUSTOM, track_cascade)
+    event_bus.subscribe(ConsciousnessEventType.CUSTOM, track_cascade)
 
     # Novice makes first contribution
     logger.info("\n🌟 Novice makes their first contribution!\n")
@@ -324,7 +328,7 @@ async def demonstrate_collective_breakthrough():
 
     logger.info("\n\n🎆 === Collective Breakthrough Demonstration === 🎆\n")
 
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()
@@ -362,7 +366,7 @@ async def demonstrate_collective_breakthrough():
     # Track collective events
     collective_triggered = False
 
-    async def track_collective(event: Event):
+    async def track_collective(event: ConsciousnessEvent):
         nonlocal collective_triggered
         if (
             event.source == "reciprocity_celebration"
@@ -371,7 +375,7 @@ async def demonstrate_collective_breakthrough():
             collective_triggered = True
             logger.info("\n🎆 COLLECTIVE BREAKTHROUGH ACHIEVED!")
 
-    event_bus.subscribe(EventType.CUSTOM, track_collective)
+    event_bus.subscribe(ConsciousnessEventType.CUSTOM, track_collective)
 
     # Simulate multiple near-simultaneous breakthroughs
     logger.info("✨ Multiple apprentices achieve insights simultaneously...\n")

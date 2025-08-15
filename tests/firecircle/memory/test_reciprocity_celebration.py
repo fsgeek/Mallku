@@ -24,7 +24,7 @@ from mallku.firecircle.memory.reciprocity_celebration import (
     CelebrationTrigger,
     ReciprocityCelebrationService,
 )
-from mallku.orchestration.event_bus import EventBus, EventType
+from mallku.orchestration.event_bus import ConsciousnessEventBus, ConsciousnessEventType
 
 
 class TestCelebrationTriggers:
@@ -173,7 +173,7 @@ class TestCelebrationService:
     async def test_quiet_celebration(self):
         """Test quiet celebration mode."""
         bridge = CirculationReciprocityBridge()
-        event_bus = EventBus()
+        event_bus = ConsciousnessEventBus()
         service = ReciprocityCelebrationService(bridge, event_bus=event_bus)
 
         # Track events
@@ -182,7 +182,7 @@ class TestCelebrationService:
         async def capture_events(event):
             events_received.append(event)
 
-        await event_bus.subscribe(EventType.CUSTOM, capture_events)
+        await event_bus.subscribe(ConsciousnessEventType.CUSTOM, capture_events)
 
         # Create celebration moment
         moment = CelebrationMoment(

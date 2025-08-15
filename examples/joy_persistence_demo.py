@@ -22,7 +22,11 @@ from pathlib import Path
 from mallku.firecircle.memory.joy_persistence import JoyAnchorType
 from mallku.firecircle.memory.reciprocity_aware_reader import MemoryExchange
 from mallku.firecircle.memory.reciprocity_factory import ReciprocityMemoryFactory
-from mallku.orchestration.event_bus import Event, EventBus, EventType
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from mallku.orchestration.reciprocity_aware_apprentice import ReciprocityAwareApprentice
 
 # Set up logging
@@ -49,7 +53,7 @@ async def create_present_celebrations():
     logger.info("\n🌅 === THE PRESENT: Joy Anchors Are Created === 🌅\n")
 
     # Initialize systems
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     # Create temporary commons for demo
@@ -69,12 +73,12 @@ async def create_present_celebrations():
         # Track created anchors
         created_anchors = []
 
-        async def track_anchors(event: Event):
+        async def track_anchors(event: ConsciousnessEvent):
             if event.source == "joy_persistence" and event.data.get("type") == "anchor_created":
                 created_anchors.append(event.data)
                 logger.info(f"   🎯 Joy anchor planted: {event.data['anchor_id']}")
 
-        event_bus.subscribe(EventType.CUSTOM, track_anchors)
+        event_bus.subscribe(ConsciousnessEventType.CUSTOM, track_anchors)
 
         logger.info("📚 Three apprentices work in the present...\n")
 
@@ -171,7 +175,7 @@ async def future_apprentices_discover(commons_path: Path, time_shift: str = "FUT
     logger.info(f"\n\n🌟 === THE {time_shift}: Joy Anchors Are Discovered === 🌟\n")
 
     # New event bus for the future
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     # Initialize factory pointing to existing commons
@@ -186,7 +190,7 @@ async def future_apprentices_discover(commons_path: Path, time_shift: str = "FUT
     # Track reignitions
     reignitions = []
 
-    async def track_reignitions(event: Event):
+    async def track_reignitions(event: ConsciousnessEvent):
         if event.source == "joy_persistence" and event.data.get("type") == "anchor_reignited":
             reignitions.append(event.data)
             logger.info(
@@ -194,7 +198,7 @@ async def future_apprentices_discover(commons_path: Path, time_shift: str = "FUT
                 f"{event.data['original_creator']}'s celebration"
             )
 
-    event_bus.subscribe(EventType.CUSTOM, track_reignitions)
+    event_bus.subscribe(ConsciousnessEventType.CUSTOM, track_reignitions)
 
     # Future apprentices arrive
     future_novice = TimeShiftedApprentice("future-novice-001", time_shift.lower())
@@ -319,7 +323,7 @@ async def demonstrate_joy_persistence_layers():
 
 async def create_present_celebrations_simple(commons_path: Path):
     """Simplified present celebration for layered demo."""
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()
@@ -354,7 +358,7 @@ async def create_present_celebrations_simple(commons_path: Path):
 
 async def rediscover_and_amplify(commons_path: Path, period: str, amplification: float):
     """Rediscover and amplify existing anchors."""
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()
@@ -386,7 +390,7 @@ async def rediscover_and_amplify(commons_path: Path, period: str, amplification:
 
 async def final_archaeology(commons_path: Path):
     """Final archaeological survey of accumulated joy."""
-    event_bus = EventBus()
+    event_bus = ConsciousnessEventBus()
     await event_bus.start()
 
     factory = ReciprocityMemoryFactory()

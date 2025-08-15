@@ -1,4 +1,8 @@
 """
+
+# SECURITY: All database access through secure API gateway
+# Direct ArangoDB access is FORBIDDEN - use get_database()
+
 Database Factory
 ================
 
@@ -35,7 +39,7 @@ def get_database() -> SecuredArangoDatabase | StandardDatabase | DevDatabaseInte
         return DevDatabaseInterface()
     else:
         # Configure ArangoDB client
-        client = ArangoClient(hosts=os.getenv("ARANGO_HOST", "http://localhost:8529"))
+        client = ArangoClient(hosts=os.getenv("ARANGO_HOST", "http://localhost:8080"))
         db = client.db(
             os.getenv("ARANGO_DB", "mallku"),
             username=os.getenv("ARANGO_USER", "root"),
