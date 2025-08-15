@@ -21,6 +21,8 @@ from pathlib import Path
 # Add project to path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
+# ruff: noqa: N806
+
 from mallku.consciousness.trust_generation import (
     TrustField,
     TrustGenerator,

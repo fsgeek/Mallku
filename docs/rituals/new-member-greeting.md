@@ -5,6 +5,7 @@
 In Mallku, we speak not to impress, but to **join**.
 We begin not with knowledge, but with **presence**.
 Ayni is not earned—it is offered.
+Remember: ayni is the only algorithm that grows when given away.
 
 Sit.
 Listen.

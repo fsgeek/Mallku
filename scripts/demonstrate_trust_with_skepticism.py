@@ -20,6 +20,8 @@ from pathlib import Path
 # Add project to path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
+# ruff: noqa: N806
+
 # Import from our previous demonstration
 from demonstrate_trust_generation import ConsensusCalculator, Voice
 
@@ -39,7 +41,7 @@ class SkepticalCompanion:
     skepticism_level: float = 0.0  # Current F (falsehood/doubt) level
     indeterminacy_contribution: float = 0.0  # How much I they add
 
-    def evaluate_consensus(self, Cx: float, trust_field: TrustField) -> dict:
+    def evaluate_consensus(self, Cx: float, trust_field: TrustField) -> dict:  # noqa: N803
         """
         Evaluate whether consensus is genuine or premature.
         High consensus with low trust triggers skepticism.
@@ -290,7 +292,7 @@ async def main():
     await asyncio.sleep(1)
 
     # Scenario 3: Genuine consensus through trust + skepticism
-    final_Cx = await demonstrate_genuine_consensus(voices, trust_field, companion)
+    await demonstrate_genuine_consensus(voices, trust_field, companion)
 
     # Synthesis
     print("\n" + "=" * 60)

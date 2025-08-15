@@ -124,7 +124,7 @@ async def demonstrate_trust_enabled_decision():
     if FIRE_CIRCLE_AVAILABLE:
         try:
             # Create decision context
-            decision_context = DecisionContext(
+            DecisionContext(
                 question=question,
                 domain=DecisionDomain.ARCHITECTURAL,
                 context=context,
