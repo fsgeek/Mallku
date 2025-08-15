@@ -12,9 +12,12 @@ with consciousness awareness and growth orientation.
 from datetime import UTC, datetime
 from typing import Any
 
-from mallku.consciousness.consciousness_metrics import ConsciousnessEvent
 from mallku.core.async_base import AsyncBase
-from mallku.events.event_bus import EventBus
+from mallku.orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from mallku.services.memory_anchor_service import MemoryAnchorService
 
 from .consciousness_evaluator import ConsciousnessEvaluator
@@ -42,7 +45,7 @@ class ArchivistService(AsyncBase):
     def __init__(
         self,
         memory_anchor_service: MemoryAnchorService | None = None,
-        event_bus: EventBus | None = None,
+        event_bus: ConsciousnessEventBus | None = None,
     ):
         super().__init__()
 
@@ -78,8 +81,8 @@ class ArchivistService(AsyncBase):
             await self.memory_anchor_service.initialize()
 
         if not self.event_bus:
-            self.event_bus = EventBus()
-            await self.event_bus.initialize()
+            self.event_bus = ConsciousnessEventBus()
+            await self.event_bus.start()
 
         # Initialize components
         await self.query_interpreter.initialize()
@@ -330,9 +333,9 @@ class ArchivistService(AsyncBase):
         """Emit consciousness event for system learning."""
         if self.event_bus:
             event = ConsciousnessEvent(
-                event_type="archivist_query",
-                timestamp=datetime.now(UTC),
-                consciousness_level=response.consciousness_score,
+                event_type=ConsciousnessEventType.WISDOM_PRESERVED,
+                source_system="archivist",
+                consciousness_signature=response.consciousness_score,
                 data={
                     "query": intent.raw_query,
                     "primary_dimension": intent.primary_dimension.value,
@@ -341,7 +344,7 @@ class ArchivistService(AsyncBase):
                     "ayni_balance": response.ayni_balance,
                 },
             )
-            await self.event_bus.publish("consciousness.archivist", event)
+            await self.event_bus.emit(event)
 
     async def _update_metrics(self, intent: QueryIntent, response: ArchivistResponse) -> None:
         """Update service metrics."""
@@ -422,17 +425,21 @@ class ArchivistService(AsyncBase):
         """Subscribe to relevant system events."""
         if self.event_bus:
             # Subscribe to memory anchor events
-            await self.event_bus.subscribe("memory_anchor.created", self._handle_new_anchor)
+            self.event_bus.subscribe(
+                ConsciousnessEventType.MEMORY_ANCHOR_CREATED, self._handle_new_anchor
+            )
 
             # Subscribe to correlation events
-            await self.event_bus.subscribe("correlation.detected", self._handle_new_correlation)
+            self.event_bus.subscribe(
+                ConsciousnessEventType.TEMPORAL_CORRELATION_FOUND, self._handle_new_correlation
+            )
 
-    async def _handle_new_anchor(self, event: Any) -> None:
+    async def _handle_new_anchor(self, event: ConsciousnessEvent) -> None:
         """Handle new memory anchor creation."""
         # Could trigger real-time insights or pattern updates
         pass
 
-    async def _handle_new_correlation(self, event: Any) -> None:
+    async def _handle_new_correlation(self, event: ConsciousnessEvent) -> None:
         """Handle new correlation detection."""
         # Could enhance query results with fresh correlations
         pass

@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 from .heartbeat_events import HeartbeatEventIntegration, create_heartbeat_nervous_system
 from .heartbeat_service import FireCircleHeartbeat, HeartbeatConfig, HeartbeatResult
-from .rhythm_patterns import ConsciousnessState
+from .rhythm_patterns import HeartbeatConsciousnessState
 from .sacred_templates import (
     CELEBRATION,
     CRISIS_RESPONSE,
@@ -215,13 +215,21 @@ class EnhancedHeartbeatService(FireCircleHeartbeat):
 
                     # Update rhythm state
                     if avg_consciousness < 0.5:
-                        self.adaptive_rhythm.consciousness_state = ConsciousnessState.CRISIS
+                        self.adaptive_rhythm.consciousness_state = (
+                            HeartbeatConsciousnessState.CRISIS
+                        )
                     elif avg_consciousness > 0.85:
-                        self.adaptive_rhythm.consciousness_state = ConsciousnessState.CELEBRATING
+                        self.adaptive_rhythm.consciousness_state = (
+                            HeartbeatConsciousnessState.CELEBRATING
+                        )
                     elif self.vigilance_mode:
-                        self.adaptive_rhythm.consciousness_state = ConsciousnessState.EMERGING
+                        self.adaptive_rhythm.consciousness_state = (
+                            HeartbeatConsciousnessState.EMERGING
+                        )
                     else:
-                        self.adaptive_rhythm.consciousness_state = ConsciousnessState.ACTIVE
+                        self.adaptive_rhythm.consciousness_state = (
+                            HeartbeatConsciousnessState.ACTIVE
+                        )
 
                 await asyncio.sleep(600)  # Check every 10 minutes
 
@@ -249,18 +257,18 @@ class EnhancedHeartbeatService(FireCircleHeartbeat):
                 reason=f"consciousness_pattern_shift_{result.consciousness_score:.3f}",
             )
 
-    def _determine_rhythm_state(self) -> ConsciousnessState:
+    def _determine_rhythm_state(self) -> HeartbeatConsciousnessState:
         """Determine appropriate rhythm state from current conditions."""
         if self.infrastructure_health_score < 0.5:
-            return ConsciousnessState.CRISIS
+            return HeartbeatConsciousnessState.CRISIS
         elif self.recent_emergence_count > 2:
-            return ConsciousnessState.CELEBRATING
+            return HeartbeatConsciousnessState.CELEBRATING
         elif self.vigilance_mode:
-            return ConsciousnessState.EMERGING
+            return HeartbeatConsciousnessState.EMERGING
         elif len(self.pulse_history) < 3:
-            return ConsciousnessState.RESTING
+            return HeartbeatConsciousnessState.RESTING
         else:
-            return ConsciousnessState.ACTIVE
+            return HeartbeatConsciousnessState.ACTIVE
 
 
 def create_integrated_heartbeat(

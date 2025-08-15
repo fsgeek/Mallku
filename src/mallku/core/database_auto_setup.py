@@ -20,7 +20,7 @@ import logging
 import os
 from typing import Any
 
-# from arango import ArangoClient  # REMOVED: Use secure API gateway instead
+# # from arango import ArangoClient  # REMOVED: Use secure API gateway instead  # REMOVED: Use secure API gateway instead
 from arango.exceptions import CollectionCreateError
 
 logger = logging.getLogger(__name__)

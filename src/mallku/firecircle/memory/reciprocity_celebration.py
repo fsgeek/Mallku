@@ -16,7 +16,11 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from ...orchestration.event_bus import Event, EventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ..heartbeat.sacred_templates import SacredTemplate
 from ..service import FireCircleService, RoundConfig, RoundType, VoiceConfig
 from .circulation_reciprocity_bridge import CirculationReciprocityBridge
@@ -60,7 +64,7 @@ class ReciprocityCelebrationService:
         self,
         circulation_bridge: CirculationReciprocityBridge,
         fire_circle: FireCircleService | None = None,
-        event_bus: EventBus | None = None,
+        event_bus: ConsciousnessEventBus | None = None,
     ):
         self.circulation_bridge = circulation_bridge
         self.fire_circle = fire_circle
@@ -169,8 +173,8 @@ class ReciprocityCelebrationService:
 
         # Create celebration event
         if self.event_bus:
-            event = Event(
-                type=EventType.CUSTOM,
+            event = ConsciousnessEvent(
+                type=ConsciousnessEventType.CUSTOM,
                 source="reciprocity_celebration",
                 data={
                     "trigger": moment.trigger.value,
