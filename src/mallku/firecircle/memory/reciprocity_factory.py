@@ -16,7 +16,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ...orchestration.event_bus import EventBus
+from ...orchestration.event_bus import ConsciousnessEventBus
 from ...reciprocity.tracker import SecureReciprocityTracker
 from .celebration_resonance import CelebrationResonanceService
 from .circulation_reciprocity_bridge import CirculationReciprocityBridge
@@ -42,7 +42,7 @@ class ReciprocityMemoryFactory:
     _celebration_service: ReciprocityCelebrationService | None = None
     _resonance_service: CelebrationResonanceService | None = None
     _persistence_service: JoyPersistenceService | None = None
-    _event_bus: EventBus | None = None
+    _event_bus: ConsciousnessEventBus | None = None
 
     @classmethod
     def get_memory_store(
@@ -158,7 +158,7 @@ class ReciprocityMemoryFactory:
         if cls._celebration_service is None:
             # Create event bus if needed
             if cls._event_bus is None:
-                cls._event_bus = EventBus()
+                cls._event_bus = ConsciousnessEventBus()
 
             cls._celebration_service = ReciprocityCelebrationService(
                 circulation_bridge=cls._circulation_bridge,
@@ -198,7 +198,7 @@ class ReciprocityMemoryFactory:
         if cls._resonance_service is None:
             # Ensure event bus exists
             if cls._event_bus is None:
-                cls._event_bus = EventBus()
+                cls._event_bus = ConsciousnessEventBus()
 
             cls._resonance_service = CelebrationResonanceService(
                 celebration_service=cls._celebration_service,
@@ -246,7 +246,7 @@ class ReciprocityMemoryFactory:
         if cls._persistence_service is None:
             # Ensure event bus exists
             if cls._event_bus is None:
-                cls._event_bus = EventBus()
+                cls._event_bus = ConsciousnessEventBus()
 
             cls._persistence_service = JoyPersistenceService(
                 resonance_service=cls._resonance_service,

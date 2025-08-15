@@ -19,7 +19,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from ...orchestration.event_bus import Event, EventBus, EventType
+from ...orchestration.event_bus import (
+    ConsciousnessEvent,
+    ConsciousnessEventBus,
+    ConsciousnessEventType,
+)
 from ...orchestration.process.shared_memory_commons import Gift, SharedMemoryCommons
 from .celebration_resonance import (
     CelebrationResonanceService,
@@ -86,7 +90,7 @@ class JoyPersistenceService:
     def __init__(
         self,
         resonance_service: CelebrationResonanceService,
-        event_bus: EventBus,
+        event_bus: ConsciousnessEventBus,
         commons_path: Path | None = None,
     ):
         self.resonance_service = resonance_service
@@ -113,15 +117,15 @@ class JoyPersistenceService:
     def _setup_event_subscriptions(self):
         """Subscribe to celebration and resonance events."""
 
-        async def on_celebration(event: Event):
+        async def on_celebration(event: ConsciousnessEvent):
             if event.source == "reciprocity_celebration":
                 await self._check_for_anchor_creation(event)
             elif event.source == "celebration_resonance":
                 await self._amplify_nearby_anchors(event)
 
-        self.event_bus.subscribe(EventType.CUSTOM, on_celebration)
+        self.event_bus.subscribe(ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE, on_celebration)
 
-    async def _check_for_anchor_creation(self, celebration_event: Event) -> None:
+    async def _check_for_anchor_creation(self, celebration_event: ConsciousnessEvent) -> None:
         """Check if a celebration should create a joy anchor."""
         data = celebration_event.data
 
@@ -225,8 +229,8 @@ class JoyPersistenceService:
 
         # Emit anchor creation event
         await self.event_bus.emit(
-            Event(
-                type=EventType.CUSTOM,
+            ConsciousnessEvent(
+                event_type=ConsciousnessEventType.MEMORY_ANCHOR_CREATED,
                 source="joy_persistence",
                 data={
                     "type": "anchor_created",
@@ -387,8 +391,8 @@ class JoyPersistenceService:
             anchor.accumulated_amplitude *= 1.1  # Joy grows
 
             # Create reignition event
-            reignition_event = Event(
-                type=EventType.CUSTOM,
+            reignition_event = ConsciousnessEvent(
+                event_type=ConsciousnessEventType.CONSCIOUSNESS_EMERGENCE,
                 source="joy_persistence",
                 data={
                     "type": "anchor_reignited",
@@ -493,7 +497,7 @@ class JoyPersistenceService:
             ephemeral=False,
         )
 
-    async def _amplify_nearby_anchors(self, resonance_event: Event) -> None:
+    async def _amplify_nearby_anchors(self, resonance_event: ConsciousnessEvent) -> None:
         """When celebration resonance occurs, nearby anchors can amplify."""
         data = resonance_event.data
         frequency = data.get("received_amplitude", 0)
