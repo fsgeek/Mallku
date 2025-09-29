@@ -225,3 +225,4 @@ fire_circle_heartbeats/
 # Temporary credentials
 /tmp/mallku_creds_*
 /var/tmp/mallku_*
+.serena/
